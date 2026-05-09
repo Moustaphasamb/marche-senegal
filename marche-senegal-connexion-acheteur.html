@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Connexion Acheteur — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--gold:#E6A817;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--border:#D8E8DE;--red:#C0392B;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select{font-family:inherit}
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.left{background:var(--dark);display:flex;flex-direction:column;justify-content:center;padding:60px;position:relative;overflow:hidden}
+.left::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.15),transparent 70%)}
+.left::after{content:'';position:absolute;bottom:-80px;left:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(27,107,58,.25),transparent 70%)}
+.left-content{position:relative;z-index:1}
+.left-logo{display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.left-logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--green)}
+.left-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;line-height:1.2;margin-bottom:16px}
+.left-title span{color:var(--gold)}
+.left-sub{font-size:.96rem;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:40px;max-width:380px}
+.features{display:flex;flex-direction:column;gap:14px}
+.feature{display:flex;align-items:flex-start;gap:12px}
+.feat-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.feat-text{font-size:.86rem;color:rgba(255,255,255,.65);line-height:1.5}
+.feat-title{font-size:.9rem;font-weight:600;color:#fff;margin-bottom:2px}
+.left-switch{margin-top:40px;padding:16px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.1)}
+.ls-text{font-size:.84rem;color:rgba(255,255,255,.5);margin-bottom:8px}
+.ls-btn{display:flex;align-items:center;gap:8px;background:var(--green);color:#fff;border:none;border-radius:99px;padding:10px 20px;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .2s}
+.ls-btn:hover{background:var(--gl)}
+.right{display:flex;align-items:center;justify-content:center;padding:40px;background:#fff;overflow-y:auto}
+.form-box{width:100%;max-width:420px}
+.mode-tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:28px}
+.mode-tab{flex:1;height:36px;border:none;border-radius:7px;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted)}
+.mode-tab.active{background:#fff;color:var(--green);box-shadow:var(--shadow)}
+.form-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--dark);margin-bottom:6px}
+.form-sub{font-size:.86rem;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.field{margin-bottom:16px}
+.fl{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.fi{width:100%;height:46px;border:1.5px solid var(--border);border-radius:10px;padding:0 14px;font-size:.9rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;background:#fff}
+.fi:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
+.fi.error{border-color:var(--red)}
+.fi-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fi-password{position:relative}
+.fi-password .fi{padding-right:44px}
+.fi-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:.9rem;padding:4px}
+.fi-hint{font-size:.74rem;color:var(--muted);margin-top:4px}
+.submit-btn{width:100%;height:48px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:.96rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(27,107,58,.25);margin-bottom:14px}
+.submit-btn:hover{background:var(--gl);transform:translateY(-1px)}
+.submit-btn:disabled{background:var(--muted);transform:none;cursor:not-allowed}
+.link-text{text-align:center;font-size:.84rem;color:var(--muted)}
+.link-text span{color:var(--green);font-weight:600;cursor:pointer}
+.link-text span:hover{text-decoration:underline}
+.success-box{text-align:center;padding:20px 0;display:none}
+.sb-icon{font-size:3.5rem;margin-bottom:14px;display:block}
+.sb-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:7px}
+.sb-sub{font-size:.86rem;color:var(--muted);line-height:1.65}
+@media(max-width:860px){.page{grid-template-columns:1fr}.left{display:none}.right{min-height:100vh;padding:30px 20px}}
+@media(max-width:480px){.fi-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="page">
+
+  <div class="left">
+    <div class="left-content">
+      <div class="left-logo">
+        <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+        <span class="left-logo-text">Marché Sénégal</span>
+      </div>
+      <div class="left-title">Le marché digital<br/>du <span>Sénégal</span></div>
+      <div class="left-sub">Achetez en toute confiance auprès des meilleurs vendeurs des marchés sénégalais.</div>
+      <div class="features">
+        <div class="feature">
+          <div class="feat-icon">🛡️</div>
+          <div class="feat-text"><div class="feat-title">Paiement sécurisé</div>Votre argent est protégé jusqu'à la livraison</div>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">🚚</div>
+          <div class="feat-text"><div class="feat-title">Livraison partout</div>Dakar et toutes les régions du Sénégal</div>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">📱</div>
+          <div class="feat-text"><div class="feat-title">Wave et Orange Money</div>Les moyens de paiement que vous utilisez déjà</div>
+        </div>
+      </div>
+      <div class="left-switch">
+        <div class="ls-text">Vous êtes vendeur ?</div>
+        <button class="ls-btn" onclick="window.location.href='marche-senegal-connexion-vendeur.html'">🏪 Espace vendeur →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="form-box">
+
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-login" onclick="setMode('login')">Se connecter</button>
+        <button class="mode-tab" id="tab-register" onclick="setMode('register')">S'inscrire</button>
+      </div>
+
+      <!-- CONNEXION -->
+      <div id="form-login">
+        <div class="form-title">Bon retour ! 👋</div>
+        <div class="form-sub">Connectez-vous pour accéder à vos commandes et favoris.</div>
+        <div class="field">
+          <label class="fl">Email ou numéro de téléphone</label>
+          <input class="fi" type="text" id="login-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username" onkeydown="if(event.key==='Enter')submitLogin()"/>
+        </div>
+        <div class="field">
+          <label class="fl">Mot de passe</label>
+          <div class="fi-password">
+            <input class="fi" type="password" id="login-password" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLogin()"/>
+            <button class="fi-eye" id="eye-login" onclick="toggleEye('login-password','eye-login')">👁️</button>
+          </div>
+        </div>
+        <button class="submit-btn" id="login-btn" onclick="submitLogin()">Se connecter</button>
+        <div class="link-text">Pas encore de compte ? <span onclick="setMode('register')">Créer un compte gratuitement</span></div>
+      </div>
+
+      <!-- INSCRIPTION -->
+      <div id="form-register" style="display:none">
+        <div class="form-title">Créer un compte 🛍️</div>
+        <div class="form-sub">Inscrivez-vous gratuitement pour commencer à acheter.</div>
+        <div class="fi-row">
+          <div class="field">
+            <label class="fl">Prénom *</label>
+            <input class="fi" type="text" id="reg-first-name" placeholder="Fatou" autocomplete="given-name"/>
+          </div>
+          <div class="field">
+            <label class="fl">Nom *</label>
+            <input class="fi" type="text" id="reg-last-name" placeholder="Ndiaye" autocomplete="family-name"/>
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl">Email ou numéro de téléphone *</label>
+          <input class="fi" type="text" id="reg-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username"/>
+          <div class="fi-hint">Vous pouvez utiliser votre email ou votre numéro Wave / Orange Money</div>
+        </div>
+        <div class="field">
+          <label class="fl">Mot de passe *</label>
+          <div class="fi-password">
+            <input class="fi" type="password" id="reg-password" placeholder="Minimum 6 caractères" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitRegister()"/>
+            <button class="fi-eye" id="eye-reg" onclick="toggleEye('reg-password','eye-reg')">👁️</button>
+          </div>
+        </div>
+        <button class="submit-btn" id="register-btn" onclick="submitRegister()">Créer mon compte</button>
+        <div class="link-text">Déjà un compte ? <span onclick="setMode('login')">Se connecter</span></div>
+      </div>
+
+      <!-- SUCCÈS -->
+      <div class="success-box" id="success-box">
+        <span class="sb-icon">🎉</span>
+        <div class="sb-title" id="success-title">Bienvenue !</div>
+        <div class="sb-sub" id="success-sub">Redirection en cours...</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var user = getCurrentUser();
+  if (user) {
+    if (user.role === 'SELLER') window.location.href = 'marche-senegal-dashboard.html';
+    else if (user.role === 'ADMIN') window.location.href = 'marche-senegal-admin.html';
+    else window.location.href = 'marche-senegal-accueil.html';
+  }
+});
+
+function setMode(mode) {
+  var isReg = mode === 'register';
+  document.getElementById('tab-login').classList.toggle('active', !isReg);
+  document.getElementById('tab-register').classList.toggle('active', isReg);
+  document.getElementById('form-login').style.display = isReg ? 'none' : 'block';
+  document.getElementById('form-register').style.display = isReg ? 'block' : 'none';
+  document.getElementById('success-box').style.display = 'none';
+}
+
+function toggleEye(inputId, btnId) {
+  var input = document.getElementById(inputId);
+  var btn = document.getElementById(btnId);
+  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+function showSuccess(title, sub) {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-register').style.display = 'none';
+  document.getElementById('success-box').style.display = 'block';
+  document.getElementById('success-title').textContent = title;
+  document.getElementById('success-sub').textContent = sub;
+}
+
+function parseIdentifier(identifier) {
+  var trimmed = identifier.trim();
+  if (trimmed.includes('@')) return { email: trimmed.toLowerCase(), phone: null };
+  return { email: null, phone: trimmed };
+}
+
+async function submitLogin() {
+  var identifier = document.getElementById('login-identifier').value.trim();
+  var password = document.getElementById('login-password').value;
+
+  if (!identifier || !password) { showToast('Remplissez tous les champs'); return; }
+
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Connexion en cours...';
+
+  var result = await apiCall('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ identifier: identifier, password: password })
+  });
+
+  if (result.success) {
+    localStorage.setItem('token', result.token);
+    localStorage.setItem('user', JSON.stringify(result.user));
+
+    if (result.user.role === 'SELLER') {
+      showSuccess('Compte vendeur détecté 🏪', 'Redirection vers votre dashboard...');
+      setTimeout(function() { window.location.href = 'marche-senegal-dashboard.html'; }, 1200);
+      return;
+    }
+    if (result.user.role === 'ADMIN') {
+      showSuccess('Compte admin détecté ⚙️', 'Redirection vers le panel admin...');
+      setTimeout(function() { window.location.href = 'marche-senegal-admin.html'; }, 1200);
+      return;
+    }
+
+    showSuccess('Bon retour ! 👋', 'Connexion réussie. Redirection vers l\'accueil...');
+    setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1200);
+  } else {
+    showToast(result.message || 'Identifiant ou mot de passe incorrect');
+    btn.disabled = false;
+    btn.textContent = 'Se connecter';
+  }
+}
+
+async function submitRegister() {
+  var firstName = document.getElementById('reg-first-name').value.trim();
+  var lastName = document.getElementById('reg-last-name').value.trim();
+  var identifier = document.getElementById('reg-identifier').value.trim();
+  var password = document.getElementById('reg-password').value;
+
+  if (!firstName || !lastName || !identifier || !password) { showToast('Remplissez tous les champs'); return; }
+  if (password.length < 6) { showToast('Mot de passe trop court (6 caractères minimum)'); return; }
+
+  var btn = document.getElementById('register-btn');
+  btn.disabled = true;
+  btn.textContent = 'Création du compte...';
+
+  var parsed = parseIdentifier(identifier);
+
+  var result = await apiCall('/api/auth/register-buyer', {
+    method: 'POST',
+    body: JSON.stringify({ firstName: firstName, lastName: lastName, email: parsed.email, phone: parsed.phone, password: password })
+  });
+
+  if (result.success) {
+    localStorage.setItem('token', result.token);
+    localStorage.setItem('user', JSON.stringify(result.user));
+    showSuccess('Bienvenue ' + firstName + ' ! 🎉', 'Votre compte est créé. Redirection vers l\'accueil...');
+    setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1500);
+  } else {
+    showToast(result.message || 'Erreur lors de la création du compte');
+    btn.disabled = false;
+    btn.textContent = 'Créer mon compte';
+  }
+}
+</script>
+</body>
+</html>

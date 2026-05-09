@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Marché Sénégal — Accueil</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:68px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
+.nav-logo:hover{color:var(--gl)}
+.nav-search{flex:1;min-width:0;max-width:520px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
+.nav-search input{flex:1;min-width:0;border:none;outline:none;font-size:.88rem;color:var(--text);background:transparent}
+.nav-search input::placeholder{color:var(--muted)}
+.nav-search-btn{flex-shrink:0;background:var(--green);color:#fff;border:none;border-radius:99px;height:32px;padding:0 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .2s;white-space:nowrap}
+.nav-search-btn:hover{background:var(--gl)}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.nav-btn{display:flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:99px;font-size:.82rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s;white-space:nowrap;flex-shrink:0}
+.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.nav-btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.nav-btn-primary:hover{background:var(--gl);color:#fff}
+.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0}
+.nav-cart:hover{border-color:var(--green);background:var(--gp)}
+.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}.nav-hamburger.open span:nth-child(2){opacity:0}.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-drawer{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;border-bottom:1.5px solid var(--border);padding:16px 4vw 20px;z-index:190;box-shadow:0 8px 32px rgba(0,0,0,.1);flex-direction:column;gap:12px}
+.nav-drawer.open{display:flex}
+.nav-drawer .nav-search{max-width:100%;width:100%}
+.nav-drawer-row{display:flex;gap:8px}.nav-drawer-row .nav-btn{flex:1;justify-content:center;height:42px}
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0 max(10px,env(safe-area-inset-bottom))}
+.mn-items{display:flex}.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
+.mn-icon{width:24px;height:24px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:background .18s}
+.mn-item.act .mn-icon{background:var(--green)}.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}.mn-item.act .mn-label{color:var(--green)}
+/* HERO */
+.hero{margin-top:var(--nav-h);background:var(--dark);min-height:500px;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:60px 5vw;gap:40px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.14),transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(27,107,58,.2),transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(230,168,23,.16);border:1px solid rgba(230,168,23,.35);color:var(--gold);font-size:.78rem;font-weight:600;padding:5px 14px;border-radius:99px;margin-bottom:1.2rem}
+.hero-badge-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.35)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,4.5vw,3.6rem);font-weight:900;color:#fff;line-height:1.1;margin-bottom:1rem}
+.hero h1 .acc{color:var(--gold)}.hero-desc{font-size:.98rem;color:rgba(255,255,255,.6);line-height:1.72;max-width:460px;margin-bottom:1.8rem}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:2rem}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:99px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-white{background:#fff;color:var(--green)}.btn-white:hover{background:#f0f0f0;transform:translateY(-1px)}
+.btn-outline-white{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}.btn-outline-white:hover{background:rgba(255,255,255,.08)}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap}
+.hstat-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--gold)}.hstat-label{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:2px}
+/* PHONE MOCK */
+.hero-right{display:flex;justify-content:center;align-items:center}
+.hero-phone{width:220px;background:#111;border-radius:30px;padding:10px;box-shadow:0 28px 70px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.07)}
+.hp-screen{background:#f5f7f5;border-radius:22px;overflow:hidden}
+.hp-top{background:var(--green);padding:12px 12px 10px}
+.hp-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.hp-topname{font-size:.75rem;font-weight:600;color:#fff}
+.hp-avatar{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;font-weight:600}
+.hp-search{background:rgba(255,255,255,.18);border-radius:7px;padding:6px 9px;display:flex;align-items:center;gap:5px}
+.hp-search-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(255,255,255,.6)}.hp-search-text{font-size:.62rem;color:rgba(255,255,255,.65)}
+.hp-cats{display:flex;gap:4px;padding:7px 8px 4px;overflow:hidden}
+.hp-cat{background:#fff;border-radius:6px;padding:4px 7px;text-align:center;flex-shrink:0}.hp-cat.act{background:var(--green)}
+.hp-cat-e{font-size:.8rem}.hp-cat-n{font-size:.5rem;font-weight:600;color:var(--text);margin-top:1px}.hp-cat.act .hp-cat-n{color:#fff}
+.hp-prods{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:5px 8px 8px}
+.hp-card{background:#fff;border-radius:7px;overflow:hidden}.hp-card-img{height:44px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.hp-card-body{padding:4px 6px}.hp-card-name{font-size:.5rem;font-weight:600;color:var(--text)}.hp-card-price{font-size:.5rem;color:var(--green);margin-top:1px}
+/* SECTIONS */
+.section-wrap{padding:56px 5vw}
+.section-wrap.dark-bg{background:var(--dark)}.section-wrap.white-bg{background:var(--white)}.section-wrap.bg{background:var(--bg)}
+.section-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.8rem;flex-wrap:wrap;gap:12px}
+.section-label{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:.4rem}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:700;color:var(--dark)}
+.section-link{font-size:.84rem;color:var(--green);font-weight:600}.section-link:hover{text-decoration:underline}
+/* MARKETS */
+.markets-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.4rem}
+.mtab{padding:7px 15px;border-radius:99px;font-size:.8rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s}
+.mtab:hover,.mtab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.markets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.market-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .22s}
+.market-card:hover{border-color:var(--green);box-shadow:var(--shadow);transform:translateY(-2px)}
+.market-card.featured{border-color:var(--green);background:var(--gp)}
+.market-emoji{font-size:1.6rem;margin-bottom:7px}.market-name{font-size:.84rem;font-weight:600;color:var(--dark)}.market-city{font-size:.7rem;color:var(--muted);margin-top:2px}
+.market-count{display:inline-block;margin-top:5px;font-size:.66rem;font-weight:600;background:var(--gp);color:var(--green);padding:2px 8px;border-radius:99px}
+.market-card.featured .market-count{background:var(--green);color:#fff}
+/* PROMO BAND */
+.promos-band{background:linear-gradient(135deg,var(--dark),#1a4a2e);padding:36px 5vw;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.pb-label{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.pb-title{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,2.5vw,1.9rem);font-weight:700;color:#fff}.pb-sub{font-size:.85rem;color:rgba(255,255,255,.5);margin-top:.3rem}
+.promo-pills{display:flex;gap:10px;flex-wrap:wrap}
+.promo-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius);padding:12px 16px;text-align:center;min-width:105px}
+.pp-disc{font-size:1.2rem;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif}.pp-shop{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:3px}
+/* PRODUCTS */
+.prod-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.4rem}
+.pf-btn{padding:6px 13px;border-radius:99px;font-size:.78rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s}
+.pf-btn:hover,.pf-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.prod-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.prod-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.prod-img{height:155px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;background:var(--bg)}
+.prod-badge{position:absolute;top:9px;left:9px;background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.prod-badge.new{background:var(--green);color:#fff}
+.prod-wish{position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;transition:all .18s}
+.prod-wish:hover{border-color:var(--red);background:var(--rp)}
+.prod-body{padding:12px}
+.prod-market{display:inline-flex;align-items:center;gap:3px;font-size:.63rem;font-weight:600;color:var(--green);background:var(--gp);padding:2px 7px;border-radius:99px;margin-bottom:5px}
+.prod-name{font-size:.88rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.prod-shop{font-size:.72rem;color:var(--muted);margin-bottom:5px}
+.prod-rating{display:flex;align-items:center;gap:3px;font-size:.7rem;color:var(--muted);margin-bottom:7px}
+.prod-stars{color:var(--gold);font-size:.72rem}
+.prod-footer{display:flex;align-items:center;justify-content:space-between}
+.prod-price{font-size:.96rem;font-weight:700;color:var(--green)}.prod-old-price{font-size:.72rem;color:var(--muted);text-decoration:line-through;margin-left:4px}
+.prod-cart-btn{width:28px;height:28px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.prod-cart-btn:hover{background:var(--gl);transform:scale(1.1)}
+/* CATS */
+.cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.cat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 12px;text-align:center;cursor:pointer;transition:all .22s}
+.cat-card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:var(--shadow)}
+.cat-emoji{font-size:1.8rem;margin-bottom:8px}.cat-name{font-size:.82rem;font-weight:600;color:var(--dark)}.cat-count{font-size:.68rem;color:var(--muted);margin-top:3px}
+/* HIW */
+.hiw-header{text-align:center;margin-bottom:2.8rem}
+.hiw-title{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2.3rem);font-weight:700;color:#fff;margin-bottom:.5rem}
+.hiw-sub{font-size:.92rem;color:rgba(255,255,255,.45);max-width:440px;margin:0 auto}
+.hiw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.hiw-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:26px 22px;transition:all .22s}
+.hiw-card:hover{background:rgba(27,107,58,.2);border-color:rgba(27,107,58,.4)}
+.hiw-num{width:38px;height:38px;border-radius:11px;background:var(--green);color:#fff;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.hiw-card-title{font-size:.92rem;font-weight:600;color:#fff;margin-bottom:7px}.hiw-text{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.65}
+/* SHOPS */
+.shops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.shop-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.shop-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.shop-banner{height:76px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative}
+.shop-avatar{width:48px;height:48px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:700;color:#fff;position:absolute;bottom:-24px;left:14px;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.shop-body{padding:30px 14px 14px}
+.shop-verified{display:inline-flex;align-items:center;gap:4px;font-size:.63rem;font-weight:700;color:var(--green);background:var(--gp);padding:2px 7px;border-radius:99px;margin-bottom:5px}
+.shop-name{font-size:.92rem;font-weight:600;color:var(--dark);margin-bottom:2px}.shop-market{font-size:.73rem;color:var(--muted)}
+.shop-stats{display:flex;gap:12px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.ss-val{font-size:.84rem;font-weight:600;color:var(--dark)}.ss-lbl{font-size:.62rem;color:var(--muted)}
+/* CTA */
+.cta-section{padding:72px 5vw;background:linear-gradient(135deg,var(--green),var(--gl));text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(230,168,23,.15)}
+.cta-section::after{content:'';position:absolute;bottom:-80px;left:-60px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.07)}
+.cta-section h2{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3.5vw,2.8rem);font-weight:900;color:#fff;margin-bottom:.8rem;position:relative;z-index:1}
+.cta-section p{font-size:.96rem;color:rgba(255,255,255,.72);max-width:500px;margin:0 auto 2rem;line-height:1.68;position:relative;z-index:1}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.btn-cta-white{background:#fff;color:var(--green);padding:12px 28px;font-size:.92rem;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
+/* FOOTER */
+footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem}
+.footer-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);margin-bottom:.9rem}
+.footer-brand p{font-size:.8rem;line-height:1.7;max-width:220px}
+.footer-col h4{font-size:.76rem;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.9rem}
+.footer-col a{display:block;font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:7px;transition:color .2s}.footer-col a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:.76rem;flex-wrap:wrap;gap:10px}
+.footer-flags{display:flex;gap:5px}.fc-dot{width:9px;height:9px;border-radius:50%}
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .nav-search{display:none}.nav-btn.nav-btn-login,.nav-btn.nav-btn-shop{display:none}.nav-hamburger{display:flex}
+  .mobile-nav{display:block}body{padding-bottom:64px}.toast{bottom:74px}
+  .hero{grid-template-columns:1fr;min-height:auto;padding:48px 5vw 40px}.hero-right{display:none}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .markets-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+}
+@media(max-width:600px){
+  :root{--nav-h:58px}.nav{padding:0 4vw;gap:10px}.nav-logo .nav-logo-text{display:none}.nav-cart{width:38px;height:38px}
+  .hero{padding:36px 4vw}.hero h1{font-size:1.9rem}.hero-stats{gap:1.4rem}.hero-desc{font-size:.9rem}
+  .section-wrap{padding:40px 4vw}.promos-band{padding:28px 4vw}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:10px}.prod-img{height:130px;font-size:2.6rem}
+  .cats-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+  .shops-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}
+  .footer-grid .footer-col:nth-child(n+3){display:none}
+  .cta-btns{flex-direction:column;align-items:center}.btn-cta-white{width:100%;max-width:320px;justify-content:center}
+  .hero-btns .btn{padding:10px 20px;font-size:.84rem}
+}
+@media(max-width:380px){
+  .hero h1{font-size:1.7rem}.hero-btns{flex-direction:column}.hero-btns .btn{justify-content:center}
+  .markets-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
+  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..."/><button class="nav-search-btn" onclick="goToSearch()">🔍 Rechercher</button></div>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
+    <button class="nav-btn nav-btn-primary nav-btn-shop" onclick="goToShop()">🏪 Ma boutique</button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">🛒<div class="cart-badge" id="cart-count">0</div></button>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<!-- DRAWER -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..."/><button class="nav-search-btn" onclick="goToSearch()">🔍</button></div>
+  <div class="nav-drawer-row">
+    <button class="nav-btn" id="drawer-login-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-dashboard.html'">🏪 Ma boutique</button>
+  </div>
+</div>
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-badge"><span class="hero-badge-dot"></span>La marketplace #1 du Sénégal</div>
+    <h1>Tout le marché<br/>sénégalais dans<br/>votre <span class="acc">poche</span></h1>
+    <p class="hero-desc">Sandaga, Tilène, HLM, Kermel — tous les marchés du Sénégal en ligne. Achetez et commandez depuis chez vous.</p>
+    <div class="hero-btns">
+      <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'">🛍️ Explorer les produits</button>
+      <button class="btn btn-outline-white" onclick="document.getElementById('markets-grid').scrollIntoView({behavior:'smooth'})">🗺️ Choisir un marché</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hstat-num">2 400+</div><div class="hstat-label">Boutiques actives</div></div>
+      <div><div class="hstat-num">48K</div><div class="hstat-label">Produits listés</div></div>
+      <div><div class="hstat-num">14</div><div class="hstat-label">Régions couvertes</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-phone">
+      <div class="hp-screen">
+        <div class="hp-top">
+          <div class="hp-toprow"><div class="hp-topname">Bonjour, Fatou 👋</div><div class="hp-avatar">F</div></div>
+          <div class="hp-search"><div class="hp-search-dot"></div><div class="hp-search-text">Chercher un produit...</div></div>
+        </div>
+        <div class="hp-cats">
+          <div class="hp-cat act"><div class="hp-cat-e">🌾</div><div class="hp-cat-n">Aliment.</div></div>
+          <div class="hp-cat"><div class="hp-cat-e">👗</div><div class="hp-cat-n">Mode</div></div>
+          <div class="hp-cat"><div class="hp-cat-e">🎨</div><div class="hp-cat-n">Artisan.</div></div>
+        </div>
+        <div class="hp-prods">
+          <div class="hp-card"><div class="hp-card-img" style="background:#FFF8E7">🥭</div><div class="hp-card-body"><div class="hp-card-name">Mangues fraîches</div><div class="hp-card-price">1 200 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#F0EAF8">👗</div><div class="hp-card-body"><div class="hp-card-name">Boubou wax</div><div class="hp-card-price">18 000 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#E8F5EC">🥜</div><div class="hp-card-body"><div class="hp-card-name">Arachides</div><div class="hp-card-price">500 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#FDE8E6">🏺</div><div class="hp-card-body"><div class="hp-card-name">Poterie</div><div class="hp-card-price">7 500 FCFA</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- MARCHÉS -->
+<section class="section-wrap white-bg">
+  <div class="section-top"><div><div class="section-label">🗺️ Filtre par marché</div><div class="section-title">Choisissez votre marché</div></div><a href="marche-senegal-marche.html" class="section-link">Voir tous →</a></div>
+  <div class="markets-tabs">
+    <button class="mtab active" onclick="filterMarkets('dakar',this)">Dakar & Banlieue</button>
+    <button class="mtab" onclick="filterMarkets('region',this)">Autres régions</button>
+    <button class="mtab" onclick="filterMarkets('all',this)">Tous</button>
+  </div>
+  <div class="markets-grid" id="markets-grid">
+    <div class="market-card featured" data-zone="dakar" onclick="goMarket('Sandaga')"><div class="market-emoji">🏛️</div><div class="market-name">Sandaga</div><div class="market-city">Dakar Centre</div><div class="market-count">142 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Tilène')"><div class="market-emoji">🧵</div><div class="market-name">Tilène</div><div class="market-city">Médina</div><div class="market-count">98 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('HLM')"><div class="market-emoji">🛍️</div><div class="market-name">HLM</div><div class="market-city">Dakar</div><div class="market-count">76 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Colobane')"><div class="market-emoji">🔧</div><div class="market-name">Colobane</div><div class="market-city">Dakar</div><div class="market-count">54 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Kermel')"><div class="market-emoji">🥩</div><div class="market-name">Kermel</div><div class="market-city">Plateau</div><div class="market-count">38 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Castor')"><div class="market-emoji">🌾</div><div class="market-name">Castor</div><div class="market-city">Dakar</div><div class="market-count">29 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Pikine')"><div class="market-emoji">🏙️</div><div class="market-name">Pikine</div><div class="market-city">Banlieue</div><div class="market-count">61 boutiques</div></div>
+    <div class="market-card" data-zone="dakar" onclick="goMarket('Thiaroye')"><div class="market-emoji">🏘️</div><div class="market-name">Thiaroye</div><div class="market-city">Banlieue</div><div class="market-count">45 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Thiès')"><div class="market-emoji">🏭</div><div class="market-name">Thiès</div><div class="market-city">Thiès</div><div class="market-count">83 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Touba')"><div class="market-emoji">🕌</div><div class="market-name">Touba</div><div class="market-city">Touba</div><div class="market-count">120 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Kaolack')"><div class="market-emoji">🐟</div><div class="market-name">Kaolack</div><div class="market-city">Kaolack</div><div class="market-count">67 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Ziguinchor')"><div class="market-emoji">🌊</div><div class="market-name">Ziguinchor</div><div class="market-city">Casamance</div><div class="market-count">44 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Saint-Louis')"><div class="market-emoji">🏰</div><div class="market-name">Saint-Louis</div><div class="market-city">Nord</div><div class="market-count">52 boutiques</div></div>
+    <div class="market-card" data-zone="region" onclick="goMarket('Mbour')"><div class="market-emoji">🏖️</div><div class="market-name">Mbour</div><div class="market-city">Petite Côte</div><div class="market-count">36 boutiques</div></div>
+  </div>
+</section>
+<!-- PROMO BAND -->
+<div class="promos-band">
+  <div><div class="pb-label">🔥 Offres du moment</div><div class="pb-title">Promotions actives aujourd'hui</div><div class="pb-sub">Les vendeurs partagent leurs meilleures offres</div></div>
+  <div class="promo-pills">
+    <div class="promo-pill"><div class="pp-disc">-15%</div><div class="pp-shop">Mode Fatou · Sandaga</div></div>
+    <div class="promo-pill"><div class="pp-disc">-20%</div><div class="pp-shop">Artisan Thiès</div></div>
+    <div class="promo-pill"><div class="pp-disc">-10%</div><div class="pp-shop">Ferme Diallo</div></div>
+    <div class="promo-pill"><div class="pp-disc">2+1</div><div class="pp-shop">Boutique HLM</div></div>
+  </div>
+</div>
+<!-- PRODUITS -->
+<section class="section-wrap bg">
+  <div class="section-top"><div><div class="section-label">🛍️ Catalogue</div><div class="section-title">Produits populaires</div></div><a href="marche-senegal-recherche.html" class="section-link">Voir tout →</a></div>
+  <div class="prod-filters">
+    <button class="pf-btn active" onclick="filterProds('all',this)">Tout</button>
+    <button class="pf-btn" onclick="filterProds('aliment',this)">🌾 Alimentation</button>
+    <button class="pf-btn" onclick="filterProds('mode',this)">👗 Mode</button>
+    <button class="pf-btn" onclick="filterProds('artisan',this)">🎨 Artisanat</button>
+    <button class="pf-btn" onclick="filterProds('beaute',this)">💄 Beauté</button>
+    <button class="pf-btn" onclick="filterProds('maison',this)">🏠 Maison</button>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF8E7">🥭<div class="prod-badge">-10%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🌊 Ziguinchor</div><div class="prod-name">Mangues fraîches Casamance</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (128)</div><div class="prod-shop">Ferme Diallo · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">1 080 FCFA</span><span class="prod-old-price">1 200</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏛️ Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.8 (234)</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">18 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#E8F5EC">🥜<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🛍️ HLM</div><div class="prod-name">Arachides grillées au feu de bois</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.6 (89)</div><div class="prod-shop">Boutique Samba · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="artisan"><div class="prod-img" style="background:#FDE8E6">🏺<div class="prod-badge">Artisanat</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏖️ Mbour</div><div class="prod-name">Poterie artisanale peinte main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (42)</div><div class="prod-shop">Artisan Mbaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">7 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#FFF8E7">🧵<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🧵 Tilène</div><div class="prod-name">Bazin brodé cérémonie</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (176)</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">21 250 FCFA</span><span class="prod-old-price">25 000</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="beaute"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏛️ Sandaga</div><div class="prod-name">Beurre de karité pur naturel</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.7 (312)</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="maison"><div class="prod-img" style="background:#E8F5EC">🪑<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🔧 Colobane</div><div class="prod-name">Chaise en rotin tressée main</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.5 (55)</div><div class="prod-shop">Meubles Gaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF3E0">🐠<div class="prod-badge">Frais</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🐟 Kaolack</div><div class="prod-name">Thiof fumé séché du matin</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (203)</div><div class="prod-shop">Pêcheur Diop · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">4 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+  </div>
+</section>
+<!-- CATÉGORIES -->
+<section class="section-wrap white-bg">
+  <div class="section-top"><div><div class="section-label">📦 Explorer</div><div class="section-title">Toutes les catégories</div></div></div>
+  <div class="cats-grid">
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji">🌾</div><div class="cat-name">Alimentation</div><div class="cat-count">12 400 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji">👗</div><div class="cat-name">Mode</div><div class="cat-count">8 900 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisan'"><div class="cat-emoji">🎨</div><div class="cat-name">Artisanat</div><div class="cat-count">4 200 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=beaute'"><div class="cat-emoji">💄</div><div class="cat-name">Beauté</div><div class="cat-count">3 100 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=maison'"><div class="cat-emoji">🏠</div><div class="cat-name">Maison</div><div class="cat-count">5 600 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=electronique'"><div class="cat-emoji">📱</div><div class="cat-name">Électronique</div><div class="cat-count">2 800 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=sport'"><div class="cat-emoji">⚽</div><div class="cat-name">Sport</div><div class="cat-count">1 900 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="cat-emoji">🌿</div><div class="cat-name">Agriculture</div><div class="cat-count">6 700 produits</div></div>
+  </div>
+</section>
+<!-- HIW -->
+<section class="section-wrap dark-bg">
+  <div class="hiw-header"><div class="hiw-title">Comment ça marche ?</div><p class="hiw-sub">Commander sur Marché Sénégal c'est simple, rapide et sécurisé.</p></div>
+  <div class="hiw-grid">
+    <div class="hiw-card"><div class="hiw-num">1</div><div class="hiw-card-title">Cherchez votre produit</div><div class="hiw-text">Tapez un mot-clé ou choisissez un marché. Filtrez par prix, note et localisation.</div></div>
+    <div class="hiw-card"><div class="hiw-num">2</div><div class="hiw-card-title">Visitez la boutique</div><div class="hiw-text">Regardez la vidéo de la boutique, discutez avec le vendeur, consultez les avis.</div></div>
+    <div class="hiw-card"><div class="hiw-num">3</div><div class="hiw-card-title">Commandez & Payez</div><div class="hiw-text">Payez via Wave, Orange Money ou Free Money. Votre argent est sécurisé jusqu'à la livraison.</div></div>
+    <div class="hiw-card"><div class="hiw-num">4</div><div class="hiw-card-title">Recevez à domicile</div><div class="hiw-text">Suivez votre livreur en temps réel. Confirmez la réception pour libérer le paiement.</div></div>
+  </div>
+</section>
+<!-- BOUTIQUES VEDETTES -->
+<section class="section-wrap bg">
+  <div class="section-top"><div><div class="section-label">⭐ Vedettes</div><div class="section-title">Boutiques les mieux notées</div></div><a href="marche-senegal-recherche.html">Voir tout →</a></div>
+  <div class="shops-grid">
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#F0EAF8">👗<div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-market">Marché Sandaga · Dakar</div><div class="shop-stats"><div><div class="ss-val">4.8 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#E8F5EC">🌾<div class="shop-avatar" style="background:var(--gold);color:var(--dark)">FD</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Ziguinchor</div><div class="shop-name">Ferme Diallo Casamance</div><div class="shop-market">Marché Ziguinchor</div><div class="shop-stats"><div><div class="ss-val">4.9 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">312</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">2 100</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#FDE8E6">🏺<div class="shop-avatar" style="background:#C0392B">AM</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Mbour</div><div class="shop-name">Artisan Mbaye</div><div class="shop-market">Marché Mbour · Petite Côte</div><div class="shop-stats"><div><div class="ss-val">5.0 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">98</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">480</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+  </div>
+</section>
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Vous êtes vendeur ? 🏪</h2>
+  <p>Rejoignez des milliers de commerçants qui ont ouvert leur boutique en ligne sur Marché Sénégal. Gratuit pour commencer.</p>
+  <div class="cta-btns">
+    <button class="btn btn-cta-white" onclick="goToShop()">🏪 Ouvrir ma boutique — Gratuit</button>
+    <button class="btn btn-outline-white" onclick="showToast('En savoir plus...')">En savoir plus</button>
+  </div>
+</section>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><div class="footer-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</div><p>La marketplace qui réunit tous les commerçants du Sénégal. Achetez local.</p></div>
+    <div class="footer-col"><h4>Acheteurs</h4><a href="marche-senegal-recherche.html">Rechercher</a><a href="marche-senegal-marche.html">Choisir un marché</a><a href="marche-senegal-profil.html">Mes commandes</a><a href="#">Livraison</a></div>
+    <div class="footer-col"><h4>Vendeurs</h4><a href="marche-senegal-connexion-acheteur.html">Ouvrir ma boutique</a><a href="marche-senegal-ajout-produit.html">Mes produits</a><a href="marche-senegal-dashboard.html">Mes promotions</a><a href="#">Tarifs</a></div>
+    <div class="footer-col"><h4>Support</h4><a href="#">Aide & FAQ</a><a href="#">Nous contacter</a><a href="#">WhatsApp</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 Marché Sénégal. Fait avec ❤️ au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
+</footer>
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item act"><div class="mn-icon act">🏠</div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+  </div>
+</nav>
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE ACCUEIL — Données dynamiques
+// ════════════════════════════════════════
+
+let cartCount = 0;
+
+// ── Charger les produits depuis l'API ──
+async function loadProducts(filters = {}) {
+  showLoading('products-grid', 'Chargement des produits...');
+
+  const result = await getProducts({
+    limit: 8,
+    sortBy: 'popular',
+    ...filters
+  });
+
+  if (!result.success) {
+    showError('products-grid', 'Impossible de charger les produits');
+    return;
+  }
+
+  const grid = document.getElementById('products-grid');
+
+  if (result.data.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+        Aucun produit trouvé
+      </div>
+    `;
+    return;
+  }
+
+  // Afficher les produits
+  grid.innerHTML = result.data.map(prod => `
+    <div class="prod-card" onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+      <div class="prod-img" style="background:#F0EAF8">
+        ${prod.images.length > 0
+          ? `<img src="${prod.images[0]}" style="width:100%;height:100%;object-fit:cover"/>`
+          : '👗'
+        }
+        ${prod.originalPrice
+          ? `<div class="prod-badge">-${Math.round((1 - prod.price/prod.originalPrice)*100)}%</div>`
+          : ''
+        }
+        <div class="prod-wish" onclick="wish(event, '${prod.id}')">🤍</div>
+      </div>
+      <div class="prod-body">
+        <div class="prod-market">
+          🏛️ ${prod.shop.market.name}
+        </div>
+        <div class="prod-name">${prod.name}</div>
+        <div class="prod-shop">${prod.shop.name} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
+        <div class="prod-rating">
+          <span class="prod-stars">★★★★★</span>
+          ${prod.rating} (${prod.totalReviews})
+        </div>
+        <div class="prod-footer">
+          <div>
+            <span class="prod-price">${formatPrice(prod.price)}</span>
+            ${prod.originalPrice
+              ? `<span class="prod-old-price">${formatPrice(prod.originalPrice)}</span>`
+              : ''
+            }
+          </div>
+          <button class="prod-cart-btn" onclick="addToCart(event, '${prod.id}', '${prod.name}', ${prod.price})">+</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Charger les marchés depuis l'API ──
+async function loadMarkets() {
+  const result = await getMarkets();
+
+  if (!result.success) return;
+
+  const grid = document.getElementById('markets-grid');
+
+  const dakarCities = ['Dakar', 'Médina', 'Plateau', 'Pikine', 'Thiaroye', 'Guédiawaye', 'Banlieue'];
+  grid.innerHTML = result.data.map(market => {
+    const zone = dakarCities.some(c => market.city.includes(c)) ? 'dakar' : 'region';
+    return `
+    <div class="market-card ${market.name.includes('Sandaga') ? 'featured' : ''}"
+         data-zone="${zone}"
+         onclick="goMarket('${market.id}', '${market.name}')">
+      <div class="market-emoji">🏛️</div>
+      <div class="market-name">${market.name.replace('Marché ', '')}</div>
+      <div class="market-city">${market.city}</div>
+      <div class="market-count">${market._count.shops} boutiques</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Aller vers un marché ──
+function goMarket(marketId, marketName) {
+  showToast('🗺️ ' + marketName + ' sélectionné');
+  setTimeout(() => {
+    window.location.href = `marche-senegal-marche.html?id=${marketId}`;
+  }, 600);
+}
+
+// ── Ajouter au panier ──
+function addToCart(event, productId, productName, price) {
+  event.stopPropagation();
+
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(item => item.productId === productId);
+
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    // Trouver les infos du produit depuis les données chargées
+    const prodCard = event.target.closest('.prod-card');
+    const shopName = prodCard?.querySelector('.prod-shop')?.textContent?.split('·')[0]?.trim() || '';
+    const marketName = prodCard?.querySelector('.prod-market')?.textContent?.trim() || '';
+
+    cart.push({
+      productId,
+      name: productName,
+      price,
+      quantity: 1,
+      shopId: null,
+      shopName: shopName,
+      marketName: marketName,
+      image: null
+    });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  // Mettre à jour le compteur
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartBadge = document.getElementById('cart-count');
+  if (cartBadge) cartBadge.textContent = cartCount;
+
+  showToast('✓ ' + productName + ' ajouté au panier');
+
+  // Animation du bouton
+  const btn = event.target;
+  btn.style.transform = 'scale(1.35)';
+  btn.style.background = 'var(--gold)';
+  setTimeout(() => {
+    btn.style.transform = '';
+    btn.style.background = '';
+  }, 500);
+}
+
+// ── Ajouter aux favoris ──
+function wish(event, productId) {
+  event.stopPropagation();
+  const btn = event.target;
+  btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
+  showToast(btn.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+}
+
+// ── Aller vers la boutique selon le rôle ──
+function goToShop() {
+  const user = getCurrentUser();
+  if (!user) {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  if (user.role === 'SELLER') {
+    window.location.href = 'marche-senegal-dashboard.html';
+  } else if (user.role === 'ADMIN') {
+    window.location.href = 'marche-senegal-admin.html';
+  } else {
+    // Acheteur qui veut devenir vendeur
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+  }
+}
+
+// ── Aller vers la recherche ──
+function goToSearch() {
+  const inputs = document.querySelectorAll('.nav-search input');
+  let val = '';
+  inputs.forEach(input => { if(input.value.trim()) val = input.value.trim(); });
+  if (val) {
+    window.location.href = `marche-senegal-recherche.html?q=${encodeURIComponent(val)}`;
+  } else {
+    window.location.href = 'marche-senegal-recherche.html';
+  }
+}
+
+// ── Filtrer les produits par catégorie ──
+async function filterProds(cat, el) {
+  document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  if (cat === 'all') {
+    await loadProducts();
+  } else {
+    await loadProducts({ category: cat });
+  }
+}
+
+// ── Filtrer les marchés ──
+function filterMarkets(zone, el) {
+  document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.market-card').forEach(card => {
+    card.style.display = (zone === 'all' || card.dataset.zone === zone) ? '' : 'none';
+  });
+}
+
+// ── Hamburger menu ──
+function toggleMenu() {
+  const h = document.getElementById('nav-hamburger');
+  const d = document.getElementById('nav-drawer');
+  h.classList.toggle('open');
+  d.classList.toggle('open');
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = cartCount;
+}
+
+// ── Mettre à jour le bouton connexion ──
+function updateAuthButton() {
+  const user = getCurrentUser();
+  const loginBtn = document.querySelector('.nav-btn-login');
+  const shopBtn = document.querySelector('.nav-btn-shop');
+  const drawerLoginBtn = document.getElementById('drawer-login-btn');
+
+  if (!loginBtn) return;
+
+  if (user) {
+    // Bouton connexion → prénom
+    loginBtn.textContent = user.firstName || 'Mon profil';
+    loginBtn.onclick = () => window.location.href = 'marche-senegal-profil.html';
+
+    if (drawerLoginBtn) {
+      drawerLoginBtn.textContent = user.firstName || 'Mon profil';
+      drawerLoginBtn.onclick = () => window.location.href = 'marche-senegal-profil.html';
+    }
+
+    // Bouton boutique selon le rôle
+    if (shopBtn) {
+      if (user.role === 'SELLER') {
+        // Vendeur → Ma boutique
+        shopBtn.textContent = '🏪 Ma boutique';
+        shopBtn.onclick = () => window.location.href = 'marche-senegal-dashboard.html';
+      } else if (user.role === 'ADMIN') {
+        // Admin → Panel admin
+        shopBtn.textContent = '⚙️ Panel admin';
+        shopBtn.onclick = () => window.location.href = 'marche-senegal-admin.html';
+      } else {
+        // Acheteur → Ouvrir ma boutique
+        shopBtn.textContent = '🏪 Ouvrir ma boutique';
+        shopBtn.onclick = () => window.location.href = 'marche-senegal-connexion-vendeur.html';
+      }
+    }
+
+  } else {
+    // Non connecté
+    loginBtn.textContent = 'Se connecter';
+    loginBtn.onclick = () => window.location.href = 'marche-senegal-connexion-acheteur.html';
+
+    if (drawerLoginBtn) {
+      drawerLoginBtn.textContent = 'Se connecter';
+      drawerLoginBtn.onclick = () => window.location.href = 'marche-senegal-connexion-acheteur.html';
+    }
+
+    if (shopBtn) {
+      shopBtn.textContent = '🏪 Devenir vendeur';
+      shopBtn.onclick = () => window.location.href = 'marche-senegal-connexion-vendeur.html';
+    }
+  }
+}
+// ── Fermer le drawer en cliquant dehors ──
+document.addEventListener('click', function(e) {
+  const d = document.getElementById('nav-drawer');
+  const h = document.getElementById('nav-hamburger');
+  if (d && d.classList.contains('open') &&
+      !d.contains(e.target) && !h.contains(e.target)) {
+    d.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Ajouter au panier depuis les cartes statiques ──
+function addCartFromBtn(event) {
+  event.stopPropagation();
+  const card = event.target.closest('.prod-card');
+  const name = card.querySelector('.prod-name').textContent;
+  const priceText = card.querySelector('.prod-price').textContent.replace(/[^\d]/g, '');
+  const price = parseInt(priceText);
+  const id = 'static-' + name.substring(0, 20).replace(/\s/g, '-').toLowerCase();
+  addToCart(event, id, name, price);
+}
+
+// ── Initialisation au chargement de la page ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+  updateAuthButton();
+  await loadMarkets();
+  await loadProducts();
+});
+</script>
+</body>
+</html>

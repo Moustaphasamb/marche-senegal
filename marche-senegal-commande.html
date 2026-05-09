@@ -1,0 +1,801 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Suivi de commande — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --blue:#1565C0;--bluep:#E3F2FD;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+a{text-decoration:none;color:inherit}
+
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0}
+.nav-back{display:flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:99px;font-size:.84rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s}
+.nav-back:hover{border-color:var(--green);color:var(--green)}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem}
+.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0}
+.mn-items{display:flex}
+.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
+.mn-icon{font-size:1.1rem}
+.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}
+
+/* MAIN */
+.main{margin-top:var(--nav-h);max-width:860px;margin-left:auto;margin-right:auto;padding:24px 4vw 80px}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);margin-bottom:18px;flex-wrap:wrap}
+.bc-link{cursor:pointer;transition:color .18s}.bc-link:hover{color:var(--green)}
+.bc-sep{color:var(--border)}
+.bc-current{color:var(--dark);font-weight:500}
+
+/* ORDER HEADER */
+.order-header{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.oh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.oh-num{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:3px}
+.oh-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark)}
+.oh-date{font-size:.78rem;color:var(--muted);margin-top:2px}
+.oh-status{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;font-size:.84rem;font-weight:700}
+.ost-pending{background:var(--gdl);color:#8A6100}
+.ost-confirmed{background:var(--bluep);color:var(--blue)}
+.ost-preparing{background:var(--bluep);color:var(--blue)}
+.ost-delivering{background:#E8F4FD;color:#0277BD}
+.ost-delivered{background:var(--gp);color:var(--green)}
+.ost-cancelled{background:var(--rp);color:var(--red)}
+
+.oh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--border);padding-top:14px}
+.ohs-item{text-align:center;padding:8px;border-right:1px solid var(--border)}
+.ohs-item:last-child{border-right:none}
+.ohs-val{font-size:.96rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+.ohs-label{font-size:.7rem;color:var(--muted)}
+
+/* TRACKING */
+.tracking-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.tc-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+.tracking-steps{display:flex;flex-direction:column;gap:0;position:relative}
+.tracking-steps::before{content:'';position:absolute;left:18px;top:20px;bottom:20px;width:2px;background:var(--border)}
+.ts-item{display:flex;gap:14px;position:relative;z-index:1;padding-bottom:22px}
+.ts-item:last-child{padding-bottom:0}
+.ts-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;border:2px solid var(--border);background:#fff;transition:all .3s}
+.ts-item.done .ts-dot{background:var(--green);border-color:var(--green);color:#fff}
+.ts-item.active .ts-dot{background:var(--gold);border-color:var(--gold);color:var(--dark);box-shadow:0 0 0 4px rgba(230,168,23,.2)}
+.ts-item.pending .ts-dot{background:#fff;border-color:var(--border);color:var(--muted)}
+.ts-info{flex:1;padding-top:8px}
+.ts-label{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:2px}
+.ts-item.pending .ts-label{color:var(--muted)}
+.ts-time{font-size:.76rem;color:var(--muted)}
+.ts-desc{font-size:.8rem;color:var(--muted);margin-top:3px;line-height:1.5}
+
+/* LIVE TRACKER */
+.live-tracker{background:linear-gradient(135deg,var(--dark),#1A3A28);border-radius:var(--radius);padding:18px;margin-bottom:16px;color:#fff}
+.lt-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.lt-pulse{width:10px;height:10px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.lt-title{font-size:.9rem;font-weight:600}
+.lt-sub{font-size:.74rem;color:rgba(255,255,255,.5);margin-left:auto}
+.lt-map{background:rgba(255,255,255,.08);border-radius:10px;height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;overflow:hidden}
+.lt-map-bg{position:absolute;inset:0;opacity:.15;font-size:8rem;display:flex;align-items:center;justify-content:center}
+.lt-rider{position:absolute;font-size:1.8rem;animation:moveRider 4s ease-in-out infinite}
+@keyframes moveRider{0%,100%{left:20%;top:50%}50%{left:60%;top:35%}}
+.lt-eta{display:flex;align-items:center;justify-content:space-between}
+.lt-eta-time{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--gold)}
+.lt-eta-label{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:2px}
+.lt-rider-info{display:flex;align-items:center;gap:8px}
+.lt-rider-av{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
+.lt-rider-name{font-size:.82rem;font-weight:500}
+.lt-rider-phone{font-size:.7rem;color:rgba(255,255,255,.5)}
+.lt-call{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:background .18s}
+.lt-call:hover{background:rgba(255,255,255,.2)}
+
+/* ITEMS */
+.items-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.ic-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.ic-title{font-size:.9rem;font-weight:600;color:var(--dark)}
+.item-row{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.item-row:last-child{border-bottom:none}
+.ir-img{width:52px;height:52px;border-radius:9px;background:#F0EAF8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden}
+.ir-img img{width:100%;height:100%;object-fit:cover}
+.ir-info{flex:1}
+.ir-name{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:2px}
+.ir-variant{font-size:.74rem;color:var(--muted)}
+.ir-right{text-align:right;flex-shrink:0}
+.ir-price{font-size:.9rem;font-weight:700;color:var(--green)}
+.ir-qty{font-size:.74rem;color:var(--muted);margin-top:2px}
+
+/* SUMMARY */
+.summary-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.sc-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px}
+.sc-row{display:flex;justify-content:space-between;align-items:center;font-size:.86rem;padding:5px 0}
+.sc-label{color:var(--muted)}
+.sc-val{font-weight:500;color:var(--text)}
+.sc-divider{height:1px;background:var(--border);margin:8px 0}
+.sc-total{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0}
+.sc-total-label{font-size:.96rem;font-weight:700;color:var(--dark)}
+.sc-total-val{font-size:1.1rem;font-weight:900;color:var(--green);font-family:'Playfair Display',serif}
+
+/* DELIVERY INFO */
+.delivery-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.dc-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px}
+.dc-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.dc-row:last-child{margin-bottom:0}
+.dc-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;margin-top:1px}
+.dc-info{flex:1}
+.dc-label{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.dc-val{font-size:.86rem;color:var(--text);line-height:1.5}
+
+/* ACTIONS */
+.actions-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.ac-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px}
+.ac-btns{display:flex;flex-direction:column;gap:9px}
+.ac-btn{width:100%;height:44px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.ac-btn:hover{border-color:var(--green);color:var(--green)}
+.ac-btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.ac-btn-green:hover{background:var(--gl);color:#fff}
+.ac-btn-red{border-color:var(--red);color:var(--red)}
+.ac-btn-red:hover{background:var(--red);color:#fff}
+
+/* SHOP CARD */
+.shop-mini{display:flex;align-items:center;gap:12px;background:var(--gp);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer;transition:all .18s;border:1.5px solid var(--g2)}
+.shop-mini:hover{border-color:var(--green)}
+.sm-av{width:40px;height:40px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:700;color:#fff;flex-shrink:0}
+.sm-info{flex:1}
+.sm-name{font-size:.88rem;font-weight:600;color:var(--dark)}
+.sm-sub{font-size:.74rem;color:var(--muted);margin-top:1px}
+.sm-arrow{font-size:1rem;color:var(--green)}
+
+/* LOADING */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center}
+.ls-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ls-text{font-size:.9rem;color:var(--muted)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  :root{--nav-h:58px}
+  .oh-stats{grid-template-columns:repeat(2,1fr)}
+  .ohs-item:nth-child(2){border-right:none}
+  .ohs-item:nth-child(3){border-top:1px solid var(--border)}
+  .ohs-item:nth-child(4){border-top:1px solid var(--border);border-right:none}
+  .mobile-nav{display:block}
+  body{padding-bottom:64px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    Marché Sénégal
+  </a>
+  <button class="nav-back" onclick="window.location.href='marche-senegal-profil.html'">
+    ← Mes commandes
+  </button>
+  <div class="nav-actions">
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
+      🛒<div class="cart-badge" id="cart-count">0</div>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <span class="bc-link" onclick="window.location.href='marche-senegal-accueil.html'">Accueil</span>
+    <span class="bc-sep">›</span>
+    <span class="bc-link" onclick="window.location.href='marche-senegal-profil.html'">Mon profil</span>
+    <span class="bc-sep">›</span>
+    <span class="bc-current" id="bc-order-num">Commande #MS-2025-00001</span>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" id="loading-state">
+    <div class="ls-spinner"></div>
+    <div class="ls-text">Chargement de votre commande...</div>
+  </div>
+
+  <!-- CONTENT — caché pendant le chargement -->
+  <div id="order-content" style="display:none">
+
+    <!-- ORDER HEADER -->
+    <div class="order-header">
+      <div class="oh-top">
+        <div>
+          <div class="oh-num" id="oh-num">Commande #MS-2025-00001</div>
+          <div class="oh-title" id="oh-title">Boutique Mode Fatou Ndoye</div>
+          <div class="oh-date" id="oh-date">Passée le 3 avril 2025</div>
+        </div>
+        <div class="oh-status" id="oh-status">
+          ⏳ En attente
+        </div>
+      </div>
+      <div class="oh-stats">
+        <div class="ohs-item">
+          <div class="ohs-val" id="ohs-items">—</div>
+          <div class="ohs-label">Articles</div>
+        </div>
+        <div class="ohs-item">
+          <div class="ohs-val" id="ohs-total">—</div>
+          <div class="ohs-label">Total payé</div>
+        </div>
+        <div class="ohs-item">
+          <div class="ohs-val" id="ohs-delivery">—</div>
+          <div class="ohs-label">Livraison</div>
+        </div>
+        <div class="ohs-item">
+          <div class="ohs-val" id="ohs-payment">Wave</div>
+          <div class="ohs-label">Paiement</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE TRACKER — visible seulement si en livraison -->
+    <div class="live-tracker" id="live-tracker" style="display:none">
+      <div class="lt-header">
+        <div class="lt-pulse"></div>
+        <div class="lt-title">🚵 Livreur en route</div>
+        <div class="lt-sub">Suivi en temps réel</div>
+      </div>
+      <div class="lt-map">
+        <div class="lt-map-bg">🗺️</div>
+        <div class="lt-rider">🛵</div>
+      </div>
+      <div class="lt-eta">
+        <div>
+          <div class="lt-eta-time">~15 min</div>
+          <div class="lt-eta-label">Temps estimé d'arrivée</div>
+        </div>
+        <div class="lt-rider-info">
+          <div class="lt-rider-av">MD</div>
+          <div>
+            <div class="lt-rider-name">Mamadou Diallo</div>
+            <div class="lt-rider-phone">Livreur certifié ✓</div>
+          </div>
+          <button class="lt-call" onclick="showToast('📞 Appel livreur...')">📞</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACKING STEPS -->
+    <div class="tracking-card">
+      <div class="tc-title">📍 Suivi de la commande</div>
+      <div class="tracking-steps" id="tracking-steps">
+        <!-- Généré dynamiquement -->
+      </div>
+    </div>
+
+    <!-- SHOP MINI -->
+    <div class="shop-mini" id="shop-mini" onclick="goToShop()">
+      <div class="sm-av" id="sm-av">MF</div>
+      <div class="sm-info">
+        <div class="sm-name" id="sm-name">Mode Fatou Ndoye</div>
+        <div class="sm-sub">Cliquez pour visiter la boutique →</div>
+      </div>
+      <div class="sm-arrow">›</div>
+    </div>
+
+    <!-- ITEMS -->
+    <div class="items-card">
+      <div class="ic-header">
+        <div class="ic-title">📦 Articles commandés</div>
+      </div>
+      <div id="items-list">
+        <!-- Généré dynamiquement -->
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-card">
+      <div class="sc-title">💰 Récapitulatif</div>
+      <div class="sc-row">
+        <span class="sc-label">Sous-total</span>
+        <span class="sc-val" id="sc-subtotal">—</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-label">Livraison</span>
+        <span class="sc-val" id="sc-delivery">—</span>
+      </div>
+      <div class="sc-row" id="sc-discount-row" style="display:none">
+        <span class="sc-label">Réduction promo</span>
+        <span class="sc-val" style="color:var(--green)" id="sc-discount">—</span>
+      </div>
+      <div class="sc-divider"></div>
+      <div class="sc-total">
+        <span class="sc-total-label">Total payé</span>
+        <span class="sc-total-val" id="sc-total">—</span>
+      </div>
+    </div>
+
+    <!-- DELIVERY INFO -->
+    <div class="delivery-card">
+      <div class="dc-title">🚚 Informations de livraison</div>
+      <div class="dc-row">
+        <div class="dc-icon">📍</div>
+        <div class="dc-info">
+          <div class="dc-label">Adresse de livraison</div>
+          <div class="dc-val" id="dc-address">—</div>
+        </div>
+      </div>
+      <div class="dc-row">
+        <div class="dc-icon">📅</div>
+        <div class="dc-info">
+          <div class="dc-label">Date estimée</div>
+          <div class="dc-val" id="dc-date">—</div>
+        </div>
+      </div>
+      <div class="dc-row">
+        <div class="dc-icon">💳</div>
+        <div class="dc-info">
+          <div class="dc-label">Moyen de paiement</div>
+          <div class="dc-val" id="dc-payment">Wave</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions-card" id="actions-card">
+      <div class="ac-title">⚡ Actions</div>
+      <div class="ac-btns" id="ac-btns">
+        <!-- Généré dynamiquement selon le statut -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'">
+      <div class="mn-icon">🏠</div><div class="mn-label">Accueil</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'">
+      <div class="mn-icon">🔍</div><div class="mn-label">Recherche</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'">
+      <div class="mn-icon">🛒</div><div class="mn-label">Panier</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'">
+      <div class="mn-icon">👤</div><div class="mn-label">Profil</div>
+    </div>
+  </div>
+</nav>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE SUIVI COMMANDE — Données dynamiques
+// ════════════════════════════════════════
+
+let currentOrder = null;
+
+// ── Récupérer l'ID de la commande depuis l'URL ──
+function getOrderIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+// ── Charger la commande ──
+async function loadOrder(orderId) {
+  const result = await getOrder(orderId);
+
+  document.getElementById('loading-state').style.display = 'none';
+
+  if (!result.success) {
+    document.getElementById('order-content').innerHTML = `
+      <div style="text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:14px">❌</div>
+        <div style="font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:6px">
+          Commande introuvable
+        </div>
+        <div style="font-size:.86rem;margin-bottom:20px">
+          Cette commande n'existe pas ou vous n'y avez pas accès.
+        </div>
+        <button onclick="window.location.href='marche-senegal-profil.html'"
+                style="background:var(--green);color:#fff;border:none;
+                       border-radius:99px;padding:10px 22px;
+                       font-size:.86rem;font-weight:600;cursor:pointer">
+          ← Mes commandes
+        </button>
+      </div>
+    `;
+    document.getElementById('order-content').style.display = 'block';
+    return;
+  }
+
+  currentOrder = result.data;
+  document.getElementById('order-content').style.display = 'block';
+
+  renderOrder(currentOrder);
+}
+
+// ── Afficher la commande ──
+function renderOrder(order) {
+
+  // Breadcrumb
+  document.getElementById('bc-order-num').textContent = order.orderNumber;
+  document.title = `${order.orderNumber} — Marché Sénégal`;
+
+  // Header
+  document.getElementById('oh-num').textContent = order.orderNumber;
+  document.getElementById('oh-title').textContent = order.shop?.name || 'Boutique';
+  document.getElementById('oh-date').textContent =
+    'Passée le ' + new Date(order.createdAt).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+
+  // Statut
+  const statusEl = document.getElementById('oh-status');
+  statusEl.textContent = getStatusEmoji(order.status) + ' ' + getStatusLabel(order.status);
+  statusEl.className = 'oh-status ' + getStatusClass(order.status);
+
+  // Stats
+  document.getElementById('ohs-items').textContent = order.items?.length || 0;
+  document.getElementById('ohs-total').textContent =
+    (order.total / 1000).toFixed(0) + 'K FCFA';
+  document.getElementById('ohs-delivery').textContent =
+    order.deliveryType === 'PICKUP' ? 'Retrait' : '1 000 FCFA';
+
+  // Live tracker — visible si en livraison
+  if (order.status === 'DELIVERING') {
+    document.getElementById('live-tracker').style.display = 'block';
+  }
+
+  // Tracking steps
+  renderTrackingSteps(order.status);
+
+  // Boutique
+  const shopName = order.shop?.name || 'Boutique';
+  document.getElementById('sm-av').textContent =
+    shopName.charAt(0) + (shopName.split(' ')[1]?.charAt(0) || '');
+  document.getElementById('sm-name').textContent = shopName;
+
+  // Articles
+  renderItems(order.items || []);
+
+  // Récapitulatif
+  document.getElementById('sc-subtotal').textContent = formatPrice(order.subtotal);
+  document.getElementById('sc-delivery').textContent = formatPrice(order.deliveryFee);
+  document.getElementById('sc-total').textContent = formatPrice(order.total);
+
+  if (order.discount > 0) {
+    document.getElementById('sc-discount-row').style.display = 'flex';
+    document.getElementById('sc-discount').textContent = '−' + formatPrice(order.discount);
+  }
+
+  // Infos livraison
+  document.getElementById('dc-address').textContent =
+    order.address
+      ? `${order.address.address}, ${order.address.city}`
+      : order.deliveryType === 'PICKUP'
+        ? 'Retrait en boutique'
+        : 'Adresse non spécifiée';
+
+  const deliveryDate = new Date(order.createdAt);
+  deliveryDate.setDate(deliveryDate.getDate() + 2);
+  document.getElementById('dc-date').textContent =
+    order.status === 'DELIVERED'
+      ? '✅ Livré'
+      : deliveryDate.toLocaleDateString('fr-FR', {
+          weekday: 'long', day: 'numeric', month: 'long'
+        });
+
+  // Actions
+  renderActions(order);
+}
+
+// ── Afficher les étapes de suivi ──
+function renderTrackingSteps(status) {
+  const steps = [
+    { key: 'PENDING',    icon: '📋', label: 'Commande passée',         desc: 'Votre commande a été reçue' },
+    { key: 'CONFIRMED',  icon: '✅', label: 'Commande confirmée',      desc: 'Le vendeur a confirmé votre commande' },
+    { key: 'PREPARING',  icon: '📦', label: 'En cours de préparation', desc: 'Le vendeur prépare votre commande' },
+    { key: 'READY',      icon: '🏪', label: 'Prête pour livraison',    desc: 'Votre commande est prête' },
+    { key: 'DELIVERING', icon: '🛵', label: 'En livraison',            desc: 'Le livreur est en route' },
+    { key: 'DELIVERED',  icon: '🎉', label: 'Livré',                   desc: 'Commande reçue avec succès' }
+  ];
+
+  const statusOrder = ['PENDING','CONFIRMED','PREPARING','READY','DELIVERING','DELIVERED'];
+  const currentIdx = statusOrder.indexOf(status);
+
+  const container = document.getElementById('tracking-steps');
+  container.innerHTML = steps.map((step, i) => {
+    let state = 'pending';
+    if (i < currentIdx) state = 'done';
+    else if (i === currentIdx) state = 'active';
+
+    const time = state === 'done' ? getStepTime(i) : '';
+
+    return `
+      <div class="ts-item ${state}">
+        <div class="ts-dot">${state === 'done' ? '✓' : step.icon}</div>
+        <div class="ts-info">
+          <div class="ts-label">${step.label}</div>
+          <div class="ts-desc">${step.desc}</div>
+          ${time ? `<div class="ts-time">${time}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Afficher les articles ──
+function renderItems(items) {
+  const container = document.getElementById('items-list');
+
+  if (items.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:24px;color:var(--muted)">
+        Aucun article
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = items.map(item => `
+    <div class="item-row">
+      <div class="ir-img">
+        ${item.imageUrl
+          ? `<img src="${item.imageUrl}" alt="${item.name}"/>`
+          : '👗'
+        }
+      </div>
+      <div class="ir-info">
+        <div class="ir-name">${item.name}</div>
+        <div class="ir-variant">
+          ${item.size ? 'Taille : ' + item.size : ''}
+          ${item.size && item.color ? ' · ' : ''}
+          ${item.color ? item.color : ''}
+        </div>
+      </div>
+      <div class="ir-right">
+        <div class="ir-price">${formatPrice(item.price * item.quantity)}</div>
+        <div class="ir-qty">Qté : ${item.quantity}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Afficher les actions selon le statut ──
+function renderActions(order) {
+  const container = document.getElementById('ac-btns');
+
+  const actions = [];
+
+  // Confirmer la réception — si en livraison ou prêt
+  if (['DELIVERING', 'READY'].includes(order.status)) {
+    actions.push(`
+      <button class="ac-btn ac-btn-green" onclick="confirmDelivery()">
+        ✅ Confirmer la réception
+      </button>
+    `);
+  }
+
+  // Annuler — si en attente
+  if (order.status === 'PENDING') {
+    actions.push(`
+      <button class="ac-btn ac-btn-red" onclick="cancelOrder()">
+        ✕ Annuler la commande
+      </button>
+    `);
+  }
+
+  // Laisser un avis — si livré
+  if (order.status === 'DELIVERED') {
+    actions.push(`
+      <button class="ac-btn ac-btn-green" onclick="leaveReview()">
+        ⭐ Laisser un avis
+      </button>
+    `);
+    actions.push(`
+      <button class="ac-btn" onclick="reorder()">
+        🔄 Recommander les mêmes articles
+      </button>
+    `);
+  }
+
+  // Contacter le vendeur — toujours disponible
+  actions.push(`
+    <button class="ac-btn" onclick="contactSeller()">
+      💬 Contacter le vendeur
+    </button>
+  `);
+
+  // Signaler un problème — si livré ou en cours
+  if (!['PENDING', 'CANCELLED'].includes(order.status)) {
+    actions.push(`
+      <button class="ac-btn" onclick="reportProblem()">
+        ⚠️ Signaler un problème
+      </button>
+    `);
+  }
+
+  container.innerHTML = actions.join('');
+}
+
+// ── Actions ──
+async function confirmDelivery() {
+  if (!currentOrder) return;
+
+  const btn = event.target;
+  btn.textContent = '⏳ Confirmation...';
+  btn.disabled = true;
+
+  const result = await updateOrderStatus(currentOrder.id, 'DELIVERED');
+
+  if (result.success) {
+    showToast('✅ Réception confirmée ! Merci pour votre commande.');
+    setTimeout(() => location.reload(), 1500);
+  } else {
+    showToast('❌ Erreur lors de la confirmation');
+    btn.textContent = '✅ Confirmer la réception';
+    btn.disabled = false;
+  }
+}
+
+async function cancelOrder() {
+  if (!currentOrder) return;
+  if (!confirm('Voulez-vous vraiment annuler cette commande ?')) return;
+
+  const result = await updateOrderStatus(currentOrder.id, 'CANCELLED');
+
+  if (result.success) {
+    showToast('Commande annulée');
+    setTimeout(() => location.reload(), 1500);
+  } else {
+    showToast('❌ Erreur lors de l\'annulation');
+  }
+}
+
+function leaveReview() {
+  showToast('⭐ Merci ! Les avis arrivent bientôt.');
+}
+
+function reorder() {
+  if (!currentOrder?.items) return;
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  currentOrder.items.forEach(item => {
+    cart.push({
+      productId: item.productId,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      shopId: currentOrder.shopId,
+      shopName: currentOrder.shop?.name
+    });
+  });
+  localStorage.setItem('cart', JSON.stringify(cart));
+  showToast('✓ Articles ajoutés au panier !');
+  setTimeout(() => window.location.href = 'marche-senegal-panier.html', 1500);
+}
+
+function contactSeller() {
+  showToast('💬 Chat vendeur — bientôt disponible !');
+}
+
+function reportProblem() {
+  showToast('⚠️ Signalement en cours de développement');
+}
+
+function goToShop() {
+  if (currentOrder?.shopId) {
+    window.location.href = `marche-senegal-boutique.html?id=${currentOrder.shopId}`;
+  }
+}
+
+// ── Helpers ──
+function getStatusLabel(status) {
+  const labels = {
+    'PENDING':    'En attente',
+    'CONFIRMED':  'Confirmé',
+    'PREPARING':  'En préparation',
+    'READY':      'Prête',
+    'DELIVERING': 'En livraison',
+    'DELIVERED':  'Livré',
+    'CANCELLED':  'Annulé',
+    'REFUNDED':   'Remboursé'
+  };
+  return labels[status] || status;
+}
+
+function getStatusEmoji(status) {
+  const emojis = {
+    'PENDING':    '⏳',
+    'CONFIRMED':  '✅',
+    'PREPARING':  '📦',
+    'READY':      '🏪',
+    'DELIVERING': '🛵',
+    'DELIVERED':  '🎉',
+    'CANCELLED':  '❌',
+    'REFUNDED':   '↩️'
+  };
+  return emojis[status] || '📋';
+}
+
+function getStatusClass(status) {
+  const classes = {
+    'PENDING':    'ost-pending',
+    'CONFIRMED':  'ost-confirmed',
+    'PREPARING':  'ost-preparing',
+    'READY':      'ost-confirmed',
+    'DELIVERING': 'ost-delivering',
+    'DELIVERED':  'ost-delivered',
+    'CANCELLED':  'ost-cancelled'
+  };
+  return classes[status] || 'ost-pending';
+}
+
+function getStepTime(stepIndex) {
+  const now = new Date();
+  const times = [
+    new Date(now - 3600000 * 3),
+    new Date(now - 3600000 * 2.5),
+    new Date(now - 3600000 * 2),
+    new Date(now - 3600000 * 1),
+    new Date(now - 3600000 * 0.5),
+    now
+  ];
+  return times[stepIndex]?.toLocaleTimeString('fr-FR', {
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const count = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = count;
+}
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+
+  if (!isLoggedIn()) {
+    window.location.href = 'marche-senegal-connexion-acheteur.html';
+    return;
+  }
+
+  const orderId = getOrderIdFromURL();
+
+  if (orderId) {
+    await loadOrder(orderId);
+  } else {
+    // Pas d'ID — aller vers le profil
+    window.location.href = 'marche-senegal-profil.html';
+  }
+});
+</script>
+</body>
+</html>

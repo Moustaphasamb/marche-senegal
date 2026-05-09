@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mode Fatou Ndoye — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.15);
+  --radius:14px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+button,input,textarea,select{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ═══════ FLAG ═══════ */
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* ═══════ NAV ═══════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:var(--nav-h);
+  background:rgba(250,250,247,.97);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 4vw;gap:12px;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:9px;
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-weight:900;color:var(--green);
+  flex-shrink:0;white-space:nowrap;
+}
+.nav-logo:hover{color:var(--gl)}
+.nav-search{
+  flex:1;min-width:0;max-width:500px;
+  display:flex;align-items:center;
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:99px;padding:0 5px 0 16px;height:42px;
+  box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s;
+}
+.nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
+.nav-search input{flex:1;min-width:0;border:none;outline:none;font-size:.88rem;color:var(--text);background:transparent}
+.nav-search input::placeholder{color:var(--muted)}
+.nav-search-btn{
+  flex-shrink:0;background:var(--green);color:#fff;border:none;
+  border-radius:99px;height:32px;padding:0 14px;
+  font-size:.82rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:background .2s;white-space:nowrap;
+}
+.nav-search-btn:hover{background:var(--gl)}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.nav-btn{
+  display:flex;align-items:center;gap:6px;
+  height:38px;padding:0 16px;border-radius:99px;
+  font-size:.82rem;font-weight:500;cursor:pointer;
+  border:1.5px solid var(--border);background:#fff;color:var(--text);
+  transition:all .2s;white-space:nowrap;flex-shrink:0;
+}
+.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.nav-btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.nav-btn-primary:hover{background:var(--gl);color:#fff}
+.nav-cart{
+  position:relative;width:42px;height:42px;border-radius:50%;
+  border:1.5px solid var(--border);background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0;
+}
+.nav-cart:hover{border-color:var(--green);background:var(--gp)}
+.cart-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:var(--dark);
+  font-size:.58rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #fff;
+}
+.nav-hamburger{
+  display:none;flex-direction:column;gap:5px;
+  width:38px;height:38px;border-radius:10px;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;
+}
+.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-drawer{
+  display:none;position:fixed;
+  top:var(--nav-h);left:0;right:0;
+  background:#fff;border-bottom:1.5px solid var(--border);
+  padding:16px 4vw 20px;z-index:190;
+  box-shadow:0 8px 32px rgba(0,0,0,.1);
+  flex-direction:column;gap:12px;
+}
+.nav-drawer.open{display:flex}
+.nav-drawer .nav-search{max-width:100%;width:100%}
+.nav-drawer-row{display:flex;gap:8px}
+.nav-drawer-row .nav-btn{flex:1;justify-content:center;height:42px}
+
+/* ═══════ TOAST ═══════ */
+.toast{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--dark);color:#fff;
+  padding:10px 22px;border-radius:99px;
+  font-size:.84rem;font-weight:500;
+  opacity:0;transition:all .28s;pointer-events:none;z-index:500;
+  white-space:nowrap;box-shadow:var(--shadow-lg);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════ MOBILE NAV ═══════ */
+.mobile-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:#fff;border-top:1.5px solid var(--border);
+  padding:8px 0 max(10px,env(safe-area-inset-bottom));
+}
+.mn-items{display:flex}
+.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
+.mn-icon{width:24px;height:24px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:background .18s}
+.mn-item.act .mn-icon{background:var(--green)}
+.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}
+.mn-item.act .mn-label{color:var(--green)}
+
+/* ═══════ BREADCRUMB ═══════ */
+.breadcrumb{
+  padding:12px 4vw;display:flex;align-items:center;gap:7px;
+  font-size:.8rem;color:var(--muted);
+  background:#fff;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;overflow-x:auto;scrollbar-width:none;
+}
+.breadcrumb::-webkit-scrollbar{display:none}
+.bc-link{color:var(--green);cursor:pointer}
+.bc-link:hover{text-decoration:underline}
+.bc-sep{color:var(--border);flex-shrink:0}
+.bc-current{color:var(--text);font-weight:500;white-space:nowrap}
+
+/* ═══════ SHOP HERO ═══════ */
+.shop-hero{background:var(--dark);position:relative;overflow:hidden}
+.sh-banner{
+  height:180px;
+  background:linear-gradient(135deg,#1B6B3A,#0D3320);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4.5rem;position:relative;overflow:hidden;
+}
+.sh-banner::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.18),transparent 70%)}
+.sh-promo-badge{
+  position:absolute;top:14px;right:14px;
+  background:var(--gold);color:var(--dark);
+  font-size:.76rem;font-weight:700;padding:5px 13px;border-radius:99px;z-index:2;
+}
+.sh-info{padding:0 5vw 28px;position:relative}
+.sh-avatar-row{display:flex;align-items:flex-end;gap:18px;margin-top:-34px;margin-bottom:18px;flex-wrap:wrap}
+.sh-avatar{
+  width:76px;height:76px;border-radius:50%;
+  border:4px solid var(--dark);background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:700;color:#fff;
+  flex-shrink:0;box-shadow:0 4px 18px rgba(0,0,0,.3);
+}
+.sh-meta{flex:1;min-width:200px;padding-top:36px}
+.sh-verified{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(27,107,58,.25);color:#4CAF50;
+  font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px;margin-bottom:7px;
+}
+.sh-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.3rem,3vw,2rem);font-weight:700;
+  color:#fff;margin-bottom:4px;
+}
+.sh-location{
+  font-size:.82rem;color:rgba(255,255,255,.5);
+  margin-bottom:10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+}
+.sh-loc-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.7);font-size:.7rem;padding:3px 9px;border-radius:99px;
+}
+.sh-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sh-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 18px;border-radius:99px;
+  font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;
+}
+.sh-btn-primary{background:var(--green);color:#fff}.sh-btn-primary:hover{background:var(--gl)}
+.sh-btn-gold{background:var(--gold);color:var(--dark)}.sh-btn-gold:hover{filter:brightness(1.08)}
+.sh-btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8)}
+.sh-btn-outline:hover{background:rgba(255,255,255,.1)}
+.sh-stats-row{display:flex;gap:22px;flex-wrap:wrap}
+.sh-stat-n{font-size:1.25rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif}
+.sh-stat-l{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:2px}
+
+/* ═══════ MAIN GRID ═══════ */
+.main{display:grid;grid-template-columns:1fr 340px;gap:22px;padding:24px 5vw 60px;max-width:1280px;margin:0 auto}
+
+/* ═══════ TABS ═══════ */
+.tabs{display:flex;gap:0;border:.5px solid var(--border);border-radius:99px;overflow:hidden;background:#fff;margin-bottom:22px}
+.tab{flex:1;padding:9px 0;text-align:center;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;border-right:1px solid var(--border)}
+.tab:last-child{border-right:none}
+.tab.active{background:var(--green);color:#fff}
+
+/* ═══════ VIDEO ═══════ */
+.visit-section{margin-bottom:26px}
+.vs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.vs-title{font-size:.96rem;font-weight:600;color:var(--dark)}
+.vs-badge{display:inline-flex;align-items:center;gap:5px;background:var(--rp);color:var(--red);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px}
+.vs-badge-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.video-player{background:#0D1F17;border-radius:var(--radius);overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer}
+.vp-thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0D1F17,#1a4a2e);position:relative}
+.vp-emoji{font-size:3.5rem;position:relative;z-index:1}
+.vp-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:2;transition:background .2s}
+.vp-overlay:hover{background:rgba(0,0,0,.28)}
+.vp-play{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.vp-overlay:hover .vp-play{transform:scale(1.08)}
+.vp-tri{width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;border-left:18px solid var(--green);margin-left:4px}
+.vp-duration{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.65);color:#fff;font-size:.7rem;font-weight:600;padding:3px 7px;border-radius:4px}
+.vp-label{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:99px;z-index:3}
+.vp-hint{font-size:.78rem;color:var(--muted);margin:10px 0 8px;font-weight:500}
+.vp-tags{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.vp-tags::-webkit-scrollbar{display:none}
+.vp-tag{
+  flex-shrink:0;background:#fff;border:1.5px solid var(--border);
+  border-radius:9px;padding:7px 11px;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:7px;
+}
+.vp-tag:hover{border-color:var(--green);box-shadow:var(--shadow)}
+.vt-icon{font-size:1.1rem}
+.vt-name{font-size:.75rem;font-weight:600;color:var(--dark)}
+.vt-price{font-size:.7rem;color:var(--green);margin-top:1px}
+.vt-time{font-size:.62rem;color:var(--muted)}
+
+/* ═══════ PRODUCTS ═══════ */
+.prod-section{margin-bottom:26px}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:7px}
+.sec-title{font-size:.96rem;font-weight:600;color:var(--dark)}
+.sec-link{font-size:.78rem;color:var(--green);font-weight:600;cursor:pointer}
+.sec-link:hover{text-decoration:underline}
+.pf-row{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.pf-row::-webkit-scrollbar{display:none}
+.pf{padding:5px 12px;border-radius:99px;font-size:.76rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0}
+.pf.active,.pf:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.prods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.prod-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.prod-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.pc-img{height:125px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;position:relative;background:var(--bg)}
+.pc-badge{position:absolute;top:7px;left:7px;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.pc-badge.new{background:var(--green);color:#fff}
+.pc-wish{position:absolute;top:7px;right:7px;width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;cursor:pointer;transition:all .18s}
+.pc-wish:hover{border-color:var(--red)}
+.pc-body{padding:9px}
+.pc-name{font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.pc-rating{display:flex;align-items:center;gap:3px;font-size:.66rem;color:var(--muted);margin-bottom:6px}
+.pc-stars{color:var(--gold);font-size:.68rem}
+.pc-footer{display:flex;align-items:center;justify-content:space-between}
+.pc-price{font-size:.92rem;font-weight:700;color:var(--green)}
+.pc-old{font-size:.68rem;color:var(--muted);text-decoration:line-through;margin-left:3px}
+.add-btn{width:24px;height:24px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.add-btn:hover{background:var(--gl);transform:scale(1.1)}
+
+/* ═══════ REVIEWS ═══════ */
+.rating-summary{
+  display:flex;gap:18px;align-items:center;
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;flex-wrap:wrap;
+}
+.rs-big{text-align:center;min-width:72px}
+.rs-num{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;color:var(--dark);line-height:1}
+.rs-stars{color:var(--gold);font-size:1rem;margin:4px 0}
+.rs-count{font-size:.7rem;color:var(--muted)}
+.rs-bars{flex:1;display:flex;flex-direction:column;gap:5px;min-width:150px}
+.rb-row{display:flex;align-items:center;gap:7px;font-size:.72rem;color:var(--muted)}
+.rb-star{width:12px;text-align:right;flex-shrink:0}
+.rb-bg{flex:1;height:7px;background:var(--border);border-radius:3px}
+.rb-fill{height:7px;background:var(--gold);border-radius:3px}
+.rb-pct{width:26px;text-align:right;flex-shrink:0}
+.review-list{display:flex;flex-direction:column;gap:12px}
+.review-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.rv-header{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.rv-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.rv-name{font-weight:600;font-size:.86rem;color:var(--dark)}
+.rv-date{font-size:.68rem;color:var(--muted);margin-top:2px}
+.rv-stars{color:var(--gold);font-size:.76rem;margin-left:auto}
+.rv-text{font-size:.82rem;color:var(--text);line-height:1.62}
+.rv-product{display:inline-flex;align-items:center;gap:4px;background:var(--gp);color:var(--green);font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:7px}
+
+/* ═══════ INFO TAB ═══════ */
+.info-tab{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px}
+.it-desc{font-size:.86rem;color:var(--muted);line-height:1.7;margin-bottom:18px}
+.it-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.it-icon{width:32px;height:32px;border-radius:8px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.it-label{font-size:.8rem;font-weight:600;color:var(--dark)}
+.it-sub{font-size:.74rem;color:var(--muted);margin-top:2px;line-height:1.45}
+.it-open{display:inline-block;background:var(--gp);color:var(--green);font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:3px}
+
+/* ═══════ RIGHT COLUMN ═══════ */
+.right-col{display:flex;flex-direction:column;gap:14px}
+.promo-card{background:linear-gradient(135deg,var(--dark),#1a4a2e);border-radius:var(--radius);padding:18px;color:#fff}
+.pc-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold);margin-bottom:5px}
+.pc-code{font-size:1.3rem;font-weight:700;letter-spacing:.07em;color:#fff;margin-bottom:3px;font-family:'Playfair Display',serif}
+.pc-detail{font-size:.76rem;color:rgba(255,255,255,.55);margin-bottom:12px;line-height:1.5}
+.pc-copy{background:var(--gold);color:var(--dark);border:none;border-radius:99px;padding:8px 16px;font-size:.8rem;font-weight:700;cursor:pointer;width:100%;transition:filter .2s}
+.pc-copy:hover{filter:brightness(1.1)}
+.pc-timer{display:flex;align-items:center;gap:5px;font-size:.7rem;color:rgba(255,255,255,.45);margin-top:9px}
+.pt-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.6s infinite}
+.contact-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px}
+.cc-title{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:12px}
+.cc-btns{display:flex;flex-direction:column;gap:7px}
+.cc-btn{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:9px;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;font-size:.82rem;font-weight:500;
+  color:var(--text);transition:all .2s;width:100%;
+}
+.cc-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.cc-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.cc-primary{background:var(--green);border-color:var(--green);color:#fff}
+.cc-primary:hover{background:var(--gl);color:#fff}
+.info-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px}
+.ic-title{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:12px}
+.ic-row{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px}
+.ic-icon{width:30px;height:30px;border-radius:7px;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.ic-label{font-size:.78rem;font-weight:600;color:var(--dark)}
+.ic-sub{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.4}
+.ic-open{display:inline-block;background:var(--gp);color:var(--green);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:99px;margin-top:3px}
+.map-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.map-visual{height:110px;background:linear-gradient(135deg,var(--gp),#c8e8d4);display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative}
+.map-pin{position:absolute;font-size:1.8rem}
+.map-body{padding:12px}
+.map-address{font-size:.8rem;color:var(--text);font-weight:500;margin-bottom:3px}
+.map-sub{font-size:.72rem;color:var(--muted);margin-bottom:9px}
+.map-btn{background:var(--gp);border:1px solid var(--g2);color:var(--green);border-radius:7px;padding:7px;width:100%;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.map-btn:hover{background:var(--green);color:#fff}
+
+/* ═══════ CHAT ═══════ */
+.chat-panel{
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+  display:none;flex-direction:column;
+}
+.chat-panel.open{display:flex}
+.chat-header{background:var(--green);padding:13px 14px;display:flex;align-items:center;gap:9px}
+.chat-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:#fff;flex-shrink:0}
+.chat-name-txt{font-size:.86rem;font-weight:600;color:#fff}
+.chat-status{font-size:.68rem;color:rgba(255,255,255,.65)}
+.chat-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:1.05rem;cursor:pointer;padding:3px;margin-left:auto}
+.chat-messages{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;max-height:260px;overflow-y:auto;background:var(--bg)}
+.msg{max-width:82%;display:flex;flex-direction:column;gap:2px}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.msg.them{align-self:flex-start;align-items:flex-start}
+.msg-bubble{padding:7px 11px;border-radius:10px;font-size:.8rem;line-height:1.5}
+.msg.them .msg-bubble{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:10px 10px 10px 3px}
+.msg.me .msg-bubble{background:var(--green);color:#fff;border-radius:10px 10px 3px 10px}
+.msg-time{font-size:.6rem;color:var(--muted)}
+.chat-input-row{padding:9px 11px;border-top:1px solid var(--border);display:flex;gap:7px;background:#fff}
+.chat-input{flex:1;border:1.5px solid var(--border);border-radius:18px;padding:7px 13px;font-size:.8rem;outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:var(--green)}
+.chat-send{background:var(--green);color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.chat-send:hover{background:var(--gl)}
+
+/* ═══════ MOBILE STICKY CTA ═══════ */
+.mobile-cta{
+  display:none;position:fixed;bottom:70px;left:0;right:0;
+  z-index:150;padding:10px 16px;
+  background:rgba(250,250,247,.96);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--border);
+  gap:8px;
+}
+
+/* ═══════ RESPONSIVE ═══════ */
+@media(max-width:900px){
+  .nav-search{display:none}
+  .nav-btn.nav-btn-login,.nav-btn.nav-btn-shop{display:none}
+  .nav-hamburger{display:flex}
+  .mobile-nav{display:block}
+  .mobile-cta{display:flex}
+  .main{grid-template-columns:1fr}
+  .right-col{order:-1}
+  body{padding-bottom:130px}
+  .toast{bottom:140px}
+  .chat-panel{
+    position:fixed;bottom:130px;left:0;right:0;
+    z-index:300;border-radius:var(--radius) var(--radius) 0 0;
+    max-height:380px;
+  }
+}
+@media(max-width:600px){
+  :root{--nav-h:58px}
+  .nav{padding:0 4vw;gap:10px}
+  .nav-logo .nav-logo-text{display:none}
+  .nav-cart{width:38px;height:38px}
+  .sh-banner{height:130px;font-size:3rem}
+  .sh-stats-row{gap:14px}
+  .sh-actions .sh-btn-outline{display:none}
+  .main{padding:16px 4vw 20px}
+  .prods-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .tabs .tab{font-size:.74rem;padding:8px 0}
+}
+@media(max-width:380px){
+  .sh-stats-row{gap:10px}
+  .prods-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════ NAV ═══════ -->
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    <span class="nav-logo-text">Marché Sénégal</span>
+  </a>
+  <div class="nav-search">
+    <input type="text" placeholder="Rechercher dans Mode Fatou..."/>
+    <button class="nav-search-btn">🔍 Rechercher</button>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
+    <button class="nav-btn nav-btn-primary nav-btn-shop" onclick="toast('Boutique...')">🏪 Ma boutique</button>
+    <button class="nav-cart" onclick="toast('Panier...')">
+      🛒<div class="cart-badge" id="cart-count">0</div>
+    </button>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-search" style="max-width:100%;width:100%">
+    <input type="text" placeholder="Rechercher..."/>
+    <button class="nav-search-btn">🔍</button>
+  </div>
+  <div class="nav-drawer-row">
+    <button class="nav-btn" style="flex:1;justify-content:center" onclick="toast('Connexion...')">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center" onclick="toast('Boutique...')">🏪 Ma boutique</button>
+  </div>
+</div>
+
+<!-- ═══════ BREADCRUMB ═══════ -->
+<div class="breadcrumb">
+  <a href="marche-senegal-accueil.html" class="bc-link">Accueil</a>
+  <span class="bc-sep">›</span>
+  <a href="marche-senegal-marche.html" class="bc-link">Marchés</a>
+  <span class="bc-sep">›</span>
+  <a href="marche-senegal-marche.html" class="bc-link">Sandaga</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">Mode Fatou Ndoye</span>
+</div>
+
+<!-- ═══════ SHOP HERO ═══════ -->
+<div class="shop-hero">
+  <div class="sh-banner">
+    👗
+    <div class="sh-promo-badge">🔥 -15% Code FATOU15</div>
+  </div>
+  <div class="sh-info">
+    <div class="sh-avatar-row">
+      <div class="sh-avatar">MF</div>
+      <div class="sh-meta">
+        <div class="sh-verified">✓ Vendeur Vérifié · CNI validée</div>
+        <div class="sh-name">Mode Fatou Ndoye</div>
+        <div class="sh-location">
+          <span class="sh-loc-chip">🏛️ Marché Sandaga · Allée 3</span>
+          <span class="sh-loc-chip">📍 Dakar Centre</span>
+          <span class="sh-loc-chip" style="background:rgba(76,175,80,.2);border-color:rgba(76,175,80,.3);color:#4CAF50">● Ouverte maintenant</span>
+        </div>
+        <div class="sh-actions">
+          <button class="sh-btn sh-btn-primary" onclick="openChat()">💬 Contacter</button>
+          <button class="sh-btn sh-btn-gold" onclick="follow()">❤️ Suivre</button>
+          <button class="sh-btn sh-btn-outline" onclick="share()">↗ Partager</button>
+        </div>
+        <div class="sh-stats-row">
+          <div><div class="sh-stat-n">4.8 ⭐</div><div class="sh-stat-l">Note moyenne</div></div>
+          <div><div class="sh-stat-n">234</div><div class="sh-stat-l">Avis clients</div></div>
+          <div><div class="sh-stat-n">1 240</div><div class="sh-stat-l">Ventes totales</div></div>
+          <div><div class="sh-stat-n">48</div><div class="sh-stat-l">Produits</div></div>
+          <div><div class="sh-stat-n">2 100</div><div class="sh-stat-l">Abonnés</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="main">
+
+  <!-- LEFT -->
+  <div id="left-col">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('boutique',this)">🏪 Boutique</div>
+      <div class="tab" onclick="switchTab('produits',this)">📦 Produits (48)</div>
+      <div class="tab" onclick="switchTab('avis',this)">⭐ Avis (234)</div>
+      <div class="tab" onclick="switchTab('infos',this)">ℹ️ Infos</div>
+    </div>
+
+    <!-- TAB BOUTIQUE -->
+    <div id="tab-boutique">
+      <div class="visit-section">
+        <div class="vs-header">
+          <div class="vs-title">🎥 Visite virtuelle de la boutique</div>
+          <div class="vs-badge"><span class="vs-badge-dot"></span>Nouvelle vidéo</div>
+        </div>
+        <div class="video-player" onclick="playVideo()">
+          <div class="vp-thumb">
+            <div class="vp-label">🎥 Visite virtuelle</div>
+            <div class="vp-emoji">🏪</div>
+            <div class="vp-overlay" id="vp-overlay">
+              <div class="vp-play"><div class="vp-tri"></div></div>
+            </div>
+            <div class="vp-duration" id="vp-dur">2:34</div>
+          </div>
+        </div>
+        <div class="vp-hint">📌 Produits vus dans cette vidéo — cliquez pour commander</div>
+        <div class="vp-tags">
+          <div class="vp-tag" onclick="addToCart2('Boubou wax L',18000)">
+            <div class="vt-icon">👗</div>
+            <div><div class="vt-name">Boubou wax — Taille L</div><div class="vt-price">18 000 FCFA</div><div class="vt-time">à 0:18 dans la vidéo</div></div>
+          </div>
+          <div class="vp-tag" onclick="addToCart2('Robe wax brodée',9500)">
+            <div class="vt-icon">👘</div>
+            <div><div class="vt-name">Robe wax brodée</div><div class="vt-price">9 500 FCFA</div><div class="vt-time">à 0:45 dans la vidéo</div></div>
+          </div>
+          <div class="vp-tag" onclick="addToCart2('Bazin brodé cérémonie',25000)">
+            <div class="vt-icon">🧵</div>
+            <div><div class="vt-name">Bazin brodé cérémonie</div><div class="vt-price">25 000 FCFA</div><div class="vt-time">à 1:12 dans la vidéo</div></div>
+          </div>
+          <div class="vp-tag" onclick="addToCart2('Tissu wax 6 yards',4500)">
+            <div class="vt-icon">🎨</div>
+            <div><div class="vt-name">Tissu wax 6 yards</div><div class="vt-price">4 500 FCFA</div><div class="vt-time">à 1:55 dans la vidéo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prod-section">
+        <div class="sec-hd">
+          <div class="sec-title">Produits vedettes</div>
+          <span class="sec-link" onclick="switchTab('produits',document.querySelectorAll('.tab')[1])">Voir tout →</span>
+        </div>
+        <div class="pf-row">
+          <button class="pf active" onclick="filterP('all',this)">Tout</button>
+          <button class="pf" onclick="filterP('wax',this)">Tissu wax</button>
+          <button class="pf" onclick="filterP('boubou',this)">Boubou</button>
+          <button class="pf" onclick="filterP('bazin',this)">Bazin</button>
+          <button class="pf" onclick="filterP('promo',this)">🔥 Promo</button>
+        </div>
+        <div class="prods-grid">
+          <div class="prod-card" data-cat="boubou promo">
+            <div class="pc-img" style="background:#F0EAF8">👗<div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Boubou wax tissé main — L</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (89)</div><div class="pc-footer"><div><span class="pc-price">15 300 FCFA</span><span class="pc-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+          <div class="prod-card" data-cat="bazin">
+            <div class="pc-img" style="background:#FFF8E7">🧵<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Bazin brodé cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 5.0 (42)</div><div class="pc-footer"><div><span class="pc-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+          <div class="prod-card" data-cat="wax">
+            <div class="pc-img" style="background:#FDE8E6">👘<div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Robe wax africaine brodée</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (67)</div><div class="pc-footer"><div><span class="pc-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+          <div class="prod-card" data-cat="wax promo">
+            <div class="pc-img" style="background:#E8F5EC">🎨<div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Tissu wax hollandais 6 yards</div><div class="pc-rating"><span class="pc-stars">★★★★☆</span> 4.7 (112)</div><div class="pc-footer"><div><span class="pc-price">4 050 FCFA</span><span class="pc-old">4 500</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+          <div class="prod-card" data-cat="boubou promo">
+            <div class="pc-img" style="background:#F0EAF8">🥻<div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Ensemble 3 pièces femme cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (33)</div><div class="pc-footer"><div><span class="pc-price">28 000 FCFA</span><span class="pc-old">35 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+          <div class="prod-card" data-cat="bazin">
+            <div class="pc-img" style="background:#FDF3DC">👒<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-body"><div class="pc-name">Kaftan bazin riche homme brodé</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (28)</div><div class="pc-footer"><div><span class="pc-price">22 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB PRODUITS -->
+    <div id="tab-produits" style="display:none">
+      <div class="sec-hd" style="margin-bottom:14px"><div class="sec-title">Tous les produits (48)</div></div>
+      <div class="pf-row">
+        <button class="pf active">Tout</button>
+        <button class="pf">Boubou</button><button class="pf">Bazin</button>
+        <button class="pf">Robe</button><button class="pf">Tissu wax</button>
+        <button class="pf">Promo</button>
+      </div>
+      <div class="prods-grid">
+        <div class="prod-card"><div class="pc-img" style="background:#F0EAF8">👗<div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Boubou wax tissé main L</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (89)</div><div class="pc-footer"><div><span class="pc-price">15 300 FCFA</span><span class="pc-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="pc-img" style="background:#FFF8E7">🧵<div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Bazin brodé cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 5.0 (42)</div><div class="pc-footer"><div><span class="pc-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="pc-img" style="background:#FDE8E6">👘<div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Robe wax brodée col rond</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (67)</div><div class="pc-footer"><div><span class="pc-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="pc-img" style="background:#E8F5EC">🎨<div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Tissu wax hollandais 6y</div><div class="pc-rating"><span class="pc-stars">★★★★☆</span> 4.7 (112)</div><div class="pc-footer"><div><span class="pc-price">4 050 FCFA</span><span class="pc-old">4 500</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="pc-img" style="background:#F0EAF8">🥻<div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Ensemble 3 pièces femme</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (33)</div><div class="pc-footer"><div><span class="pc-price">28 000 FCFA</span><span class="pc-old">35 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="pc-img" style="background:#FDF3DC">👒<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Kaftan bazin riche homme</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (28)</div><div class="pc-footer"><div><span class="pc-price">22 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      </div>
+    </div>
+
+    <!-- TAB AVIS -->
+    <div id="tab-avis" style="display:none">
+      <div class="rating-summary">
+        <div class="rs-big"><div class="rs-num">4.8</div><div class="rs-stars">★★★★★</div><div class="rs-count">234 avis</div></div>
+        <div class="rs-bars">
+          <div class="rb-row"><span class="rb-star">5★</span><div class="rb-bg"><div class="rb-fill" style="width:72%"></div></div><span class="rb-pct">72%</span></div>
+          <div class="rb-row"><span class="rb-star">4★</span><div class="rb-bg"><div class="rb-fill" style="width:20%"></div></div><span class="rb-pct">20%</span></div>
+          <div class="rb-row"><span class="rb-star">3★</span><div class="rb-bg"><div class="rb-fill" style="width:6%"></div></div><span class="rb-pct">6%</span></div>
+          <div class="rb-row"><span class="rb-star">2★</span><div class="rb-bg"><div class="rb-fill" style="width:2%"></div></div><span class="rb-pct">2%</span></div>
+          <div class="rb-row"><span class="rb-star">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct">0%</span></div>
+        </div>
+      </div>
+      <div class="review-list">
+        <div class="review-card">
+          <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 2 jours</div></div><div class="rv-stars">★★★★★</div></div>
+          <div class="rv-text">Excellente boutique ! Le boubou est exactement comme sur la vidéo. Fatou est très réactive, elle m'a aidé à choisir la bonne taille. Livraison rapide à Parcelles Assainies.</div>
+          <div class="rv-product">👗 Boubou wax tissé main — Taille L</div>
+        </div>
+        <div class="review-card">
+          <div class="rv-header"><div class="rv-avatar" style="background:#8B3A8A">AB</div><div><div class="rv-name">Aissatou Ba</div><div class="rv-date">Il y a 5 jours</div></div><div class="rv-stars">★★★★★</div></div>
+          <div class="rv-text">Je suis venue au marché Sandaga après avoir vu la visite virtuelle. C'est exactement pareil ! Les tissus wax sont authentiques et les prix sont honnêtes. Merci Fatou !</div>
+          <div class="rv-product">🧵 Bazin brodé cérémonie</div>
+        </div>
+        <div class="review-card">
+          <div class="rv-header"><div class="rv-avatar" style="background:var(--gold);color:var(--dark)">RF</div><div><div class="rv-name">Rokhaya Fall</div><div class="rv-date">Il y a 1 semaine</div></div><div class="rv-stars">★★★★★</div></div>
+          <div class="rv-text">J'habite à Thiès et je ne pouvais pas me déplacer. Grâce à la vidéo j'ai pu choisir ma robe en toute confiance. La livraison est arrivée en 2 jours. Vraiment top !</div>
+          <div class="rv-product">👘 Robe wax brodée col rond</div>
+        </div>
+        <div class="review-card">
+          <div class="rv-header"><div class="rv-avatar" style="background:#C0392B">ID</div><div><div class="rv-name">Ibrahima Diallo</div><div class="rv-date">Il y a 2 semaines</div></div><div class="rv-stars">★★★★☆</div></div>
+          <div class="rv-text">Très belle boutique, produits de qualité. Je retire une étoile car la livraison a pris 3 jours au lieu de 2. Mais le kaftan bazin est magnifique, ma femme adore.</div>
+          <div class="rv-product">👒 Kaftan bazin riche homme</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB INFOS -->
+    <div id="tab-infos" style="display:none">
+      <div class="info-tab">
+        <p class="it-desc">Mode Fatou Ndoye est une boutique spécialisée dans les tissus wax, bazin et boubous de qualité supérieure depuis 2015. Située à l'Allée 3 du marché Sandaga, Fatou propose une sélection soigneuse de vêtements et tissus africains authentiques.</p>
+        <div class="it-row"><div class="it-icon">🕐</div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub">Lundi – Samedi : 8h00 – 20h00<br/>Dimanche : 9h00 – 15h00</div><span class="it-open">Ouverte maintenant</span></div></div>
+        <div class="it-row"><div class="it-icon">📍</div><div><div class="it-label">Adresse physique</div><div class="it-sub">Allée 3, Stand 12 · Marché Sandaga<br/>Rue Mohamed V, Dakar Centre</div></div></div>
+        <div class="it-row"><div class="it-icon">📞</div><div><div class="it-label">Contact</div><div class="it-sub">+221 77 XXX XX XX · WhatsApp disponible</div></div></div>
+        <div class="it-row"><div class="it-icon">🚚</div><div><div class="it-label">Livraison</div><div class="it-sub">Dakar & banlieue : 1 000 FCFA · 24h<br/>Régions : 2 500 – 5 000 FCFA · 48–72h</div></div></div>
+        <div class="it-row"><div class="it-icon">💳</div><div><div class="it-label">Paiements acceptés</div><div class="it-sub">Wave · Orange Money · Free Money · Espèces</div></div></div>
+        <div class="it-row" style="margin-bottom:0"><div class="it-icon">🔄</div><div><div class="it-label">Retours</div><div class="it-sub">7 jours pour signaler un problème · Échange ou remboursement garanti</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <div class="promo-card">
+      <div class="pc-label">🔥 Promotion active aujourd'hui</div>
+      <div class="pc-code">FATOU15</div>
+      <div class="pc-detail">-15% sur toute la boutique<br/>Valable jusqu'à 20h00 · Max 50 utilisations</div>
+      <button class="pc-copy" onclick="copyCode('FATOU15')">Copier le code promo</button>
+      <div class="pc-timer"><span class="pt-dot"></span>Expire dans 4h 32min</div>
+    </div>
+
+    <div class="contact-card">
+      <div class="cc-title">Contacter Fatou Ndoye</div>
+      <div class="cc-btns">
+        <button class="cc-btn cc-primary" onclick="openChat()">
+          <div class="cc-icon" style="background:rgba(255,255,255,.2)">💬</div>
+          <span>Chat dans l'application</span>
+        </button>
+        <button class="cc-btn" onclick="toast('Ouverture WhatsApp...')">
+          <div class="cc-icon" style="background:#E8F5E9">📱</div>
+          <span>WhatsApp direct</span>
+        </button>
+        <button class="cc-btn" onclick="toast('Appel en cours...')">
+          <div class="cc-icon" style="background:var(--gp)">📞</div>
+          <span>Appeler la boutique</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="ic-title">Infos rapides</div>
+      <div class="ic-row"><div class="ic-icon">🕐</div><div><div class="ic-label">Horaires</div><div class="ic-sub">Lun–Sam 8h–20h · Dim 9h–15h</div><span class="ic-open">Ouverte maintenant</span></div></div>
+      <div class="ic-row"><div class="ic-icon">🚚</div><div><div class="ic-label">Livraison Dakar</div><div class="ic-sub">1 000 FCFA · Sous 24h</div></div></div>
+      <div class="ic-row" style="margin-bottom:0"><div class="ic-icon">🔒</div><div><div class="ic-label">Paiement sécurisé</div><div class="ic-sub">Wave · Orange Money · Free Money</div></div></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-visual">🗺️<div class="map-pin">📍</div></div>
+      <div class="map-body">
+        <div class="map-address">Marché Sandaga — Allée 3, Stand 12</div>
+        <div class="map-sub">Rue Mohamed V, Dakar Centre</div>
+        <button class="map-btn" onclick="toast('Ouverture de la carte...')">📍 Voir sur la carte</button>
+      </div>
+    </div>
+
+    <div class="chat-panel" id="chat-panel">
+      <div class="chat-header">
+        <div class="chat-av">MF</div>
+        <div class="chat-info">
+          <div class="chat-name-txt">Mode Fatou Ndoye</div>
+          <div class="chat-status">● En ligne · Répond en moins de 5 min</div>
+        </div>
+        <button class="chat-close" onclick="closeChat()">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg them">
+          <div class="msg-bubble">Assalamu aleykum ! Bienvenue dans ma boutique 😊 Comment puis-je vous aider ?</div>
+          <div class="msg-time">Maintenant</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" type="text" placeholder="Écrivez votre message..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+        <button class="chat-send" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Mobile sticky CTA -->
+<div class="mobile-cta" id="mobile-cta">
+  <button class="sh-btn sh-btn-primary" style="flex:1;justify-content:center" onclick="openChat()">💬 Contacter</button>
+  <button class="sh-btn sh-btn-gold" style="flex:1;justify-content:center" onclick="follow()">❤️ Suivre</button>
+</div>
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item act"><div class="mn-icon act">🗺️</div><div class="mn-label act">Marchés</div></div>
+    <div class="mn-item"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="toast('Panier...')"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
+    <div class="mn-item"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+  </div>
+</nav>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE BOUTIQUE — Données dynamiques
+// ════════════════════════════════════════
+
+let cartCount = 0;
+let currentShop = null;
+let currentTab = 'boutique';
+
+// ── Récupérer l'ID de la boutique depuis l'URL ──
+function getShopIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+// ── Charger la boutique ──
+async function loadShop(shopId) {
+  const result = await getShop(shopId);
+
+  if (!result.success) {
+    showToast('Boutique introuvable', 'error');
+    return;
+  }
+
+  const shop = result.data;
+  currentShop = shop;
+
+  // Mettre à jour le titre
+  document.title = `${shop.name} — Marché Sénégal`;
+
+  // Mettre à jour le nom
+  const shName = document.querySelector('.sh-name');
+  if (shName) shName.textContent = shop.name;
+
+  // Mettre à jour la localisation
+  const shLocation = document.querySelector('.sh-location');
+  if (shLocation) {
+    shLocation.innerHTML = `
+      <span class="sh-loc-chip">🏛️ ${shop.market?.name || ''}</span>
+      <span class="sh-loc-chip">📍 ${shop.market?.city || ''}</span>
+      <span class="sh-loc-chip" style="background:rgba(76,175,80,.2);
+             border-color:rgba(76,175,80,.3);color:#4CAF50">
+        ● ${shop.isOpen ? 'Ouverte maintenant' : 'Fermée'}
+      </span>
+    `;
+  }
+
+  // Mettre à jour l'avatar
+  const shAvatar = document.querySelector('.sh-avatar');
+  if (shAvatar) {
+    if (shop.avatarUrl) {
+      shAvatar.innerHTML = `<img src="${shop.avatarUrl}"
+        style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    } else {
+      shAvatar.textContent =
+        shop.name.charAt(0) +
+        (shop.name.split(' ')[1] ? shop.name.split(' ')[1].charAt(0) : '');
+    }
+  }
+
+  // Mettre à jour les stats
+  const stats = document.querySelectorAll('.sh-stat-n');
+  if (stats[0]) stats[0].textContent = shop.rating > 0 ? shop.rating + ' ⭐' : 'Nouveau';
+  if (stats[1]) stats[1].textContent = shop.totalReviews;
+  if (stats[2]) stats[2].textContent = shop.totalSales;
+  if (stats[3]) stats[3].textContent = shop._count?.products || 0;
+
+  // Mettre à jour le breadcrumb
+  const bcCurrent = document.querySelector('.bc-current');
+  if (bcCurrent) bcCurrent.textContent = shop.name;
+
+  // Charger les produits
+  loadShopProducts(shop);
+
+  // Charger les avis
+  loadShopReviews(shop);
+}
+
+// ── Charger les produits de la boutique ──
+function loadShopProducts(shop) {
+  const prodsGrid = document.querySelector('.prods-grid');
+  if (!prodsGrid) return;
+
+  if (!shop.products || shop.products.length === 0) {
+    prodsGrid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+        <div style="font-size:2.5rem;margin-bottom:12px">📦</div>
+        <div>Aucun produit dans cette boutique</div>
+      </div>
+    `;
+    return;
+  }
+
+  prodsGrid.innerHTML = shop.products.map(prod => `
+    <div class="prod-card"
+         onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+      <div class="pc-img" style="background:#F0EAF8">
+        ${prod.images?.length > 0
+          ? `<img src="${prod.images[0]}"
+                  style="width:100%;height:100%;object-fit:cover"/>`
+          : '👗'
+        }
+        ${prod.originalPrice
+          ? `<div class="pc-badge">
+              -${Math.round((1-prod.price/prod.originalPrice)*100)}%
+             </div>`
+          : ''
+        }
+        <div class="pc-wish" onclick="wish(event)">🤍</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-name">${prod.name}</div>
+        <div class="pc-rating">
+          <span class="pc-stars">★★★★★</span>
+          ${prod.rating} (${prod.totalReviews})
+        </div>
+        <div class="pc-footer">
+          <div>
+            <span class="pc-price">${formatPrice(prod.price)}</span>
+            ${prod.originalPrice
+              ? `<span class="pc-old">${formatPrice(prod.originalPrice)}</span>`
+              : ''
+            }
+          </div>
+          <button class="add-btn"
+            onclick="addCart(event,'${prod.id}','${prod.name}',${prod.price})">
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Charger les avis ──
+function loadShopReviews(shop) {
+  const reviewList = document.querySelector('.review-list');
+  if (!reviewList) return;
+
+  if (!shop.reviews || shop.reviews.length === 0) {
+    reviewList.innerHTML = `
+      <div style="text-align:center;padding:40px;color:var(--muted)">
+        <div style="font-size:2rem;margin-bottom:10px">⭐</div>
+        <div>Aucun avis pour cette boutique</div>
+      </div>
+    `;
+    return;
+  }
+
+  reviewList.innerHTML = shop.reviews.map(review => `
+    <div class="review-card">
+      <div class="rv-header">
+        <div class="rv-avatar">
+          ${review.user?.firstName?.charAt(0) || '?'}
+        </div>
+        <div>
+          <div class="rv-name">${review.user?.firstName || 'Client'}</div>
+          <div class="rv-date">
+            ${new Date(review.createdAt).toLocaleDateString('fr-FR')}
+          </div>
+        </div>
+        <div class="rv-stars">
+          ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
+        </div>
+      </div>
+      <div class="rv-text">${review.comment || ''}</div>
+    </div>
+  `).join('');
+}
+
+// ── Changer d'onglet ──
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  currentTab = tab;
+
+  const tabs = ['boutique', 'produits', 'avis', 'infos'];
+  tabs.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+}
+
+// ── Ajouter au panier ──
+function addCart(event, productId, productName, price) {
+  event.stopPropagation();
+
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(i => i.productId === productId);
+
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({
+      productId,
+      name: productName,
+      price,
+      quantity: 1,
+      shopId: currentShop?.id,
+      shopName: currentShop?.name
+    });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+  document.getElementById('cart-count').textContent = cartCount;
+  showToast('✓ ' + productName + ' ajouté au panier');
+}
+
+// ── Ajouter aux favoris ──
+function wish(event) {
+  event.stopPropagation();
+  const btn = event.target;
+  btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
+  showToast(btn.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+}
+
+// ── Suivre la boutique ──
+function follow() {
+  showToast('❤️ Boutique ajoutée à vos favoris');
+}
+
+// ── Partager ──
+function share() {
+  navigator.clipboard?.writeText(window.location.href).catch(() => {});
+  showToast('↗ Lien copié !');
+}
+
+// ── Copier le code promo ──
+function copyCode(code) {
+  navigator.clipboard?.writeText(code).catch(() => {});
+  showToast('✓ Code ' + code + ' copié !');
+}
+
+// ── Chat ──
+function openChat() {
+  document.getElementById('chat-panel').classList.add('open');
+  setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+}
+
+function closeChat() {
+  document.getElementById('chat-panel').classList.remove('open');
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const msg = input?.value.trim();
+  if (!msg) return;
+
+  const box = document.getElementById('chat-messages');
+  const now = new Date().toLocaleTimeString('fr', {hour:'2-digit', minute:'2-digit'});
+
+  box.innerHTML += `
+    <div class="msg me">
+      <div class="msg-bubble">${msg}</div>
+      <div class="msg-time">${now}</div>
+    </div>
+  `;
+
+  input.value = '';
+  box.scrollTop = box.scrollHeight;
+
+  // Réponse automatique
+  const replies = [
+    'Bonjour ! Je suis disponible pour vous aider 😊',
+    'Oui, ce produit est disponible !',
+    'Je peux vous livrer demain. Paiement Wave ou Orange Money.',
+    'Merci pour votre intérêt ! 🙏'
+  ];
+
+  setTimeout(() => {
+    box.innerHTML += `
+      <div class="msg them">
+        <div class="msg-bubble">
+          ${replies[Math.floor(Math.random() * replies.length)]}
+        </div>
+        <div class="msg-time">Maintenant</div>
+      </div>
+    `;
+    box.scrollTop = box.scrollHeight;
+  }, 1200);
+}
+
+// ── Hamburger ──
+function toggleMenu() {
+  const h = document.getElementById('nav-hamburger');
+  const d = document.getElementById('nav-drawer');
+  h.classList.toggle('open');
+  d.classList.toggle('open');
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = cartCount;
+}
+
+// ── Fermer le drawer ──
+document.addEventListener('click', function(e) {
+  const d = document.getElementById('nav-drawer');
+  const h = document.getElementById('nav-hamburger');
+  if (d && d.classList.contains('open') &&
+      !d.contains(e.target) && !h.contains(e.target)) {
+    d.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+
+  const shopId = getShopIdFromURL();
+
+  if (shopId) {
+    await loadShop(shopId);
+  } else {
+    // Si pas d'ID — charger la première boutique
+    const result = await getShops({ page: 1 });
+    if (result.success && result.data.length > 0) {
+      await loadShop(result.data[0].id);
+    }
+  }
+});
+</script>
+</body>
+</html>

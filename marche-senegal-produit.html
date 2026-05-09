@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Boubou wax tissé main — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.15);
+  --radius:14px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ══ FLAG ══ */
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* ══ NAV ══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
+.nav-logo:hover{color:var(--gl)}
+.nav-search{flex:1;min-width:0;max-width:500px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
+.nav-search input{flex:1;min-width:0;border:none;outline:none;font-size:.88rem;color:var(--text);background:transparent}
+.nav-search input::placeholder{color:var(--muted)}
+.nav-search-btn{flex-shrink:0;background:var(--green);color:#fff;border:none;border-radius:99px;height:32px;padding:0 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .2s;white-space:nowrap}
+.nav-search-btn:hover{background:var(--gl)}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.nav-btn{display:flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:99px;font-size:.82rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s;white-space:nowrap;flex-shrink:0}
+.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.nav-btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.nav-btn-primary:hover{background:var(--gl);color:#fff}
+.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0}
+.nav-cart:hover{border-color:var(--green);background:var(--gp)}
+.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-drawer{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;border-bottom:1.5px solid var(--border);padding:16px 4vw 20px;z-index:190;box-shadow:0 8px 32px rgba(0,0,0,.1);flex-direction:column;gap:12px}
+.nav-drawer.open{display:flex}
+.nav-drawer .nav-search{max-width:100%;width:100%}
+.nav-drawer-row{display:flex;gap:8px}
+.nav-drawer-row .nav-btn{flex:1;justify-content:center;height:42px}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ MOBILE NAV ══ */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0 max(10px,env(safe-area-inset-bottom))}
+.mn-items{display:flex}
+.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
+.mn-icon{width:24px;height:24px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:background .18s}
+.mn-item.act .mn-icon{background:var(--green)}
+.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}
+.mn-item.act .mn-label{color:var(--green)}
+
+/* ══ BREADCRUMB ══ */
+.breadcrumb{padding:12px 4vw;display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
+.breadcrumb::-webkit-scrollbar{display:none}
+.bc-link{color:var(--green);cursor:pointer;white-space:nowrap}
+.bc-link:hover{text-decoration:underline}
+.bc-sep{color:var(--border);flex-shrink:0}
+.bc-current{color:var(--text);font-weight:500;white-space:nowrap}
+
+/* ══ MAIN LAYOUT ══ */
+.main{display:grid;grid-template-columns:1fr 400px;gap:28px;padding:28px 4vw 60px;max-width:1240px;margin:0 auto}
+
+/* ══ LEFT — IMAGES ══ */
+.product-gallery{position:sticky;top:calc(var(--nav-h) + 20px)}
+.main-img{
+  background:linear-gradient(135deg,#F0EAF8,#E8E0F0);
+  border-radius:var(--radius);
+  aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8rem;position:relative;overflow:hidden;
+  border:1.5px solid var(--border);margin-bottom:12px;
+  cursor:zoom-in;transition:transform .3s;
+}
+.main-img:hover{transform:scale(1.01)}
+.img-badge{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--dark);font-size:.76rem;font-weight:700;padding:4px 12px;border-radius:99px}
+.img-wish{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.img-wish:hover{border-color:var(--red);transform:scale(1.1)}
+.img-share{position:absolute;bottom:14px;right:14px;width:36px;height:36px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.img-share:hover{border-color:var(--green)}
+.thumb-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.thumb-row::-webkit-scrollbar{display:none}
+.thumb{
+  width:72px;height:72px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;cursor:pointer;border:2px solid var(--border);
+  transition:all .2s;background:#fff;
+}
+.thumb:hover,.thumb.active{border-color:var(--green)}
+.thumb.active{box-shadow:0 0 0 2px var(--green)}
+
+/* ══ RIGHT — PRODUCT INFO ══ */
+.product-info{}
+.pi-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pi-tag{font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:99px}
+.tag-market{background:var(--gp);color:var(--green)}
+.tag-cat{background:var(--gdl);color:#8A6100}
+.tag-new{background:var(--green);color:#fff}
+.tag-promo{background:var(--rp);color:var(--red)}
+
+.pi-title{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:10px}
+
+.pi-rating-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.pi-stars{color:var(--gold);font-size:.95rem}
+.pi-rating-num{font-size:.88rem;font-weight:600;color:var(--dark)}
+.pi-rating-count{font-size:.82rem;color:var(--muted);cursor:pointer}
+.pi-rating-count:hover{text-decoration:underline;color:var(--green)}
+.pi-sales{font-size:.78rem;color:var(--muted);padding-left:12px;border-left:1px solid var(--border)}
+
+/* Price */
+.pi-price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.pi-price{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--green)}
+.pi-old{font-size:1.1rem;color:var(--muted);text-decoration:line-through}
+.pi-discount{background:var(--rp);color:var(--red);font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px}
+.pi-price-note{font-size:.76rem;color:var(--muted);margin-bottom:16px}
+
+/* Options */
+.opt-section{margin-bottom:18px}
+.opt-label{font-size:.84rem;font-weight:600;color:var(--dark);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.opt-guide{font-size:.74rem;color:var(--green);cursor:pointer;font-weight:500}
+.opt-guide:hover{text-decoration:underline}
+.opt-btns{display:flex;gap:7px;flex-wrap:wrap}
+.opt-btn{
+  padding:7px 16px;border-radius:8px;
+  border:1.5px solid var(--border);background:#fff;
+  font-size:.84rem;font-weight:500;color:var(--text);
+  cursor:pointer;transition:all .18s;
+}
+.opt-btn:hover{border-color:var(--green);color:var(--green)}
+.opt-btn.selected{background:var(--green);border-color:var(--green);color:#fff}
+.opt-btn.out{border-color:var(--border);color:var(--muted);text-decoration:line-through;cursor:not-allowed;background:#f5f5f5}
+
+/* Color swatches */
+.color-btns{display:flex;gap:8px;flex-wrap:wrap}
+.color-btn{
+  width:34px;height:34px;border-radius:50%;
+  border:3px solid transparent;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.color-btn:hover{transform:scale(1.1)}
+.color-btn.selected{border-color:var(--green)}
+.color-btn::after{content:attr(data-name);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:.62rem;color:var(--muted);white-space:nowrap;opacity:0;transition:opacity .2s}
+.color-btn:hover::after{opacity:1}
+
+/* Qty + Add to cart */
+.cart-row{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.qty-ctrl{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;flex-shrink:0}
+.qty-btn{width:38px;height:44px;background:#fff;border:none;cursor:pointer;font-size:1.2rem;font-weight:600;color:var(--text);transition:background .18s;display:flex;align-items:center;justify-content:center}
+.qty-btn:hover{background:var(--gp);color:var(--green)}
+.qty-num{width:46px;text-align:center;font-size:.96rem;font-weight:700;color:var(--text);border-left:1px solid var(--border);border-right:1px solid var(--border);height:44px;display:flex;align-items:center;justify-content:center}
+.add-cart-btn{
+  flex:1;background:var(--green);color:#fff;border:none;
+  border-radius:10px;height:44px;
+  font-size:.92rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;box-shadow:0 4px 16px rgba(27,107,58,.25);
+}
+.add-cart-btn:hover{background:var(--gl);transform:translateY(-1px);box-shadow:0 6px 22px rgba(27,107,58,.35)}
+.buy-now-btn{
+  width:100%;background:var(--gold);color:var(--dark);border:none;
+  border-radius:10px;height:44px;margin-bottom:16px;
+  font-size:.92rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;box-shadow:0 4px 16px rgba(230,168,23,.25);
+}
+.buy-now-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* Stock status */
+.stock-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.82rem}
+.stock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stock-ok{background:#4CAF50}
+.stock-low{background:var(--gold)}
+.stock-out{background:var(--red)}
+
+/* Delivery info */
+.delivery-info{background:var(--gp);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+.di-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.di-row:last-child{margin-bottom:0}
+.di-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+.di-label{font-size:.82rem;font-weight:600;color:var(--dark)}
+.di-sub{font-size:.74rem;color:var(--muted);margin-top:1px}
+
+/* Seller card */
+.seller-card{
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+  margin-bottom:18px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:all .2s;
+}
+.seller-card:hover{border-color:var(--green);box-shadow:var(--shadow)}
+.sc-avatar{width:50px;height:50px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0}
+.sc-info{flex:1;min-width:0}
+.sc-verified{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;color:var(--green);background:var(--gp);padding:2px 7px;border-radius:99px;margin-bottom:4px}
+.sc-name{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:2px}
+.sc-market{font-size:.74rem;color:var(--muted)}
+.sc-stats{display:flex;gap:12px;margin-top:7px}
+.sc-stat-val{font-size:.82rem;font-weight:600;color:var(--dark)}
+.sc-stat-lbl{font-size:.62rem;color:var(--muted)}
+.sc-arrow{font-size:1.1rem;color:var(--muted);flex-shrink:0}
+
+/* Promo badge */
+.promo-box{background:linear-gradient(90deg,var(--dark),#1a4a2e);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pb-text{font-size:.82rem;color:rgba(255,255,255,.8)}
+.pb-code{background:rgba(230,168,23,.2);border:1px dashed var(--gold);border-radius:6px;padding:5px 12px;font-size:.86rem;font-weight:700;color:var(--gold);cursor:pointer;transition:background .18s}
+.pb-code:hover{background:rgba(230,168,23,.3)}
+
+/* Security */
+.sec-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.sec-item{display:flex;align-items:center;gap:5px;font-size:.74rem;color:var(--muted);background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px}
+
+/* ══ TABS SECTION ══ */
+.prod-tabs{margin-top:32px}
+.tabs-nav{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
+.tab-nav-item{padding:10px 20px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.tab-nav-item:hover{color:var(--green)}
+.tab-nav-item.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+
+/* Description */
+.desc-content{font-size:.9rem;color:var(--text);line-height:1.75}
+.desc-content h4{font-size:.92rem;font-weight:600;color:var(--dark);margin:16px 0 8px}
+.desc-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.desc-list li{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--text)}
+.desc-list li::before{content:'✦';color:var(--green);font-size:.65rem;flex-shrink:0}
+.spec-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.86rem}
+.spec-table tr{border-bottom:1px solid var(--border)}
+.spec-table tr:last-child{border-bottom:none}
+.spec-table td{padding:9px 12px;vertical-align:top}
+.spec-table td:first-child{color:var(--muted);width:40%;font-weight:500}
+.spec-table td:last-child{color:var(--text);font-weight:500}
+.spec-table tr:nth-child(even) td{background:#fafcfa}
+
+/* Reviews tab */
+.rating-summary{display:flex;gap:20px;align-items:center;background:var(--gp);border-radius:var(--radius);padding:20px;margin-bottom:20px;flex-wrap:wrap}
+.rs-big{text-align:center;min-width:80px}
+.rs-num{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;color:var(--dark);line-height:1}
+.rs-stars{color:var(--gold);font-size:1rem;margin:5px 0}
+.rs-count{font-size:.72rem;color:var(--muted)}
+.rs-bars{flex:1;display:flex;flex-direction:column;gap:6px;min-width:160px}
+.rb-row{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--muted)}
+.rb-bg{flex:1;height:7px;background:var(--border);border-radius:3px}
+.rb-fill{height:7px;background:var(--gold);border-radius:3px}
+.rb-pct{width:28px;text-align:right;font-size:.72rem}
+.reviews-list{display:flex;flex-direction:column;gap:14px}
+.review-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px}
+.rv-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rv-avatar{width:38px;height:38px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;flex-shrink:0}
+.rv-name{font-weight:600;font-size:.88rem;color:var(--dark)}
+.rv-date{font-size:.7rem;color:var(--muted);margin-top:2px}
+.rv-stars{color:var(--gold);font-size:.8rem;margin-left:auto}
+.rv-text{font-size:.84rem;color:var(--text);line-height:1.65}
+.rv-imgs{display:flex;gap:7px;margin-top:10px}
+.rv-img{width:54px;height:54px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer}
+.rv-verified{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:600;color:var(--green);margin-top:7px}
+
+/* Q&A tab */
+.qa-list{display:flex;flex-direction:column;gap:12px}
+.qa-item{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.qa-q{padding:14px 16px;font-size:.88rem;font-weight:600;color:var(--dark);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qa-q:hover{background:var(--gp)}
+.qa-arrow{font-size:.8rem;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.qa-item.open .qa-arrow{transform:rotate(180deg)}
+.qa-a{padding:0 16px;max-height:0;overflow:hidden;transition:all .3s;font-size:.84rem;color:var(--muted);line-height:1.65}
+.qa-item.open .qa-a{padding:0 16px 14px;max-height:200px}
+.qa-ask{background:#fff;border:1.5px dashed var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .2s}
+.qa-ask:hover{border-color:var(--green);background:var(--gp)}
+.qa-ask-text{font-size:.86rem;color:var(--muted)}
+.qa-ask-text strong{color:var(--green)}
+
+/* ══ SIMILAR PRODUCTS ══ */
+.similar-section{padding:0 4vw 60px;max-width:1240px;margin:0 auto}
+.similar-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:18px}
+.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.sim-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.sim-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.sim-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;background:var(--bg);position:relative}
+.sim-badge{position:absolute;top:7px;left:7px;background:var(--gold);color:var(--dark);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:99px}
+.sim-body{padding:10px}
+.sim-name{font-size:.84rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.sim-shop{font-size:.7rem;color:var(--muted);margin-bottom:5px}
+.sim-footer{display:flex;align-items:center;justify-content:space-between}
+.sim-price{font-size:.92rem;font-weight:700;color:var(--green)}
+.sim-add{width:26px;height:26px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.sim-add:hover{background:var(--gl);transform:scale(1.1)}
+
+/* ══ MOBILE STICKY BAR ══ */
+.mobile-sticky{display:none;position:fixed;bottom:70px;left:0;right:0;z-index:150;padding:10px 16px;background:rgba(250,250,247,.97);backdrop-filter:blur(10px);border-top:1.5px solid var(--border);gap:8px}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:960px){
+  .nav-search{display:none}
+  .nav-btn.nav-btn-login,.nav-btn.nav-btn-shop{display:none}
+  .nav-hamburger{display:flex}
+  .mobile-nav{display:block}
+  .mobile-sticky{display:flex}
+  body{padding-bottom:130px}
+  .toast{bottom:140px}
+  .main{grid-template-columns:1fr}
+  .product-gallery{position:static;top:auto}
+  .main-img{aspect-ratio:4/3;font-size:6rem}
+  .similar-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+@media(max-width:600px){
+  :root{--nav-h:58px}
+  .nav{padding:0 4vw;gap:10px}
+  .nav-logo .nav-logo-text{display:none}
+  .nav-cart{width:38px;height:38px}
+  .main{padding:16px 4vw 20px;gap:20px}
+  .pi-title{font-size:1.3rem}
+  .pi-price{font-size:1.7rem}
+  .tabs-nav{overflow-x:auto;scrollbar-width:none}
+  .tabs-nav::-webkit-scrollbar{display:none}
+  .tab-nav-item{padding:9px 14px;font-size:.82rem}
+  .similar-section{padding:0 4vw 80px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    <span class="nav-logo-text">Marché Sénégal</span>
+  </a>
+  <div class="nav-search">
+    <input type="text" placeholder="Rechercher un produit, une boutique..."/>
+    <button class="nav-search-btn">🔍 Rechercher</button>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-login">Se connecter</button>
+    <button class="nav-btn nav-btn-primary nav-btn-shop">🏪 Ma boutique</button>
+    <button class="nav-cart" onclick="toast('Panier...')">
+      🛒<div class="cart-badge" id="cart-count">0</div>
+    </button>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-search" style="max-width:100%;width:100%">
+    <input type="text" placeholder="Rechercher..."/>
+    <button class="nav-search-btn">🔍</button>
+  </div>
+  <div class="nav-drawer-row">
+    <button class="nav-btn" style="flex:1;justify-content:center">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center">🏪 Ma boutique</button>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb" style="margin-top:var(--nav-h)">
+  <a href="marche-senegal-accueil.html" class="bc-link">Accueil</a>
+  <span class="bc-sep">›</span>
+  <a href="marche-senegal-marche.html" class="bc-link">Sandaga</a>
+  <span class="bc-sep">›</span>
+  <a href="marche-senegal-boutique.html" class="bc-link">Mode Fatou Ndoye</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-current">Boubou wax tissé main</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT — GALLERY -->
+  <div class="product-gallery">
+    <div class="main-img" id="main-img">
+      <div class="img-badge">-15% · Code FATOU15</div>
+      <span id="main-emoji">👗</span>
+      <div class="img-wish" id="wish-btn" onclick="toggleWish()">🤍</div>
+      <div class="img-share" onclick="shareProduct()">↗</div>
+    </div>
+    <div class="thumb-row">
+      <div class="thumb active" onclick="changeImg(this,'👗','#F0EAF8')">👗</div>
+      <div class="thumb" onclick="changeImg(this,'🧵','#FFF8E7')">🧵</div>
+      <div class="thumb" onclick="changeImg(this,'🎨','#E8F5EC')">🎨</div>
+      <div class="thumb" onclick="changeImg(this,'✨','#FDE8E6')">✨</div>
+      <div class="thumb" onclick="changeImg(this,'🪡','#FDF3DC')">🪡</div>
+    </div>
+
+    <!-- TABS — visible on desktop under image -->
+    <div class="prod-tabs" id="desktop-tabs">
+      <div class="tabs-nav">
+        <div class="tab-nav-item active" onclick="switchProdTab('desc',this)">Description</div>
+        <div class="tab-nav-item" onclick="switchProdTab('specs',this)">Caractéristiques</div>
+        <div class="tab-nav-item" onclick="switchProdTab('avis',this)">Avis (89)</div>
+        <div class="tab-nav-item" onclick="switchProdTab('qa',this)">Q&A (12)</div>
+      </div>
+
+      <!-- DESC -->
+      <div id="tab-desc" class="desc-content">
+        <p>Le <strong>Boubou wax tissé main</strong> est une pièce d'exception confectionnée à la main par les artisans sénégalais. Ce vêtement traditionnel allie l'élégance du wax hollandais à la finesse du travail artisanal local.</p>
+        <h4>Points forts</h4>
+        <ul class="desc-list">
+          <li>Tissu wax hollandais 100% coton certifié</li>
+          <li>Couture et broderie entièrement faites à la main</li>
+          <li>Colorants naturels résistants au lavage</li>
+          <li>Coupe ample et confortable, idéale pour les cérémonies</li>
+          <li>Disponible en plusieurs tailles du S au XXXL</li>
+          <li>Livraison dans toutes les régions du Sénégal</li>
+        </ul>
+        <h4>Entretien</h4>
+        <ul class="desc-list">
+          <li>Lavage à la main recommandé à l'eau froide</li>
+          <li>Ne pas utiliser de javel ou d'eau de Javel</li>
+          <li>Séchage à l'ombre pour préserver les couleurs</li>
+          <li>Repassage à température moyenne côté envers</li>
+        </ul>
+      </div>
+
+      <!-- SPECS -->
+      <div id="tab-specs" style="display:none">
+        <table class="spec-table">
+          <tr><td>Matière</td><td>100% Coton — Tissu wax hollandais</td></tr>
+          <tr><td>Origine</td><td>Fabriqué au Sénégal — Marché Sandaga, Dakar</td></tr>
+          <tr><td>Tailles disponibles</td><td>S · M · L · XL · XXL · XXXL</td></tr>
+          <tr><td>Couleurs</td><td>Bleu/Or · Rouge/Noir · Vert/Blanc · Multicolore</td></tr>
+          <tr><td>Poids</td><td>Environ 350g</td></tr>
+          <tr><td>Longueur</td><td>Sol (taille L : 140cm)</td></tr>
+          <tr><td>Occasion</td><td>Cérémonie · Tabaski · Korité · Sortie élégante</td></tr>
+          <tr><td>Garantie</td><td>7 jours retour · Échange ou remboursement</td></tr>
+          <tr><td>Vendeur</td><td>Mode Fatou Ndoye — Vérifié ✓</td></tr>
+          <tr><td>Référence</td><td>MFN-BWX-2025-L</td></tr>
+        </table>
+      </div>
+
+      <!-- AVIS -->
+      <div id="tab-avis" style="display:none">
+        <div class="rating-summary">
+          <div class="rs-big">
+            <div class="rs-num">4.9</div>
+            <div class="rs-stars">★★★★★</div>
+            <div class="rs-count">89 avis</div>
+          </div>
+          <div class="rs-bars">
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">5★</span><div class="rb-bg"><div class="rb-fill" style="width:78%"></div></div><span class="rb-pct">78%</span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">4★</span><div class="rb-bg"><div class="rb-fill" style="width:16%"></div></div><span class="rb-pct">16%</span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">3★</span><div class="rb-bg"><div class="rb-fill" style="width:4%"></div></div><span class="rb-pct">4%</span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">2★</span><div class="rb-bg"><div class="rb-fill" style="width:2%"></div></div><span class="rb-pct">2%</span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct">0%</span></div>
+          </div>
+        </div>
+        <div class="reviews-list">
+          <div class="review-card">
+            <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 3 jours · Dakar</div></div><div class="rv-stars">★★★★★</div></div>
+            <div class="rv-text">Qualité exceptionnelle ! Le tissu est exactement comme sur la photo, les couleurs sont vives et la couture est parfaite. Ma femme est ravie. La livraison a été rapide.</div>
+            <div class="rv-imgs"><div class="rv-img">👗</div><div class="rv-img">🎨</div></div>
+            <div class="rv-verified">✓ Achat vérifié</div>
+          </div>
+          <div class="review-card">
+            <div class="rv-header"><div class="rv-avatar" style="background:#8B3A8A">AB</div><div><div class="rv-name">Aissatou Ba</div><div class="rv-date">Il y a 1 semaine · Thiès</div></div><div class="rv-stars">★★★★★</div></div>
+            <div class="rv-text">J'ai commandé pour la Tabaski et je n'ai pas été déçue. Le boubou est magnifique, la taille correspond parfaitement au guide. Fatou a répondu rapidement à mes questions sur WhatsApp.</div>
+            <div class="rv-verified">✓ Achat vérifié</div>
+          </div>
+          <div class="review-card">
+            <div class="rv-header"><div class="rv-avatar" style="background:var(--gold);color:var(--dark)">OF</div><div><div class="rv-name">Ousmane Fall</div><div class="rv-date">Il y a 2 semaines · Saint-Louis</div></div><div class="rv-stars">★★★★★</div></div>
+            <div class="rv-text">Très bon produit. La broderie est fine et bien faite. Le tissu wax est authentique, pas de la imitation. Prix juste pour la qualité. Je recommande cette boutique les yeux fermés.</div>
+            <div class="rv-verified">✓ Achat vérifié</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q&A -->
+      <div id="tab-qa" style="display:none">
+        <div class="qa-list">
+          <div class="qa-item">
+            <div class="qa-q" onclick="toggleQa(this)">
+              <span>Est-ce que le tissu rétrécit au lavage ?</span>
+              <span class="qa-arrow">▼</span>
+            </div>
+            <div class="qa-a">Non, le tissu wax hollandais ne rétrécit pas si vous respectez les instructions d'entretien. Lavage à la main à l'eau froide et séchage à l'ombre recommandés.</div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q" onclick="toggleQa(this)">
+              <span>Faites-vous des commandes sur mesure ?</span>
+              <span class="qa-arrow">▼</span>
+            </div>
+            <div class="qa-a">Oui ! Contactez-moi directement sur le chat ou WhatsApp avec vos mesures. Délai de 5 à 7 jours pour une confection sur mesure. Supplément de 5 000 FCFA.</div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q" onclick="toggleQa(this)">
+              <span>Livrez-vous en dehors de Dakar ?</span>
+              <span class="qa-arrow">▼</span>
+            </div>
+            <div class="qa-a">Oui, je livre dans toutes les 14 régions du Sénégal via le réseau de livraison Marché Sénégal. Délai 2 à 4 jours selon la région. Frais entre 2 500 et 5 000 FCFA.</div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q" onclick="toggleQa(this)">
+              <span>Quelle taille prendre pour 1m70 et 80kg ?</span>
+              <span class="qa-arrow">▼</span>
+            </div>
+            <div class="qa-a">Pour ces mensurations je recommande la taille XL. Le boubou est ample donc si vous voulez plus de volume prenez XXL. N'hésitez pas à me contacter pour un conseil personnalisé.</div>
+          </div>
+          <div class="qa-ask" onclick="toast('Poser une question...')">
+            <div class="qa-ask-text">Vous avez une question ? <strong>Posez-la directement au vendeur →</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — PRODUCT INFO -->
+  <div class="product-info">
+    <div class="pi-tags">
+      <span class="pi-tag tag-market">🏛️ Sandaga</span>
+      <span class="pi-tag tag-cat">👗 Mode</span>
+      <span class="pi-tag tag-new">Nouveau</span>
+      <span class="pi-tag tag-promo">-15%</span>
+    </div>
+
+    <h1 class="pi-title">Boubou wax tissé main — Qualité supérieure</h1>
+
+    <div class="pi-rating-row">
+      <span class="pi-stars">★★★★★</span>
+      <span class="pi-rating-num">4.9</span>
+      <span class="pi-rating-count" onclick="switchProdTab('avis',document.querySelectorAll('.tab-nav-item')[2])">(89 avis)</span>
+      <span class="pi-sales">1 240 vendus</span>
+    </div>
+
+    <div class="pi-price-row">
+      <span class="pi-price">15 300 FCFA</span>
+      <span class="pi-old">18 000 FCFA</span>
+      <span class="pi-discount">-15%</span>
+    </div>
+    <div class="pi-price-note">Prix avec code promo FATOU15 · Économie de 2 700 FCFA</div>
+
+    <!-- Promo box -->
+    <div class="promo-box">
+      <div class="pb-text">🔥 Promotion active jusqu'à 20h · Utilisez le code</div>
+      <div class="pb-code" onclick="copyCode()">FATOU15</div>
+    </div>
+
+    <!-- Taille -->
+    <div class="opt-section">
+      <div class="opt-label">
+        Taille : <strong id="selected-size">L</strong>
+        <span class="opt-guide" onclick="toast('Guide des tailles...')">Guide des tailles →</span>
+      </div>
+      <div class="opt-btns">
+        <div class="opt-btn" onclick="selectSize(this,'S')">S</div>
+        <div class="opt-btn" onclick="selectSize(this,'M')">M</div>
+        <div class="opt-btn selected" onclick="selectSize(this,'L')">L</div>
+        <div class="opt-btn" onclick="selectSize(this,'XL')">XL</div>
+        <div class="opt-btn" onclick="selectSize(this,'XXL')">XXL</div>
+        <div class="opt-btn out" onclick="toast('Taille non disponible')">XXXL</div>
+      </div>
+    </div>
+
+    <!-- Couleur -->
+    <div class="opt-section">
+      <div class="opt-label">Couleur : <strong id="selected-color">Bleu/Or</strong></div>
+      <div class="color-btns">
+        <div class="color-btn selected" style="background:linear-gradient(135deg,#1565C0,#F9A825)" data-name="Bleu/Or" onclick="selectColor(this,'Bleu/Or')"></div>
+        <div class="color-btn" style="background:linear-gradient(135deg,#C62828,#212121)" data-name="Rouge/Noir" onclick="selectColor(this,'Rouge/Noir')"></div>
+        <div class="color-btn" style="background:linear-gradient(135deg,#2E7D32,#FAFAFA)" data-name="Vert/Blanc" onclick="selectColor(this,'Vert/Blanc')"></div>
+        <div class="color-btn" style="background:linear-gradient(135deg,#6A1B9A,#F57F17)" data-name="Violet/Or" onclick="selectColor(this,'Violet/Or')"></div>
+        <div class="color-btn" style="background:linear-gradient(135deg,#BF360C,#E65100)" data-name="Multicolore" onclick="selectColor(this,'Multicolore')"></div>
+      </div>
+    </div>
+
+    <!-- Stock -->
+    <div class="stock-row">
+      <div class="stock-dot stock-low"></div>
+      <span style="font-weight:600;color:var(--text)">Stock limité</span>
+      <span style="color:var(--muted)">— Il ne reste que <strong>4 pièces</strong> en taille L</span>
+    </div>
+
+    <!-- Qty + Add to cart -->
+    <div class="cart-row">
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-num" id="qty">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="add-cart-btn" onclick="addToCart()">
+        🛒 Ajouter au panier
+      </button>
+    </div>
+    <button class="buy-now-btn" onclick="buyNow()">
+      ⚡ Acheter maintenant
+    </button>
+
+    <!-- Delivery info -->
+    <div class="delivery-info">
+      <div class="di-row">
+        <div class="di-icon">🚚</div>
+        <div><div class="di-label">Livraison Dakar — 1 000 FCFA</div><div class="di-sub">Demain avant 18h si commande avant 14h</div></div>
+      </div>
+      <div class="di-row">
+        <div class="di-icon">🗺️</div>
+        <div><div class="di-label">Livraison régions — 2 500 à 5 000 FCFA</div><div class="di-sub">2 à 4 jours ouvrés · Toutes les régions du Sénégal</div></div>
+      </div>
+      <div class="di-row">
+        <div class="di-icon">🏪</div>
+        <div><div class="di-label">Retrait gratuit en boutique</div><div class="di-sub">Allée 3, Stand 12 · Marché Sandaga · Disponible maintenant</div></div>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="sec-row">
+      <div class="sec-item">🔒 Paiement sécurisé</div>
+      <div class="sec-item">🛡️ Argent protégé escrow</div>
+      <div class="sec-item">↩️ Retour 7 jours</div>
+      <div class="sec-item">✓ Vendeur vérifié</div>
+    </div>
+
+    <!-- Seller card -->
+    <div class="seller-card" onclick="window.location.href='marche-senegal-boutique.html'">
+      <div class="sc-avatar">MF</div>
+      <div class="sc-info">
+        <div class="sc-verified">✓ Vendeur Vérifié · Sandaga</div>
+        <div class="sc-name">Mode Fatou Ndoye</div>
+        <div class="sc-market">🏛️ Marché Sandaga · Allée 3 · Ouvert maintenant</div>
+        <div class="sc-stats">
+          <div><div class="sc-stat-val">4.8⭐</div><div class="sc-stat-lbl">Note</div></div>
+          <div><div class="sc-stat-val">234</div><div class="sc-stat-lbl">Avis</div></div>
+          <div><div class="sc-stat-val">1 240</div><div class="sc-stat-lbl">Ventes</div></div>
+          <div><div class="sc-stat-val">48</div><div class="sc-stat-lbl">Produits</div></div>
+        </div>
+      </div>
+      <div class="sc-arrow">›</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SIMILAR PRODUCTS -->
+<div class="similar-section">
+  <div class="similar-title">Produits similaires</div>
+  <div class="similar-grid">
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#FFF8E7">🧵<div class="sim-badge">-20%</div></div>
+      <div class="sim-body"><div class="sim-name">Bazin brodé cérémonie homme</div><div class="sim-shop">Mode Fatou · Sandaga</div><div class="sim-footer"><span class="sim-price">20 000 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#FDE8E6">👘</div>
+      <div class="sim-body"><div class="sim-name">Robe wax africaine brodée</div><div class="sim-shop">Tissus Aminata · Sandaga</div><div class="sim-footer"><span class="sim-price">9 500 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#E8F5EC">🎨<div class="sim-badge">Nouveau</div></div>
+      <div class="sim-body"><div class="sim-name">Tissu wax hollandais 6 yards</div><div class="sim-shop">Tissus Aminata · Sandaga</div><div class="sim-footer"><span class="sim-price">4 500 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#F0EAF8">🥻</div>
+      <div class="sim-body"><div class="sim-name">Ensemble 3 pièces femme</div><div class="sim-shop">Mode Fatou · Sandaga</div><div class="sim-footer"><span class="sim-price">28 000 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#FDF3DC">👒</div>
+      <div class="sim-body"><div class="sim-name">Kaftan bazin riche homme</div><div class="sim-shop">Mode Fatou · Sandaga</div><div class="sim-footer"><span class="sim-price">22 000 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+    <div class="sim-card" onclick="toast('Produit ouvert...')">
+      <div class="sim-img" style="background:#FFF8E7">🧣<div class="sim-badge">-10%</div></div>
+      <div class="sim-body"><div class="sim-name">Foulard wax femme élégant</div><div class="sim-shop">Tissus Aminata · Tilène</div><div class="sim-footer"><span class="sim-price">3 600 FCFA</span><button class="sim-add" onclick="toast('Ajouté au panier !')">+</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile sticky bar -->
+<div class="mobile-sticky" id="mobile-sticky">
+  <button class="add-cart-btn" style="height:44px" onclick="addToCart()">🛒 Ajouter au panier — 15 300 FCFA</button>
+</div>
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
+    <div class="mn-item"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+  </div>
+</nav>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE PRODUIT — Données dynamiques
+// ════════════════════════════════════════
+
+let cartCount = 0;
+let currentProduct = null;
+let selectedSize = null;
+let selectedColor = null;
+let qty = 1;
+let wished = false;
+
+// ── Récupérer l'ID du produit depuis l'URL ──
+function getProductIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+// ── Charger le produit ──
+async function loadProduct(productId) {
+  const result = await getProduct(productId);
+
+  if (!result.success) {
+    showToast('Produit introuvable', 'error');
+    return;
+  }
+
+  const prod = result.data;
+  currentProduct = prod;
+
+  // ── Mettre à jour le titre ──
+  document.title = `${prod.name} — Marché Sénégal`;
+
+  // ── Mettre à jour le breadcrumb ──
+  const bcCurrent = document.querySelector('.bc-current');
+  if (bcCurrent) bcCurrent.textContent = prod.name;
+
+  // ── Mettre à jour l'image principale ──
+  const mainImg = document.getElementById('main-img');
+  if (mainImg) {
+    const emoji = document.getElementById('main-emoji');
+    if (prod.images.length > 0) {
+      if (emoji) emoji.style.display = 'none';
+      mainImg.style.background = '#F0EAF8';
+      const img = document.createElement('img');
+      img.src = prod.images[0];
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0';
+      mainImg.appendChild(img);
+    }
+  }
+
+  // ── Mettre à jour les miniatures ──
+  const thumbRow = document.querySelector('.thumb-row');
+ // Miniatures — seulement si le produit a de vraies images
+if (thumbRow && prod.images.length > 0) {
+  thumbRow.innerHTML = prod.images.map((img, i) => `
+    <div class="thumb ${i === 0 ? 'active' : ''}"
+         onclick="changeImg(this, '${img}')">
+      <img src="${img}"
+           style="width:100%;height:100%;object-fit:cover;border-radius:7px"
+           onerror="this.parentElement.textContent='👗'"/>
+    </div>
+  `).join('');
+} else {
+  // Pas d'images — garder les miniatures statiques d'origine
+  if (thumbRow) thumbRow.style.display = 'none';
+}
+
+  // ── Mettre à jour le nom ──
+  const title = document.querySelector('.pi-title');
+  if (title) title.textContent = prod.name;
+
+  // ── Mettre à jour la note ──
+  const ratingNum = document.querySelector('.pi-rating-num');
+  const ratingCount = document.querySelector('.pi-rating-count');
+  if (ratingNum) ratingNum.textContent = prod.rating;
+  if (ratingCount) ratingCount.textContent = `(${prod.totalReviews} avis)`;
+
+  // ── Mettre à jour le prix ──
+  const price = document.querySelector('.pi-price');
+  const oldPrice = document.querySelector('.pi-old');
+  const discount = document.querySelector('.pi-discount');
+
+  if (price) price.textContent = formatPrice(prod.price);
+
+  if (prod.originalPrice) {
+    if (oldPrice) oldPrice.textContent = formatPrice(prod.originalPrice);
+    if (discount) {
+      const pct = Math.round((1 - prod.price / prod.originalPrice) * 100);
+      discount.textContent = `-${pct}%`;
+    }
+  } else {
+    if (oldPrice) oldPrice.style.display = 'none';
+    if (discount) discount.style.display = 'none';
+  }
+
+  // ── Mettre à jour la description ──
+  const desc = document.getElementById('tab-desc');
+  if (desc) {
+    desc.innerHTML = `
+      <p style="font-size:.9rem;color:var(--text);line-height:1.75;margin-bottom:16px">
+        ${prod.description}
+      </p>
+    `;
+  }
+
+  // ── Mettre à jour les tailles ──
+  const sizesContainer = document.querySelector('.opt-btns');
+  if (sizesContainer && prod.sizes.length > 0) {
+    sizesContainer.innerHTML = prod.sizes.map(size => `
+      <div class="opt-btn" onclick="selectSize(this, '${size}')">
+        ${size}
+      </div>
+    `).join('');
+  }
+
+  // ── Mettre à jour les couleurs ──
+  const colorsContainer = document.querySelector('.color-btns');
+  if (colorsContainer && prod.colors.length > 0) {
+    const colors = {
+      'Bleu/Or': 'linear-gradient(135deg,#1565C0,#F9A825)',
+      'Rouge/Noir': 'linear-gradient(135deg,#C62828,#212121)',
+      'Vert/Blanc': 'linear-gradient(135deg,#2E7D32,#FAFAFA)',
+      'Multicolore': 'linear-gradient(135deg,#E91E63,#FF9800)',
+      'Rouge': '#C62828',
+      'Bleu': '#1565C0',
+      'Blanc': '#FAFAFA',
+      'Or': '#F9A825'
+    };
+
+    colorsContainer.innerHTML = prod.colors.map(color => `
+      <div class="color-btn"
+           style="background:${colors[color] || '#888'}"
+           data-name="${color}"
+           onclick="selectColor(this, '${color}')">
+      </div>
+    `).join('');
+  }
+
+  // ── Mettre à jour le stock ──
+  const stockRow = document.querySelector('.stock-row');
+  if (stockRow) {
+    if (prod.stock === 0) {
+      stockRow.innerHTML = `
+        <div class="stock-dot stock-out"></div>
+        <span style="font-weight:600;color:var(--red)">Rupture de stock</span>
+      `;
+    } else if (prod.stock <= 5) {
+      stockRow.innerHTML = `
+        <div class="stock-dot stock-low"></div>
+        <span style="font-weight:600">Stock limité</span>
+        <span style="color:var(--muted)">— Il reste <strong>${prod.stock} pièces</strong></span>
+      `;
+    } else {
+      stockRow.innerHTML = `
+        <div class="stock-dot stock-ok"></div>
+        <span style="font-weight:600;color:var(--green)">En stock</span>
+        <span style="color:var(--muted)">— ${prod.stock} pièces disponibles</span>
+      `;
+    }
+  }
+
+  // ── Mettre à jour la carte vendeur ──
+  const sellerCard = document.querySelector('.seller-card');
+  if (sellerCard && prod.shop) {
+    sellerCard.onclick = () => {
+      window.location.href = `marche-senegal-boutique.html?id=${prod.shop.id}`;
+    };
+
+    const scName = sellerCard.querySelector('.sc-name');
+    const scMarket = sellerCard.querySelector('.sc-market');
+    const scAvatar = sellerCard.querySelector('.sc-avatar');
+    const scRating = sellerCard.querySelector('.sc-stat-val');
+
+    if (scName) scName.textContent = prod.shop.name;
+    if (scMarket) scMarket.textContent =
+      `🏛️ ${prod.shop.market?.name || ''} · Ouvert maintenant`;
+    if (scAvatar) scAvatar.textContent =
+      prod.shop.name.charAt(0) +
+      (prod.shop.name.split(' ')[1] ? prod.shop.name.split(' ')[1].charAt(0) : '');
+    if (scRating) scRating.textContent =
+      prod.shop.rating > 0 ? prod.shop.rating + '⭐' : 'Nouveau';
+  }
+
+  // ── Mettre à jour le bouton mobile sticky ──
+  const mobileSticky = document.getElementById('mobile-sticky');
+  if (mobileSticky) {
+    mobileSticky.innerHTML = `
+      <button class="add-cart-btn" style="height:44px;flex:1"
+              onclick="addToCart()">
+        🛒 Ajouter au panier — ${formatPrice(prod.price)}
+      </button>
+    `;
+  }
+
+  // ── Charger les avis ──
+  loadReviews(prod);
+}
+
+// ── Charger les avis ──
+function loadReviews(prod) {
+  const reviewsTab = document.getElementById('tab-avis');
+  if (!reviewsTab) return;
+
+  if (!prod.reviews || prod.reviews.length === 0) {
+    reviewsTab.innerHTML = `
+      <div style="text-align:center;padding:40px;color:var(--muted)">
+        <div style="font-size:2.5rem;margin-bottom:12px">⭐</div>
+        <div>Aucun avis pour ce produit</div>
+        <div style="font-size:.82rem;margin-top:6px">
+          Soyez le premier à laisser un avis !
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  reviewsTab.innerHTML = `
+    <div class="rating-summary">
+      <div class="rs-big">
+        <div class="rs-num">${prod.rating}</div>
+        <div class="rs-stars">★★★★★</div>
+        <div class="rs-count">${prod.totalReviews} avis</div>
+      </div>
+    </div>
+    <div class="reviews-list">
+      ${prod.reviews.map(review => `
+        <div class="review-card">
+          <div class="rv-header">
+            <div class="rv-avatar">
+              ${review.user?.firstName?.charAt(0) || '?'}
+            </div>
+            <div>
+              <div class="rv-name">
+                ${review.user?.firstName || 'Anonyme'}
+              </div>
+              <div class="rv-date">
+                ${new Date(review.createdAt).toLocaleDateString('fr-FR')}
+              </div>
+            </div>
+            <div class="rv-stars">
+              ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+            </div>
+          </div>
+          <div class="rv-text">${review.comment || ''}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Sélectionner une taille ──
+function selectSize(btn, size) {
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedSize = size;
+  document.getElementById('selected-size').textContent = size;
+  showToast('Taille ' + size + ' sélectionnée');
+}
+
+// ── Sélectionner une couleur ──
+function selectColor(btn, color) {
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedColor = color;
+  document.getElementById('selected-color').textContent = color;
+  showToast('Couleur : ' + color);
+}
+
+// ── Changer l'image principale ──
+function changeImg(thumb, imgSrc) {
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+  const mainImg = document.getElementById('main-img');
+  if (mainImg && imgSrc) {
+    mainImg.style.backgroundImage = `url(${imgSrc})`;
+    mainImg.style.backgroundSize = 'cover';
+  }
+}
+
+// ── Changer la quantité ──
+function changeQty(delta) {
+  const max = currentProduct ? currentProduct.stock : 10;
+  qty = Math.max(1, Math.min(max, qty + delta));
+  document.getElementById('qty').textContent = qty;
+}
+
+// ── Ajouter au panier ──
+function addToCart() {
+  if (!currentProduct) return;
+
+  if (currentProduct.sizes.length > 0 && !selectedSize) {
+    showToast('Veuillez choisir une taille', 'error');
+    return;
+  }
+
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(item =>
+    item.productId === currentProduct.id &&
+    item.size === selectedSize &&
+    item.color === selectedColor
+  );
+
+  if (existing) {
+    existing.quantity += qty;
+  } else {
+    cart.push({
+      productId: currentProduct.id,
+      name: currentProduct.name,
+      price: currentProduct.price,
+      quantity: qty,
+      size: selectedSize,
+      color: selectedColor,
+      image: currentProduct.images[0] || null,
+      shopId: currentProduct.shopId,
+      shopName: currentProduct.shop?.name
+    });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('cart-count').textContent = cartCount;
+
+  showToast(`✓ ${qty} × ${currentProduct.name} ajouté au panier`);
+
+  const btn = document.querySelector('.add-cart-btn');
+  if (btn) {
+    btn.style.background = 'var(--gold)';
+    btn.style.color = 'var(--dark)';
+    btn.textContent = '✓ Ajouté !';
+    setTimeout(() => {
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.innerHTML = '🛒 Ajouter au panier';
+    }, 1500);
+  }
+}
+
+// ── Acheter maintenant ──
+function buyNow() {
+  addToCart();
+  setTimeout(() => {
+    window.location.href = 'marche-senegal-panier.html';
+  }, 800);
+}
+
+// ── Ajouter aux favoris ──
+function toggleWish() {
+  wished = !wished;
+  document.getElementById('wish-btn').textContent = wished ? '❤️' : '🤍';
+  showToast(wished ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+}
+
+// ── Partager ──
+function shareProduct() {
+  navigator.clipboard?.writeText(window.location.href).catch(() => {});
+  showToast('↗ Lien copié !');
+}
+
+// ── Copier le code promo ──
+function copyCode() {
+  navigator.clipboard?.writeText('FATOU15').catch(() => {});
+  showToast('✓ Code FATOU15 copié !');
+}
+
+// ── Changer d'onglet ──
+function switchProdTab(tab, el) {
+  document.querySelectorAll('.tab-nav-item').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  ['desc', 'specs', 'avis', 'qa'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+}
+
+// ── Toggle Q&A ──
+function toggleQa(el) {
+  const item = el.closest('.qa-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.qa-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ── Hamburger menu ──
+function toggleMenu() {
+  const h = document.getElementById('nav-hamburger');
+  const d = document.getElementById('nav-drawer');
+  h.classList.toggle('open');
+  d.classList.toggle('open');
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = cartCount;
+}
+
+// ── Fermer le drawer ──
+document.addEventListener('click', function(e) {
+  const d = document.getElementById('nav-drawer');
+  const h = document.getElementById('nav-hamburger');
+  if (d && d.classList.contains('open') &&
+      !d.contains(e.target) && !h.contains(e.target)) {
+    d.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+
+  const productId = getProductIdFromURL();
+
+  if (productId) {
+    await loadProduct(productId);
+  } else {
+    // Si pas d'ID — charger le premier produit disponible
+    const result = await getProducts({ limit: 1 });
+    if (result.success && result.data.length > 0) {
+      await loadProduct(result.data[0].id);
+    }
+  }
+});
+</script>
+</body>
+</html>

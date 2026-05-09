@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ajouter un produit — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:64px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select,textarea{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* TOPBAR VENDEUR */
+.seller-topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.st-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
+.st-sep{color:rgba(255,255,255,.2);flex-shrink:0}
+.st-title{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.7);flex-shrink:0}
+.st-nav{display:flex;gap:0;flex:1;overflow-x:auto;scrollbar-width:none}
+.st-nav::-webkit-scrollbar{display:none}
+.st-link{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.st-link:hover{color:rgba(255,255,255,.8)}.st-link.active{color:#fff;border-bottom-color:var(--green)}
+.st-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.st-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
+.st-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}.st-btn-outline:hover{background:rgba(255,255,255,.18)}
+.st-btn-green{background:var(--green);color:#fff}.st-btn-green:hover{background:var(--gl)}
+/* LAYOUT */
+.page{margin-top:var(--nav-h);display:grid;grid-template-columns:1fr 300px;gap:22px;padding:24px 4vw 60px;max-width:1200px;margin-left:auto;margin-right:auto}
+.page{margin-top:var(--nav-h)}
+/* FORM CARD */
+.form-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.fc-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.fc-icon{font-size:1.1rem}
+/* PHOTOS */
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.photo-slot{aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-slot:hover{border-color:var(--green);background:var(--gp)}
+.photo-slot.filled{border-style:solid;border-color:var(--g2)}
+.photo-slot-icon{font-size:1.5rem}.photo-slot-text{font-size:.66rem;color:var(--muted);text-align:center;line-height:1.3}
+.photo-del{position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:.62rem;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:700}
+.photo-slot.filled:hover .photo-del{display:flex}
+.photo-main-badge{position:absolute;bottom:5px;left:5px;background:var(--green);color:#fff;font-size:.56rem;font-weight:700;padding:2px 6px;border-radius:4px}
+.photo-hint{font-size:.76rem;color:var(--muted);line-height:1.55}
+/* FIELDS */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fgrid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.fgrid-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:.8rem;font-weight:600;color:var(--text)}
+.fl-req{color:var(--red);margin-left:2px}
+.fi{height:42px;border:1.5px solid var(--border);border-radius:9px;padding:0 13px;font-size:.86rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s}.fi:focus{border-color:var(--green)}
+.fi-ta{height:auto;padding:10px 13px;resize:vertical;min-height:90px}
+.fi-prefix{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;transition:border-color .2s}.fi-prefix:focus-within{border-color:var(--green)}
+.fi-pre-label{padding:0 12px;height:42px;background:#fafafa;border-right:1px solid var(--border);display:flex;align-items:center;font-size:.8rem;color:var(--muted);flex-shrink:0;white-space:nowrap}
+.fi-prefix input{flex:1;border:none;outline:none;padding:0 12px;font-size:.86rem;height:42px;color:var(--text);background:transparent}
+.fi-hint{font-size:.74rem;color:var(--muted);margin-top:3px}
+/* CAT */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cg-btn{padding:10px 8px;border-radius:9px;border:1.5px solid var(--border);background:#fff;text-align:center;cursor:pointer;transition:all .18s;font-size:.76rem;font-weight:500;color:var(--text)}
+.cg-btn:hover,.cg-btn.sel{border-color:var(--green);background:var(--gp);color:var(--green);font-weight:600}
+.cg-icon{font-size:1.2rem;display:block;margin-bottom:4px}
+/* VARIANTS */
+.vrow{display:flex;gap:8px;align-items:flex-start;margin-bottom:12px}
+.vrow-label{font-size:.8rem;font-weight:600;color:var(--muted);width:70px;flex-shrink:0;margin-top:8px}
+.vtags{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.vtag{padding:5px 13px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;cursor:pointer;transition:all .18s}
+.vtag.sel{background:var(--green);border-color:var(--green);color:#fff}.vtag:hover:not(.sel){border-color:var(--green)}
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.cs{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s}
+.cs:hover,.cs.sel{border-color:var(--green);transform:scale(1.12)}
+/* CB */
+.cb-list{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.cb-row{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:.83rem;color:var(--text)}
+.cb-box{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.cb-row:hover .cb-box{border-color:var(--green)}.cb-row.checked .cb-box{background:var(--green);border-color:var(--green)}
+.cb-check{color:#fff;font-size:.68rem;font-weight:700}
+/* PREVIEW */
+.preview-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;position:sticky;top:calc(var(--nav-h) + 16px)}
+.preview-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.preview-phone{width:170px;background:#111;border-radius:22px;padding:7px;margin:0 auto 16px;box-shadow:0 12px 36px rgba(0,0,0,.3)}
+.pp-screen{background:#f5f7f5;border-radius:17px;overflow:hidden}
+.pp-img{height:110px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;background:#F0EAF8;position:relative}
+.pp-badge{position:absolute;top:6px;left:6px;background:var(--gold);color:var(--dark);font-size:.54rem;font-weight:700;padding:2px 5px;border-radius:4px}
+.pp-body{padding:8px 9px}
+.pp-market{font-size:.56rem;font-weight:700;color:var(--green);margin-bottom:3px}
+.pp-name{font-size:.68rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.pp-price{font-size:.78rem;font-weight:700;color:var(--green)}
+.pp-old{font-size:.6rem;color:var(--muted);text-decoration:line-through;margin-left:3px}
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.cl-item{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cl-ok{background:var(--green)}.cl-warn{background:var(--gold)}.cl-err{background:var(--red)}
+.cl-text.warn{color:#8A6100}.cl-text.err{color:var(--red)}
+/* BUTTONS */
+.publish-btn{background:var(--green);color:#fff;border:none;border-radius:99px;padding:13px;width:100%;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(27,107,58,.25);margin-bottom:9px;display:flex;align-items:center;justify-content:center;gap:7px}
+.publish-btn:hover{background:var(--gl);transform:translateY(-1px)}
+.draft-btn{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:99px;padding:10px;width:100%;font-size:.86rem;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.draft-btn:hover{border-color:var(--green);color:var(--green)}
+.price-calc{background:var(--gp);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:.78rem;color:var(--text);line-height:1.7}
+.pc-row{display:flex;justify-content:space-between}.pc-total{font-weight:700;color:var(--green);border-top:1px solid var(--g2);padding-top:4px;margin-top:4px}
+/* RESPONSIVE */
+@media(max-width:960px){
+  .page{grid-template-columns:1fr}
+  .preview-card{position:static;margin-top:0}
+  .seller-topbar .st-link{display:none}.seller-topbar .st-link.active{display:flex}
+}
+@media(max-width:600px){
+  .page{padding:16px 4vw 40px}
+  .photo-grid{grid-template-columns:repeat(3,1fr)}
+  .cat-grid{grid-template-columns:repeat(3,1fr)}
+  .fgrid{grid-template-columns:1fr}.fgrid-3{grid-template-columns:1fr 1fr}
+  .st-sep,.st-title{display:none}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- TOPBAR VENDEUR -->
+<div class="seller-topbar">
+  <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
+  <span class="st-sep">›</span>
+  <span class="st-title">Espace Vendeur</span>
+  <div class="st-nav">
+    <div class="st-link" onclick="window.location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
+    <div class="st-link" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
+    <div class="st-link active">➕ Ajouter un produit</div>
+    <div class="st-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
+    <div class="st-link" onclick="toast('Promotions — bientôt disponible')">🎯 Promotions</div>
+    <div class="st-link" onclick="window.location.href='marche-senegal-boutique.html'">🏪 Ma boutique</div>
+  </div>
+  <div class="st-actions">
+    <button class="st-btn st-btn-outline" onclick="toast('💾 Brouillon sauvegardé !')">💾 Brouillon</button>
+    <button class="st-btn st-btn-green" onclick="publishProduct()">🚀 Publier</button>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT FORMS -->
+  <div>
+
+    <!-- PHOTOS -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">📸</span>Photos du produit</div>
+      <div class="photo-grid" id="photo-grid">
+        <div class="photo-slot" id="slot-0" onclick="triggerUpload(0)">
+          <span class="photo-slot-icon">📷</span>
+          <span class="photo-slot-text">Photo principale</span>
+          <div class="photo-main-badge">Photo principale</div>
+          <button class="photo-del" onclick="event.stopPropagation();removePhoto(0)">✕</button>
+        </div>
+        <div class="photo-slot" id="slot-1" onclick="triggerUpload(1)">
+          <span class="photo-slot-icon">+</span>
+          <span class="photo-slot-text">Photo 2</span>
+          <button class="photo-del" onclick="event.stopPropagation();removePhoto(1)">✕</button>
+        </div>
+        <div class="photo-slot" id="slot-2" onclick="triggerUpload(2)">
+          <span class="photo-slot-icon">+</span>
+          <span class="photo-slot-text">Photo 3</span>
+          <button class="photo-del" onclick="event.stopPropagation();removePhoto(2)">✕</button>
+        </div>
+        <div class="photo-slot" id="slot-3" onclick="triggerUpload(3)">
+          <span class="photo-slot-icon">+</span>
+          <span class="photo-slot-text">Photo 4</span>
+          <button class="photo-del" onclick="event.stopPropagation();removePhoto(3)">✕</button>
+        </div>
+        <div class="photo-slot" id="slot-4" onclick="triggerUpload(4)">
+          <span class="photo-slot-icon">+</span>
+          <span class="photo-slot-text">Photo 5</span>
+          <button class="photo-del" onclick="event.stopPropagation();removePhoto(4)">✕</button>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none"/>
+      <div class="photo-hint">📌 Cliquez sur un emplacement pour choisir une photo · Max 5 photos · JPG, PNG · Max 5 MB chacune<br/>💡 Bonne lumière + fond neutre = 3x plus de clics et de ventes</div>
+    </div>
+
+    <!-- INFOS DE BASE -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">📝</span>Informations du produit</div>
+      <div class="fgrid">
+        <div class="fgrid-full field">
+          <label class="fl">Nom du produit <span class="fl-req">*</span></label>
+          <input class="fi" type="text" id="prod-name" value="Boubou wax tissé main" oninput="updatePreview()" placeholder="Nom clair et descriptif du produit"/>
+          <span class="fi-hint">Un bon nom = plus de visibilité dans la recherche</span>
+        </div>
+        <div class="fgrid-full field">
+          <label class="fl">Description <span class="fl-req">*</span></label>
+          <textarea class="fi fi-ta" placeholder="Décrivez votre produit : matière, dimensions, utilisation, conseils d'entretien...">Boubou wax tissé main de qualité supérieure. Tissu wax hollandais 100% coton. Couture et broderie entièrement faites à la main par les artisans sénégalais. Idéal pour les cérémonies, Tabaski, Korité. Disponible en plusieurs tailles et couleurs.</textarea>
+        </div>
+        <div class="field">
+          <label class="fl">Prix de vente (FCFA) <span class="fl-req">*</span></label>
+          <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-price" value="18000" oninput="updatePreview()" placeholder="0"/></div>
+        </div>
+        <div class="field">
+          <label class="fl">Ancien prix (optionnel)</label>
+          <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-old-price" placeholder="Ex: 22000" oninput="updatePreview()"/></div>
+          <span class="fi-hint">Laissez vide si pas de réduction</span>
+        </div>
+        <div class="field">
+          <label class="fl">Quantité en stock <span class="fl-req">*</span></label>
+          <input class="fi" type="number" id="prod-stock" value="1" min="0" placeholder="Nombre d'unités disponibles"/>
+        </div>
+        <div class="field">
+          <label class="fl">Référence produit</label>
+          <input class="fi" type="text" value="MFN-BWX-001" placeholder="Code de référence interne"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATÉGORIE -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">🏷️</span>Catégorie <span style="font-size:.76rem;font-weight:400;color:var(--muted)">— Choisissez la plus adaptée</span></div>
+      <div class="cat-grid" id="cat-grid">
+        <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Chargement des catégories...</div>
+      </div>
+    </div>
+
+    <!-- VARIANTES -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">📐</span>Tailles & Couleurs <span style="font-size:.76rem;font-weight:400;color:var(--muted)">— Sélectionnez ce que vous proposez</span></div>
+      <div class="vrow">
+        <div class="vrow-label">Tailles</div>
+        <div class="vtags">
+          <div class="vtag" onclick="this.classList.toggle('sel')">S</div>
+          <div class="vtag" onclick="this.classList.toggle('sel')">M</div>
+          <div class="vtag sel" onclick="this.classList.toggle('sel')">L</div>
+          <div class="vtag sel" onclick="this.classList.toggle('sel')">XL</div>
+          <div class="vtag sel" onclick="this.classList.toggle('sel')">XXL</div>
+          <div class="vtag" onclick="this.classList.toggle('sel')">XXXL</div>
+          <div class="vtag" onclick="toast('Ajouter une taille personnalisée...')">+ Sur mesure</div>
+        </div>
+      </div>
+      <div class="vrow">
+        <div class="vrow-label" style="margin-top:4px">Couleurs</div>
+        <div class="color-swatches">
+          <div class="cs sel" style="background:linear-gradient(135deg,#1565C0,#F9A825)" title="Bleu/Or" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs sel" style="background:linear-gradient(135deg,#C62828,#212121)" title="Rouge/Noir" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:linear-gradient(135deg,#2E7D32,#FAFAFA)" title="Vert/Blanc" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:linear-gradient(135deg,#6A1B9A,#F57F17)" title="Violet/Or" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:linear-gradient(135deg,#880E4F,#F3E5F5)" title="Rose/Blanc" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:#eee;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted)" onclick="toast('Ajouter une couleur...')">+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVRAISON -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">🚚</span>Livraison & Logistique</div>
+      <div class="fgrid">
+        <div class="field">
+          <label class="fl">Délai de préparation</label>
+          <select class="fi"><option>Même jour</option><option>1 jour ouvré</option><option selected>2–3 jours</option><option>5–7 jours</option><option>Sur commande</option></select>
+        </div>
+        <div class="field">
+          <label class="fl">Poids estimé (grammes)</label>
+          <input class="fi" type="number" value="350" min="0" placeholder="Poids en grammes"/>
+        </div>
+      </div>
+      <div class="cb-list">
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison à domicile disponible — Tout le Sénégal</span></div>
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Retrait gratuit en boutique — Marché Sandaga, Allée 3</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express disponible (+500 FCFA)</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Expédition internationale — Diaspora sénégalaise</span></div>
+      </div>
+    </div>
+
+    <!-- PROMOTION -->
+    <div class="form-card">
+      <div class="fc-title"><span class="fc-icon">🎯</span>Promotion <span style="font-size:.76rem;font-weight:400;color:var(--muted)">— Optionnel</span></div>
+      <div class="fgrid">
+        <div class="field">
+          <label class="fl">Réduction (%)</label>
+          <div class="fi-prefix"><div class="fi-pre-label">%</div><input type="number" id="prod-discount" placeholder="Ex: 15" min="0" max="80" oninput="updatePreview()"/></div>
+        </div>
+        <div class="field">
+          <label class="fl">Code promo</label>
+          <input class="fi" type="text" placeholder="Ex: FATOU15" style="text-transform:uppercase"/>
+        </div>
+        <div class="field">
+          <label class="fl">Date de fin de promo</label>
+          <input class="fi" type="date"/>
+        </div>
+        <div class="field">
+          <label class="fl">Utilisations max.</label>
+          <input class="fi" type="number" placeholder="Ex: 50 (illimité si vide)"/>
+        </div>
+      </div>
+      <div class="cb-list" style="margin-top:10px">
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Marquer comme "Produit vedette" de la boutique</span></div>
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Activer la promotion immédiatement après publication</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Partager automatiquement sur WhatsApp et l'application</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT — PREVIEW -->
+  <div>
+    <div class="preview-card">
+      <div class="preview-title">📱 Aperçu sur l'application</div>
+      <div class="preview-phone">
+        <div class="pp-screen">
+          <div class="pp-img">
+            <span id="prev-emoji">👗</span>
+            <div class="pp-badge" id="prev-badge" style="display:none">-15%</div>
+          </div>
+          <div class="pp-body">
+            <div class="pp-market">🏛️ Sandaga · Mode Fatou Ndoye</div>
+            <div class="pp-name" id="prev-name">Boubou wax tissé main</div>
+            <div style="display:flex;align-items:baseline;gap:4px">
+              <span class="pp-price" id="prev-price">18 000 FCFA</span>
+              <span class="pp-old" id="prev-old" style="display:none"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-calc" id="price-calc">
+        <div class="pc-row"><span>Prix de vente</span><span>18 000 FCFA</span></div>
+        <div class="pc-row"><span>Commission Marché SN (8%)</span><span>- 1 440 FCFA</span></div>
+        <div class="pc-row pc-total"><span>Vous recevrez</span><span id="net-price">16 560 FCFA</span></div>
+      </div>
+
+      <div class="checklist">
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Photos ajoutées (3/5)</span></div>
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Nom du produit renseigné</span></div>
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Prix défini</span></div>
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Description rédigée</span></div>
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Catégorie sélectionnée</span></div>
+        <div class="cl-item"><div class="cl-dot cl-warn"></div><span class="cl-text warn">⚠ Ajoutez 2 photos de plus pour +40% de vues</span></div>
+        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Options de livraison configurées</span></div>
+      </div>
+
+      <button class="publish-btn" onclick="publishProduct()">🚀 Publier le produit</button>
+      <button class="draft-btn" onclick="toast('💾 Brouillon enregistré !')">💾 Sauvegarder en brouillon</button>
+
+      <div style="margin-top:14px;font-size:.74rem;color:var(--muted);text-align:center;line-height:1.6">
+        🔒 Votre produit sera visible dès la publication par les acheteurs de toute la plateforme
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   AJOUT PRODUIT — Upload + Aperçu
+// ════════════════════════════════════════
+
+const uploadedImages = [null, null, null, null, null];
+let activeSlot = 0;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── Gestion upload photos ──
+function triggerUpload(slotIndex){
+  activeSlot = slotIndex;
+  document.getElementById('file-input').click();
+}
+
+async function handleFileChange(file){
+  if(!file) return;
+  const token = localStorage.getItem('token');
+  if(!token){ toast('Connectez-vous pour uploader'); return; }
+
+  renderLoadingSlot(activeSlot);
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch('http://localhost:3000/api/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    });
+    const data = await res.json();
+
+    if(data.success){
+      uploadedImages[activeSlot] = data.url;
+      renderFilledSlot(activeSlot, data.url);
+      updateChecklist();
+      updatePreview();
+      toast('Photo ajoutee !');
+    } else {
+      renderEmptySlot(activeSlot);
+      toast(data.message || 'Erreur upload');
+    }
+  } catch(err){
+    renderEmptySlot(activeSlot);
+    toast('Erreur de connexion au serveur');
+  }
+}
+
+function renderLoadingSlot(index){
+  const slot = document.getElementById('slot-' + index);
+  slot.className = 'photo-slot';
+  slot.onclick = null;
+  slot.replaceChildren();
+  const icon = document.createElement('span');
+  icon.className = 'photo-slot-icon';
+  icon.textContent = '⏳';
+  const text = document.createElement('span');
+  text.className = 'photo-slot-text';
+  text.textContent = 'Envoi...';
+  slot.appendChild(icon);
+  slot.appendChild(text);
+}
+
+function renderFilledSlot(index, url){
+  const slot = document.getElementById('slot-' + index);
+  slot.className = 'photo-slot filled';
+  slot.replaceChildren();
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = 'Photo produit';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:8px;';
+  slot.appendChild(img);
+
+  if(index === 0){
+    const badge = document.createElement('div');
+    badge.className = 'photo-main-badge';
+    badge.textContent = 'Photo principale';
+    slot.appendChild(badge);
+  }
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'photo-del';
+  delBtn.textContent = '✕';
+  delBtn.onclick = (e) => { e.stopPropagation(); removePhoto(index); };
+  slot.appendChild(delBtn);
+
+  slot.onclick = () => triggerUpload(index);
+}
+
+function renderEmptySlot(index){
+  const labels = ['Photo principale', 'Photo 2', 'Photo 3', 'Photo 4', 'Photo 5'];
+  const slot = document.getElementById('slot-' + index);
+  slot.className = 'photo-slot';
+  slot.replaceChildren();
+
+  const iconEl = document.createElement('span');
+  iconEl.className = 'photo-slot-icon';
+  iconEl.textContent = index === 0 ? '📷' : '+';
+  slot.appendChild(iconEl);
+
+  const textEl = document.createElement('span');
+  textEl.className = 'photo-slot-text';
+  textEl.textContent = labels[index];
+  slot.appendChild(textEl);
+
+  if(index === 0){
+    const badge = document.createElement('div');
+    badge.className = 'photo-main-badge';
+    badge.textContent = 'Photo principale';
+    slot.appendChild(badge);
+  }
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'photo-del';
+  delBtn.textContent = '✕';
+  delBtn.onclick = (e) => { e.stopPropagation(); removePhoto(index); };
+  slot.appendChild(delBtn);
+
+  slot.onclick = () => triggerUpload(index);
+}
+
+function removePhoto(index){
+  uploadedImages[index] = null;
+  renderEmptySlot(index);
+  updateChecklist();
+  updatePreview();
+  toast('Photo supprimee');
+}
+
+function updateChecklist(){
+  const count = uploadedImages.filter(Boolean).length;
+  const items = document.querySelectorAll('.cl-item');
+  if(!items.length) return;
+  const dot = items[0].querySelector('.cl-dot');
+  const text = items[0].querySelector('.cl-text');
+  if(count === 0){
+    dot.className = 'cl-dot cl-err';
+    text.textContent = 'Aucune photo — ajoutez au moins 1 photo';
+    text.className = 'cl-text err';
+  } else if(count < 3){
+    dot.className = 'cl-dot cl-warn';
+    text.textContent = 'Photos ajoutees (' + count + '/5) — ajoutez-en plus pour plus de vues';
+    text.className = 'cl-text warn';
+  } else {
+    dot.className = 'cl-dot cl-ok';
+    text.textContent = 'Photos ajoutees (' + count + '/5)';
+    text.className = 'cl-text';
+  }
+}
+
+// ── Apercu en temps reel ──
+function updatePreview(){
+  const name = document.getElementById('prod-name')?.value || 'Nom du produit';
+  const price = parseInt(document.getElementById('prod-price')?.value) || 0;
+  const oldPrice = parseInt(document.getElementById('prod-old-price')?.value) || 0;
+  const discount = parseInt(document.getElementById('prod-discount')?.value) || 0;
+
+  const prevName = document.getElementById('prev-name');
+  const prevPrice = document.getElementById('prev-price');
+  const prevOld = document.getElementById('prev-old');
+  const prevBadge = document.getElementById('prev-badge');
+  const prevEmoji = document.getElementById('prev-emoji');
+
+  if(prevName) prevName.textContent = name;
+  if(prevPrice) prevPrice.textContent = price.toLocaleString() + ' FCFA';
+  if(prevOld){
+    if(oldPrice > 0){ prevOld.style.display = 'inline'; prevOld.textContent = oldPrice.toLocaleString() + ' FCFA'; }
+    else { prevOld.style.display = 'none'; }
+  }
+  if(prevBadge){
+    if(discount > 0){ prevBadge.style.display = 'block'; prevBadge.textContent = '-' + discount + '%'; }
+    else { prevBadge.style.display = 'none'; }
+  }
+
+  // Apercu photo principale
+  const ppImg = document.querySelector('.pp-img');
+  if(ppImg && prevEmoji){
+    const mainPhoto = uploadedImages[0];
+    let previewImg = ppImg.querySelector('img.preview-img');
+    if(mainPhoto){
+      prevEmoji.style.display = 'none';
+      if(!previewImg){
+        previewImg = document.createElement('img');
+        previewImg.className = 'preview-img';
+        previewImg.alt = 'Apercu';
+        previewImg.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:inherit';
+        ppImg.style.position = 'relative';
+        ppImg.insertBefore(previewImg, ppImg.firstChild);
+      }
+      previewImg.src = mainPhoto;
+    } else {
+      prevEmoji.style.display = '';
+      if(previewImg) previewImg.remove();
+    }
+  }
+
+  // Calcul commission
+  const commission = Math.round(price * 0.08);
+  const net = price - commission;
+  const calc = document.querySelector('.price-calc');
+  if(calc){
+    calc.replaceChildren();
+    [['Prix de vente', price.toLocaleString() + ' FCFA'],
+     ['Commission Marche SN (8%)', '- ' + commission.toLocaleString() + ' FCFA']
+    ].forEach(function(pair){
+      const row = document.createElement('div');
+      row.className = 'pc-row';
+      const s1 = document.createElement('span'); s1.textContent = pair[0];
+      const s2 = document.createElement('span'); s2.textContent = pair[1];
+      row.appendChild(s1); row.appendChild(s2);
+      calc.appendChild(row);
+    });
+    const totalRow = document.createElement('div');
+    totalRow.className = 'pc-row pc-total';
+    const tl = document.createElement('span'); tl.textContent = 'Vous recevrez';
+    const tv = document.createElement('span'); tv.textContent = net.toLocaleString() + ' FCFA';
+    totalRow.appendChild(tl); totalRow.appendChild(tv);
+    calc.appendChild(totalRow);
+  }
+}
+
+function selCat(btn){
+  document.querySelectorAll('.cg-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function toggleCb(row){ row.classList.toggle('checked'); }
+
+// ── Publier le produit ──
+async function publishProduct(){
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if(!user){
+    toast('Connectez-vous pour publier');
+    setTimeout(() => window.location.href = 'marche-senegal-connexion-vendeur.html', 1500);
+    return;
+  }
+  if(user.role !== 'SELLER' && user.role !== 'ADMIN'){
+    toast('Acces reserve aux vendeurs');
+    return;
+  }
+
+  const name = document.getElementById('prod-name')?.value.trim();
+  const price = document.getElementById('prod-price')?.value;
+  const descEl = document.querySelector('textarea.fi-ta');
+  const description = descEl ? descEl.value.trim() : '';
+
+  if(!name || !price){
+    toast('Remplissez le nom et le prix du produit');
+    return;
+  }
+
+  const btn = document.querySelector('.publish-btn');
+  const topBtn = document.querySelector('.st-btn-green');
+  if(btn){ btn.textContent = 'Publication en cours...'; btn.style.background = 'var(--muted)'; btn.disabled = true; }
+  if(topBtn){ topBtn.textContent = '...'; topBtn.disabled = true; }
+
+  const sizes = Array.from(document.querySelectorAll('.vtag.sel')).map(t => t.textContent.trim());
+  const selectedCat = document.querySelector('.cg-btn.sel');
+  const images = uploadedImages.filter(Boolean);
+
+  const productData = {
+    name,
+    description,
+    price: parseInt(price),
+    originalPrice: parseInt(document.getElementById('prod-old-price')?.value) || null,
+    stock: parseInt(document.getElementById('prod-stock')?.value) || 1,
+    categoryId: selectedCat ? selectedCat.getAttribute('data-id') : null,
+    images,
+    sizes,
+    colors: []
+  };
+
+  const result = await createProduct(productData);
+
+  if(result.success){
+    if(btn){ btn.textContent = 'Produit publie !'; btn.style.background = 'var(--gl)'; }
+    toast('Produit publie avec succes !');
+    setTimeout(() => window.location.href = 'marche-senegal-dashboard.html', 2000);
+  } else {
+    if(btn){ btn.textContent = 'Publier le produit'; btn.style.background = ''; btn.disabled = false; }
+    if(topBtn){ topBtn.textContent = 'Publier'; topBtn.disabled = false; }
+    toast(result.message || 'Erreur lors de la publication');
+  }
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', function(){
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if(!user){
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  if(user.role !== 'SELLER' && user.role !== 'ADMIN'){
+    toast('Acces reserve aux vendeurs');
+    setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
+    return;
+  }
+
+  document.getElementById('file-input').addEventListener('change', function(){
+    handleFileChange(this.files[0]);
+    this.value = '';
+  });
+
+  loadCategories();
+  updatePreview();
+  updateChecklist();
+});
+
+async function loadCategories(){
+  try {
+    const res = await fetch('http://localhost:3000/api/categories');
+    const data = await res.json();
+    if(!data.success || !data.data.length) return;
+    const grid = document.getElementById('cat-grid');
+    grid.replaceChildren();
+    data.data.forEach(function(cat, i){
+      const btn = document.createElement('div');
+      btn.className = 'cg-btn' + (i === 0 ? ' sel' : '');
+      btn.setAttribute('data-id', cat.id);
+      btn.onclick = function(){ selCat(btn); };
+      const icon = document.createElement('span');
+      icon.className = 'cg-icon';
+      icon.textContent = cat.emoji;
+      btn.appendChild(icon);
+      btn.appendChild(document.createTextNode(cat.name));
+      grid.appendChild(btn);
+    });
+  } catch(e){
+    console.error('Erreur categories:', e);
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Modifier le produit — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--radius:14px;--nav-h:64px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font-family:inherit}a{text-decoration:none;color:inherit}
+.flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.st-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
+.st-nav{display:flex;gap:0;flex:1;overflow-x:auto;scrollbar-width:none}.st-nav::-webkit-scrollbar{display:none}
+.st-link{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.st-link:hover{color:rgba(255,255,255,.8)}.st-link.active{color:#fff;border-bottom-color:var(--green)}
+.st-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.st-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
+.st-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}.st-btn-outline:hover{background:rgba(255,255,255,.18)}
+.st-btn-green{background:var(--green);color:#fff}.st-btn-green:hover{background:var(--gl)}
+.page{margin-top:var(--nav-h);max-width:760px;margin-left:auto;margin-right:auto;padding:28px 4vw 60px}
+.page-header{margin-bottom:22px}
+.page-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:4px}
+.page-sub{font-size:.84rem;color:var(--muted)}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.card-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:.8rem;font-weight:600;color:var(--text)}.fl-req{color:var(--red);margin-left:2px}
+.fi{height:42px;border:1.5px solid var(--border);border-radius:9px;padding:0 13px;font-size:.86rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s}.fi:focus{border-color:var(--green)}
+.fi-ta{height:auto;padding:10px 13px;resize:vertical;min-height:100px}
+.fi-prefix{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;transition:border-color .2s}.fi-prefix:focus-within{border-color:var(--green)}
+.fi-pre-label{padding:0 12px;height:42px;background:#fafafa;border-right:1px solid var(--border);display:flex;align-items:center;font-size:.8rem;color:var(--muted);flex-shrink:0}
+.fi-prefix input{flex:1;border:none;outline:none;padding:0 12px;font-size:.86rem;height:42px;color:var(--text);background:transparent}
+.fi-hint{font-size:.74rem;color:var(--muted);margin-top:3px}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cg-btn{padding:10px 8px;border-radius:9px;border:1.5px solid var(--border);background:#fff;text-align:center;cursor:pointer;transition:all .18s;font-size:.76rem;font-weight:500;color:var(--text)}
+.cg-btn:hover,.cg-btn.sel{border-color:var(--green);background:var(--gp);color:var(--green);font-weight:600}
+.cg-icon{font-size:1.2rem;display:block;margin-bottom:4px}
+.vtags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.vtag{padding:5px 13px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;cursor:pointer;transition:all .18s}
+.vtag.sel{background:var(--green);border-color:var(--green);color:#fff}.vtag:hover:not(.sel){border-color:var(--green)}
+.photo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px}
+.photo-slot{aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-slot:hover{border-color:var(--green);background:var(--gp)}
+.photo-slot.filled{border-style:solid;border-color:var(--g2)}
+.photo-slot-icon{font-size:1.3rem}.photo-slot-text{font-size:.62rem;color:var(--muted);text-align:center}
+.photo-del{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:.58rem;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:700}
+.photo-slot.filled:hover .photo-del{display:flex}
+.status-bar{background:var(--gp);border:1.5px solid var(--g2);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:.84rem;color:var(--green);font-weight:500}
+.actions{display:flex;gap:10px;margin-top:8px}
+.btn-save{flex:1;background:var(--green);color:#fff;border:none;border-radius:99px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-save:hover{background:var(--gl)}.btn-save:disabled{background:var(--muted);cursor:not-allowed}
+.btn-cancel{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:99px;padding:13px 22px;font-size:.86rem;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-cancel:hover{border-color:var(--red);color:var(--red)}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;height:42px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}.cat-grid{grid-template-columns:repeat(3,1fr)}.photo-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="topbar">
+  <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
+  <div class="st-nav">
+    <div class="st-link" onclick="location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
+    <div class="st-link" onclick="location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
+    <div class="st-link" onclick="location.href='marche-senegal-ajout-produit.html'">➕ Ajouter</div>
+    <div class="st-link" onclick="location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
+  </div>
+  <div class="st-actions">
+    <button class="st-btn st-btn-outline btn-cancel-top" onclick="location.href='marche-senegal-mes-produits.html'">← Annuler</button>
+    <button class="st-btn st-btn-green" onclick="saveProduct()">💾 Enregistrer</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">✏️ Modifier le produit</div>
+    <div class="page-sub" id="prod-subtitle">Chargement...</div>
+  </div>
+
+  <div class="status-bar" id="status-bar" style="display:none">
+    ✅ Produit actif — visible par les acheteurs
+  </div>
+
+  <!-- PHOTOS -->
+  <div class="card">
+    <div class="card-title">📸 Photos</div>
+    <div class="photo-grid" id="photo-grid"></div>
+    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none"/>
+    <div style="font-size:.75rem;color:var(--muted)">Max 5 photos · JPG, PNG · Max 5 MB</div>
+  </div>
+
+  <!-- INFOS -->
+  <div class="card">
+    <div class="card-title">📝 Informations</div>
+    <div class="fgrid">
+      <div class="fgrid-full field">
+        <label class="fl">Nom du produit <span class="fl-req">*</span></label>
+        <input class="fi" type="text" id="prod-name" placeholder="Nom du produit"/>
+      </div>
+      <div class="fgrid-full field">
+        <label class="fl">Description <span class="fl-req">*</span></label>
+        <textarea class="fi fi-ta" id="prod-desc" placeholder="Description du produit..."></textarea>
+      </div>
+      <div class="field">
+        <label class="fl">Prix (FCFA) <span class="fl-req">*</span></label>
+        <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-price" placeholder="0"/></div>
+      </div>
+      <div class="field">
+        <label class="fl">Ancien prix (optionnel)</label>
+        <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-old-price" placeholder="Ex: 22000"/></div>
+      </div>
+      <div class="field">
+        <label class="fl">Stock <span class="fl-req">*</span></label>
+        <input class="fi" type="number" id="prod-stock" min="0" placeholder="Quantité disponible"/>
+      </div>
+      <div class="field">
+        <label class="fl">Référence</label>
+        <input class="fi" type="text" id="prod-sku" placeholder="Code interne"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATÉGORIE -->
+  <div class="card">
+    <div class="card-title">🏷️ Catégorie</div>
+    <div class="cat-grid" id="cat-grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+
+  <!-- TAILLES & COULEURS -->
+  <div class="card">
+    <div class="card-title">📐 Tailles & Couleurs</div>
+    <div class="field" style="margin-bottom:14px">
+      <label class="fl">Tailles disponibles</label>
+      <div class="vtags" id="size-tags">
+        <div class="vtag" onclick="this.classList.toggle('sel')">S</div>
+        <div class="vtag" onclick="this.classList.toggle('sel')">M</div>
+        <div class="vtag" onclick="this.classList.toggle('sel')">L</div>
+        <div class="vtag" onclick="this.classList.toggle('sel')">XL</div>
+        <div class="vtag" onclick="this.classList.toggle('sel')">XXL</div>
+        <div class="vtag" onclick="this.classList.toggle('sel')">XXXL</div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="fl">Couleurs (séparées par virgule)</label>
+      <input class="fi" type="text" id="prod-colors" placeholder="Ex: Rouge, Bleu/Or, Noir"/>
+      <span class="fi-hint">Entrez les couleurs disponibles séparées par une virgule</span>
+    </div>
+  </div>
+
+  <!-- STATUT -->
+  <div class="card">
+    <div class="card-title">⚙️ Statut</div>
+    <div class="field">
+      <label class="fl">Statut du produit</label>
+      <select class="fi" id="prod-status">
+        <option value="ACTIVE">✅ Actif — visible par les acheteurs</option>
+        <option value="PAUSED">⏸️ En pause — masqué temporairement</option>
+        <option value="OUT_OF_STOCK">📦 Rupture de stock</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-cancel" onclick="location.href='marche-senegal-mes-produits.html'">Annuler</button>
+    <button class="btn-save" id="btn-save" onclick="saveProduct()">💾 Enregistrer les modifications</button>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const PRODUCT_ID = params.get('id');
+const uploadedImages = [];
+let activeSlot = 0;
+let currentProduct = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', async function(){
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if(!user || (user.role !== 'SELLER' && user.role !== 'ADMIN')){
+    location.href = 'marche-senegal-connexion-vendeur.html'; return;
+  }
+  if(!PRODUCT_ID){ toast('Produit introuvable'); return; }
+
+  document.getElementById('file-input').addEventListener('change', function(){
+    handleFileChange(this.files[0]); this.value = '';
+  });
+
+  await Promise.all([loadProduct(), loadCategories()]);
+});
+
+async function loadProduct(){
+  try {
+    const res = await fetch('http://localhost:3000/api/products/' + PRODUCT_ID);
+    const data = await res.json();
+    if(!data.success){ toast('Produit introuvable'); return; }
+
+    currentProduct = data.data;
+    document.getElementById('prod-subtitle').textContent = currentProduct.name;
+    document.getElementById('prod-name').value = currentProduct.name || '';
+    document.getElementById('prod-desc').value = currentProduct.description || '';
+    document.getElementById('prod-price').value = currentProduct.price || '';
+    document.getElementById('prod-old-price').value = currentProduct.originalPrice || '';
+    document.getElementById('prod-stock').value = currentProduct.stock ?? '';
+    document.getElementById('prod-sku').value = currentProduct.sku || '';
+    document.getElementById('prod-colors').value = (currentProduct.colors || []).join(', ');
+    document.getElementById('prod-status').value = currentProduct.status || 'ACTIVE';
+
+    // Statut bar
+    if(currentProduct.status === 'ACTIVE'){
+      const bar = document.getElementById('status-bar');
+      bar.style.display = 'flex';
+    }
+
+    // Tailles pré-sélectionnées
+    const sizes = currentProduct.sizes || [];
+    document.querySelectorAll('#size-tags .vtag').forEach(tag => {
+      if(sizes.includes(tag.textContent.trim())) tag.classList.add('sel');
+    });
+
+    // Photos existantes
+    const images = currentProduct.images || [];
+    images.forEach((url, i) => { uploadedImages[i] = url; });
+    renderPhotoGrid();
+
+  } catch(e){ toast('Erreur de chargement'); }
+}
+
+async function loadCategories(){
+  try {
+    const res = await fetch('http://localhost:3000/api/categories');
+    const data = await res.json();
+    if(!data.success) return;
+    const grid = document.getElementById('cat-grid');
+    grid.replaceChildren();
+    data.data.forEach(cat => {
+      const btn = document.createElement('div');
+      btn.className = 'cg-btn';
+      btn.setAttribute('data-id', cat.id);
+      btn.onclick = () => {
+        document.querySelectorAll('.cg-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+      };
+      const icon = document.createElement('span');
+      icon.className = 'cg-icon'; icon.textContent = cat.emoji;
+      btn.appendChild(icon);
+      btn.appendChild(document.createTextNode(cat.name));
+      grid.appendChild(btn);
+
+      // Pré-sélectionner la catégorie actuelle
+      if(currentProduct && currentProduct.categoryId === cat.id){
+        btn.classList.add('sel');
+      }
+    });
+  } catch(e){ console.error(e); }
+}
+
+// ── Photos ──
+function renderPhotoGrid(){
+  const grid = document.getElementById('photo-grid');
+  grid.replaceChildren();
+  for(let i = 0; i < 5; i++){
+    const slot = document.createElement('div');
+    slot.id = 'slot-' + i;
+    if(uploadedImages[i]){
+      renderFilledSlot(i, uploadedImages[i]);
+    } else {
+      renderEmptySlot(i);
+    }
+    grid.appendChild(slot);
+  }
+}
+
+function triggerUpload(i){ activeSlot = i; document.getElementById('file-input').click(); }
+
+async function handleFileChange(file){
+  if(!file) return;
+  const token = localStorage.getItem('token');
+  const slot = document.getElementById('slot-' + activeSlot);
+  slot.className = 'photo-slot';
+  slot.replaceChildren();
+  const sp = document.createElement('span'); sp.className = 'photo-slot-icon'; sp.textContent = '⏳';
+  slot.appendChild(sp);
+
+  const fd = new FormData(); fd.append('image', file);
+  try {
+    const r = await fetch('http://localhost:3000/api/upload/image', {
+      method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd
+    });
+    const d = await r.json();
+    if(d.success){ uploadedImages[activeSlot] = d.url; renderFilledSlot(activeSlot, d.url); toast('Photo ajoutée !'); }
+    else { renderEmptySlot(activeSlot); toast(d.message || 'Erreur upload'); }
+  } catch(e){ renderEmptySlot(activeSlot); toast('Erreur serveur'); }
+}
+
+function renderFilledSlot(i, url){
+  const slot = document.getElementById('slot-' + i) || document.createElement('div');
+  slot.className = 'photo-slot filled'; slot.replaceChildren();
+  const img = document.createElement('img');
+  img.src = url; img.alt = 'Photo';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:8px;';
+  const del = document.createElement('button');
+  del.className = 'photo-del'; del.textContent = '✕';
+  del.onclick = e => { e.stopPropagation(); uploadedImages[i] = null; renderEmptySlot(i); };
+  slot.appendChild(img); slot.appendChild(del);
+  slot.onclick = () => triggerUpload(i);
+}
+
+function renderEmptySlot(i){
+  const slot = document.getElementById('slot-' + i) || document.createElement('div');
+  slot.className = 'photo-slot'; slot.replaceChildren();
+  const ic = document.createElement('span'); ic.className = 'photo-slot-icon'; ic.textContent = i === 0 ? '📷' : '+';
+  const tx = document.createElement('span'); tx.className = 'photo-slot-text'; tx.textContent = i === 0 ? 'Principale' : 'Photo '+(i+1);
+  slot.appendChild(ic); slot.appendChild(tx);
+  slot.onclick = () => triggerUpload(i);
+}
+
+// ── Sauvegarder ──
+async function saveProduct(){
+  const name = document.getElementById('prod-name').value.trim();
+  const description = document.getElementById('prod-desc').value.trim();
+  const price = document.getElementById('prod-price').value;
+  const stock = document.getElementById('prod-stock').value;
+
+  if(!name || !price){ toast('Nom et prix obligatoires'); return; }
+
+  const categoryId = document.querySelector('.cg-btn.sel')?.getAttribute('data-id');
+  const sizes = Array.from(document.querySelectorAll('#size-tags .vtag.sel')).map(t => t.textContent.trim());
+  const colorsRaw = document.getElementById('prod-colors').value;
+  const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+  const images = uploadedImages.filter(Boolean);
+
+  const btn = document.getElementById('btn-save');
+  btn.textContent = 'Enregistrement...'; btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:3000/api/products/' + PRODUCT_ID, {
+      method: 'PUT',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+      body: JSON.stringify({
+        name, description,
+        price: parseInt(price),
+        originalPrice: parseInt(document.getElementById('prod-old-price').value) || null,
+        stock: parseInt(stock),
+        sku: document.getElementById('prod-sku').value.trim() || null,
+        categoryId: categoryId || undefined,
+        images, sizes, colors,
+        status: document.getElementById('prod-status').value
+      })
+    });
+    const data = await res.json();
+    if(data.success){
+      toast('Produit modifié !');
+      setTimeout(() => location.href = 'marche-senegal-mes-produits.html', 1500);
+    } else {
+      toast(data.message || 'Erreur'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+    }
+  } catch(e){
+    toast('Erreur de connexion'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

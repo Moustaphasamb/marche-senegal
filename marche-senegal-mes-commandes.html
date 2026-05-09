@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mes commandes — Marché Sénégal Vendeur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --blue:#1565C0;--bluep:#E3F2FD;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;--topbar-h:56px;--seller-nav-h:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+.flag{display:flex;width:26px;height:16px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.tb-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
+.tb-breadcrumb{display:flex;align-items:center;gap:7px;font-size:.82rem;color:rgba(255,255,255,.4)}
+.tb-bc-link{cursor:pointer;color:rgba(255,255,255,.55);transition:color .18s}
+.tb-bc-link:hover{color:#fff}
+.tb-bc-sep{color:rgba(255,255,255,.2)}
+.tb-bc-current{color:rgba(255,255,255,.85);font-weight:500}
+.tb-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.tb-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
+.tb-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}
+.tb-btn-outline:hover{background:rgba(255,255,255,.18)}
+
+/* SELLER NAV */
+.seller-nav{position:fixed;top:var(--topbar-h);left:0;right:0;z-index:190;height:var(--seller-nav-h);background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;overflow-x:auto;scrollbar-width:none}
+.seller-nav::-webkit-scrollbar{display:none}
+.sn-item{display:flex;align-items:center;gap:6px;padding:0 16px;height:var(--seller-nav-h);font-size:.84rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.sn-item:hover{color:var(--green)}
+.sn-item.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+
+/* MAIN */
+.main{margin-top:calc(var(--topbar-h) + var(--seller-nav-h));padding:22px 4vw 60px}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.sc-val{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--dark);margin-bottom:3px}
+.sc-label{font-size:.74rem;color:var(--muted)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.tb-search{display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 14px;height:38px;flex:1;min-width:200px;transition:border-color .2s}
+.tb-search:focus-within{border-color:var(--green)}
+.tb-search input{flex:1;border:none;outline:none;font-size:.84rem;color:var(--text);background:transparent}
+.tb-search input::placeholder{color:var(--muted)}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ft{height:34px;padding:0 14px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text);position:relative}
+.ft.active,.ft:hover{background:var(--green);border-color:var(--green);color:#fff}
+.ft-badge{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+/* ORDERS TABLE */
+.orders-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.orders-table{width:100%;border-collapse:collapse;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.orders-table th{background:#fafcfa;padding:11px 16px;text-align:left;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+.orders-table td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:.84rem;color:var(--text);vertical-align:middle}
+.orders-table tr:last-child td{border-bottom:none}
+.orders-table tr:hover td{background:#fafcfa;cursor:pointer}
+
+/* ORDER NUM */
+.order-num{font-weight:700;color:var(--green);font-size:.82rem}
+.order-date{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+/* BUYER CELL */
+.buyer-cell{display:flex;align-items:center;gap:8px}
+.buyer-av{width:30px;height:30px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0}
+.buyer-name{font-size:.84rem;font-weight:500;color:var(--dark)}
+.buyer-phone{font-size:.7rem;color:var(--muted);margin-top:1px}
+
+/* ITEMS CELL */
+.items-cell{font-size:.82rem;color:var(--text)}
+.items-more{font-size:.72rem;color:var(--muted)}
+
+/* STATUS */
+.order-status{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.os-pending{background:var(--gdl);color:#8A6100}
+.os-confirmed{background:var(--bluep);color:var(--blue)}
+.os-preparing{background:var(--bluep);color:var(--blue)}
+.os-delivering{background:#E8F4FD;color:#0277BD}
+.os-delivered{background:var(--gp);color:var(--green)}
+.os-cancelled{background:var(--rp);color:var(--red)}
+
+/* AMOUNT */
+.order-amount{font-weight:700;color:var(--dark);font-size:.9rem}
+
+/* ACTIONS */
+.order-actions{display:flex;gap:5px}
+.oa-btn{padding:5px 10px;border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .18s;white-space:nowrap}
+.oa-btn:hover{border-color:var(--green);color:var(--green)}
+.oa-btn.confirm{background:var(--green);border-color:var(--green);color:#fff}
+.oa-btn.confirm:hover{background:var(--gl)}
+.oa-btn.deliver{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ORDER DETAIL PANEL */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px}
+.detail-overlay.show{display:flex}
+.detail-panel{background:#fff;border-radius:var(--radius);width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.dp-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1}
+.dp-title{font-size:.96rem;font-weight:600;color:var(--dark)}
+.dp-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .18s}
+.dp-close:hover{border-color:var(--red);color:var(--red)}
+.dp-body{padding:18px 20px}
+.dp-section{margin-bottom:18px}
+.dp-section-title{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.dp-item-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.dp-item-row:last-child{border-bottom:none}
+.dp-item-img{width:40px;height:40px;border-radius:7px;background:#F0EAF8;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;overflow:hidden}
+.dp-item-img img{width:100%;height:100%;object-fit:cover}
+.dp-item-name{font-size:.84rem;font-weight:500;color:var(--dark);flex:1}
+.dp-item-price{font-size:.84rem;font-weight:700;color:var(--green);flex-shrink:0}
+.dp-info-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.84rem}
+.dp-info-label{color:var(--muted)}
+.dp-info-val{font-weight:500;color:var(--text)}
+.dp-total-row{display:flex;justify-content:space-between;padding:10px 0 0;font-size:.96rem;border-top:1px solid var(--border);margin-top:6px}
+.dp-total-label{font-weight:700;color:var(--dark)}
+.dp-total-val{font-weight:900;color:var(--green);font-family:'Playfair Display',serif}
+.dp-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.dp-action-btn{width:100%;height:42px;border-radius:9px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.dp-btn-green{background:var(--green);color:#fff}
+.dp-btn-green:hover{background:var(--gl)}
+.dp-btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.dp-btn-outline:hover{border-color:var(--green);color:var(--green)}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.es-icon{font-size:3rem;margin-bottom:12px}
+.es-title{font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:6px}
+.es-sub{font-size:.84rem;line-height:1.65}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;flex-direction:column;gap:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .tb-breadcrumb{display:none}
+}
+@media(max-width:600px){
+  :root{--topbar-h:50px}
+  .main{padding:16px 3vw 40px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-panel" onclick="event.stopPropagation()">
+    <div class="dp-header">
+      <div class="dp-title" id="dp-title">Commande #MS-2025-00001</div>
+      <button class="dp-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="dp-body" id="dp-body">
+      <!-- Généré dynamiquement -->
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    Marché Sénégal
+  </div>
+  <div class="tb-breadcrumb">
+    <span class="tb-bc-link" onclick="window.location.href='marche-senegal-dashboard.html'">Dashboard</span>
+    <span class="tb-bc-sep">›</span>
+    <span class="tb-bc-current">Mes commandes</span>
+  </div>
+  <div class="tb-actions">
+    <button class="tb-btn tb-btn-outline" onclick="window.location.href='marche-senegal-dashboard.html'">← Dashboard</button>
+  </div>
+</div>
+
+<!-- SELLER NAV -->
+<nav class="seller-nav">
+  <div class="sn-item" onclick="window.location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
+  <div class="sn-item" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
+  <div class="sn-item active">🛒 Mes commandes</div>
+  <div class="sn-item" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</div>
+  <div class="sn-item" onclick="var u=getCurrentUser();window.location.href='marche-senegal-boutique.html'+(u&&u.shop?'?id='+u.shop.id:'')">🏪 Ma boutique</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="sc-val" id="stat-total">—</div>
+      <div class="sc-label">Commandes totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-pending">—</div>
+      <div class="sc-label">En attente</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-delivered">—</div>
+      <div class="sc-label">Livrées</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-revenue">—</div>
+      <div class="sc-label">Revenus totaux</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="tb-search">
+      <input type="text" id="search-input"
+             placeholder="Rechercher une commande, un client..."
+             oninput="filterOrders()"/>
+    </div>
+    <div class="filter-tabs">
+      <button class="ft active" onclick="setFilter('all',this)">Toutes</button>
+      <button class="ft" id="ft-pending" onclick="setFilter('PENDING',this)">
+        En attente
+        <span class="ft-badge" id="pending-badge" style="display:none">0</span>
+      </button>
+      <button class="ft" onclick="setFilter('CONFIRMED',this)">Confirmées</button>
+      <button class="ft" onclick="setFilter('DELIVERING',this)">En livraison</button>
+      <button class="ft" onclick="setFilter('DELIVERED',this)">Livrées</button>
+      <button class="ft" onclick="setFilter('CANCELLED',this)">Annulées</button>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="orders-card" id="orders-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div style="font-size:.88rem;color:var(--muted)">Chargement des commandes...</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   MES COMMANDES VENDEUR — Dynamique
+// ════════════════════════════════════════
+
+let allOrders = [];
+let currentFilter = 'all';
+let currentOrderDetail = null;
+
+// ── Charger les commandes ──
+async function loadOrders() {
+  // Pour le vendeur — on charge via le dashboard
+  const result = await getShopOrders();
+
+  if (!result.success) {
+    document.getElementById('orders-container').innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">❌</div>
+        <div class="es-title">Erreur de chargement</div>
+        <div class="es-sub">Impossible de charger vos commandes</div>
+      </div>
+    `;
+    return;
+  }
+
+  allOrders = result.data || [];
+
+  // Mettre à jour les stats
+  updateStats(result.stats || {});
+
+  renderOrders(allOrders);
+}
+
+// ── Mettre à jour les stats ──
+function updateStats(stats) {
+  document.getElementById('stat-total').textContent = stats.total || 0;
+  document.getElementById('stat-pending').textContent = stats.pending || 0;
+  document.getElementById('stat-delivered').textContent =
+    allOrders.filter(o => o.status === 'DELIVERED').length;
+  document.getElementById('stat-revenue').textContent =
+    stats.totalRevenue > 0
+      ? (stats.totalRevenue / 1000).toFixed(0) + 'K FCFA'
+      : '0 FCFA';
+
+  // Badge en attente
+  const pendingCount = stats.pendingOrders || 0;
+  const badge = document.getElementById('pending-badge');
+  if (badge && pendingCount > 0) {
+    badge.textContent = pendingCount;
+    badge.style.display = 'flex';
+  }
+}
+
+// ── Afficher les commandes ──
+function renderOrders(orders) {
+  const container = document.getElementById('orders-container');
+
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">🛒</div>
+        <div class="es-title">Aucune commande</div>
+        <div class="es-sub">
+          Vous n'avez pas encore reçu de commandes.<br/>
+          Partagez votre boutique pour attirer des acheteurs !
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Commande</th>
+          <th>Client</th>
+          <th>Articles</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${orders.map(order => `
+          <tr onclick="openDetail('${order.id}')">
+            <td>
+              <div class="order-num">${order.orderNumber}</div>
+              <div class="order-date">
+                ${new Date(order.createdAt).toLocaleDateString('fr-FR', {
+                  day:'numeric', month:'short', year:'numeric'
+                })}
+              </div>
+            </td>
+            <td>
+              <div class="buyer-cell">
+                <div class="buyer-av">
+                  ${order.buyer?.firstName?.charAt(0) || '?'}
+                </div>
+                <div>
+                  <div class="buyer-name">
+                    ${order.buyer?.firstName || 'Client'}
+                  </div>
+                  <div class="buyer-phone">
+                    ${order.buyer?.phone || ''}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="items-cell">
+                ${order.items?.[0]?.name || '—'}
+              </div>
+              ${order.items?.length > 1
+                ? `<div class="items-more">+${order.items.length-1} article(s)</div>`
+                : ''
+              }
+            </td>
+            <td>
+              <div class="order-amount">${formatPrice(order.total)}</div>
+            </td>
+            <td>
+              <span class="order-status ${getStatusClass(order.status)}">
+                ${getStatusLabel(order.status)}
+              </span>
+            </td>
+            <td onclick="event.stopPropagation()">
+              <div class="order-actions">
+                ${getOrderActions(order)}
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ── Actions selon statut ──
+function getOrderActions(order) {
+  const actions = [];
+
+  if (order.status === 'PENDING') {
+    actions.push(`
+      <button class="oa-btn confirm"
+        onclick="updateStatus('${order.id}','CONFIRMED')">
+        ✓ Confirmer
+      </button>
+    `);
+  }
+
+  if (order.status === 'CONFIRMED') {
+    actions.push(`
+      <button class="oa-btn"
+        onclick="updateStatus('${order.id}','PREPARING')">
+        📦 Préparer
+      </button>
+    `);
+  }
+
+  if (order.status === 'PREPARING') {
+    actions.push(`
+      <button class="oa-btn deliver"
+        onclick="updateStatus('${order.id}','DELIVERING')">
+        🛵 Livrer
+      </button>
+    `);
+  }
+
+  actions.push(`
+    <button class="oa-btn"
+      onclick="openDetail('${order.id}')">
+      👁 Voir
+    </button>
+  `);
+
+  return actions.join('');
+}
+
+// ── Mettre à jour le statut ──
+async function updateStatus(orderId, newStatus) {
+  const result = await updateOrderStatus(orderId, newStatus);
+
+  if (result.success) {
+    const labels = {
+      'CONFIRMED': '✓ Commande confirmée !',
+      'PREPARING': '📦 Préparation commencée',
+      'DELIVERING': '🛵 Livraison lancée',
+      'DELIVERED': '✅ Livraison confirmée'
+    };
+    showToast(labels[newStatus] || 'Statut mis à jour');
+    await loadOrders();
+  } else {
+    showToast('❌ Erreur lors de la mise à jour');
+  }
+}
+
+// ── Ouvrir le détail ──
+async function openDetail(orderId) {
+  const result = await getOrder(orderId);
+  if (!result.success) {
+    showToast('❌ Impossible de charger la commande');
+    return;
+  }
+
+  currentOrderDetail = result.data;
+  const order = result.data;
+
+  document.getElementById('dp-title').textContent = order.orderNumber;
+
+  document.getElementById('dp-body').innerHTML = `
+    <div class="dp-section">
+      <div class="dp-section-title">Articles commandés</div>
+      ${order.items?.map(item => `
+        <div class="dp-item-row">
+          <div class="dp-item-img">
+            ${item.imageUrl
+              ? `<img src="${item.imageUrl}" alt="${item.name}"/>`
+              : '👗'
+            }
+          </div>
+          <div class="dp-item-name">
+            ${item.name}
+            ${item.size ? `<span style="color:var(--muted);font-size:.76rem"> · ${item.size}</span>` : ''}
+            ${item.color ? `<span style="color:var(--muted);font-size:.76rem"> · ${item.color}</span>` : ''}
+            <div style="font-size:.74rem;color:var(--muted)">Qté : ${item.quantity}</div>
+          </div>
+          <div class="dp-item-price">${formatPrice(item.price * item.quantity)}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title">Récapitulatif</div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Sous-total</span>
+        <span class="dp-info-val">${formatPrice(order.subtotal)}</span>
+      </div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Livraison</span>
+        <span class="dp-info-val">${formatPrice(order.deliveryFee)}</span>
+      </div>
+      ${order.discount > 0 ? `
+        <div class="dp-info-row">
+          <span class="dp-info-label">Réduction</span>
+          <span class="dp-info-val" style="color:var(--green)">−${formatPrice(order.discount)}</span>
+        </div>
+      ` : ''}
+      <div class="dp-total-row">
+        <span class="dp-total-label">Total</span>
+        <span class="dp-total-val">${formatPrice(order.total)}</span>
+      </div>
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title">Informations client</div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Client</span>
+        <span class="dp-info-val">${order.buyer?.firstName || '—'}</span>
+      </div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Téléphone</span>
+        <span class="dp-info-val">${order.buyer?.phone || '—'}</span>
+      </div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Livraison</span>
+        <span class="dp-info-val">
+          ${order.deliveryType === 'PICKUP' ? 'Retrait en boutique' : 'À domicile'}
+        </span>
+      </div>
+      ${order.address ? `
+        <div class="dp-info-row">
+          <span class="dp-info-label">Adresse</span>
+          <span class="dp-info-val">${order.address.address}, ${order.address.city}</span>
+        </div>
+      ` : ''}
+      ${order.notes ? `
+        <div class="dp-info-row">
+          <span class="dp-info-label">Notes</span>
+          <span class="dp-info-val">${order.notes}</span>
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title">Statut actuel</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="order-status ${getStatusClass(order.status)}">
+          ${getStatusLabel(order.status)}
+        </span>
+        <span style="font-size:.78rem;color:var(--muted)">
+          ${new Date(order.updatedAt).toLocaleDateString('fr-FR')}
+        </span>
+      </div>
+    </div>
+
+    <div class="dp-actions">
+      ${order.status === 'PENDING' ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','CONFIRMED');closeDetail()">
+          ✓ Confirmer la commande
+        </button>
+      ` : ''}
+      ${order.status === 'CONFIRMED' ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','PREPARING');closeDetail()">
+          📦 Commencer la préparation
+        </button>
+      ` : ''}
+      ${order.status === 'PREPARING' ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','DELIVERING');closeDetail()">
+          🛵 Envoyer en livraison
+        </button>
+      ` : ''}
+      <button class="dp-action-btn dp-btn-outline" onclick="closeDetail()">
+        Fermer
+      </button>
+    </div>
+  `;
+
+  document.getElementById('detail-overlay').classList.add('show');
+}
+
+function closeDetail(event) {
+  if (event && event.target !== document.getElementById('detail-overlay')) return;
+  document.getElementById('detail-overlay').classList.remove('show');
+  currentOrderDetail = null;
+}
+
+// ── Filtrer ──
+function filterOrders() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  let filtered = allOrders;
+
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(o => o.status === currentFilter);
+  }
+
+  if (query) {
+    filtered = filtered.filter(o =>
+      o.orderNumber.toLowerCase().includes(query) ||
+      o.buyer?.firstName?.toLowerCase().includes(query) ||
+      o.items?.[0]?.name?.toLowerCase().includes(query)
+    );
+  }
+
+  renderOrders(filtered);
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.ft').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterOrders();
+}
+
+// ── Helpers ──
+function getStatusClass(status) {
+  const classes = {
+    'PENDING':'os-pending','CONFIRMED':'os-confirmed',
+    'PREPARING':'os-preparing','DELIVERING':'os-delivering',
+    'DELIVERED':'os-delivered','CANCELLED':'os-cancelled'
+  };
+  return classes[status]||'os-pending';
+}
+
+function getStatusLabel(status) {
+  const labels = {
+    'PENDING':'⏳ En attente','CONFIRMED':'✓ Confirmée',
+    'PREPARING':'📦 En préparation','DELIVERING':'🛵 En livraison',
+    'DELIVERED':'✅ Livrée','CANCELLED':'❌ Annulée'
+  };
+  return labels[status]||status;
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = getCurrentUser();
+  if (!user) {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  if (user.role !== 'SELLER' && user.role !== 'ADMIN') {
+    showToast('Accès réservé aux vendeurs');
+    setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
+    return;
+  }
+  await loadOrders();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Recherche — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:68px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}.nav-logo:hover{color:var(--gl)}
+.nav-search{flex:1;min-width:0;max-width:520px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}.nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
+.nav-search input{flex:1;min-width:0;border:none;outline:none;font-size:.88rem;color:var(--text);background:transparent}.nav-search input::placeholder{color:var(--muted)}
+.nav-search-btn{flex-shrink:0;background:var(--green);color:#fff;border:none;border-radius:99px;height:32px;padding:0 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .2s;white-space:nowrap}.nav-search-btn:hover{background:var(--gl)}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.nav-btn{display:flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:99px;font-size:.82rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s;white-space:nowrap;flex-shrink:0}.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.nav-btn-primary{background:var(--green);color:#fff;border-color:var(--green)}.nav-btn-primary:hover{background:var(--gl);color:#fff}
+.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0}.nav-cart:hover{border-color:var(--green);background:var(--gp)}
+.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}.nav-hamburger.open span:nth-child(2){opacity:0}.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-drawer{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;border-bottom:1.5px solid var(--border);padding:16px 4vw 20px;z-index:190;box-shadow:0 8px 32px rgba(0,0,0,.1);flex-direction:column;gap:12px}.nav-drawer.open{display:flex}
+.nav-drawer .nav-search{max-width:100%;width:100%}.nav-drawer-row{display:flex;gap:8px}.nav-drawer-row .nav-btn{flex:1;justify-content:center;height:42px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0 max(10px,env(safe-area-inset-bottom))}
+.mn-items{display:flex}.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}.mn-icon{width:24px;height:24px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:background .18s}.mn-item.act .mn-icon{background:var(--green)}.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}.mn-item.act .mn-label{color:var(--green)}
+/* HERO */
+.search-hero{margin-top:var(--nav-h);background:var(--dark);padding:36px 4vw 28px;position:relative;overflow:hidden}
+.search-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.12),transparent 70%);pointer-events:none}
+.sh-label{font-size:.74rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;position:relative;z-index:1}
+.sh-title{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:#fff;margin-bottom:18px;position:relative;z-index:1}
+.sh-title span{color:var(--gold)}
+.sh-bar{display:flex;align-items:center;background:#fff;border-radius:12px;padding:5px 5px 5px 18px;max-width:680px;box-shadow:0 8px 32px rgba(0,0,0,.25);position:relative;z-index:1}
+.sh-bar input{flex:1;border:none;outline:none;font-size:.96rem;color:var(--text);background:transparent;min-width:0}
+.sh-bar input::placeholder{color:var(--muted)}
+.sh-bar-btn{background:var(--green);color:#fff;border:none;border-radius:9px;height:40px;padding:0 22px;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .2s;flex-shrink:0}.sh-bar-btn:hover{background:var(--gl)}
+.sh-suggestions{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1}
+.sh-sug{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-size:.78rem;padding:5px 13px;border-radius:99px;cursor:pointer;transition:all .2s}.sh-sug:hover{background:rgba(255,255,255,.2);color:#fff}
+.sh-stats{display:flex;gap:22px;margin-top:20px;position:relative;z-index:1;flex-wrap:wrap}
+.sh-stat-n{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--gold)}.sh-stat-l{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:2px}
+/* FILTER TABS */
+.filter-tabs{background:#fff;border-bottom:1.5px solid var(--border);padding:0 4vw;display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:90}
+.filter-tabs::-webkit-scrollbar{display:none}
+.ft-tab{padding:0 18px;height:48px;display:flex;align-items:center;gap:7px;font-size:.84rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.ft-tab:hover{color:var(--green)}.ft-tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+.ft-count{font-size:.7rem;background:var(--gp);color:var(--green);padding:2px 7px;border-radius:99px;font-weight:700}.ft-tab.active .ft-count{background:var(--green);color:#fff}
+/* LAYOUT */
+.search-layout{display:grid;grid-template-columns:260px 1fr;gap:0;min-height:70vh}
+/* SIDEBAR */
+.filters-sidebar{background:#fff;border-right:1.5px solid var(--border);padding:20px 18px;position:sticky;top:calc(var(--nav-h) + 48px);height:calc(100vh - var(--nav-h) - 48px);overflow-y:auto}
+.fs-section{margin-bottom:22px}
+.fs-title{font-size:.78rem;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.fs-clear{font-size:.72rem;color:var(--green);font-weight:500;cursor:pointer;text-transform:none;letter-spacing:0}.fs-clear:hover{text-decoration:underline}
+.range-track{position:relative;height:5px;background:var(--border);border-radius:3px;margin:10px 0 4px}
+.range-fill{position:absolute;top:0;left:0;height:100%;background:var(--green);border-radius:3px;width:70%}
+.range-slider{width:100%;height:5px;opacity:0;cursor:pointer;position:relative;z-index:2;margin-bottom:-5px}
+.price-labels{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-top:6px}
+.cb-list{display:flex;flex-direction:column;gap:9px}
+.cb-row{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:.83rem;color:var(--text)}
+.cb-box{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.cb-row:hover .cb-box{border-color:var(--green)}.cb-row.checked .cb-box{background:var(--green);border-color:var(--green)}
+.cb-check{color:#fff;font-size:.68rem;font-weight:700}.cb-count{margin-left:auto;font-size:.72rem;color:var(--muted)}
+.star-rows{display:flex;flex-direction:column;gap:6px}
+.sr{display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0}
+.sr-stars{color:var(--gold);font-size:.82rem;flex-shrink:0;width:68px}
+.sr-bar{flex:1;height:6px;background:var(--border);border-radius:3px}.sr-fill{height:100%;background:var(--gold);border-radius:3px}
+.sr-pct{font-size:.72rem;color:var(--muted);width:28px;text-align:right}
+.market-pills{display:flex;flex-direction:column;gap:6px}
+.mp-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;font-size:.82rem}
+.mp-item:hover,.mp-item.sel{border-color:var(--green);background:var(--gp)}.mp-item.sel .mp-name{color:var(--green);font-weight:600}
+.mp-emoji{font-size:.95rem;flex-shrink:0;width:20px;text-align:center}.mp-name{flex:1;font-weight:500;color:var(--text)}.mp-count{font-size:.7rem;color:var(--muted)}
+.apply-btn{background:var(--green);color:#fff;border:none;border-radius:99px;padding:11px;width:100%;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:10px;transition:background .2s}.apply-btn:hover{background:var(--gl)}
+.reset-link{background:transparent;border:none;color:var(--muted);font-size:.76rem;cursor:pointer;text-decoration:underline;text-align:center;width:100%;margin-top:7px;display:block}
+/* RESULTS */
+.results-area{padding:20px 4vw 60px}
+.results-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.rt-count{font-size:.9rem;color:var(--muted)}.rt-count strong{color:var(--text);font-weight:600}
+.rt-right{display:flex;align-items:center;gap:8px}
+.rt-sort{height:36px;padding:0 14px;border-radius:99px;border:1.5px solid var(--border);font-size:.82rem;color:var(--text);background:#fff;cursor:pointer;outline:none}
+.rt-views{display:flex;gap:4px}
+.rv-btn{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;transition:all .18s}
+.rv-btn.active,.rv-btn:hover{background:var(--green);border-color:var(--green);color:#fff}
+.active-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.ac-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--green);border-radius:99px;padding:4px 12px;font-size:.76rem;font-weight:500;color:var(--green)}
+.ac-remove{cursor:pointer;color:var(--muted);transition:color .18s;margin-left:2px}.ac-remove:hover{color:var(--red)}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(192px,1fr));gap:14px}
+.rc{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.rc:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.rc-img{height:148px;display:flex;align-items:center;justify-content:center;font-size:3.1rem;background:var(--bg);position:relative}
+.rc-badge{position:absolute;top:8px;left:8px;background:var(--gold);color:var(--dark);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:99px}
+.rc-badge.new{background:var(--green);color:#fff}
+.rc-wish{position:absolute;top:8px;right:8px;width:27px;height:27px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;cursor:pointer;transition:all .18s}.rc-wish:hover{border-color:var(--red)}
+.rc-body{padding:11px}
+.rc-market{display:inline-flex;align-items:center;gap:3px;font-size:.63rem;font-weight:600;color:var(--green);background:var(--gp);padding:2px 7px;border-radius:99px;margin-bottom:4px}
+.rc-name{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.rc-shop{font-size:.7rem;color:var(--muted);margin-bottom:5px}
+.rc-rating{display:flex;align-items:center;gap:3px;font-size:.68rem;color:var(--muted);margin-bottom:7px}
+.rc-stars{color:var(--gold);font-size:.7rem}
+.rc-footer{display:flex;align-items:center;justify-content:space-between}
+.rc-price{font-size:.94rem;font-weight:700;color:var(--green)}.rc-old{font-size:.7rem;color:var(--muted);text-decoration:line-through;margin-left:3px}
+.rc-add{width:27px;height:27px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}.rc-add:hover{background:var(--gl);transform:scale(1.1)}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.pg{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .18s}
+.pg.active{background:var(--green);border-color:var(--green);color:#fff}.pg:hover:not(.active){border-color:var(--green);color:var(--green)}
+.pg-dots{color:var(--muted);padding:0 4px;display:flex;align-items:center}
+.mobile-filter-btn{display:none;position:fixed;bottom:74px;right:16px;z-index:150;background:var(--green);color:#fff;border:none;border-radius:99px;padding:10px 18px;font-size:.84rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-lg);gap:6px;align-items:center}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:180}.sb-overlay.show{display:block}
+@media(max-width:900px){
+  .nav-search{display:none}.nav-btn.nav-btn-login,.nav-btn.nav-btn-primary{display:none}.nav-hamburger{display:flex}
+  .mobile-nav{display:block}.mobile-filter-btn{display:flex}
+  body{padding-bottom:64px}.toast{bottom:74px}
+  .search-layout{grid-template-columns:1fr}
+  .filters-sidebar{position:fixed;left:-280px;top:0;bottom:0;width:280px;height:100vh;z-index:190;transition:left .3s;padding-top:80px}
+  .filters-sidebar.open{left:0}
+}
+@media(max-width:600px){
+  :root{--nav-h:58px}.nav{padding:0 4vw;gap:10px}.nav-logo .nav-logo-text{display:none}.nav-cart{width:38px;height:38px}
+  .results-grid{grid-template-columns:repeat(2,1fr);gap:10px}.rc-img{height:125px;font-size:2.6rem}
+  .results-area{padding:16px 4vw 80px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
+  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..."/><button class="nav-search-btn" onclick="doSearch()">🔍 Rechercher</button></div>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">🏪 Ma boutique</button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">🛒<div class="cart-badge" id="cart-count">0</div></button>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..."/><button class="nav-search-btn">🔍</button></div>
+  <div class="nav-drawer-row">
+    <button class="nav-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center">🏪 Ma boutique</button>
+  </div>
+</div>
+<div class="search-hero">
+  <div class="sh-label">🔍 Recherche avancée</div>
+  <div class="sh-title">Résultats pour "<span id="search-query">boubou wax</span>"</div>
+  <div class="sh-bar"><input type="text" id="main-search" value="boubou wax" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()">🔍 Rechercher</button></div>
+  <div class="sh-suggestions">
+    <div class="sh-sug" onclick="setSug('boubou wax sandaga')">🏛️ boubou wax sandaga</div>
+    <div class="sh-sug" onclick="setSug('bazin brodé')">🧵 bazin brodé</div>
+    <div class="sh-sug" onclick="setSug('tissu wax hollandais')">🎨 tissu wax hollandais</div>
+    <div class="sh-sug" onclick="setSug('robe wax femme')">👘 robe wax femme</div>
+    <div class="sh-sug" onclick="setSug('kaftan bazin homme')">👒 kaftan bazin homme</div>
+  </div>
+  <div class="sh-stats">
+    <div><div class="sh-stat-n">241</div><div class="sh-stat-l">Produits trouvés</div></div>
+    <div><div class="sh-stat-n">38</div><div class="sh-stat-l">Boutiques</div></div>
+    <div><div class="sh-stat-n">5</div><div class="sh-stat-l">Marchés</div></div>
+    <div><div class="sh-stat-n">43</div><div class="sh-stat-l">En promotion</div></div>
+  </div>
+</div>
+<div class="filter-tabs">
+  <div class="ft-tab active" onclick="setTab(this)">Tout <span class="ft-count">284</span></div>
+  <div class="ft-tab" onclick="setTab(this)">Produits <span class="ft-count">241</span></div>
+  <div class="ft-tab" onclick="setTab(this)">Boutiques <span class="ft-count">38</span></div>
+  <div class="ft-tab" onclick="setTab(this)">Marchés <span class="ft-count">5</span></div>
+  <div class="ft-tab" onclick="setTab(this)">En promo <span class="ft-count">43</span></div>
+  <div class="ft-tab" onclick="setTab(this)">Nouveautés <span class="ft-count">28</span></div>
+</div>
+<div class="search-layout">
+  <aside class="filters-sidebar" id="filters-sidebar">
+    <div class="fs-section">
+      <div class="fs-title">Prix (FCFA) <span class="fs-clear" onclick="toast('Réinitialisé')">Effacer</span></div>
+      <div class="range-track"><div class="range-fill" id="range-fill"></div></div>
+      <input type="range" class="range-slider" min="0" max="500000" value="350000" oninput="updatePrice(this.value)"/>
+      <div class="price-labels"><span>0 FCFA</span><span id="price-max">350 000 FCFA</span></div>
+    </div>
+    <div class="fs-section">
+      <div class="fs-title">Catégorie</div>
+      <div class="cb-list">
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mode & Vêtements</span><span class="cb-count">142</span></div>
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Tissu & Wax</span><span class="cb-count">86</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Artisanat</span><span class="cb-count">24</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Beauté & Soins</span><span class="cb-count">18</span></div>
+      </div>
+    </div>
+    <div class="fs-section">
+      <div class="fs-title">Note minimale</div>
+      <div class="star-rows">
+        <div class="sr"><span class="sr-stars">★★★★★</span><div class="sr-bar"><div class="sr-fill" style="width:65%"></div></div><span class="sr-pct">65%</span></div>
+        <div class="sr"><span class="sr-stars">★★★★☆</span><div class="sr-bar"><div class="sr-fill" style="width:25%"></div></div><span class="sr-pct">25%</span></div>
+        <div class="sr"><span class="sr-stars">★★★☆☆</span><div class="sr-bar"><div class="sr-fill" style="width:8%"></div></div><span class="sr-pct">8%</span></div>
+      </div>
+    </div>
+    <div class="fs-section">
+      <div class="fs-title">Marché <span class="fs-clear" onclick="toast('Réinitialisé')">Effacer</span></div>
+      <div class="market-pills">
+        <div class="mp-item sel" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🏛️</span><span class="mp-name">Sandaga</span><span class="mp-count">142</span></div>
+        <div class="mp-item sel" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🧵</span><span class="mp-name">Tilène</span><span class="mp-count">98</span></div>
+        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🛍️</span><span class="mp-name">HLM</span><span class="mp-count">76</span></div>
+        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🕌</span><span class="mp-name">Touba</span><span class="mp-count">120</span></div>
+        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🏭</span><span class="mp-name">Thiès</span><span class="mp-count">83</span></div>
+        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🌊</span><span class="mp-name">Ziguinchor</span><span class="mp-count">44</span></div>
+      </div>
+    </div>
+    <div class="fs-section">
+      <div class="fs-title">Options</div>
+      <div class="cb-list">
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur vérifié ✓</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle 🎥</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>En stock uniquement</span></div>
+      </div>
+    </div>
+    <button class="apply-btn" onclick="toast('✓ Filtres appliqués');closeSidebar()">Appliquer les filtres</button>
+    <button class="reset-link" onclick="toast('Filtres réinitialisés')">Tout réinitialiser</button>
+  </aside>
+  <div class="results-area">
+    <div class="results-topbar">
+      <div class="rt-count"><strong>241</strong> résultats pour "<span id="result-query">boubou wax</span>"</div>
+      <div class="rt-right">
+        <select class="rt-sort" onchange="toast('Tri : '+this.options[this.selectedIndex].text)"><option>Pertinence</option><option>Prix croissant</option><option>Prix décroissant</option><option>Mieux notés</option><option>Plus vendus</option></select>
+        <div class="rt-views"><button class="rv-btn active">⊞</button><button class="rv-btn">☰</button></div>
+      </div>
+    </div>
+    <div class="active-chips">
+      <div class="ac-chip">Mode & Vêtements <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
+      <div class="ac-chip">🏛️ Sandaga <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
+      <div class="ac-chip">🧵 Tilène <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
+      <div class="ac-chip">Vendeur vérifié ✓ <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
+    </div>
+    <div class="results-grid">
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-badge">-15%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Boubou wax tissé main</div><div class="rc-shop">Mode Fatou Ndoye · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (89)</div><div class="rc-footer"><div><span class="rc-price">15 300 FCFA</span><span class="rc-old">18 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF8E7">🧵<div class="rc-badge new">Nouveau</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🧵 Tilène</div><div class="rc-name">Bazin brodé cérémonie</div><div class="rc-shop">Tissus Aminata · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (176)</div><div class="rc-footer"><div><span class="rc-price">25 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FDE8E6">👘<div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Robe wax africaine brodée</div><div class="rc-shop">Mode Fatou · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.8 (67)</div><div class="rc-footer"><div><span class="rc-price">9 500 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#E8F5EC">🎨<div class="rc-badge">-10%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🧵 Tilène</div><div class="rc-name">Tissu wax hollandais 6 yards</div><div class="rc-shop">Tissus Aminata · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★☆</span> 4.7 (112)</div><div class="rc-footer"><div><span class="rc-price">4 050 FCFA</span><span class="rc-old">4 500</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">🥻<div class="rc-badge">-20%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Ensemble 3 pièces femme cérémonie</div><div class="rc-shop">Mode Fatou · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (33)</div><div class="rc-footer"><div><span class="rc-price">28 000 FCFA</span><span class="rc-old">35 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FDF3DC">👒<div class="rc-badge new">Nouveau</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🕌 Touba</div><div class="rc-name">Kaftan bazin riche homme</div><div class="rc-shop">Boutique Touba · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.8 (28)</div><div class="rc-footer"><div><span class="rc-price">22 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF3E0">🧣<div class="rc-badge">-10%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏭 Thiès</div><div class="rc-name">Foulard wax femme élégant</div><div class="rc-shop">Mode Thiès · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★☆</span> 4.5 (54)</div><div class="rc-footer"><div><span class="rc-price">3 600 FCFA</span><span class="rc-old">4 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🛍️ HLM</div><div class="rc-name">Boubou wax grande taille femme</div><div class="rc-shop">Boutique HLM · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.6 (41)</div><div class="rc-footer"><div><span class="rc-price">14 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
+    </div>
+    <div class="pagination">
+      <div class="pg active">1</div><div class="pg" onclick="toast('Page 2...')">2</div><div class="pg" onclick="toast('Page 3...')">3</div><div class="pg-dots">...</div><div class="pg" onclick="toast('Page 25...')">25</div><div class="pg" onclick="toast('Suivant...')">›</div>
+    </div>
+  </div>
+</div>
+<button class="mobile-filter-btn" onclick="openSidebar()">⚙️ Filtres</button>
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item act"><div class="mn-icon act">🔍</div><div class="mn-label act">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+  </div>
+</nav>
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE RECHERCHE — Données dynamiques
+// ════════════════════════════════════════
+
+let cartCount = 0;
+let currentFilters = {};
+let currentPage = 1;
+
+// ── Rechercher les produits ──
+async function doSearch() {
+  const val = document.getElementById('hero-search')?.value.trim() ||
+              document.getElementById('main-search')?.value.trim();
+  if (!val) { toast('Entrez un terme de recherche'); return; }
+
+  document.getElementById('search-query').textContent = val;
+  document.getElementById('result-query').textContent = val;
+
+  currentFilters.q = val;
+  currentPage = 1;
+  await loadResults();
+}
+
+// ── Charger les résultats ──
+async function loadResults() {
+  const grid = document.getElementById('results-grid');
+  if (!grid) return;
+
+  showLoading('results-grid', 'Recherche en cours...');
+
+  const result = await getProducts({
+    ...currentFilters,
+    page: currentPage,
+    limit: 12
+  });
+
+  if (!result.success) {
+    showError('results-grid', 'Erreur lors de la recherche');
+    return;
+  }
+
+  // Mettre à jour le compteur
+  const resultCount = document.getElementById('result-count');
+  if (resultCount) {
+    resultCount.textContent = result.pagination.total;
+  }
+
+  if (result.data.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:14px">🔍</div>
+        <div style="font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:6px">
+          Aucun résultat trouvé
+        </div>
+        <div style="font-size:.86rem">
+          Essayez avec d'autres mots-clés
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = result.data.map(prod => `
+    <div class="rc"
+         onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+      <div class="rc-img" style="background:#F0EAF8">
+        ${prod.images?.length > 0
+          ? `<img src="${prod.images[0]}"
+                  style="width:100%;height:100%;object-fit:cover"/>`
+          : '👗'
+        }
+        ${prod.originalPrice
+          ? `<div class="rc-badge">
+              -${Math.round((1-prod.price/prod.originalPrice)*100)}%
+             </div>`
+          : ''
+        }
+        <div class="rc-wish" onclick="wish(event)">🤍</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-market">
+          🏛️ ${prod.shop?.market?.name || ''}
+        </div>
+        <div class="rc-name">${prod.name}</div>
+        <div class="rc-shop">
+          ${prod.shop?.name || ''}
+          ${prod.shop?.isVerified ? '· Vérifié ✓' : ''}
+        </div>
+        <div class="rc-rating">
+          <span class="rc-stars">★★★★★</span>
+          ${prod.rating} (${prod.totalReviews})
+        </div>
+        <div class="rc-footer">
+          <div>
+            <span class="rc-price">${formatPrice(prod.price)}</span>
+            ${prod.originalPrice
+              ? `<span class="rc-old">${formatPrice(prod.originalPrice)}</span>`
+              : ''
+            }
+          </div>
+          <button class="rc-add"
+            onclick="addCart(event,'${prod.id}','${prod.name}',${prod.price})">
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Suggestion rapide ──
+function setSug(val) {
+  const input = document.getElementById('hero-search') ||
+                document.getElementById('main-search');
+  if (input) input.value = val;
+  document.getElementById('search-query').textContent = val;
+  document.getElementById('result-query').textContent = val;
+  currentFilters.q = val;
+  loadResults();
+}
+
+// ── Onglets ──
+function setTab(el) {
+  document.querySelectorAll('.ft-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Filtre prix ──
+function updatePrice(val) {
+  const f = parseInt(val);
+  document.getElementById('price-max').textContent = f.toLocaleString() + ' FCFA';
+  document.getElementById('range-fill').style.width = (f/500000*100) + '%';
+  currentFilters.maxPrice = f;
+}
+
+// ── Appliquer les filtres ──
+async function applyFilters() {
+  currentPage = 1;
+  await loadResults();
+  closeSidebar();
+  toast('✓ Filtres appliqués');
+}
+
+// ── Reset filtres ──
+function resetFilters() {
+  currentFilters = {};
+  document.querySelectorAll('.cb-row').forEach(cb => cb.classList.remove('checked'));
+  toast('Filtres réinitialisés');
+  loadResults();
+}
+
+// ── Checkbox ──
+function toggleCb(el) { el.classList.toggle('checked'); }
+
+// ── Favoris ──
+function wish(e) {
+  e.stopPropagation();
+  const b = e.target;
+  b.textContent = b.textContent === '🤍' ? '❤️' : '🤍';
+  toast(b.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+}
+
+// ── Ajouter au panier ──
+function addCart(event, productId, productName, price) {
+  event.stopPropagation();
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(i => i.productId === productId);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ productId, name: productName, price, quantity: 1 });
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+  document.getElementById('cart-count').textContent = cartCount;
+  toast('✓ ' + productName + ' ajouté au panier');
+  const btn = event.target;
+  btn.style.background = 'var(--gold)';
+  btn.style.transform = 'scale(1.3)';
+  setTimeout(() => { btn.style.background = ''; btn.style.transform = ''; }, 500);
+}
+
+// ── Sidebar filtres ──
+function openSidebar() {
+  document.getElementById('filters-sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('filters-sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+// ── Menu hamburger ──
+function toggleMenu() {
+  const h = document.getElementById('nav-hamburger');
+  const d = document.getElementById('nav-drawer');
+  h.classList.toggle('open');
+  d.classList.toggle('open');
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = cartCount;
+}
+
+// ── Toast ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── Fermer le drawer ──
+document.addEventListener('click', function(e) {
+  const d = document.getElementById('nav-drawer');
+  const h = document.getElementById('nav-hamburger');
+  if (d && d.classList.contains('open') &&
+      !d.contains(e.target) && !h.contains(e.target)) {
+    d.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Récupérer le terme de recherche depuis l'URL ──
+function getQueryFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('q');
+}
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+
+  // Récupérer le terme depuis l'URL si présent
+  const urlQuery = getQueryFromURL();
+  if (urlQuery) {
+    const input = document.getElementById('hero-search') ||
+                  document.getElementById('main-search');
+    if (input) input.value = urlQuery;
+    document.getElementById('search-query').textContent = urlQuery;
+    document.getElementById('result-query').textContent = urlQuery;
+    currentFilters.q = urlQuery;
+  }
+
+  // Charger les produits
+  await loadResults();
+});
+</script>
+</body>
+</html>
+

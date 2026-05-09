@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ma boutique — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--shadow:0 2px 16px rgba(27,107,58,.09);--radius:14px;--nav-h:64px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font-family:inherit}a{text-decoration:none;color:inherit}
+.flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.st-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
+.st-nav{display:flex;gap:0;flex:1;overflow-x:auto;scrollbar-width:none}.st-nav::-webkit-scrollbar{display:none}
+.st-link{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.st-link:hover{color:rgba(255,255,255,.8)}.st-link.active{color:#fff;border-bottom-color:var(--green)}
+.st-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.st-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
+.st-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}.st-btn-outline:hover{background:rgba(255,255,255,.18)}
+.st-btn-green{background:var(--green);color:#fff}.st-btn-green:hover{background:var(--gl)}
+.page{margin-top:var(--nav-h);max-width:760px;margin-left:auto;margin-right:auto;padding:28px 4vw 60px}
+.page-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:4px}
+.page-sub{font-size:.84rem;color:var(--muted);margin-bottom:22px}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
+.card-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.fl{font-size:.8rem;font-weight:600;color:var(--text)}.fl-req{color:var(--red);margin-left:2px}
+.fi{height:42px;border:1.5px solid var(--border);border-radius:9px;padding:0 13px;font-size:.86rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s}.fi:focus{border-color:var(--green)}
+.fi-ta{height:auto;padding:10px 13px;resize:vertical;min-height:90px}
+.fi-hint{font-size:.74rem;color:var(--muted);margin-top:3px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* Photo banner */
+.banner-zone{height:140px;border-radius:12px;border:1.5px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative;margin-bottom:14px}
+.banner-zone:hover{border-color:var(--green);background:var(--gp)}
+.banner-zone.filled{border-style:solid;border-color:var(--g2)}
+.avatar-row{display:flex;align-items:flex-end;gap:14px;margin-bottom:16px}
+.avatar-zone{width:80px;height:80px;border-radius:50%;border:2px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:all .2s;position:relative}
+.avatar-zone:hover{border-color:var(--green)}
+.avatar-zone.filled{border-style:solid;border-color:var(--g2)}
+.avatar-info{flex:1}
+.avatar-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+.avatar-market{font-size:.8rem;color:var(--muted)}
+/* Badge statut */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:.73rem;font-weight:600}
+.badge-active{background:#E8F5EC;color:var(--green)}
+.badge-pending{background:#FDF3DC;color:#8A6100}
+.badge-rejected{background:var(--rp);color:var(--red)}
+/* Horaires */
+.hours-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+.hour-row{display:flex;flex-direction:column;gap:4px}
+.hour-label{font-size:.72rem;font-weight:600;color:var(--muted)}
+.hour-input{border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;font-size:.78rem;color:var(--text);outline:none;background:#fff}
+.hour-input:focus{border-color:var(--green)}
+/* Actions */
+.actions{display:flex;gap:10px;margin-top:8px}
+.btn-save{flex:1;background:var(--green);color:#fff;border:none;border-radius:99px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-save:hover{background:var(--gl)}.btn-save:disabled{background:var(--muted);cursor:not-allowed}
+.btn-cancel{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:99px;padding:13px 22px;font-size:.86rem;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-cancel:hover{border-color:var(--red);color:var(--red)}
+/* CNI status */
+.cni-card{display:flex;align-items:center;gap:12px;background:var(--gp);border:1.5px solid var(--g2);border-radius:10px;padding:14px 16px}
+.cni-icon{font-size:1.6rem;flex-shrink:0}
+.cni-text{flex:1}
+.cni-title{font-size:.86rem;font-weight:600;color:var(--dark)}
+.cni-sub{font-size:.76rem;color:var(--muted);margin-top:2px}
+.upload-cni-btn{background:var(--green);color:#fff;border:none;border-radius:99px;padding:7px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}.hours-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="topbar">
+  <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
+  <div class="st-nav">
+    <div class="st-link" onclick="location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
+    <div class="st-link" onclick="location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
+    <div class="st-link" onclick="location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
+    <div class="st-link active">🏪 Ma boutique</div>
+  </div>
+  <div class="st-actions">
+    <button class="st-btn st-btn-green" onclick="saveShop()">💾 Enregistrer</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">🏪 Ma boutique</div>
+  <div class="page-sub">Modifier les informations de votre boutique</div>
+
+  <!-- APERÇU BOUTIQUE -->
+  <div class="card">
+    <div class="card-title">🖼️ Apparence</div>
+
+    <input type="file" id="banner-input" accept="image/*" style="display:none"/>
+    <input type="file" id="avatar-input" accept="image/*" style="display:none"/>
+
+    <div class="banner-zone" id="banner-zone" onclick="document.getElementById('banner-input').click()">
+      <span style="font-size:1.4rem">🖼️</span>
+      <div>
+        <div style="font-size:.84rem;font-weight:600;color:var(--text)">Bannière de boutique</div>
+        <div style="font-size:.74rem;color:var(--muted)">Format paysage · 1200×400 recommandé</div>
+      </div>
+    </div>
+
+    <div class="avatar-row">
+      <div class="avatar-zone" id="avatar-zone" onclick="document.getElementById('avatar-input').click()">
+        <span style="font-size:1.8rem" id="avatar-emoji">🏪</span>
+      </div>
+      <div class="avatar-info">
+        <div class="avatar-name" id="shop-name-preview">Chargement...</div>
+        <div class="avatar-market" id="shop-market-preview">Chargement du marché...</div>
+        <div style="margin-top:5px" id="shop-status-badge"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFOS -->
+  <div class="card">
+    <div class="card-title">📝 Informations générales</div>
+    <div class="field">
+      <label class="fl">Nom de la boutique <span class="fl-req">*</span></label>
+      <input class="fi" type="text" id="shop-name" placeholder="Nom de votre boutique"/>
+    </div>
+    <div class="field">
+      <label class="fl">Description</label>
+      <textarea class="fi fi-ta" id="shop-desc" placeholder="Décrivez votre boutique, vos spécialités, votre histoire..."></textarea>
+    </div>
+    <div class="field">
+      <label class="fl">Lien visite virtuelle (optionnel)</label>
+      <input class="fi" type="url" id="shop-tour" placeholder="https://..."/>
+      <span class="fi-hint">YouTube, Google Maps, Matterport...</span>
+    </div>
+  </div>
+
+  <!-- HORAIRES -->
+  <div class="card">
+    <div class="card-title">🕐 Horaires d'ouverture</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Laissez vide si fermé ce jour</div>
+    <div class="hours-grid">
+      <div class="hour-row"><span class="hour-label">Lundi</span><input class="hour-input" id="h-lun" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Mardi</span><input class="hour-input" id="h-mar" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Mercredi</span><input class="hour-input" id="h-mer" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Jeudi</span><input class="hour-input" id="h-jeu" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Vendredi</span><input class="hour-input" id="h-ven" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Samedi</span><input class="hour-input" id="h-sam" placeholder="08:00–20:00"/></div>
+      <div class="hour-row"><span class="hour-label">Dimanche</span><input class="hour-input" id="h-dim" placeholder="Fermé"/></div>
+      <div class="hour-row"><span class="hour-label">Jours fériés</span><input class="hour-input" id="h-fer" placeholder="Fermé"/></div>
+    </div>
+  </div>
+
+  <!-- CNI -->
+  <div class="card">
+    <div class="card-title">🪪 Vérification CNI</div>
+    <div class="cni-card" id="cni-card">
+      <div class="cni-icon">🪪</div>
+      <div class="cni-text">
+        <div class="cni-title" id="cni-title">Chargement...</div>
+        <div class="cni-sub" id="cni-sub"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-cancel" onclick="location.href='marche-senegal-dashboard.html'">Annuler</button>
+    <button class="btn-save" id="btn-save" onclick="saveShop()">💾 Enregistrer les modifications</button>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+let shopData = null;
+let bannerUrl = null;
+let avatarUrl = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.addEventListener('DOMContentLoaded', async function(){
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if(!user || user.role !== 'SELLER'){ location.href = 'marche-senegal-connexion-vendeur.html'; return; }
+
+  document.getElementById('banner-input').addEventListener('change', function(){ uploadImage(this.files[0], 'banner'); this.value=''; });
+  document.getElementById('avatar-input').addEventListener('change', function(){ uploadImage(this.files[0], 'avatar'); this.value=''; });
+
+  await loadShop();
+});
+
+async function loadShop(){
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:3000/api/shops/dashboard', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    if(!data.success){ toast('Impossible de charger la boutique'); return; }
+
+    shopData = data.data.shop;
+    bannerUrl = shopData.bannerUrl;
+    avatarUrl = shopData.avatarUrl;
+
+    // Remplir les champs
+    document.getElementById('shop-name').value = shopData.name || '';
+    document.getElementById('shop-name-preview').textContent = shopData.name || '';
+    document.getElementById('shop-desc').value = shopData.description || '';
+    document.getElementById('shop-tour').value = shopData.virtualTourUrl || '';
+    document.getElementById('shop-market-preview').textContent =
+      (shopData.market?.name || '') + ' · ' + (shopData.market?.city || '');
+
+    // Badge statut
+    const badge = document.getElementById('shop-status-badge');
+    const statusMap = { ACTIVE: ['badge-active','✅ Boutique active'], PENDING: ['badge-pending','⏳ En attente de validation'], REJECTED: ['badge-rejected','❌ Non validée'], SUSPENDED: ['badge-rejected','⚠️ Suspendue'] };
+    const [cls, label] = statusMap[shopData.status] || ['badge-pending', shopData.status];
+    badge.className = 'badge ' + cls; badge.textContent = label;
+
+    // Banner
+    if(bannerUrl){
+      const zone = document.getElementById('banner-zone');
+      zone.className = 'banner-zone filled'; zone.replaceChildren();
+      const img = document.createElement('img');
+      img.src = bannerUrl; img.alt = 'Bannière';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      zone.appendChild(img);
+    }
+
+    // Avatar
+    if(avatarUrl){
+      const zone = document.getElementById('avatar-zone');
+      zone.className = 'avatar-zone filled'; zone.replaceChildren();
+      const img = document.createElement('img');
+      img.src = avatarUrl; img.alt = 'Logo';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      zone.appendChild(img);
+    }
+
+    // Horaires
+    const h = shopData.openingHours || {};
+    if(h.lundi) document.getElementById('h-lun').value = h.lundi;
+    if(h.mardi) document.getElementById('h-mar').value = h.mardi;
+    if(h.mercredi) document.getElementById('h-mer').value = h.mercredi;
+    if(h.jeudi) document.getElementById('h-jeu').value = h.jeudi;
+    if(h.vendredi) document.getElementById('h-ven').value = h.vendredi;
+    if(h.samedi) document.getElementById('h-sam').value = h.samedi;
+    if(h.dimanche) document.getElementById('h-dim').value = h.dimanche;
+    if(h.feries) document.getElementById('h-fer').value = h.feries;
+
+    // CNI
+    const cniTitle = document.getElementById('cni-title');
+    const cniSub = document.getElementById('cni-sub');
+    if(shopData.isVerified){
+      cniTitle.textContent = 'CNI vérifiée — Boutique de confiance';
+      cniSub.textContent = 'Votre identité a été validée par l\'équipe Marché Sénégal';
+    } else if(shopData.cniNumber){
+      cniTitle.textContent = 'CNI en cours de vérification';
+      cniSub.textContent = 'CNI n°' + shopData.cniNumber + ' — Vérification sous 24–48h';
+    } else {
+      cniTitle.textContent = 'CNI non fournie';
+      cniSub.textContent = 'Fournissez votre CNI pour valider votre boutique';
+    }
+
+  } catch(e){ toast('Erreur de chargement'); }
+}
+
+async function uploadImage(file, type){
+  if(!file) return;
+  const token = localStorage.getItem('token');
+  const zone = document.getElementById(type === 'banner' ? 'banner-zone' : 'avatar-zone');
+  zone.style.opacity = '0.5';
+
+  const fd = new FormData(); fd.append('image', file);
+  try {
+    const r = await fetch('http://localhost:3000/api/upload/image', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd
+    });
+    const d = await r.json();
+    zone.style.opacity = '1';
+    if(d.success){
+      if(type === 'banner'){ bannerUrl = d.url; renderBanner(d.url); }
+      else { avatarUrl = d.url; renderAvatar(d.url); }
+      toast('Photo uploadée !');
+    } else { toast(d.message || 'Erreur upload'); }
+  } catch(e){ zone.style.opacity='1'; toast('Erreur serveur'); }
+}
+
+function renderBanner(url){
+  const zone = document.getElementById('banner-zone');
+  zone.className = 'banner-zone filled'; zone.replaceChildren();
+  const img = document.createElement('img');
+  img.src = url; img.alt = 'Bannière';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+  zone.appendChild(img);
+  zone.onclick = () => document.getElementById('banner-input').click();
+}
+
+function renderAvatar(url){
+  const zone = document.getElementById('avatar-zone');
+  zone.className = 'avatar-zone filled'; zone.replaceChildren();
+  const img = document.createElement('img');
+  img.src = url; img.alt = 'Logo';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+  zone.appendChild(img);
+  zone.onclick = () => document.getElementById('avatar-input').click();
+}
+
+async function saveShop(){
+  const name = document.getElementById('shop-name').value.trim();
+  if(!name){ toast('Le nom est obligatoire'); return; }
+
+  const openingHours = {
+    lundi: document.getElementById('h-lun').value,
+    mardi: document.getElementById('h-mar').value,
+    mercredi: document.getElementById('h-mer').value,
+    jeudi: document.getElementById('h-jeu').value,
+    vendredi: document.getElementById('h-ven').value,
+    samedi: document.getElementById('h-sam').value,
+    dimanche: document.getElementById('h-dim').value,
+    feries: document.getElementById('h-fer').value
+  };
+
+  const btn = document.getElementById('btn-save');
+  btn.textContent = 'Enregistrement...'; btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:3000/api/shops/me', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        name,
+        description: document.getElementById('shop-desc').value.trim() || null,
+        virtualTourUrl: document.getElementById('shop-tour').value.trim() || null,
+        bannerUrl: bannerUrl || null,
+        avatarUrl: avatarUrl || null,
+        openingHours
+      })
+    });
+    const data = await res.json();
+    if(data.success){
+      document.getElementById('shop-name-preview').textContent = name;
+      toast('Boutique mise à jour !');
+      btn.textContent = '✅ Enregistré !';
+      setTimeout(() => { btn.textContent = '💾 Enregistrer les modifications'; btn.disabled = false; }, 2000);
+    } else {
+      toast(data.message || 'Erreur'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+    }
+  } catch(e){
+    toast('Erreur de connexion'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--blue:#1565C0;--bluep:#E3F2FD;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--sb-w:220px;--tb-h:56px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:600;white-space:nowrap;box-shadow:var(--shadow-lg)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:#0A1710;display:flex;flex-direction:column;z-index:100;overflow-y:auto;transition:transform .3s}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:9px}
+.sb-logo-text{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:var(--green)}
+.sb-admin-badge{font-size:.6rem;font-weight:700;background:rgba(230,168,23,.2);color:var(--gold);padding:2px 7px;border-radius:99px;margin-top:2px}
+.sb-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:9px}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:.84rem;font-weight:600;color:#fff}.sb-user-role{font-size:.68rem;color:rgba(255,255,255,.4)}
+.sb-nav{flex:1;padding:8px 0}
+.sb-sec{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.25);padding:12px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;transition:all .18s;position:relative}
+.sb-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}.sb-item.active{background:rgba(27,107,58,.25);color:#fff}
+.sb-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);border-radius:0 2px 2px 0}
+.sb-icon{font-size:.9rem;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--red)}.sb-badge.gold{background:var(--gold);color:var(--dark)}.sb-badge.green{background:var(--green)}
+.sb-bottom{padding:14px 16px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-back{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.8rem;color:rgba(255,255,255,.45);transition:all .18s}.sb-back:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.06)}
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:var(--sb-w);right:0;height:var(--tb-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;z-index:90}
+.tb-title{font-size:1rem;font-weight:600;color:var(--dark)}
+.tb-search{flex:1;max-width:340px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 14px;height:36px;transition:border-color .2s}.tb-search:focus-within{border-color:var(--green)}
+.tb-search input{flex:1;border:none;outline:none;font-size:.82rem;color:var(--text);background:transparent}.tb-search input::placeholder{color:var(--muted)}
+.tb-search-btn{width:27px;height:27px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s}.tb-search-btn:hover{background:var(--gl)}
+.tb-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.tb-btn{position:relative;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .18s}.tb-btn:hover{border-color:var(--green);background:var(--gp)}
+.tb-notif{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.tb-profile{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .18s}.tb-profile:hover{border-color:var(--green);background:var(--gp)}
+.tb-av{width:26px;height:26px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
+.tb-name{font-size:.8rem;font-weight:500;color:var(--text)}
+.hamburger{display:none;width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0}
+.hamburger span{display:block;width:16px;height:2px;background:var(--text);border-radius:2px}
+/* MAIN */
+.main{margin-left:var(--sb-w);margin-top:var(--tb-h);padding:22px 24px 60px;min-height:calc(100vh - var(--tb-h))}
+/* PAGE SECTIONS */
+.ps{display:none}.ps.active{display:block}
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.sec-title{font-size:1.05rem;font-weight:600;color:var(--dark)}
+.sec-btn{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:99px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.sec-btn-green{background:var(--green);color:#fff;box-shadow:0 3px 14px rgba(27,107,58,.25)}.sec-btn-green:hover{background:var(--gl)}
+.sec-btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}.sec-btn-outline:hover{border-color:var(--green);color:var(--green)}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .22s}.kpi:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.kpi-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.ki-g{background:var(--gp)}.ki-gold{background:var(--gdl)}.ki-b{background:var(--bluep)}.ki-r{background:var(--rp)}.ki-p{background:#F3EAF8}
+.kpi-chg{font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:99px}
+.kpi-chg.up{background:var(--gp);color:var(--green)}.kpi-chg.down{background:var(--rp);color:var(--red)}.kpi-chg.flat{background:#f0f0f0;color:var(--muted)}
+.kpi-val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--dark);line-height:1;margin-bottom:4px}
+.kpi-label{font-size:.74rem;color:var(--muted)}
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.card-title{font-size:.9rem;font-weight:600;color:var(--dark)}
+.card-action{font-size:.76rem;color:var(--green);font-weight:600;cursor:pointer}.card-action:hover{text-decoration:underline}
+/* TABLE */
+.t{width:100%;border-collapse:collapse;font-size:.82rem;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.t th{background:#fafcfa;padding:9px 14px;text-align:left;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.t td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.t tr:last-child td{border-bottom:none}.t tr:hover td{background:#fafcfa}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
+.badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.b-wait{background:var(--gdl);color:#8A6100}.b-ok{background:var(--gp);color:var(--green)}.b-rej{background:var(--rp);color:var(--red)}.b-blue{background:var(--bluep);color:var(--blue)}
+.tb-act{display:flex;gap:5px}
+.ta{padding:4px 9px;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .18s}
+.ta.approve{border-color:var(--green);color:var(--green)}.ta.approve:hover{background:var(--green);color:#fff}
+.ta.reject{border-color:var(--red);color:var(--red)}.ta.reject:hover{background:var(--red);color:#fff}
+.ta.view:hover{border-color:var(--green);color:var(--green)}
+/* CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:7px;height:90px;padding:8px 18px 0}
+.bc-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bc-val{font-size:.58rem;font-weight:600;color:var(--dark)}
+.bc-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .4s}
+.bc-bar.g{background:var(--green)}.bc-bar.gold{background:var(--gold)}.bc-bar.dim{background:var(--border)}
+.bc-label{font-size:.6rem;color:var(--muted)}
+.chart-footer{display:flex;justify-content:space-between;padding:10px 18px 16px;flex-wrap:wrap;gap:8px}
+.cf-stat{font-size:.76rem;color:var(--muted)}.cf-stat strong{color:var(--text)}
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:18px;padding:14px 18px 18px}
+.donut{width:90px;height:90px;flex-shrink:0;position:relative}
+.donut svg{transform:rotate(-90deg)}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-pct{font-size:.96rem;font-weight:700;color:var(--dark)}.donut-sub{font-size:.6rem;color:var(--muted)}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:7px}
+.dl{display:flex;align-items:center;gap:7px;font-size:.76rem;color:var(--text)}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* MARKET GRID */
+.market-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 18px}
+.ms{text-align:center;padding:10px 8px;background:var(--bg);border-radius:10px}
+.ms-emoji{font-size:1.4rem;margin-bottom:5px}
+.ms-name{font-size:.76rem;font-weight:600;color:var(--dark);margin-bottom:2px}
+.ms-val{font-size:.82rem;font-weight:700;color:var(--green)}
+.ms-sub{font-size:.64rem;color:var(--muted)}
+/* ACTIVITY LOG */
+.log-list{display:flex;flex-direction:column;gap:0}
+.log{display:flex;align-items:flex-start;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border)}
+.log:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.ld-g{background:var(--green)}.ld-gold{background:var(--gold)}.ld-r{background:var(--red)}.ld-b{background:var(--blue)}
+.log-text{font-size:.8rem;color:var(--text);line-height:1.5;flex:1}
+.log-text strong{color:var(--dark);font-weight:600}
+.log-time{font-size:.68rem;color:var(--muted);flex-shrink:0;margin-top:2px}
+/* DISPUTE */
+.dispute-list{display:flex;flex-direction:column;gap:0}
+.disp{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s}
+.disp:last-child{border-bottom:none}.disp:hover{background:#fafcfa}
+.disp-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.disp-info{flex:1}
+.disp-title{font-size:.82rem;font-weight:600;color:var(--dark)}
+.disp-sub{font-size:.72rem;color:var(--muted);margin-top:1px}
+.disp-amount{font-size:.82rem;font-weight:600;color:var(--red);flex-shrink:0}
+.disp-status{font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.ds-open{background:var(--rp);color:var(--red)}.ds-resolved{background:var(--gp);color:var(--green)}
+/* OVERLAY */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}.sb-overlay.show{display:block}
+/* RESPONSIVE */
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:860px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .topbar{left:0}.main{margin-left:0}.hamburger{display:flex}
+  .tb-search{display:none}
+}
+@media(max-width:600px){
+  :root{--tb-h:52px}.main{padding:16px 14px 60px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}.kpi-val{font-size:1.35rem}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .market-stats{grid-template-columns:repeat(2,1fr)}
+  .topbar{padding:0 14px;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    <div>
+      <div class="sb-logo-text">Marché Sénégal</div>
+      <div class="sb-admin-badge">👑 Admin Panel</div>
+    </div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar">AD</div>
+    <div><div class="sb-user-name">Admin Principal</div><div class="sb-user-role">Super Administrateur</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Vue d'ensemble</div>
+    <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-icon">📊</span>Tableau de bord</div>
+    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon">👥</span>Utilisateurs<span class="sb-badge gold">48 260</span></div>
+    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon">🏪</span>Vendeurs<span class="sb-badge">12</span></div>
+    <div class="sb-sec">Commerce</div>
+    <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green">3 840</span></div>
+    <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge">8</span></div>
+    <div class="sb-item" onclick="toast('Produits...')"><span class="sb-icon">📦</span>Produits</div>
+    <div class="sb-sec">Plateforme</div>
+    <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon">🗺️</span>Marchés</div>
+    <div class="sb-item" onclick="toast('Revenus...')"><span class="sb-icon">💰</span>Revenus</div>
+    <div class="sb-item" onclick="toast('Livreurs...')"><span class="sb-icon">🛵</span>Livreurs</div>
+    <div class="sb-item" onclick="toast('Promotions...')"><span class="sb-icon">🎯</span>Promotions</div>
+    <div class="sb-sec">Système</div>
+    <div class="sb-item" onclick="toast('Paramètres...')"><span class="sb-icon">⚙️</span>Paramètres</div>
+    <div class="sb-item" onclick="toast('Logs système...')"><span class="sb-icon">📋</span>Logs</div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-back" onclick="window.location.href='marche-senegal-accueil.html'"><span>🌐</span>Voir le site public</div>
+    <div class="sb-back" onclick="logoutAdmin()"><span>🚪</span>Se déconnecter</div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  <div class="tb-title" id="page-title">Tableau de bord</div>
+  <div class="tb-search">
+    <input type="text" placeholder="Rechercher utilisateur, commande..."/>
+    <button class="tb-search-btn">🔍</button>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="toast('Notifications admin...')">🔔<div class="tb-notif">14</div></button>
+    <button class="tb-btn" onclick="toast('Exporter rapport...')">📊</button>
+    <div class="tb-profile" onclick="toast('Mon profil admin...')"><div class="tb-av">AD</div><span class="tb-name">Admin</span></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ── OVERVIEW ── -->
+  <div class="ps active" id="ps-overview">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🛒</div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🏪</div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val">2 412</div><div class="kpi-label">Boutiques actives</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">👥</div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">⚖️</div><div class="kpi-chg down">↑ +3</div></div><div class="kpi-val">8</div><div class="kpi-label">Litiges ouverts</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🚚</div><div class="kpi-chg up">↑ +2%</div></div><div class="kpi-val">94%</div><div class="kpi-label">Taux livraison réussie</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">⭐</div><div class="kpi-chg up">↑ +0.1</div></div><div class="kpi-val">4.7</div><div class="kpi-label">Note moyenne globale</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🗺️</div><div class="kpi-chg flat">→ stable</div></div><div class="kpi-val">14</div><div class="kpi-label">Régions couvertes</div></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Revenue chart -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">📈 Revenus — 6 derniers mois</div><div class="card-action" onclick="toast('Exporter...')">Exporter CSV →</div></div>
+        <div class="bar-chart">
+          <div class="bc-wrap"><div class="bc-val">7,2M</div><div class="bc-bar g" style="height:58%"></div><div class="bc-label">Nov</div></div>
+          <div class="bc-wrap"><div class="bc-val">8,1M</div><div class="bc-bar g" style="height:65%"></div><div class="bc-label">Déc</div></div>
+          <div class="bc-wrap"><div class="bc-val">6,8M</div><div class="bc-bar g" style="height:54%"></div><div class="bc-label">Jan</div></div>
+          <div class="bc-wrap"><div class="bc-val">9,4M</div><div class="bc-bar g" style="height:75%"></div><div class="bc-label">Fév</div></div>
+          <div class="bc-wrap"><div class="bc-val">10,8M</div><div class="bc-bar g" style="height:87%"></div><div class="bc-label">Mar</div></div>
+          <div class="bc-wrap"><div class="bc-val">12,4M</div><div class="bc-bar gold" style="height:100%"></div><div class="bc-label">Avr</div></div>
+        </div>
+        <div class="chart-footer">
+          <div class="cf-stat">Total 6 mois : <strong>54,7M FCFA</strong></div>
+          <div class="cf-stat">Croissance : <strong style="color:var(--green)">+22%</strong></div>
+        </div>
+      </div>
+      <!-- Donut -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">🥧 Répartition des revenus</div></div>
+        <div class="donut-wrap">
+          <div class="donut">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#D8E8DE" stroke-width="12"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#1B6B3A" stroke-width="12" stroke-dasharray="110 110" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#E6A817" stroke-width="12" stroke-dasharray="55 165" stroke-dashoffset="-110" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#1565C0" stroke-width="12" stroke-dasharray="22 198" stroke-dashoffset="-165" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center"><div class="donut-pct">50%</div><div class="donut-sub">Abo.</div></div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl"><div class="dl-dot" style="background:var(--green)"></div>Abonnements vendeurs — 50%</div>
+            <div class="dl"><div class="dl-dot" style="background:var(--gold)"></div>Commissions livraison — 25%</div>
+            <div class="dl"><div class="dl-dot" style="background:var(--blue)"></div>Commissions ventes — 15%</div>
+            <div class="dl"><div class="dl-dot" style="background:var(--border)"></div>Publicité & autres — 10%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Vendor verif -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">🔍 Vérifications en attente (12)</div><div class="card-action" onclick="showPage('vendors',document.querySelector('.sb-item:nth-child(4)'))">Voir tout →</div></div>
+        <table class="t">
+          <thead><tr><th>Vendeur</th><th>Marché</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">FN</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Fatou Ndiaye</div><div style="font-size:.7rem;color:var(--muted)">Mode · Sandaga</div></div></div></td><td>🏛️ Sandaga</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Vendeur approuvé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div><div style="font-size:.7rem;color:var(--muted)">Alimentation · HLM</div></div></div></td><td>🛍️ HLM</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Vendeur approuvé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
+            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">AS</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Aminata Sow</div><div style="font-size:.7rem;color:var(--muted)">Artisanat · Tilène</div></div></div></td><td>🧵 Tilène</td><td><span class="badge b-ok">Approuvé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir dossier...')">Voir</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Disputes -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚖️ Litiges ouverts (8)</div><div class="card-action" onclick="showPage('disputes',null)">Gérer →</div></div>
+        <div class="dispute-list">
+          <div class="disp" onclick="toast('Gérer le litige...')"><div class="disp-icon" style="background:var(--rp)">⚖️</div><div class="disp-info"><div class="disp-title">Produit non conforme — #MS-847</div><div class="disp-sub">Fatou N. vs Mode Fatou · Il y a 2h</div></div><div class="disp-amount">15 300 FCFA</div><div class="disp-status ds-open">Ouvert</div></div>
+          <div class="disp" onclick="toast('Gérer le litige...')"><div class="disp-icon" style="background:var(--rp)">⚖️</div><div class="disp-info"><div class="disp-title">Livraison non reçue — #MS-841</div><div class="disp-sub">Ousmane D. vs Ferme Diallo · Il y a 1j</div></div><div class="disp-amount">4 320 FCFA</div><div class="disp-status ds-open">Ouvert</div></div>
+          <div class="disp" onclick="toast('Voir détails...')"><div class="disp-icon" style="background:var(--gp)">✓</div><div class="disp-info"><div class="disp-title">Taille incorrecte — #MS-835</div><div class="disp-sub">Remboursé · Résolu il y a 2j</div></div><div class="disp-amount">9 500 FCFA</div><div class="disp-status ds-resolved">Résolu</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Market stats + Activity -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🗺️ Stats par marché</div><div class="card-action" onclick="showPage('markets',null)">Voir tout →</div></div>
+        <div class="market-stats">
+          <div class="ms"><div class="ms-emoji">🏛️</div><div class="ms-name">Sandaga</div><div class="ms-val">142 boutiques</div><div class="ms-sub">12 400 produits</div></div>
+          <div class="ms"><div class="ms-emoji">🕌</div><div class="ms-name">Touba</div><div class="ms-val">120 boutiques</div><div class="ms-sub">9 800 produits</div></div>
+          <div class="ms"><div class="ms-emoji">🧵</div><div class="ms-name">Tilène</div><div class="ms-val">98 boutiques</div><div class="ms-sub">7 600 produits</div></div>
+          <div class="ms"><div class="ms-emoji">🏭</div><div class="ms-name">Thiès</div><div class="ms-val">83 boutiques</div><div class="ms-sub">6 200 produits</div></div>
+          <div class="ms"><div class="ms-emoji">🛍️</div><div class="ms-name">HLM</div><div class="ms-val">76 boutiques</div><div class="ms-sub">5 400 produits</div></div>
+          <div class="ms"><div class="ms-emoji">🏙️</div><div class="ms-name">Pikine</div><div class="ms-val">61 boutiques</div><div class="ms-sub">4 200 produits</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 Activité en temps réel</div><div class="card-action" onclick="toast('Tous les logs...')">Voir tout →</div></div>
+        <div class="log-list">
+          <div class="log"><div class="log-dot ld-g"></div><div class="log-text"><strong>Nouvelle boutique</strong> — Artisan Mbour · En attente vérification CNI</div><div class="log-time">2 min</div></div>
+          <div class="log"><div class="log-dot ld-gold"></div><div class="log-text"><strong>Commande</strong> — #MS-00848 · 22 000 FCFA via Wave · Dakar → Thiès</div><div class="log-time">5 min</div></div>
+          <div class="log"><div class="log-dot ld-g"></div><div class="log-text"><strong>Vendeur approuvé</strong> — Aminata Sow · Marché Tilène · CNI validée</div><div class="log-time">12 min</div></div>
+          <div class="log"><div class="log-dot ld-r"></div><div class="log-text"><strong>Litige ouvert</strong> — #MS-847 · 15 300 FCFA bloqués en escrow</div><div class="log-time">2h</div></div>
+          <div class="log"><div class="log-dot ld-b"></div><div class="log-text"><strong>Paiement</strong> — 342 500 FCFA retirés par Mode Fatou Ndoye</div><div class="log-time">3h</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── USERS ── -->
+  <div class="ps" id="ps-users">
+    <div class="sec-header">
+      <div class="sec-title">👥 Utilisateurs (48 260)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
+        <select style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none"><option>Tous</option><option>Acheteurs</option><option>Vendeurs</option></select>
+      </div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Utilisateur</th><th>Type</th><th>Région</th><th>Inscrit le</th><th>Activité</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">FN</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Fatou Ndiaye</div><div style="font-size:.7rem;color:var(--muted)">+221 77 XXX XX XX</div></div></div></td><td><span class="badge b-blue">Acheteur</span></td><td>Dakar</td><td>Jan 2025</td><td>12 commandes</td><td><span class="badge b-ok">Actif</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir profil...')">Voir</button><button class="ta reject" onclick="toast('Compte suspendu')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div><div style="font-size:.7rem;color:var(--muted)">+221 77 XXX XX XX</div></div></div></td><td><span class="badge b-ok">Vendeur ✓</span></td><td>Dakar · Sandaga</td><td>Mar 2024</td><td>1 240 ventes</td><td><span class="badge b-ok">Actif</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Boutique</button><button class="ta reject" onclick="toast('Compte suspendu')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div><div style="font-size:.7rem;color:var(--muted)">+221 76 XXX XX XX</div></div></div></td><td><span class="badge b-wait">Vendeur ⏳</span></td><td>Dakar · HLM</td><td>Avr 2025</td><td>En attente CNI</td><td><span class="badge b-wait">En vérif.</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('CNI validée !')">Valider CNI</button><button class="ta reject" onclick="toast('Compte refusé')">Refuser</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">ID</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ibrahima Diallo</div><div style="font-size:.7rem;color:var(--muted)">+221 78 XXX XX XX</div></div></div></td><td><span class="badge b-blue">Acheteur</span></td><td>Thiès</td><td>Fév 2025</td><td>3 commandes</td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Compte réactivé !')">Réactiver</button><button class="ta view" onclick="toast('Voir dossier...')">Dossier</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── VENDORS ── -->
+  <div class="ps" id="ps-vendors">
+    <div class="sec-header">
+      <div class="sec-title">🏪 Vendeurs (2 412 actifs · 12 en attente)</div>
+      <button class="sec-btn sec-btn-outline" onclick="toast('Exporter la liste...')">📊 Exporter</button>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Vendeur</th><th>Marché</th><th>Boutique</th><th>Ventes</th><th>Note</th><th>CNI</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div></div></div></td><td>🏛️ Sandaga</td><td>Mode Fatou</td><td>1 240</td><td>4.8 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Voir</button><button class="ta reject" onclick="toast('Boutique suspendue')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">FD</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ferme Diallo</div></div></div></td><td>🌊 Ziguinchor</td><td>Ferme Diallo Casamance</td><td>2 100</td><td>4.9 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir boutique...')">Voir</button><button class="ta reject" onclick="toast('Suspendu')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div></div></div></td><td>🛍️ HLM</td><td>HLM Alimentation</td><td>En attente</td><td>—</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Validé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">AC</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Artisan Cheikh</div></div></div></td><td>🏖️ Mbour</td><td>Artisan Cheikh Mbour</td><td>480</td><td>5.0 ⭐</td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Boutique réactivée !')">Réactiver</button><button class="ta view" onclick="toast('Dossier...')">Dossier</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="ps" id="ps-orders">
+    <div class="sec-header"><div class="sec-title">🛒 Commandes (3 840 ce mois)</div><div style="font-size:.86rem;color:var(--muted)">Total encaissé : <strong style="color:var(--green)">98,4M FCFA</strong></div></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">⏳</div></div><div class="kpi-val">124</div><div class="kpi-label">En attente de confirmation</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🚚</div></div><div class="kpi-val">287</div><div class="kpi-label">En cours de livraison</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val">3 381</div><div class="kpi-label">Livrées avec succès</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val">48</div><div class="kpi-label">Annulées ou litiges</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Dernières commandes</div><div class="card-action" onclick="toast('Toutes les commandes...')">Voir tout →</div></div>
+      <table class="t">
+        <thead><tr><th>Numéro</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Paiement</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;color:var(--dark)">#MS-00848</td><td>Moussa Sow · Dakar</td><td>Mode Fatou · Sandaga</td><td style="color:var(--green);font-weight:600">15 300 FCFA</td><td>Wave ✓</td><td><span class="badge b-ok">En livraison</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
+          <tr><td style="font-weight:600;color:var(--dark)">#MS-00847</td><td>Aissatou Ba · Thiès</td><td>Tissus Aminata · Tilène</td><td style="color:var(--green);font-weight:600">25 000 FCFA</td><td>OM ✓</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
+          <tr><td style="font-weight:600;color:var(--dark)">#MS-00841</td><td>Ibrahima Fall · Dakar</td><td>Ferme Diallo · Ziguinchor</td><td style="color:var(--green);font-weight:600">4 320 FCFA</td><td>Wave ✓</td><td><span class="badge b-ok">Livré ✓</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
+          <tr><td style="font-weight:600;color:var(--dark)">#MS-00835</td><td>Rokhaya Faye · Kaolack</td><td>Beauté Naturelle · Sandaga</td><td style="color:var(--green);font-weight:600">3 500 FCFA</td><td>FM ✓</td><td><span class="badge b-rej">Litige ⚖️</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Gérer litige...')">Gérer</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── DISPUTES ── -->
+  <div class="ps" id="ps-disputes">
+    <div class="sec-header"><div class="sec-title">⚖️ Litiges (8 ouverts)</div><div style="font-size:.86rem;color:var(--muted)">Montant bloqué en escrow : <strong style="color:var(--red)">43 620 FCFA</strong></div></div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Litige</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Motif</th><th>Ouvert</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">#DIS-047</td><td>Fatou Ndiaye</td><td>Mode Fatou Ndoye</td><td style="color:var(--red);font-weight:600">15 300 FCFA</td><td>Produit non conforme</td><td>Il y a 2h</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Remboursement acheteur !')">Rembourser</button><button class="ta reject" onclick="toast('Montant libéré au vendeur')">Libérer</button></div></td></tr>
+          <tr><td style="font-weight:600">#DIS-046</td><td>Ousmane Diop</td><td>Ferme Diallo</td><td style="color:var(--red);font-weight:600">4 320 FCFA</td><td>Livraison non reçue</td><td>Il y a 1j</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Remboursement acheteur !')">Rembourser</button><button class="ta reject" onclick="toast('Montant libéré')">Libérer</button></div></td></tr>
+          <tr><td style="font-weight:600">#DIS-044</td><td>Cheikh Ba</td><td>Boutique HLM</td><td style="color:var(--red);font-weight:600">9 500 FCFA</td><td>Taille incorrecte</td><td>Il y a 2j</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Résolu — remboursement !')">Résoudre</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── MARKETS ── -->
+  <div class="ps" id="ps-markets">
+    <div class="sec-header">
+      <div class="sec-title">🗺️ Gestion des marchés (14 régions)</div>
+      <button class="sec-btn sec-btn-green" onclick="toast('Ajouter un marché...')">+ Ajouter un marché</button>
+    </div>
+    <div class="grid-3">
+      <div class="card"><div class="card-header"><div class="card-title">🏛️ Sandaga — Dakar</div><div class="card-action" onclick="window.location.href='marche-senegal-marche.html'">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong style="color:var(--dark)">142</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong style="color:var(--dark)">12 400</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">3,2M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="window.location.href='marche-senegal-marche.html'">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">🕌 Touba</div><div class="card-action" onclick="toast('Voir marché Touba...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>120</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>9 800</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.7 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,8M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Touba...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">🧵 Tilène — Médina</div><div class="card-action" onclick="toast('Voir marché Tilène...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>98</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>7 600</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,1M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Tilène...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
+    </div>
+  </div>
+
+</main>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   DASHBOARD ADMIN — Données dynamiques
+// ════════════════════════════════════════
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+const pageTitles={
+  overview:'Tableau de bord',
+  users:'Gestion des utilisateurs',
+  vendors:'Gestion des vendeurs',
+  orders:'Toutes les commandes',
+  disputes:'Gestion des litiges',
+  markets:'Gestion des marchés'
+};
+
+function showPage(id, navItem){
+  document.querySelectorAll('.ps').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('ps-'+id);
+  if(el) el.classList.add('active');
+  if(navItem){
+    document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+  document.getElementById('page-title').textContent = pageTitles[id]||'Admin';
+  closeSidebar();
+}
+
+function logoutAdmin() {
+  localStorage.clear();
+  window.location.href = 'marche-senegal-connexion-admin.html';
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('show');
+}
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+function filterTgl(btn){
+  btn.closest('.filters-row').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Charger les stats globales ──
+async function loadAdminStats() {
+  // Charger les marchés réels
+  const marketsResult = await getMarkets();
+  if (marketsResult.success) {
+    const marketCount = document.getElementById('stat-markets');
+    if (marketCount) marketCount.textContent = marketsResult.data.length;
+  }
+
+  // Charger les produits réels
+  const productsResult = await getProducts({ limit: 1 });
+  if (productsResult.success) {
+    const prodCount = document.getElementById('stat-products');
+    if (prodCount) prodCount.textContent = productsResult.pagination.total;
+  }
+
+  // Charger les boutiques réelles
+  const shopsResult = await getShops({ limit: 1 });
+  if (shopsResult.success) {
+    const shopCount = document.getElementById('stat-shops');
+    if (shopCount) shopCount.textContent = shopsResult.pagination.total;
+  }
+}
+
+// ── Approuver un vendeur ──
+function approveVendor(btn, name) {
+  const row = btn.closest('tr');
+  const statusCell = row.querySelector('.badge');
+  if (statusCell) {
+    statusCell.textContent = 'Approuvé ✓';
+    statusCell.className = 'badge b-green';
+  }
+  btn.closest('.tb-act').innerHTML =
+    '<button class="ta view" onclick="toast(\'Voir boutique...\')">Voir</button>';
+  toast('✓ ' + name + ' approuvé !');
+}
+
+// ── Refuser un vendeur ──
+function rejectVendor(btn, name) {
+  const row = btn.closest('tr');
+  const statusCell = row.querySelector('.badge');
+  if (statusCell) {
+    statusCell.textContent = 'Refusé ✗';
+    statusCell.className = 'badge b-red';
+  }
+  btn.closest('.tb-act').innerHTML = '';
+  toast('✗ ' + name + ' refusé');
+}
+
+// ── Vérifier accès admin ──
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+  if (!user) {
+    window.location.href = 'marche-senegal-connexion-admin.html';
+    return;
+  }
+
+  if (user.role !== 'ADMIN') {
+    toast('❌ Accès réservé aux administrateurs');
+    setTimeout(() => {
+      window.location.href = 'marche-senegal-accueil.html';
+    }, 2000);
+    return;
+  }
+
+  // Charger les vraies stats
+  await loadAdminStats();
+});
+</script>
+</body>
+</html>

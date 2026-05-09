@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mon Profil — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+a{text-decoration:none;color:inherit}
+
+.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0}
+.nav-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.nav-btn{height:38px;padding:0 16px;border-radius:99px;font-size:.82rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s}
+.nav-btn:hover{border-color:var(--green);color:var(--green)}
+.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem}
+.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0}
+.mn-items{display:flex}
+.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
+.mn-icon{font-size:1.1rem}
+.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}
+.mn-item.act .mn-label{color:var(--green)}
+
+/* MAIN LAYOUT */
+.main{margin-top:var(--nav-h);display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - var(--nav-h));max-width:1200px;margin-left:auto;margin-right:auto;padding:24px 4vw 60px;gap:22px}
+
+/* SIDEBAR */
+.profile-sidebar{display:flex;flex-direction:column;gap:14px}
+
+.profile-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;text-align:center}
+.pc-avatar{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:#fff;margin:0 auto 12px;font-family:'Playfair Display',serif}
+.pc-name{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+.pc-phone{font-size:.82rem;color:var(--muted);margin-bottom:10px}
+.pc-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gp);color:var(--green);font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:99px;margin-bottom:14px}
+.pc-edit-btn{width:100%;height:38px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s}
+.pc-edit-btn:hover{border-color:var(--green);color:var(--green)}
+
+.sidebar-nav{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.sn-item{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-size:.86rem;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);transition:all .18s}
+.sn-item:last-child{border-bottom:none}
+.sn-item:hover{background:var(--gp);color:var(--green)}
+.sn-item.active{background:var(--gp);color:var(--green);font-weight:600}
+.sn-icon{font-size:.95rem;width:20px;text-align:center}
+.sn-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px}
+
+/* CONTENT */
+.profile-content{display:flex;flex-direction:column;gap:16px}
+
+/* CARDS */
+.content-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cc-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.cc-title{font-size:.96rem;font-weight:600;color:var(--dark)}
+.cc-action{font-size:.78rem;color:var(--green);font-weight:600;cursor:pointer}
+.cc-action:hover{text-decoration:underline}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{text-align:center;padding:18px 10px;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:3px}
+.stat-label{font-size:.72rem;color:var(--muted)}
+
+/* ORDERS */
+.orders-list{display:flex;flex-direction:column}
+.order-item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s}
+.order-item:last-child{border-bottom:none}
+.order-item:hover{background:#fafcfa}
+.oi-img{width:48px;height:48px;border-radius:9px;background:#F0EAF8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.oi-info{flex:1}
+.oi-num{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:2px}
+.oi-name{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:3px}
+.oi-shop{font-size:.74rem;color:var(--muted)}
+.oi-right{text-align:right;flex-shrink:0}
+.oi-price{font-size:.9rem;font-weight:700;color:var(--green);margin-bottom:4px}
+.oi-status{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.os-delivered{background:var(--gp);color:var(--green)}
+.os-delivering{background:var(--bluep, #E3F2FD);color:#1565C0}
+.os-pending{background:var(--gdl);color:#8A6100}
+.os-cancelled{background:var(--rp);color:var(--red)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.es-icon{font-size:3rem;margin-bottom:12px}
+.es-title{font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:6px}
+.es-sub{font-size:.84rem;line-height:1.65;margin-bottom:18px}
+.es-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;border-radius:99px;padding:10px 22px;font-size:.86rem;font-weight:600;cursor:pointer;transition:background .2s}
+.es-btn:hover{background:var(--gl)}
+
+/* ADDRESSES */
+.addr-list{display:flex;flex-direction:column;gap:10px;padding:16px 20px}
+.addr-card{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:#fff;transition:all .18s}
+.addr-card.default{border-color:var(--green);background:var(--gp)}
+.addr-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.addr-info{flex:1}
+.addr-label{font-size:.78rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+.addr-text{font-size:.82rem;color:var(--muted);line-height:1.5}
+.addr-default{font-size:.66rem;font-weight:700;background:var(--green);color:#fff;padding:2px 7px;border-radius:99px;margin-left:6px}
+.addr-actions{display:flex;gap:5px}
+.addr-btn{padding:4px 9px;border-radius:6px;font-size:.72rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .18s}
+.addr-btn:hover{border-color:var(--green);color:var(--green)}
+
+/* SETTINGS */
+.settings-list{display:flex;flex-direction:column}
+.setting-item{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.setting-item:last-child{border-bottom:none}
+.si-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0}
+.si-info{flex:1}
+.si-label{font-size:.86rem;font-weight:500;color:var(--dark)}
+.si-sub{font-size:.74rem;color:var(--muted);margin-top:2px}
+.si-toggle{width:44px;height:24px;border-radius:12px;background:var(--green);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.si-toggle.off{background:var(--border)}
+.si-toggle::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.si-toggle:not(.off)::before{transform:translateX(20px)}
+.si-arrow{color:var(--muted);font-size:.9rem;cursor:pointer}
+
+/* LOGOUT BTN */
+.logout-btn{width:100%;height:44px;border-radius:10px;border:1.5px solid var(--red);background:#fff;color:var(--red);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.logout-btn:hover{background:var(--red);color:#fff}
+
+@media(max-width:860px){
+  .main{grid-template-columns:1fr;padding:16px 4vw 80px}
+  .profile-sidebar{display:none}
+  .mobile-nav{display:block}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-item:nth-child(2){border-right:none}
+  .stat-item:nth-child(3){border-top:1px solid var(--border)}
+  .stat-item:nth-child(4){border-top:1px solid var(--border);border-right:none}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    Marché Sénégal
+  </a>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="window.location.href='marche-senegal-accueil.html'">🏠 Accueil</button>
+    <button class="nav-btn" onclick="window.location.href='marche-senegal-recherche.html'">🔍 Rechercher</button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
+      🛒<div class="cart-badge" id="cart-count">0</div>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="profile-sidebar">
+    <div class="profile-card">
+      <div class="pc-avatar" id="pc-avatar">FN</div>
+      <div class="pc-name" id="pc-name">Fatou Ndiaye</div>
+      <div class="pc-phone" id="pc-phone">+221 77 000 00 01</div>
+      <div class="pc-badge">🛍️ Acheteur vérifié ✓</div>
+      <button class="pc-edit-btn" onclick="showTab('settings')">✏️ Modifier le profil</button>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="sn-item active" onclick="showTab('orders',this)">
+        <span class="sn-icon">🛒</span> Mes commandes
+        <span class="sn-badge" id="orders-badge">0</span>
+      </div>
+      <div class="sn-item" onclick="showTab('favorites',this)">
+        <span class="sn-icon">❤️</span> Mes favoris
+      </div>
+      <div class="sn-item" onclick="showTab('addresses',this)">
+        <span class="sn-icon">📍</span> Mes adresses
+      </div>
+      <div class="sn-item" onclick="showTab('payments',this)">
+        <span class="sn-icon">💳</span> Mes paiements
+      </div>
+      <div class="sn-item" onclick="showTab('settings',this)">
+        <span class="sn-icon">⚙️</span> Paramètres
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="logoutUser()">
+      🚪 Se déconnecter
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="profile-content">
+
+    <!-- STATS -->
+    <div class="content-card">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-val" id="stat-orders">0</div>
+          <div class="stat-label">Commandes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="stat-spent">0</div>
+          <div class="stat-label">FCFA dépensés</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="stat-favorites">0</div>
+          <div class="stat-label">Favoris</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="stat-reviews">0</div>
+          <div class="stat-label">Avis laissés</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMANDES -->
+    <div class="content-card" id="tab-orders">
+      <div class="cc-head">
+        <div class="cc-title">🛒 Mes commandes</div>
+        <div class="cc-action" onclick="loadOrders()">Actualiser</div>
+      </div>
+      <div id="orders-container">
+        <div class="empty-state">
+          <div class="es-icon">⏳</div>
+          <div class="es-title">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAVORIS -->
+    <div class="content-card" id="tab-favorites" style="display:none">
+      <div class="cc-head">
+        <div class="cc-title">❤️ Mes favoris</div>
+      </div>
+      <div class="empty-state">
+        <div class="es-icon">❤️</div>
+        <div class="es-title">Aucun favori</div>
+        <div class="es-sub">Ajoutez des produits à vos favoris en cliquant sur 🤍</div>
+        <button class="es-btn" onclick="window.location.href='marche-senegal-accueil.html'">
+          🛍️ Explorer les produits
+        </button>
+      </div>
+    </div>
+
+    <!-- ADRESSES -->
+    <div class="content-card" id="tab-addresses" style="display:none">
+      <div class="cc-head">
+        <div class="cc-title">📍 Mes adresses</div>
+        <div class="cc-action" onclick="showToast('Ajouter une adresse...')">+ Ajouter</div>
+      </div>
+      <div class="addr-list">
+        <div class="addr-card default">
+          <div class="addr-icon">🏠</div>
+          <div class="addr-info">
+            <div class="addr-label">
+              Domicile <span class="addr-default">Par défaut</span>
+            </div>
+            <div class="addr-text">Sacré-Cœur 3, Villa 24<br/>Dakar, Sénégal</div>
+          </div>
+          <div class="addr-actions">
+            <button class="addr-btn" onclick="showToast('Modifier...')">✏️</button>
+            <button class="addr-btn" onclick="showToast('Supprimer...')">🗑</button>
+          </div>
+        </div>
+        <div class="addr-card">
+          <div class="addr-icon">💼</div>
+          <div class="addr-info">
+            <div class="addr-label">Bureau</div>
+            <div class="addr-text">Plateau, Immeuble Fahd<br/>Dakar, Sénégal</div>
+          </div>
+          <div class="addr-actions">
+            <button class="addr-btn" onclick="showToast('Modifier...')">✏️</button>
+            <button class="addr-btn" onclick="showToast('Supprimer...')">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAIEMENTS -->
+    <div class="content-card" id="tab-payments" style="display:none">
+      <div class="cc-head">
+        <div class="cc-title">💳 Moyens de paiement</div>
+        <div class="cc-action" onclick="showToast('Ajouter...')">+ Ajouter</div>
+      </div>
+      <div class="addr-list">
+        <div class="addr-card default">
+          <div class="addr-icon">📱</div>
+          <div class="addr-info">
+            <div class="addr-label">Wave <span class="addr-default">Par défaut</span></div>
+            <div class="addr-text">+221 77 000 00 01 · Solde disponible</div>
+          </div>
+        </div>
+        <div class="addr-card">
+          <div class="addr-icon">🟠</div>
+          <div class="addr-info">
+            <div class="addr-label">Orange Money</div>
+            <div class="addr-text">+221 77 000 00 01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="content-card" id="tab-settings" style="display:none">
+      <div class="cc-head">
+        <div class="cc-title">⚙️ Paramètres</div>
+      </div>
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="si-icon">👤</div>
+          <div class="si-info">
+            <div class="si-label">Prénom et nom</div>
+            <div class="si-sub" id="settings-name">Fatou Ndiaye</div>
+          </div>
+          <div class="si-arrow" onclick="showToast('Modifier le nom...')">›</div>
+        </div>
+        <div class="setting-item">
+          <div class="si-icon">📱</div>
+          <div class="si-info">
+            <div class="si-label">Numéro de téléphone</div>
+            <div class="si-sub" id="settings-phone">+221 77 000 00 01</div>
+          </div>
+          <div class="si-arrow" onclick="showToast('Modifier le téléphone...')">›</div>
+        </div>
+        <div class="setting-item">
+          <div class="si-icon">🔔</div>
+          <div class="si-info">
+            <div class="si-label">Notifications commandes</div>
+            <div class="si-sub">Recevoir les mises à jour par SMS</div>
+          </div>
+          <div class="si-toggle" onclick="this.classList.toggle('off')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="si-icon">🎯</div>
+          <div class="si-info">
+            <div class="si-label">Notifications promotions</div>
+            <div class="si-sub">Recevoir les offres et bons plans</div>
+          </div>
+          <div class="si-toggle off" onclick="this.classList.toggle('off')"></div>
+        </div>
+        <div class="setting-item">
+          <div class="si-icon">🌍</div>
+          <div class="si-info">
+            <div class="si-label">Langue</div>
+            <div class="si-sub">Français</div>
+          </div>
+          <div class="si-arrow" onclick="showToast('Changer la langue...')">›</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'">
+      <div class="mn-icon">🏠</div><div class="mn-label">Accueil</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'">
+      <div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'">
+      <div class="mn-icon">🔍</div><div class="mn-label">Recherche</div>
+    </div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'">
+      <div class="mn-icon">🛒</div><div class="mn-label">Panier</div>
+    </div>
+    <div class="mn-item act">
+      <div class="mn-icon">👤</div><div class="mn-label">Profil</div>
+    </div>
+  </div>
+</nav>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   PAGE PROFIL — Données dynamiques
+// ════════════════════════════════════════
+
+// ── Charger le profil ──
+async function loadProfile() {
+  const user = getCurrentUser();
+
+  if (!user) {
+    window.location.href = 'marche-senegal-connexion-acheteur.html';
+    return;
+  }
+
+  // Mettre à jour l'avatar
+  const avatar = document.getElementById('pc-avatar');
+  if (avatar) {
+    const initials =
+      (user.firstName?.charAt(0) || '') +
+      (user.lastName?.charAt(0) || '');
+    avatar.textContent = initials || '?';
+  }
+
+  // Mettre à jour le nom
+  const pcName = document.getElementById('pc-name');
+  if (pcName) {
+    pcName.textContent =
+      (user.firstName || '') + ' ' + (user.lastName || '') ||
+      'Mon Profil';
+  }
+
+  // Mettre à jour le téléphone
+  const pcPhone = document.getElementById('pc-phone');
+  if (pcPhone) pcPhone.textContent = user.phone || '';
+
+  // Mettre à jour les paramètres
+  const settingsName = document.getElementById('settings-name');
+  if (settingsName) {
+    settingsName.textContent =
+      (user.firstName || '') + ' ' + (user.lastName || '');
+  }
+
+  const settingsPhone = document.getElementById('settings-phone');
+  if (settingsPhone) settingsPhone.textContent = user.phone || '';
+
+  // Charger les commandes
+  await loadOrders();
+}
+
+// ── Charger les commandes ──
+async function loadOrders() {
+  const container = document.getElementById('orders-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-title">Chargement...</div>
+    </div>
+  `;
+
+  const result = await getMyOrders();
+
+  if (!result.success) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">❌</div>
+        <div class="es-title">Erreur de chargement</div>
+        <div class="es-sub">Impossible de charger vos commandes</div>
+      </div>
+    `;
+    return;
+  }
+
+  const orders = result.data;
+
+  // Mettre à jour le badge et les stats
+  const badge = document.getElementById('orders-badge');
+  if (badge) badge.textContent = orders.length;
+
+  const statOrders = document.getElementById('stat-orders');
+  if (statOrders) statOrders.textContent = orders.length;
+
+  // Calculer le total dépensé
+  const totalSpent = orders
+    .filter(o => o.status === 'DELIVERED')
+    .reduce((sum, o) => sum + o.total, 0);
+
+  const statSpent = document.getElementById('stat-spent');
+  if (statSpent) statSpent.textContent =
+    totalSpent > 0 ? (totalSpent/1000).toFixed(0) + 'K' : '0';
+
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">🛒</div>
+        <div class="es-title">Aucune commande</div>
+        <div class="es-sub">
+          Vous n'avez pas encore passé de commande.<br/>
+          Explorez nos marchés et trouvez ce qu'il vous faut !
+        </div>
+        <button class="es-btn"
+          onclick="window.location.href='marche-senegal-accueil.html'">
+          🛍️ Explorer les produits
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="orders-list">
+      ${orders.map(order => `
+        <div class="order-item" onclick="window.location.href='marche-senegal-commande.html?id=${order.id}'">
+          <div class="oi-img">
+            ${order.items[0]?.imageUrl
+              ? `<img src="${order.items[0].imageUrl}"
+                      style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>`
+              : '👗'
+            }
+          </div>
+          <div class="oi-info">
+            <div class="oi-num">${order.orderNumber}</div>
+            <div class="oi-name">
+              ${order.items[0]?.name || 'Commande'}
+              ${order.items.length > 1
+                ? `<span style="color:var(--muted)">
+                    +${order.items.length - 1} article(s)
+                   </span>`
+                : ''
+              }
+            </div>
+            <div class="oi-shop">🏪 ${order.shop?.name || ''}</div>
+          </div>
+          <div class="oi-right">
+            <div class="oi-price">${formatPrice(order.total)}</div>
+            <div class="oi-status ${getStatusClass(order.status)}">
+              ${getStatusLabel(order.status)}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Helpers statut ──
+function getStatusClass(status) {
+  const classes = {
+    'PENDING': 'os-pending',
+    'CONFIRMED': 'os-delivering',
+    'PREPARING': 'os-delivering',
+    'DELIVERING': 'os-delivering',
+    'DELIVERED': 'os-delivered',
+    'CANCELLED': 'os-cancelled'
+  };
+  return classes[status] || 'os-pending';
+}
+
+function getStatusLabel(status) {
+  const labels = {
+    'PENDING': '⏳ En attente',
+    'CONFIRMED': '✓ Confirmé',
+    'PREPARING': '📦 En préparation',
+    'DELIVERING': '🚚 En livraison',
+    'DELIVERED': '✅ Livré',
+    'CANCELLED': '❌ Annulé'
+  };
+  return labels[status] || status;
+}
+
+// ── Changer d'onglet ──
+function showTab(tabId, navItem) {
+  const tabs = ['orders', 'favorites', 'addresses', 'payments', 'settings'];
+  tabs.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tabId ? '' : 'none';
+  });
+
+  document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('active'));
+  if (navItem) navItem.classList.add('active');
+}
+
+// ── Se déconnecter ──
+function logoutUser() {
+  if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+    logout();
+  }
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const count = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = count;
+}
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+  await loadProfile();
+});
+</script>
+</body>
+</html>

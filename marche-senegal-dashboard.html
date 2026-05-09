@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tableau de bord — Marché Sénégal Vendeur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --blue:#1565C0;--bluep:#E3F2FD;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;
+  --sidebar-w:240px;--topbar-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ══ FLAG ══ */
+.flag{display:flex;width:26px;height:16px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;
+  width:var(--sidebar-w);z-index:100;
+  background:var(--dark);
+  display:flex;flex-direction:column;
+  transition:transform .3s;
+}
+.sb-logo{
+  display:flex;align-items:center;gap:9px;
+  padding:20px 20px 16px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sb-logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green)}
+.sb-shop{
+  padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sb-shop-row{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:38px;height:38px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-shop-name{font-size:.86rem;font-weight:600;color:#fff}
+.sb-shop-status{font-size:.7rem;color:#4CAF50;margin-top:1px;display:flex;align-items:center;gap:4px}
+.sb-status-dot{width:6px;height:6px;border-radius:50%;background:#4CAF50}
+.sb-plan{display:inline-block;background:rgba(230,168,23,.2);color:var(--gold);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:4px}
+
+.sb-nav{flex:1;overflow-y:auto;padding:10px 0}
+.sb-section-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.3);padding:14px 20px 6px}
+.sb-item{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 20px;cursor:pointer;
+  font-size:.86rem;font-weight:500;color:rgba(255,255,255,.55);
+  transition:all .18s;position:relative;border-radius:0;
+}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.sb-item.active{background:rgba(27,107,58,.3);color:#fff}
+.sb-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);border-radius:0 2px 2px 0}
+.sb-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px;min-width:18px;text-align:center}
+.sb-badge.gold{background:var(--gold);color:var(--dark)}
+
+.sb-bottom{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-help{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;background:rgba(255,255,255,.06);cursor:pointer;transition:background .18s;margin-bottom:8px}
+.sb-help:hover{background:rgba(255,255,255,.1)}
+.sb-help-text{font-size:.8rem;color:rgba(255,255,255,.55)}
+.sb-logout{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:9px;cursor:pointer;font-size:.8rem;color:rgba(255,255,255,.4);transition:all .18s}
+.sb-logout:hover{color:var(--red);background:rgba(192,57,43,.1)}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  position:fixed;top:0;left:var(--sidebar-w);right:0;z-index:90;
+  height:var(--topbar-h);
+  background:rgba(250,250,247,.97);
+  backdrop-filter:blur(16px);
+  border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 28px;gap:14px;
+}
+.tb-title{font-size:1.05rem;font-weight:600;color:var(--dark);flex-shrink:0}
+.tb-search{
+  flex:1;max-width:360px;
+  display:flex;align-items:center;
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:99px;padding:0 5px 0 14px;height:36px;
+  transition:border-color .2s;
+}
+.tb-search:focus-within{border-color:var(--green)}
+.tb-search input{flex:1;border:none;outline:none;font-size:.84rem;color:var(--text);background:transparent}
+.tb-search input::placeholder{color:var(--muted)}
+.tb-search-btn{width:28px;height:28px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;transition:background .18s}
+.tb-search-btn:hover{background:var(--gl)}
+.tb-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.tb-btn{
+  position:relative;width:38px;height:38px;border-radius:50%;
+  border:1.5px solid var(--border);background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.95rem;transition:all .18s;
+}
+.tb-btn:hover{border-color:var(--green);background:var(--gp)}
+.tb-notif-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.tb-profile{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:99px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .18s}
+.tb-profile:hover{border-color:var(--green);background:var(--gp)}
+.tb-profile-av{width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff}
+.tb-profile-name{font-size:.82rem;font-weight:500;color:var(--text)}
+.hamburger-btn{display:none;width:38px;height:38px;border-radius:9px;border:1.5px solid var(--border);background:#fff;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0}
+.hamburger-btn span{display:block;width:16px;height:2px;background:var(--text);border-radius:2px}
+
+/* ══ MAIN CONTENT ══ */
+.main{
+  margin-left:var(--sidebar-w);
+  margin-top:var(--topbar-h);
+  padding:24px 28px 60px;
+  min-height:calc(100vh - var(--topbar-h));
+}
+
+/* ══ PAGE SECTIONS ══ */
+.page-section{display:none}
+.page-section.active{display:block}
+
+/* ══ DASHBOARD PAGE ══ */
+
+/* Welcome bar */
+.welcome-bar{
+  background:linear-gradient(135deg,var(--dark),#1a4a2e);
+  border-radius:var(--radius);padding:22px 26px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:22px;
+  position:relative;overflow:hidden;
+}
+.welcome-bar::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.15),transparent 70%)}
+.wb-left{position:relative;z-index:1}
+.wb-greeting{font-size:.8rem;color:rgba(255,255,255,.5);margin-bottom:4px}
+.wb-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#fff}
+.wb-market{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.wb-open{background:rgba(76,175,80,.2);border:1px solid rgba(76,175,80,.3);color:#4CAF50;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.wb-right{display:flex;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
+.wb-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:99px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.wb-btn-primary{background:var(--green);color:#fff}
+.wb-btn-primary:hover{background:var(--gl)}
+.wb-btn-gold{background:var(--gold);color:var(--dark)}
+.wb-btn-gold:hover{filter:brightness(1.08)}
+
+/* KPI Cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-card{
+  background:#fff;border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:18px;
+  transition:all .22s;cursor:pointer;
+}
+.kpi-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.kpi-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ki-green{background:var(--gp)}
+.ki-gold{background:var(--gdl)}
+.ki-blue{background:var(--bluep)}
+.ki-red{background:var(--rp)}
+.kpi-change{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:99px}
+.kpi-change.up{background:var(--gp);color:var(--green)}
+.kpi-change.down{background:var(--rp);color:var(--red)}
+.kpi-change.flat{background:#f0f0f0;color:var(--muted)}
+.kpi-val{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--dark);line-height:1;margin-bottom:4px}
+.kpi-label{font-size:.76rem;color:var(--muted);font-weight:500}
+.kpi-sub{font-size:.7rem;color:var(--muted);margin-top:3px}
+
+/* Charts row */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.chart-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px}
+.cc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.cc-title{font-size:.92rem;font-weight:600;color:var(--dark)}
+.cc-period{display:flex;gap:5px}
+.cc-per-btn{padding:4px 10px;border-radius:99px;font-size:.72rem;font-weight:500;border:1px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s}
+.cc-per-btn.active{background:var(--green);border-color:var(--green);color:#fff}
+
+/* Mini bar chart */
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:80px;padding-top:8px}
+.mc-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.mc-bar{width:100%;border-radius:4px 4px 0 0;background:var(--green);transition:height .4s ease;min-height:4px}
+.mc-bar.gold{background:var(--gold)}
+.mc-bar.dim{background:var(--border)}
+.mc-label{font-size:.58rem;color:var(--muted)}
+.mc-val{font-size:.58rem;font-weight:600;color:var(--dark)}
+
+/* Donut chart */
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut{width:90px;height:90px;flex-shrink:0;position:relative}
+.donut svg{transform:rotate(-90deg)}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-pct{font-size:.96rem;font-weight:700;color:var(--dark)}
+.donut-sub{font-size:.6rem;color:var(--muted)}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1}
+.dl-item{display:flex;align-items:center;gap:7px;font-size:.76rem;color:var(--text)}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* 2-col grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+
+/* Orders table */
+.table-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.tc-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.tc-title{font-size:.92rem;font-weight:600;color:var(--dark)}
+.tc-link{font-size:.78rem;color:var(--green);font-weight:600;cursor:pointer}
+.tc-link:hover{text-decoration:underline}
+.orders-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.orders-table th{background:#fafcfa;padding:10px 16px;text-align:left;font-size:.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.orders-table td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text)}
+.orders-table tr:last-child td{border-bottom:none}
+.orders-table tr:hover td{background:#fafcfa}
+.order-status{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px}
+.os-wait{background:var(--gdl);color:#8A6100}
+.os-go{background:var(--bluep);color:var(--blue)}
+.os-done{background:var(--gp);color:var(--green)}
+.os-cancel{background:var(--rp);color:var(--red)}
+.order-action{color:var(--green);font-size:.78rem;font-weight:600;cursor:pointer}
+.order-action:hover{text-decoration:underline}
+
+/* Top products */
+.prod-list{display:flex;flex-direction:column;gap:0}
+.prod-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .18s;cursor:pointer}
+.prod-row:last-child{border-bottom:none}
+.prod-row:hover{background:#fafcfa}
+.pr-rank{width:22px;height:22px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--green);flex-shrink:0}
+.pr-rank.gold{background:var(--gdl);color:#8A6100}
+.pr-img{width:40px;height:40px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;border:1px solid var(--border)}
+.pr-info{flex:1;min-width:0}
+.pr-name{font-size:.84rem;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-cat{font-size:.7rem;color:var(--muted)}
+.pr-right{text-align:right;flex-shrink:0}
+.pr-sold{font-size:.82rem;font-weight:600;color:var(--dark)}
+.pr-rev{font-size:.7rem;color:var(--green);margin-top:1px}
+
+/* Activity feed */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.act-item{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.ai-green{background:var(--gp)}.ai-gold{background:var(--gdl)}.ai-red{background:var(--rp)}.ai-blue{background:var(--bluep)}
+.act-text{font-size:.82rem;color:var(--text);line-height:1.5;flex:1}
+.act-text strong{color:var(--dark);font-weight:600}
+.act-time{font-size:.7rem;color:var(--muted);flex-shrink:0;margin-top:2px}
+
+/* Stock alerts */
+.stock-list{display:flex;flex-direction:column;gap:0}
+.stock-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border)}
+.stock-item:last-child{border-bottom:none}
+.st-img{width:36px;height:36px;border-radius:7px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.1rem;border:1px solid var(--border);flex-shrink:0}
+.st-info{flex:1;min-width:0}
+.st-name{font-size:.82rem;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-stock{font-size:.72rem;color:var(--muted);margin-top:1px}
+.st-badge{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.stb-low{background:var(--gdl);color:#8A6100}
+.stb-out{background:var(--rp);color:var(--red)}
+.st-action{font-size:.76rem;color:var(--green);font-weight:600;cursor:pointer;flex-shrink:0}
+
+/* ══ PRODUCTS PAGE ══ */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.ph-title{font-size:1.1rem;font-weight:600;color:var(--dark)}
+.ph-btn{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:99px;font-size:.84rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.ph-btn-primary{background:var(--green);color:#fff;box-shadow:0 3px 14px rgba(27,107,58,.25)}
+.ph-btn-primary:hover{background:var(--gl)}
+.ph-btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.ph-btn-outline:hover{border-color:var(--green);color:var(--green)}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-input{height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;transition:border-color .2s;background:#fff}
+.filter-input:focus{border-color:var(--green)}
+.filter-select{height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;cursor:pointer;background:#fff;color:var(--text)}
+.filter-btn{padding:6px 14px;border-radius:99px;font-size:.78rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s}
+.filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+
+.prod-table-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.prod-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.prod-table th{background:#fafcfa;padding:10px 16px;text-align:left;font-size:.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.prod-table td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.prod-table tr:last-child td{border-bottom:none}
+.prod-table tr:hover td{background:#fafcfa}
+.pt-img{width:44px;height:44px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.3rem;border:1px solid var(--border);flex-shrink:0}
+.pt-name{font-weight:600;color:var(--dark);margin-bottom:2px}
+.pt-cat{font-size:.72rem;color:var(--muted)}
+.pt-stock-ok{color:var(--green);font-weight:600}
+.pt-stock-low{color:var(--gold);font-weight:600}
+.pt-stock-out{color:var(--red);font-weight:600}
+.pt-status{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:99px}
+.pts-active{background:var(--gp);color:var(--green)}
+.pts-paused{background:#f0f0f0;color:var(--muted)}
+.pt-actions{display:flex;gap:6px}
+.pta-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .18s}
+.pta-btn:hover{border-color:var(--green);background:var(--gp)}
+.pta-btn.del:hover{border-color:var(--red);background:var(--rp)}
+
+/* ══ COMMANDES PAGE ══ */
+.orders-filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.of-btn{padding:7px 14px;border-radius:99px;font-size:.8rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s}
+.of-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.order-cards{display:flex;flex-direction:column;gap:12px}
+.order-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .22s}
+.order-card:hover{box-shadow:var(--shadow)}
+.oc-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.oc-num{font-size:.86rem;font-weight:700;color:var(--dark)}
+.oc-date{font-size:.76rem;color:var(--muted)}
+.oc-status{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:99px;margin-left:auto}
+.oc-body{padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.oc-items{display:flex;gap:7px}
+.oc-item-img{width:48px;height:48px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.oc-info{flex:1;min-width:160px}
+.oc-client{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:2px}
+.oc-detail{font-size:.76rem;color:var(--muted)}
+.oc-amount{font-size:1rem;font-weight:700;color:var(--green);flex-shrink:0}
+.oc-actions{display:flex;gap:7px;padding:0 18px 14px;flex-wrap:wrap}
+.oca-btn{padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .18s}
+.oca-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.oca-btn-primary{background:var(--green);border-color:var(--green);color:#fff}
+.oca-btn-primary:hover{background:var(--gl);color:#fff}
+
+/* ══ PROMOTIONS PAGE ══ */
+.promo-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:22px}
+.promo-card-item{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .22s}
+.promo-card-item:hover{box-shadow:var(--shadow)}
+.pci-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.pci-type{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.pci-type.code{color:var(--green)}
+.pci-type.solde{color:var(--blue)}
+.pci-type.offre{color:var(--gold)}
+.pci-status{font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px}
+.pci-active{background:var(--gp);color:var(--green)}
+.pci-expired{background:#f0f0f0;color:var(--muted)}
+.pci-code{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+.pci-desc{font-size:.8rem;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.pci-stats{display:flex;gap:16px}
+.pcis-val{font-size:.88rem;font-weight:600;color:var(--dark)}
+.pcis-lbl{font-size:.68rem;color:var(--muted)}
+.pci-actions{display:flex;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.pci-btn{flex:1;padding:7px 0;border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .18s;text-align:center}
+.pci-btn:hover{border-color:var(--green);color:var(--green)}
+.pci-btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.pci-btn.primary:hover{background:var(--gl)}
+
+/* New promo form */
+.new-promo-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:22px}
+.npc-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px}
+.promo-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:18px}
+.ptg-btn{padding:12px 10px;border-radius:10px;border:1.5px solid var(--border);background:#fff;text-align:center;cursor:pointer;transition:all .18s}
+.ptg-btn:hover,.ptg-btn.selected{border-color:var(--green);background:var(--gp)}
+.ptg-icon{font-size:1.4rem;margin-bottom:5px}
+.ptg-name{font-size:.76rem;font-weight:600;color:var(--dark)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.form-field{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:.8rem;font-weight:600;color:var(--text)}
+.form-input{height:40px;border:1.5px solid var(--border);border-radius:8px;padding:0 12px;font-size:.86rem;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--green)}
+.form-preview{background:var(--dark);border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fp-label{font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:3px}
+.fp-val{font-size:.92rem;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif}
+.promo-submit{background:var(--green);color:#fff;border:none;border-radius:99px;padding:11px 24px;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s}
+.promo-submit:hover{background:var(--gl)}
+
+/* ══ SIDEBAR OVERLAY ══ */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}
+.sidebar-overlay.show{display:block}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.show{display:block}
+  .topbar{left:0}
+  .main{margin-left:0}
+  .hamburger-btn{display:flex}
+  .tb-search{display:none}
+  .two-col{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  :root{--topbar-h:56px}
+  .main{padding:16px 16px 80px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi-val{font-size:1.4rem}
+  .welcome-bar{padding:16px 18px}
+  .wb-name{font-size:1.2rem}
+  .charts-row{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .promo-type-grid{grid-template-columns:repeat(2,1fr)}
+  .orders-table{font-size:.76rem;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(max-width:400px){
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .topbar{padding:0 14px;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    <span class="sb-logo-text">Marché Sénégal</span>
+  </div>
+  <div class="sb-shop">
+    <div class="sb-shop-row">
+      <div class="sb-avatar">MF</div>
+      <div>
+        <div class="sb-shop-name">Mode Fatou Ndoye</div>
+        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+        <div class="sb-plan">⭐ Plan Pro</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section-label">Principal</div>
+    <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="sb-icon">📊</span>Tableau de bord</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-produits.html'"><span class="sb-icon">📦</span>Mes produits<span class="sb-badge gold" id="sb-badge-products">—</span></div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-commandes.html'"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge" id="sb-badge-orders">—</span></div>
+    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions<span class="sb-badge gold">3</span></div>
+    <div class="sb-section-label">Boutique</div>
+    <div class="sb-item" onclick="toast('Visite virtuelle...')"><span class="sb-icon">🎥</span>Visite virtuelle</div>
+    <div class="sb-item" onclick="toast('Messages...')"><span class="sb-icon">💬</span>Messages<span class="sb-badge">12</span></div>
+    <div class="sb-item" onclick="toast('Avis clients...')"><span class="sb-icon">⭐</span>Avis clients</div>
+    <div class="sb-section-label">Finance</div>
+    <div class="sb-item" onclick="toast('Mes revenus...')"><span class="sb-icon">💰</span>Mes revenus</div>
+    <div class="sb-item" onclick="toast('Factures...')"><span class="sb-icon">📄</span>Factures</div>
+    <div class="sb-section-label">Compte</div>
+    <div class="sb-item" onclick="toast('Paramètres boutique...')"><span class="sb-icon">⚙️</span>Paramètres boutique</div>
+    <div class="sb-item" onclick="toast('Mon profil...')"><span class="sb-icon">👤</span>Mon profil</div>
+    <div class="sb-item" id="sb-see-shop" onclick="window.location.href='marche-senegal-accueil.html'"><span class="sb-icon">🌐</span>Voir ma boutique</div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-help" onclick="toast('Aide & Support...')">
+      <span style="font-size:1rem">❓</span>
+      <span class="sb-help-text">Aide & Support</span>
+    </div>
+    <div class="sb-logout" onclick="logoutVendeur()">
+      <span>🚪</span> Se déconnecter
+    </div>
+  </div>
+</aside>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="tb-title" id="tb-title">Tableau de bord</div>
+  <div class="tb-search">
+    <input type="text" placeholder="Rechercher commande, produit..."/>
+    <button class="tb-search-btn">🔍</button>
+  </div>
+  <div class="tb-actions">
+    <button class="tb-btn" onclick="toast('Notifications...')">
+      🔔<div class="tb-notif-badge">8</div>
+    </button>
+    <button class="tb-btn" onclick="toast('Aide...')">❓</button>
+    <div class="tb-profile" onclick="toast('Profil...')">
+      <div class="tb-profile-av">MF</div>
+      <span class="tb-profile-name">Fatou Ndoye</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page-section active" id="page-dashboard">
+
+    <div class="welcome-bar">
+      <div class="wb-left">
+        <div class="wb-greeting">Bonjour 👋</div>
+        <div class="wb-name">Fatou Ndoye</div>
+        <div class="wb-market">
+          🏛️ Marché Sandaga · Allée 3
+          <span class="wb-open">● Boutique ouverte</span>
+        </div>
+      </div>
+      <div class="wb-right">
+        <button class="wb-btn wb-btn-primary" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</button>
+        <button class="wb-btn wb-btn-gold" onclick="showPage('promotions',null);toast('Créer une promotion...')">🎯 Créer une promo</button>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon ki-green">💰</div>
+          <div class="kpi-change up">↑ +18%</div>
+        </div>
+        <div class="kpi-val">342 500</div>
+        <div class="kpi-label">Revenus totaux (FCFA)</div>
+        <div class="kpi-sub" id="kpi0-sub">commandes livrées</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon ki-gold">🛒</div>
+          <div class="kpi-change up">↑ +12%</div>
+        </div>
+        <div class="kpi-val">28</div>
+        <div class="kpi-label">Commandes ce mois</div>
+        <div class="kpi-sub" id="kpi1-sub">5 en attente</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon ki-blue">📦</div>
+          <div class="kpi-change flat">→ actifs</div>
+        </div>
+        <div class="kpi-val" id="kpi2-val">—</div>
+        <div class="kpi-label">Produits actifs</div>
+        <div class="kpi-sub" id="kpi2-sub">dans votre boutique</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon ki-red">⭐</div>
+          <div class="kpi-change flat">→ stable</div>
+        </div>
+        <div class="kpi-val">4.8</div>
+        <div class="kpi-label">Note moyenne</div>
+        <div class="kpi-sub">234 avis clients</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="cc-header">
+          <div class="cc-title">Revenus (FCFA)</div>
+          <div class="cc-period">
+            <button class="cc-per-btn active">7J</button>
+            <button class="cc-per-btn" onclick="this.parentElement.querySelectorAll('.cc-per-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">1M</button>
+            <button class="cc-per-btn" onclick="this.parentElement.querySelectorAll('.cc-per-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">3M</button>
+          </div>
+        </div>
+        <div class="mini-chart">
+          <div class="mc-bar-wrap"><div class="mc-bar" style="height:35%"></div><div class="mc-label">Lun</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar" style="height:55%"></div><div class="mc-label">Mar</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar" style="height:40%"></div><div class="mc-label">Mer</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar" style="height:80%"></div><div class="mc-label">Jeu</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar" style="height:95%"></div><div class="mc-label">Ven</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar gold" style="height:100%"></div><div class="mc-label">Sam</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:20%"></div><div class="mc-label">Dim</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:.74rem;color:var(--muted)">
+          <span>Total semaine : <strong style="color:var(--green)">342 500 FCFA</strong></span>
+          <span>Moy. jour : <strong style="color:var(--text)">48 928 FCFA</strong></span>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="cc-header"><div class="cc-title">Répartition des ventes</div></div>
+        <div class="donut-wrap">
+          <div class="donut">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#D8E8DE" stroke-width="12"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#1B6B3A" stroke-width="12" stroke-dasharray="132 88" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#E6A817" stroke-width="12" stroke-dasharray="52 168" stroke-dashoffset="-132" stroke-linecap="round"/>
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#4A90D9" stroke-width="12" stroke-dasharray="26 194" stroke-dashoffset="-184" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center"><div class="donut-pct">48%</div><div class="donut-sub">Boubou</div></div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div><span>Boubou wax — 48%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--gold)"></div><span>Bazin brodé — 28%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:#4A90D9"></div><span>Robe wax — 14%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--border)"></div><span>Autres — 10%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two col -->
+    <div class="two-col">
+
+      <!-- Recent orders -->
+      <div class="table-card">
+        <div class="tc-header">
+          <div class="tc-title">🛒 Commandes récentes</div>
+          <div class="tc-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">Voir tout →</div>
+        </div>
+        <table class="orders-table">
+          <thead>
+            <tr><th>Client</th><th>Produit</th><th>Montant</th><th>Statut</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Moussa Sow</td><td>Boubou wax L</td><td style="font-weight:600;color:var(--green)">15 300</td><td><span class="order-status os-wait">En attente</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
+            <tr><td>Aissatou Ba</td><td>Bazin brodé</td><td style="font-weight:600;color:var(--green)">25 000</td><td><span class="order-status os-go">En livraison</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
+            <tr><td>Ibrahima Fall</td><td>Tissu wax 6y</td><td style="font-weight:600;color:var(--green)">4 500</td><td><span class="order-status os-done">Livré</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
+            <tr><td>Rokhaya Faye</td><td>Robe wax M</td><td style="font-weight:600;color:var(--green)">9 500</td><td><span class="order-status os-wait">En attente</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
+            <tr><td>Cheikh Diop</td><td>Kaftan bazin</td><td style="font-weight:600;color:var(--green)">22 000</td><td><span class="order-status os-cancel">Annulé</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top products -->
+      <div class="table-card">
+        <div class="tc-header">
+          <div class="tc-title">🏆 Produits les plus vendus</div>
+          <div class="tc-link" onclick="window.location.href='marche-senegal-mes-produits.html'">Voir tout →</div>
+        </div>
+        <div class="prod-list">
+          <div class="prod-row">
+            <div class="pr-rank gold">1</div>
+            <div class="pr-img">👗</div>
+            <div class="pr-info"><div class="pr-name">Boubou wax tissé main</div><div class="pr-cat">Mode · Taille L</div></div>
+            <div class="pr-right"><div class="pr-sold">89 ventes</div><div class="pr-rev">1,36M FCFA</div></div>
+          </div>
+          <div class="prod-row">
+            <div class="pr-rank">2</div>
+            <div class="pr-img">🧵</div>
+            <div class="pr-info"><div class="pr-name">Bazin brodé cérémonie</div><div class="pr-cat">Mode · Homme</div></div>
+            <div class="pr-right"><div class="pr-sold">42 ventes</div><div class="pr-rev">1,05M FCFA</div></div>
+          </div>
+          <div class="prod-row">
+            <div class="pr-rank">3</div>
+            <div class="pr-img">👘</div>
+            <div class="pr-info"><div class="pr-name">Robe wax africaine</div><div class="pr-cat">Mode · Femme</div></div>
+            <div class="pr-right"><div class="pr-sold">67 ventes</div><div class="pr-rev">636k FCFA</div></div>
+          </div>
+          <div class="prod-row">
+            <div class="pr-rank">4</div>
+            <div class="pr-img">🎨</div>
+            <div class="pr-info"><div class="pr-name">Tissu wax hollandais</div><div class="pr-cat">Tissu · 6 yards</div></div>
+            <div class="pr-right"><div class="pr-sold">112 ventes</div><div class="pr-rev">504k FCFA</div></div>
+          </div>
+          <div class="prod-row">
+            <div class="pr-rank">5</div>
+            <div class="pr-img">👒</div>
+            <div class="pr-info"><div class="pr-name">Kaftan bazin riche</div><div class="pr-cat">Mode · Homme</div></div>
+            <div class="pr-right"><div class="pr-sold">28 ventes</div><div class="pr-rev">616k FCFA</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom two col -->
+    <div class="two-col">
+
+      <!-- Activity -->
+      <div class="table-card">
+        <div class="tc-header"><div class="tc-title">🔔 Activité récente</div></div>
+        <div class="activity-list">
+          <div class="act-item"><div class="act-icon ai-green">🛒</div><div class="act-text"><strong>Nouvelle commande</strong> de Moussa Sow — Boubou wax L · 15 300 FCFA</div><div class="act-time">5 min</div></div>
+          <div class="act-item"><div class="act-icon ai-gold">⭐</div><div class="act-text"><strong>Avis 5 étoiles</strong> reçu de Aissatou Ba — "Tissu magnifique, livraison rapide !"</div><div class="act-time">23 min</div></div>
+          <div class="act-item"><div class="act-icon ai-blue">💬</div><div class="act-text"><strong>Message</strong> de Ibrahima Fall — "Est-ce que vous avez le boubou en taille XXL ?"</div><div class="act-time">1h</div></div>
+          <div class="act-item"><div class="act-icon ai-green">💰</div><div class="act-text"><strong>Paiement reçu</strong> — 25 000 FCFA via Wave pour commande #MS-2025-00841</div><div class="act-time">2h</div></div>
+          <div class="act-item"><div class="act-icon ai-red">📦</div><div class="act-text"><strong>Stock faible</strong> — Boubou wax taille L, il reste seulement <strong>4 pièces</strong></div><div class="act-time">3h</div></div>
+        </div>
+      </div>
+
+      <!-- Stock alerts -->
+      <div class="table-card">
+        <div class="tc-header">
+          <div class="tc-title">⚠️ Alertes stock</div>
+          <div class="tc-link" onclick="showPage('produits',null)">Gérer →</div>
+        </div>
+        <div class="stock-list">
+          <div class="stock-item"><div class="st-img">👗</div><div class="st-info"><div class="st-name">Boubou wax tissé main — Taille L</div><div class="st-stock">4 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img">🎨</div><div class="st-info"><div class="st-name">Tissu wax hollandais XXXL</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img">🥻</div><div class="st-info"><div class="st-name">Ensemble 3 pièces cérémonie</div><div class="st-stock">2 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img">👘</div><div class="st-info"><div class="st-name">Robe wax africaine — Taille S</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ PRODUITS ══ -->
+  <div class="page-section" id="page-produits">
+    <div class="page-header">
+      <div class="ph-title">📦 Mes produits</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="ph-btn ph-btn-outline" onclick="toast('Importer des produits...')">↑ Importer</button>
+        <button class="ph-btn ph-btn-primary" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Nouveau produit</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <input class="filter-input" type="text" placeholder="🔍 Rechercher un produit..."/>
+      <select class="filter-select"><option>Toutes catégories</option><option>Boubou</option><option>Bazin</option><option>Tissu wax</option><option>Robe</option></select>
+      <button class="filter-btn active" onclick="filterTgl(this)">Tous (48)</button>
+      <button class="filter-btn" onclick="filterTgl(this)">Actifs (44)</button>
+      <button class="filter-btn" onclick="filterTgl(this)">En pause (4)</button>
+      <button class="filter-btn" onclick="filterTgl(this)">Rupture (2)</button>
+    </div>
+    <div class="prod-table-card">
+      <table class="prod-table">
+        <thead><tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Ventes</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👗</div><div><div class="pt-name">Boubou wax tissé main</div><div class="pt-cat">Mode · Ref: MFN-BWX-001</div></div></div></td><td style="font-weight:600">15 300 FCFA<br/><span style="font-size:.7rem;color:var(--muted);text-decoration:line-through">18 000</span></td><td class="pt-stock-low">4 restants</td><td>89 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🧵</div><div><div class="pt-name">Bazin brodé cérémonie</div><div class="pt-cat">Mode · Ref: MFN-BAZ-002</div></div></div></td><td style="font-weight:600">25 000 FCFA</td><td class="pt-stock-ok">12 restants</td><td>42 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👘</div><div><div class="pt-name">Robe wax africaine brodée</div><div class="pt-cat">Mode · Ref: MFN-RBW-003</div></div></div></td><td style="font-weight:600">9 500 FCFA</td><td class="pt-stock-ok">18 restants</td><td>67 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🎨</div><div><div class="pt-name">Tissu wax hollandais 6y</div><div class="pt-cat">Tissu · Ref: MFN-TWX-004</div></div></div></td><td style="font-weight:600">4 500 FCFA</td><td class="pt-stock-out">0 — Rupture</td><td>112 ventes</td><td><span class="pt-status pts-paused">En pause</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🥻</div><div><div class="pt-name">Ensemble 3 pièces femme</div><div class="pt-cat">Mode · Ref: MFN-ENS-005</div></div></div></td><td style="font-weight:600">28 000 FCFA<br/><span style="font-size:.7rem;color:var(--muted);text-decoration:line-through">35 000</span></td><td class="pt-stock-low">2 restants</td><td>33 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👒</div><div><div class="pt-name">Kaftan bazin riche homme</div><div class="pt-cat">Mode · Ref: MFN-KAF-006</div></div></div></td><td style="font-weight:600">22 000 FCFA</td><td class="pt-stock-ok">7 restants</td><td>28 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ COMMANDES ══ -->
+  <div class="page-section" id="page-commandes">
+    <div class="page-header">
+      <div class="ph-title">🛒 Mes commandes</div>
+      <div style="font-size:.86rem;color:var(--muted)">5 commandes en attente</div>
+    </div>
+    <div class="orders-filters">
+      <button class="of-btn active" onclick="filterOf(this)">Toutes (28)</button>
+      <button class="of-btn" onclick="filterOf(this)">En attente (5)</button>
+      <button class="of-btn" onclick="filterOf(this)">En livraison (3)</button>
+      <button class="of-btn" onclick="filterOf(this)">Livrées (18)</button>
+      <button class="of-btn" onclick="filterOf(this)">Annulées (2)</button>
+    </div>
+    <div class="order-cards">
+      <div class="order-card">
+        <div class="oc-header">
+          <div class="oc-num">#MS-2025-00847</div>
+          <div class="oc-date">Aujourd'hui à 14h23</div>
+          <div class="oc-status os-wait">En attente</div>
+        </div>
+        <div class="oc-body">
+          <div class="oc-items"><div class="oc-item-img">👗</div></div>
+          <div class="oc-info">
+            <div class="oc-client">Moussa Sow · 📱 +221 77 XXX XX XX</div>
+            <div class="oc-detail">Boubou wax L · Taille L · Bleu/Or · Wave</div>
+            <div class="oc-detail" style="margin-top:3px">📍 Cité Keur Gorgui, Villa 12 · Dakar</div>
+          </div>
+          <div class="oc-amount">15 300 FCFA</div>
+        </div>
+        <div class="oc-actions">
+          <button class="oca-btn oca-btn-primary" onclick="toast('✓ Commande confirmée !')">✓ Confirmer</button>
+          <button class="oca-btn" onclick="toast('Contacter le client...')">💬 Contacter</button>
+          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
+          <button class="oca-btn" style="color:var(--red);border-color:var(--red)" onclick="toast('Commande annulée')">✕ Annuler</button>
+        </div>
+      </div>
+
+      <div class="order-card">
+        <div class="oc-header">
+          <div class="oc-num">#MS-2025-00841</div>
+          <div class="oc-date">Hier à 09h15</div>
+          <div class="oc-status os-go">En livraison</div>
+        </div>
+        <div class="oc-body">
+          <div class="oc-items"><div class="oc-item-img">🧵</div></div>
+          <div class="oc-info">
+            <div class="oc-client">Aissatou Ba · 📱 +221 78 XXX XX XX</div>
+            <div class="oc-detail">Bazin brodé cérémonie · Taille XL · Orange Money</div>
+            <div class="oc-detail" style="margin-top:3px">📍 Médina, Rue 12 · Dakar</div>
+          </div>
+          <div class="oc-amount">25 000 FCFA</div>
+        </div>
+        <div class="oc-actions">
+          <button class="oca-btn" onclick="toast('Suivre le livreur...')">📍 Suivre livreur</button>
+          <button class="oca-btn" onclick="toast('Contacter le client...')">💬 Contacter</button>
+          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
+        </div>
+      </div>
+
+      <div class="order-card">
+        <div class="oc-header">
+          <div class="oc-num">#MS-2025-00835</div>
+          <div class="oc-date">Il y a 3 jours</div>
+          <div class="oc-status os-done">Livré ✓</div>
+        </div>
+        <div class="oc-body">
+          <div class="oc-items"><div class="oc-item-img">🎨</div><div class="oc-item-img">👘</div></div>
+          <div class="oc-info">
+            <div class="oc-client">Ibrahima Fall · 📱 +221 76 XXX XX XX</div>
+            <div class="oc-detail">2 articles · Tissu wax + Robe wax · Wave</div>
+            <div class="oc-detail" style="margin-top:3px">📍 Thiès centre · Livré le 28 Avril</div>
+          </div>
+          <div class="oc-amount">14 000 FCFA</div>
+        </div>
+        <div class="oc-actions">
+          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
+          <button class="oca-btn" onclick="toast('Télécharger la facture...')">📄 Facture</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROMOTIONS ══ -->
+  <div class="page-section" id="page-promotions">
+    <div class="page-header">
+      <div class="ph-title">🎯 Mes promotions</div>
+      <button class="ph-btn ph-btn-primary" onclick="toast('Créer une promotion...')">+ Nouvelle promotion</button>
+    </div>
+
+    <!-- Active promos -->
+    <div style="font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:12px">Promotions actives (3)</div>
+    <div class="promo-cards">
+      <div class="promo-card-item">
+        <div class="pci-header">
+          <div class="pci-type code">🏷️ Code promo</div>
+          <div class="pci-status pci-active">● Actif</div>
+        </div>
+        <div class="pci-code">FATOU15</div>
+        <div class="pci-desc">-15% sur toute la boutique · Valable jusqu'à ce soir 20h · Max 50 utilisations</div>
+        <div class="pci-stats">
+          <div><div class="pcis-val">23/50</div><div class="pcis-lbl">Utilisations</div></div>
+          <div><div class="pcis-val">-51 750 FCFA</div><div class="pcis-lbl">Économies offertes</div></div>
+        </div>
+        <div class="pci-actions">
+          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
+          <div class="pci-btn primary" onclick="toast('Code copié !')">📋 Copier</div>
+          <div class="pci-btn" onclick="toast('Promo partagée !')">↗ Partager</div>
+        </div>
+      </div>
+
+      <div class="promo-card-item">
+        <div class="pci-header">
+          <div class="pci-type solde">💸 Soldes</div>
+          <div class="pci-status pci-active">● Actif</div>
+        </div>
+        <div class="pci-code">-20% Cérémonie</div>
+        <div class="pci-desc">20% de réduction sur tous les ensembles cérémonie · Valable 7 jours</div>
+        <div class="pci-stats">
+          <div><div class="pcis-val">8 ventes</div><div class="pcis-lbl">Ce mois</div></div>
+          <div><div class="pcis-val">5 jours</div><div class="pcis-lbl">Restants</div></div>
+        </div>
+        <div class="pci-actions">
+          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
+          <div class="pci-btn" onclick="toast('Arrêter la promo...')">⏸ Mettre en pause</div>
+        </div>
+      </div>
+
+      <div class="promo-card-item">
+        <div class="pci-header">
+          <div class="pci-type offre">🎁 Offre spéciale</div>
+          <div class="pci-status pci-active">● Actif</div>
+        </div>
+        <div class="pci-code">2+1 Tissus</div>
+        <div class="pci-desc">Achetez 2 tissus wax, obtenez le 3ème gratuit · Valable cette semaine</div>
+        <div class="pci-stats">
+          <div><div class="pcis-val">14 ventes</div><div class="pcis-lbl">Ce mois</div></div>
+          <div><div class="pcis-val">3 jours</div><div class="pcis-lbl">Restants</div></div>
+        </div>
+        <div class="pci-actions">
+          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
+          <div class="pci-btn" onclick="toast('Partager...')">↗ Partager</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New promo form -->
+    <div class="new-promo-card">
+      <div class="npc-title">✨ Créer une nouvelle promotion</div>
+      <div class="promo-type-grid">
+        <div class="ptg-btn selected" onclick="selPromoType(this)"><div class="ptg-icon">🏷️</div><div class="ptg-name">Code promo</div></div>
+        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">💸</div><div class="ptg-name">Soldes</div></div>
+        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">🎁</div><div class="ptg-name">Offre spéciale</div></div>
+        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">📢</div><div class="ptg-name">Annonce</div></div>
+        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">⭐</div><div class="ptg-name">Produit vedette</div></div>
+        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">🚚</div><div class="ptg-name">Livraison gratuite</div></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-field"><div class="form-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex: SANDAGA20" id="promo-code-input" oninput="updatePreview()"/></div>
+        <div class="form-field"><div class="form-label">Réduction (%)</div><input class="form-input" type="number" placeholder="Ex: 20" id="promo-pct-input" min="1" max="80" oninput="updatePreview()"/></div>
+        <div class="form-field"><div class="form-label">Durée</div><select class="form-input"><option>1 jour</option><option>3 jours</option><option selected>7 jours</option><option>14 jours</option><option>30 jours</option></select></div>
+        <div class="form-field"><div class="form-label">Utilisations max.</div><input class="form-input" type="number" placeholder="Ex: 50" value="50"/></div>
+      </div>
+      <div class="form-preview" id="promo-preview">
+        <div><div class="fp-label">Aperçu du code</div><div class="fp-val" id="preview-code">SANDAGA20</div></div>
+        <div><div class="fp-label">Réduction</div><div class="fp-val" id="preview-pct">-20%</div></div>
+        <div><div class="fp-label">Durée</div><div class="fp-val">7 jours</div></div>
+      </div>
+      <button class="promo-submit" onclick="toast('✓ Promotion créée et activée !')">🎯 Activer la promotion</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="api.js"></script>
+<script src="marche-senegal-dashboard-script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mes produits — Marché Sénégal Vendeur</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;--topbar-h:56px;--seller-nav-h:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+.flag{display:flex;width:26px;height:16px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.tb-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
+.tb-breadcrumb{display:flex;align-items:center;gap:7px;font-size:.82rem;color:rgba(255,255,255,.4)}
+.tb-bc-link{cursor:pointer;color:rgba(255,255,255,.55);transition:color .18s}
+.tb-bc-link:hover{color:#fff}
+.tb-bc-sep{color:rgba(255,255,255,.2)}
+.tb-bc-current{color:rgba(255,255,255,.85);font-weight:500}
+.tb-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.tb-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
+.tb-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}
+.tb-btn-outline:hover{background:rgba(255,255,255,.18)}
+.tb-btn-green{background:var(--green);color:#fff}
+.tb-btn-green:hover{background:var(--gl)}
+
+/* SELLER NAV */
+.seller-nav{position:fixed;top:var(--topbar-h);left:0;right:0;z-index:190;height:var(--seller-nav-h);background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;overflow-x:auto;scrollbar-width:none}
+.seller-nav::-webkit-scrollbar{display:none}
+.sn-item{display:flex;align-items:center;gap:6px;padding:0 16px;height:var(--seller-nav-h);font-size:.84rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.sn-item:hover{color:var(--green)}
+.sn-item.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+
+/* MAIN */
+.main{margin-top:calc(var(--topbar-h) + var(--seller-nav-h));padding:22px 4vw 60px}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.sc-val{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--dark);margin-bottom:3px}
+.sc-label{font-size:.74rem;color:var(--muted)}
+.sc-change{font-size:.7rem;font-weight:600;margin-top:4px}
+.sc-up{color:var(--green)}.sc-down{color:var(--red)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.tb-search{display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 14px;height:38px;flex:1;min-width:200px;transition:border-color .2s}
+.tb-search:focus-within{border-color:var(--green)}
+.tb-search input{flex:1;border:none;outline:none;font-size:.84rem;color:var(--text);background:transparent}
+.tb-search input::placeholder{color:var(--muted)}
+.tb-search-btn{width:28px;height:28px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.72rem}
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ft{height:34px;padding:0 14px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text)}
+.ft.active,.ft:hover{background:var(--green);border-color:var(--green);color:#fff}
+.tb-sort{height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.8rem;outline:none;cursor:pointer;background:#fff;color:var(--text)}
+
+/* PRODUCTS GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+
+/* PRODUCT CARD */
+.prod-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .22s}
+.prod-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.pc-img{height:160px;background:#F0EAF8;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+.pc-img img{width:100%;height:100%;object-fit:cover}
+.pc-status{position:absolute;top:8px;left:8px;font-size:.64rem;font-weight:700;padding:3px 8px;border-radius:99px}
+.pcs-active{background:var(--gp);color:var(--green)}
+.pcs-paused{background:var(--gdl);color:#8A6100}
+.pcs-out{background:var(--rp);color:var(--red)}
+.pc-featured{position:absolute;top:8px;right:8px;background:var(--gold);color:var(--dark);font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.pc-body{padding:12px}
+.pc-name{font-size:.88rem;font-weight:600;color:var(--dark);margin-bottom:4px;line-height:1.3}
+.pc-stats{display:flex;gap:10px;margin-bottom:8px}
+.pcs-item{font-size:.72rem;color:var(--muted)}
+.pcs-item strong{color:var(--dark)}
+.pc-price{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.pc-price-val{font-size:.96rem;font-weight:700;color:var(--green)}
+.pc-price-old{font-size:.76rem;color:var(--muted);text-decoration:line-through}
+.pc-stock{font-size:.74rem;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.stock-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.stock-ok{background:var(--green)}.stock-low{background:var(--gold)}.stock-out{background:var(--red)}
+.pc-actions{display:flex;gap:6px}
+.pca-btn{flex:1;height:32px;border-radius:7px;font-size:.76rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:4px}
+.pca-btn:hover{border-color:var(--green);color:var(--green)}
+.pca-btn.edit{background:var(--green);border-color:var(--green);color:#fff}
+.pca-btn.edit:hover{background:var(--gl)}
+.pca-btn.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:80px 20px;color:var(--muted)}
+.es-icon{font-size:3.5rem;margin-bottom:14px}
+.es-title{font-size:1.1rem;font-weight:600;color:var(--dark);margin-bottom:7px}
+.es-sub{font-size:.86rem;line-height:1.65;margin-bottom:20px}
+.es-btn{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;border:none;border-radius:99px;padding:11px 24px;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s}
+.es-btn:hover{background:var(--gl)}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:80px;flex-direction:column;gap:14px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:var(--radius);padding:24px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)}
+.modal-title{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+.modal-sub{font-size:.84rem;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.modal-prod{background:var(--bg);border-radius:9px;padding:10px 13px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.mp-img{width:40px;height:40px;border-radius:7px;background:#F0EAF8;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.mp-name{font-size:.84rem;font-weight:600;color:var(--dark)}
+.mp-price{font-size:.76rem;color:var(--muted);margin-top:2px}
+.modal-btns{display:flex;gap:8px}
+.modal-btn{flex:1;height:40px;border-radius:9px;font-size:.86rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .2s}
+.modal-btn:hover{border-color:var(--green);color:var(--green)}
+.modal-btn-red{border-color:var(--red);color:var(--red)}
+.modal-btn-red:hover{background:var(--red);color:#fff}
+
+/* STOCK MODAL */
+.stock-input-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.si-label{font-size:.84rem;font-weight:500;color:var(--text);flex:1}
+.si-ctrl{display:flex;align-items:center;gap:8px}
+.si-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.si-btn:hover{border-color:var(--green);color:var(--green)}
+.si-num{font-size:1rem;font-weight:700;color:var(--dark);min-width:30px;text-align:center}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .tb-breadcrumb{display:none}
+}
+@media(max-width:600px){
+  :root{--topbar-h:50px}
+  .products-grid{grid-template-columns:repeat(2,1fr)}
+  .pc-img{height:130px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .main{padding:16px 3vw 40px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- MODAL SUPPRESSION -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal">
+    <div class="modal-title">🗑️ Supprimer ce produit ?</div>
+    <div class="modal-sub">Cette action est irréversible. Le produit sera retiré de votre boutique et ne sera plus visible par les acheteurs.</div>
+    <div class="modal-prod">
+      <div class="mp-img" id="del-img">👗</div>
+      <div>
+        <div class="mp-name" id="del-name">Nom du produit</div>
+        <div class="mp-price" id="del-price">Prix</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeDeleteModal()">Annuler</button>
+      <button class="modal-btn modal-btn-red" onclick="confirmDelete()">🗑️ Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STOCK -->
+<div class="modal-overlay" id="stock-modal">
+  <div class="modal">
+    <div class="modal-title">📦 Modifier le stock</div>
+    <div class="modal-prod">
+      <div class="mp-img">👗</div>
+      <div>
+        <div class="mp-name" id="stock-prod-name">Nom du produit</div>
+        <div class="mp-price" id="stock-prod-price">Prix</div>
+      </div>
+    </div>
+    <div class="stock-input-row">
+      <div class="si-label">Nouveau stock</div>
+      <div class="si-ctrl">
+        <button class="si-btn" onclick="changeStock(-1)">−</button>
+        <div class="si-num" id="stock-num">0</div>
+        <button class="si-btn" onclick="changeStock(1)">+</button>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeStockModal()">Annuler</button>
+      <button class="modal-btn" style="background:var(--green);color:#fff;border-color:var(--green)" onclick="confirmStock()">✓ Mettre à jour</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    Marché Sénégal
+  </div>
+  <div class="tb-breadcrumb">
+    <span class="tb-bc-link" onclick="window.location.href='marche-senegal-dashboard.html'">Dashboard</span>
+    <span class="tb-bc-sep">›</span>
+    <span class="tb-bc-current">Mes produits</span>
+  </div>
+  <div class="tb-actions">
+    <button class="tb-btn tb-btn-outline" onclick="window.location.href='marche-senegal-dashboard.html'">← Dashboard</button>
+    <button class="tb-btn tb-btn-green" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</button>
+  </div>
+</div>
+
+<!-- SELLER NAV -->
+<nav class="seller-nav">
+  <div class="sn-item" onclick="window.location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
+  <div class="sn-item active">📦 Mes produits</div>
+  <div class="sn-item" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter</div>
+  <div class="sn-item" onclick="window.location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
+  <div class="sn-item" onclick="var u=getCurrentUser();window.location.href='marche-senegal-boutique.html'+(u&&u.shop?'?id='+u.shop.id:'')">🏪 Ma boutique</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="sc-val" id="stat-total">—</div>
+      <div class="sc-label">Produits actifs</div>
+      <div class="sc-change sc-up" id="stat-total-change"></div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-sales">—</div>
+      <div class="sc-label">Ventes totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-low">—</div>
+      <div class="sc-label">Stock faible</div>
+      <div class="sc-change sc-down" id="stat-low-text"></div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-revenue">—</div>
+      <div class="sc-label">Revenus estimés</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="tb-search">
+      <input type="text" id="search-input" placeholder="Rechercher un produit..." oninput="filterProducts()"/>
+      <button class="tb-search-btn">🔍</button>
+    </div>
+    <div class="filter-tabs">
+      <button class="ft active" onclick="setFilter('all',this)">Tous</button>
+      <button class="ft" onclick="setFilter('active',this)">Actifs</button>
+      <button class="ft" onclick="setFilter('paused',this)">En pause</button>
+      <button class="ft" onclick="setFilter('low',this)">Stock faible</button>
+    </div>
+    <select class="tb-sort" onchange="sortProducts(this.value)">
+      <option value="date">Plus récents</option>
+      <option value="sales">Plus vendus</option>
+      <option value="price_asc">Prix croissant</option>
+      <option value="price_desc">Prix décroissant</option>
+      <option value="stock">Stock faible</option>
+    </select>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div id="products-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div style="font-size:.88rem;color:var(--muted)">Chargement de vos produits...</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+// ════════════════════════════════════════
+//   MES PRODUITS — Données dynamiques
+// ════════════════════════════════════════
+
+let allProducts = [];
+let currentFilter = 'all';
+let productToDelete = null;
+let productToStock = null;
+let newStock = 0;
+
+// ── Charger les produits ──
+async function loadProducts() {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  const result = await getMyProducts();
+
+  if (!result.success) {
+    document.getElementById('products-container').innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">❌</div>
+        <div class="es-title">Erreur de chargement</div>
+        <div class="es-sub">Impossible de charger vos produits</div>
+      </div>
+    `;
+    return;
+  }
+
+  allProducts = result.data;
+  updateStats();
+  renderProducts(allProducts);
+}
+
+// ── Mettre à jour les stats ──
+function updateStats() {
+  const active = allProducts.filter(p => p.status === 'ACTIVE').length;
+  const totalSales = allProducts.reduce((sum, p) => sum + p.totalSales, 0);
+  const lowStock = allProducts.filter(p => p.stock <= 5 && p.status === 'ACTIVE').length;
+  const revenue = allProducts.reduce((sum, p) => sum + (p.price * p.totalSales), 0);
+
+  document.getElementById('stat-total').textContent = active;
+  document.getElementById('stat-sales').textContent = totalSales;
+  document.getElementById('stat-low').textContent = lowStock;
+  document.getElementById('stat-revenue').textContent =
+    revenue > 0 ? (revenue/1000).toFixed(0) + 'K FCFA' : '0 FCFA';
+
+  if (lowStock > 0) {
+    document.getElementById('stat-low-text').textContent =
+      lowStock + ' produit(s) à réapprovisionner';
+  }
+}
+
+// ── Afficher les produits ──
+function renderProducts(products) {
+  const container = document.getElementById('products-container');
+
+  if (products.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">📦</div>
+        <div class="es-title">Aucun produit trouvé</div>
+        <div class="es-sub">
+          Vous n'avez pas encore ajouté de produits.<br/>
+          Commencez à vendre dès maintenant !
+        </div>
+        <button class="es-btn"
+          onclick="window.location.href='marche-senegal-ajout-produit.html'">
+          + Ajouter mon premier produit
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="products-grid">
+      ${products.map(prod => `
+        <div class="prod-card">
+          <div class="pc-img">
+            ${prod.images?.length > 0
+              ? `<img src="${prod.images[0]}" alt="${prod.name}"/>`
+              : '👗'
+            }
+            <div class="pc-status ${getStatusClass(prod.status)}">
+              ${getStatusLabel(prod.status)}
+            </div>
+            ${prod.isFeatured
+              ? `<div class="pc-featured">⭐ Vedette</div>`
+              : ''
+            }
+          </div>
+          <div class="pc-body">
+            <div class="pc-name">${prod.name}</div>
+            <div class="pc-stats">
+              <div class="pcs-item">
+                <strong>${prod.totalSales}</strong> ventes
+              </div>
+              <div class="pcs-item">
+                <strong>${prod.rating > 0 ? prod.rating : '—'}</strong> ⭐
+              </div>
+              <div class="pcs-item">
+                <strong>${prod.totalReviews}</strong> avis
+              </div>
+            </div>
+            <div class="pc-price">
+              <span class="pc-price-val">${formatPrice(prod.price)}</span>
+              ${prod.originalPrice
+                ? `<span class="pc-price-old">${formatPrice(prod.originalPrice)}</span>`
+                : ''
+              }
+            </div>
+            <div class="pc-stock">
+              <div class="stock-dot ${getStockDot(prod.stock)}"></div>
+              <span style="color:${getStockColor(prod.stock)}">
+                ${prod.stock === 0
+                  ? 'Rupture de stock'
+                  : prod.stock <= 5
+                    ? `Stock faible — ${prod.stock} restant(s)`
+                    : `En stock — ${prod.stock} pièces`
+                }
+              </span>
+            </div>
+            <div class="pc-actions">
+              <button class="pca-btn edit"
+                onclick="editProduct('${prod.id}')">
+                ✏️ Modifier
+              </button>
+              <button class="pca-btn"
+                onclick="openStockModal('${prod.id}','${prod.name}',${prod.price},${prod.stock})">
+                📦 Stock
+              </button>
+              <button class="pca-btn"
+                onclick="toggleStatus('${prod.id}','${prod.status}')">
+                ${prod.status === 'ACTIVE' ? '⏸️' : '▶️'}
+              </button>
+              <button class="pca-btn danger"
+                onclick="openDeleteModal('${prod.id}','${prod.name}',${prod.price})">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Filtrer les produits ──
+function filterProducts() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  let filtered = allProducts;
+
+  // Filtre par statut
+  if (currentFilter === 'active') {
+    filtered = filtered.filter(p => p.status === 'ACTIVE');
+  } else if (currentFilter === 'paused') {
+    filtered = filtered.filter(p => p.status === 'PAUSED');
+  } else if (currentFilter === 'low') {
+    filtered = filtered.filter(p => p.stock <= 5 && p.status === 'ACTIVE');
+  }
+
+  // Filtre par recherche
+  if (query) {
+    filtered = filtered.filter(p =>
+      p.name.toLowerCase().includes(query)
+    );
+  }
+
+  renderProducts(filtered);
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.ft').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterProducts();
+}
+
+function sortProducts(sortBy) {
+  let sorted = [...allProducts];
+  if (sortBy === 'sales') sorted.sort((a,b) => b.totalSales - a.totalSales);
+  else if (sortBy === 'price_asc') sorted.sort((a,b) => a.price - b.price);
+  else if (sortBy === 'price_desc') sorted.sort((a,b) => b.price - a.price);
+  else if (sortBy === 'stock') sorted.sort((a,b) => a.stock - b.stock);
+  else sorted.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  renderProducts(sorted);
+}
+
+// ── Modifier un produit ──
+function editProduct(productId) {
+  window.location.href = 'marche-senegal-modifier-produit.html?id=' + productId;
+}
+
+// ── Toggle statut ──
+async function toggleStatus(productId, currentStatus) {
+  const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+  const result = await apiCall(`/api/products/${productId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ status: newStatus })
+  });
+
+  if (result.success) {
+    showToast(newStatus === 'ACTIVE' ? '▶️ Produit activé' : '⏸️ Produit mis en pause');
+    await loadProducts();
+  } else {
+    showToast('❌ Erreur lors de la mise à jour');
+  }
+}
+
+// ── Modal suppression ──
+function openDeleteModal(productId, name, price) {
+  productToDelete = productId;
+  document.getElementById('del-name').textContent = name;
+  document.getElementById('del-price').textContent = formatPrice(price);
+  document.getElementById('delete-modal').classList.add('show');
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('show');
+  productToDelete = null;
+}
+
+async function confirmDelete() {
+  if (!productToDelete) return;
+
+  const result = await apiCall(`/api/products/${productToDelete}`, {
+    method: 'DELETE'
+  });
+
+  closeDeleteModal();
+
+  if (result.success) {
+    showToast('✓ Produit supprimé');
+    await loadProducts();
+  } else {
+    showToast('❌ Erreur lors de la suppression');
+  }
+}
+
+// ── Modal stock ──
+function openStockModal(productId, name, price, stock) {
+  productToStock = productId;
+  newStock = stock;
+  document.getElementById('stock-prod-name').textContent = name;
+  document.getElementById('stock-prod-price').textContent = formatPrice(price);
+  document.getElementById('stock-num').textContent = stock;
+  document.getElementById('stock-modal').classList.add('show');
+}
+
+function closeStockModal() {
+  document.getElementById('stock-modal').classList.remove('show');
+  productToStock = null;
+}
+
+function changeStock(delta) {
+  newStock = Math.max(0, newStock + delta);
+  document.getElementById('stock-num').textContent = newStock;
+}
+
+async function confirmStock() {
+  if (!productToStock) return;
+
+  const result = await apiCall(`/api/products/${productToStock}`, {
+    method: 'PUT',
+    body: JSON.stringify({ stock: newStock })
+  });
+
+  closeStockModal();
+
+  if (result.success) {
+    showToast('✓ Stock mis à jour — ' + newStock + ' pièces');
+    await loadProducts();
+  } else {
+    showToast('❌ Erreur lors de la mise à jour du stock');
+  }
+}
+
+// ── Helpers ──
+function getStatusClass(status) {
+  return status === 'ACTIVE' ? 'pcs-active' :
+         status === 'PAUSED' ? 'pcs-paused' : 'pcs-out';
+}
+
+function getStatusLabel(status) {
+  return status === 'ACTIVE' ? '● Actif' :
+         status === 'PAUSED' ? '⏸ En pause' :
+         status === 'OUT_OF_STOCK' ? '✕ Rupture' : status;
+}
+
+function getStockDot(stock) {
+  return stock === 0 ? 'stock-out' : stock <= 5 ? 'stock-low' : 'stock-ok';
+}
+
+function getStockColor(stock) {
+  return stock === 0 ? 'var(--red)' : stock <= 5 ? 'var(--gold)' : 'var(--green)';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = getCurrentUser();
+  if (!user) {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  if (user.role !== 'SELLER' && user.role !== 'ADMIN') {
+    showToast('Accès réservé aux vendeurs');
+    setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
+    return;
+  }
+  await loadProducts();
+});
+</script>
+</body>
+</html>

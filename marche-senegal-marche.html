@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Marché Sandaga — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:68px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+/* ════════════════════════════════════════
+   MARCHÉ SÉNÉGAL — Navbar & Responsive
+   Shared across all pages
+   ════════════════════════════════════════ */
+/* NAV STYLES */
+.nav-root-placeholder{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
+  --gold:#E6A817;--gdl:#FDF3DC;--gd2:#F0C040;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
+  --radius:14px;--radius-sm:9px;
+  --nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ══ FLAG ══ */
+.flag{display:flex;width:28px;height:18px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.flag span{flex:1}
+.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
+
+/* ══════════ NAVBAR ══════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:var(--nav-h);
+  background:rgba(250,250,247,.96);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 4vw;
+  gap:14px;
+}
+
+/* Logo */
+.nav-logo{
+  display:flex;align-items:center;gap:9px;
+  font-family:'Playfair Display',serif;
+  font-size:1.18rem;font-weight:900;color:var(--green);
+  flex-shrink:0;white-space:nowrap;
+}
+.nav-logo:hover{color:var(--gl)}
+
+/* Search bar */
+.nav-search{
+  flex:1;
+  min-width:0;
+  max-width:520px;
+  display:flex;align-items:center;
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:99px;
+  padding:0 6px 0 16px;
+  height:42px;
+  box-shadow:var(--shadow);
+  transition:border-color .2s,box-shadow .2s;
+}
+.nav-search:focus-within{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(27,107,58,.1);
+}
+.nav-search input{
+  flex:1;min-width:0;
+  border:none;outline:none;
+  font-size:.88rem;color:var(--text);
+  background:transparent;
+}
+.nav-search input::placeholder{color:var(--muted)}
+.nav-search-btn{
+  flex-shrink:0;
+  background:var(--green);color:#fff;
+  border:none;border-radius:99px;
+  height:32px;padding:0 16px;
+  font-size:.82rem;font-weight:600;
+  cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  transition:background .2s;
+  white-space:nowrap;
+}
+.nav-search-btn:hover{background:var(--gl)}
+.nav-search-icon{font-size:.85rem}
+
+/* Right actions */
+.nav-actions{
+  display:flex;align-items:center;
+  gap:8px;
+  flex-shrink:0;
+  margin-left:auto;
+}
+.nav-btn{
+  display:flex;align-items:center;gap:6px;
+  height:38px;padding:0 16px;
+  border-radius:99px;
+  font-size:.82rem;font-weight:500;
+  cursor:pointer;
+  border:1.5px solid var(--border);
+  background:#fff;color:var(--text);
+  transition:all .2s;
+  white-space:nowrap;flex-shrink:0;
+}
+.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
+.nav-btn-primary{
+  background:var(--green);color:#fff;
+  border-color:var(--green);
+}
+.nav-btn-primary:hover{background:var(--gl);color:#fff;border-color:var(--gl)}
+
+/* Cart button */
+.nav-cart{
+  position:relative;
+  width:42px;height:42px;
+  border-radius:50%;
+  border:1.5px solid var(--border);
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;
+  transition:all .2s;flex-shrink:0;
+}
+.nav-cart:hover{border-color:var(--green);background:var(--gp)}
+.cart-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:var(--dark);
+  font-size:.58rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #fff;
+}
+
+/* Hamburger (mobile) */
+.nav-hamburger{
+  display:none;
+  flex-direction:column;gap:5px;
+  width:38px;height:38px;
+  border-radius:10px;border:1.5px solid var(--border);
+  background:#fff;cursor:pointer;
+  align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.nav-hamburger span{
+  display:block;width:18px;height:2px;
+  background:var(--text);border-radius:2px;
+  transition:all .25s;
+}
+
+/* Mobile menu drawer */
+.nav-drawer{
+  display:none;
+  position:fixed;top:var(--nav-h);left:0;right:0;
+  background:#fff;
+  border-bottom:1.5px solid var(--border);
+  padding:16px 4vw 20px;
+  z-index:190;
+  box-shadow:0 8px 32px rgba(0,0,0,.1);
+  flex-direction:column;gap:10px;
+}
+.nav-drawer.open{display:flex}
+.nav-drawer .nav-search{
+  max-width:100%;width:100%;
+  margin-bottom:4px;
+}
+.nav-drawer-btns{display:flex;gap:8px;flex-wrap:wrap}
+.nav-drawer-btns .nav-btn{flex:1;justify-content:center;min-width:120px}
+
+/* ══ BREADCRUMB ══ */
+.breadcrumb{
+  padding:12px 4vw;
+  display:flex;align-items:center;gap:7px;
+  font-size:.8rem;color:var(--muted);
+  background:#fff;border-bottom:1px solid var(--border);
+  flex-wrap:wrap;overflow-x:auto;
+  scrollbar-width:none;
+}
+.breadcrumb::-webkit-scrollbar{display:none}
+.bc-link{color:var(--green);cursor:pointer;white-space:nowrap}
+.bc-link:hover{text-decoration:underline}
+.bc-sep{color:var(--border);flex-shrink:0}
+.bc-current{color:var(--text);font-weight:500;white-space:nowrap}
+
+/* ══ MOBILE BOTTOM NAV ══ */
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:#fff;border-top:1.5px solid var(--border);
+  padding:6px 0 max(10px, env(safe-area-inset-bottom));
+}
+.mn-items{display:flex}
+.mn-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:3px;
+  padding:5px 0;cursor:pointer;
+}
+.mn-icon{
+  width:24px;height:24px;border-radius:7px;
+  background:var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;transition:background .18s;
+}
+.mn-item.act .mn-icon{background:var(--green)}
+.mn-label{font-size:.62rem;color:var(--muted);font-weight:500;transition:color .18s}
+.mn-item.act .mn-label{color:var(--green)}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:90px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--dark);color:#fff;
+  padding:10px 22px;border-radius:99px;
+  font-size:.84rem;font-weight:500;
+  opacity:0;transition:all .28s;
+  pointer-events:none;z-index:500;
+  white-space:nowrap;
+  box-shadow:0 4px 24px rgba(0,0,0,.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════ */
+
+/* ── Tablet (≤900px) ── */
+@media(max-width:900px){
+  .nav-search{display:none}
+  .nav-hamburger{display:flex}
+  .nav-actions .nav-btn:not(.nav-cart){display:none}
+  .mobile-nav{display:block}
+  body{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+  .toast{bottom:72px}
+}
+
+/* ── Mobile (≤600px) ── */
+@media(max-width:600px){
+  /* NAV STYLES */
+.nav-root-placeholder{--nav-h:58px}
+  .nav{padding:0 4vw;gap:10px}
+  .nav-logo .nav-logo-text{display:none}
+  .nav-cart{width:38px;height:38px}
+}
+
+/* PAGE STYLES */
+.breadcrumb{padding:12px 4vw;display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted);background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
+.breadcrumb::-webkit-scrollbar{display:none}.bc-link{color:var(--green);cursor:pointer}.bc-link:hover{text-decoration:underline}.bc-sep{color:var(--border);flex-shrink:0}.bc-current{color:var(--text);font-weight:500;white-space:nowrap}
+.market-hero{background:var(--dark);padding:36px 5vw;position:relative;overflow:hidden}
+.market-hero::before{content:'';position:absolute;top:-100px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.13),transparent 70%)}
+.mh-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;z-index:1}
+.mh-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:.73rem;font-weight:600;padding:4px 12px;border-radius:99px;margin-bottom:12px}
+.mh-badge-dot{width:7px;height:7px;background:#4CAF50;border-radius:50%;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.mh-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:#fff;line-height:1.1;margin-bottom:8px}
+.mh-title em{color:var(--gold);font-style:normal}.mh-location{font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:20px}
+.mh-stats{display:flex;gap:20px;flex-wrap:wrap}
+.mhstat-n{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--gold)}.mhstat-l{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:2px}
+.mh-info-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:16px 20px;min-width:200px}
+.mic-title{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.mic-row{display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:5px}
+.mic-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.dot-open{background:#4CAF50}
+.markets-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 5vw;display:flex;align-items:center;gap:10px;overflow-x:auto;scrollbar-width:none}
+.markets-bar::-webkit-scrollbar{display:none}.mb-label{font-size:.76rem;font-weight:600;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.mb-chips{display:flex;gap:6px}
+.mb-chip{flex-shrink:0;padding:5px 13px;border-radius:99px;font-size:.76rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
+.mb-chip:hover{border-color:var(--green);color:var(--green)}.mb-chip.active{background:var(--green);color:#fff;border-color:var(--green)}
+.main{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:70vh}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:22px 18px;position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto}
+.sb-section{margin-bottom:22px}.sb-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
+.sb-btns{display:flex;gap:5px;flex-wrap:wrap}
+.sb-btn{padding:5px 11px;border-radius:99px;font-size:.76rem;border:1.5px solid var(--border);background:#fff;color:var(--text);cursor:pointer;transition:all .18s}
+.sb-btn:hover,.sb-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.price-range{display:flex;flex-direction:column;gap:8px}
+.range-inputs{display:flex;gap:8px;align-items:center}
+.range-input{flex:1;padding:6px 9px;border-radius:7px;border:1.5px solid var(--border);font-size:.8rem;color:var(--text);background:#fff;outline:none}
+.range-input:focus{border-color:var(--green)}.range-sep{color:var(--muted);font-size:.8rem}
+.range-slider{width:100%;accent-color:var(--green)}
+.cb-list{display:flex;flex-direction:column;gap:8px}
+.cb-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.83rem;color:var(--text)}
+.cb-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.cb-item:hover .cb-box{border-color:var(--green)}.cb-item.checked .cb-box{background:var(--green);border-color:var(--green)}
+.cb-check{color:#fff;font-size:.65rem;font-weight:700}.cb-count{margin-left:auto;font-size:.7rem;color:var(--muted)}
+.star-filters{display:flex;flex-direction:column;gap:5px}
+.star-row{display:flex;align-items:center;gap:7px;cursor:pointer;padding:3px 0}
+.star-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px}.star-bar-fill{height:5px;background:var(--gold);border-radius:3px}.star-label{font-size:.72rem;color:var(--muted);width:22px;text-align:right}
+.sb-apply{background:var(--green);color:#fff;border:none;border-radius:99px;padding:9px;width:100%;font-size:.86rem;font-weight:600;cursor:pointer;margin-top:8px;transition:background .2s}.sb-apply:hover{background:var(--gl)}
+.sb-reset{background:transparent;color:var(--muted);border:none;font-size:.76rem;cursor:pointer;text-align:center;width:100%;margin-top:5px;text-decoration:underline}
+.content{padding:22px 4vw 40px}
+.content-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.ct-result{font-size:.88rem;color:var(--muted)}.ct-result strong{color:var(--text);font-weight:600}
+.ct-right{display:flex;align-items:center;gap:8px}
+.sort-select{padding:7px 13px;border-radius:99px;border:1.5px solid var(--border);font-size:.8rem;color:var(--text);background:#fff;cursor:pointer;outline:none}
+.sort-select:focus{border-color:var(--green)}
+.view-btns{display:flex;gap:3px}
+.view-btn{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;transition:all .18s}
+.view-btn.active,.view-btn:hover{background:var(--green);border-color:var(--green);color:#fff}
+.view-tabs{display:flex;gap:0;border:.5px solid var(--border);border-radius:99px;overflow:hidden;background:#fff;margin-bottom:18px}
+.vtab{flex:1;padding:8px 0;text-align:center;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s;border-right:1px solid var(--border)}
+.vtab:last-child{border-right:none}.vtab.active{background:var(--green);color:#fff}
+.promo-strip{background:linear-gradient(90deg,var(--dark),#1a4a2e);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.ps-badge{background:var(--gold);color:var(--dark);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px;flex-shrink:0}
+.ps-text{font-size:.88rem;color:#fff;font-weight:500}.ps-sub{font-size:.73rem;color:rgba(255,255,255,.5);margin-top:2px}
+.ps-code{background:rgba(255,255,255,.12);border:1px dashed rgba(255,255,255,.3);border-radius:8px;padding:7px 14px;font-size:.86rem;font-weight:700;color:var(--gold);letter-spacing:.07em;cursor:pointer;transition:background .18s}
+.ps-code:hover{background:rgba(255,255,255,.18)}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.sec-hd-title{font-size:1rem;font-weight:600;color:var(--dark)}.sec-hd-count{font-size:.76rem;color:var(--muted)}.sec-hd-link{font-size:.78rem;color:var(--green);font-weight:600;cursor:pointer}.sec-hd-link:hover{text-decoration:underline}
+.shops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.shop-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.shop-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.shop-banner{height:68px;display:flex;align-items:center;justify-content:center;font-size:2rem;position:relative}
+.shop-live-badge{position:absolute;top:7px;left:7px;background:#E74C3C;color:#fff;font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:99px}
+.shop-avatar{width:44px;height:44px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:700;color:#fff;position:absolute;bottom:-22px;left:12px;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.shop-body{padding:27px 12px 12px}
+.shop-verified{display:inline-flex;align-items:center;gap:4px;font-size:.6rem;font-weight:700;color:var(--green);background:var(--gp);padding:2px 6px;border-radius:99px;margin-bottom:4px}
+.shop-name{font-size:.88rem;font-weight:600;color:var(--dark);margin-bottom:2px}.shop-loc{font-size:.7rem;color:var(--muted);margin-bottom:7px}
+.shop-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
+.shop-tag{font-size:.6rem;padding:2px 6px;border-radius:99px;background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.shop-stats-row{display:flex;gap:10px;padding-top:7px;border-top:1px solid var(--border)}
+.ss-item{text-align:center}.ss-val{font-size:.82rem;font-weight:600;color:var(--dark)}.ss-lbl{font-size:.6rem;color:var(--muted);margin-top:1px}
+.shop-cta{margin-top:9px;padding:6px;border-radius:7px;background:var(--gp);border:none;width:100%;font-size:.76rem;font-weight:600;color:var(--green);cursor:pointer;transition:all .18s}
+.shop-cta:hover{background:var(--green);color:#fff}
+.prods-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.prod-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
+.prod-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
+.prod-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;background:var(--bg)}
+.prod-badge{position:absolute;top:8px;left:8px;background:var(--gold);color:var(--dark);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:99px}
+.prod-badge.new{background:var(--green);color:#fff}.prod-badge.hot{background:var(--red);color:#fff}
+.prod-wish{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.76rem;cursor:pointer;transition:all .18s}
+.prod-wish:hover{border-color:var(--red);background:var(--rp)}
+.prod-body{padding:10px}
+.prod-market-tag{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;font-weight:600;color:var(--green);background:var(--gp);padding:2px 6px;border-radius:99px;margin-bottom:4px}
+.prod-name{font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:3px;line-height:1.3}
+.prod-shop{font-size:.7rem;color:var(--muted);margin-bottom:4px}
+.prod-rating{display:flex;align-items:center;gap:3px;font-size:.68rem;color:var(--muted);margin-bottom:7px}
+.stars{color:var(--gold);font-size:.7rem}
+.prod-footer{display:flex;align-items:center;justify-content:space-between}
+.prod-price{font-size:.94rem;font-weight:700;color:var(--green)}.prod-old{font-size:.7rem;color:var(--muted);text-decoration:line-through;margin-left:3px}
+.add-btn{width:26px;height:26px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.add-btn:hover{background:var(--gl);transform:scale(1.1)}
+.pagination{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:28px;flex-wrap:wrap}
+.pg-btn{width:34px;height:34px;border-radius:7px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:500;color:var(--text);cursor:pointer;transition:all .18s}
+.pg-btn.active{background:var(--green);border-color:var(--green);color:#fff}.pg-btn:hover:not(.active){border-color:var(--green);color:var(--green)}.pg-dots{font-size:.9rem;color:var(--muted);padding:0 3px}
+.filter-toggle{display:none;align-items:center;gap:7px;padding:8px 16px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.82rem;font-weight:500;cursor:pointer;position:fixed;bottom:72px;right:16px;z-index:150;box-shadow:var(--shadow-lg);color:var(--text)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:180}.sidebar-overlay.show{display:block}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:-260px;top:0;bottom:0;width:260px;height:100vh;z-index:190;transition:left .3s;border-right:1px solid var(--border);padding-top:calc(var(--nav-h) + 16px)}
+  .sidebar.open{left:0}.filter-toggle{display:flex}
+}
+@media(max-width:600px){
+  :root{--nav-h:58px}
+  .mh-right{display:none}.content{padding:16px 4vw 80px}
+  .prods-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .shops-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .view-tabs .vtab{font-size:.74rem;padding:7px 0}
+  .promo-strip{flex-direction:column;align-items:flex-start;gap:10px}
+}
+@media(max-width:380px){
+  .prods-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .shops-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<!-- NAV -->
+<nav class="nav">
+  <a href="marche-senegal-accueil.html" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
+  <div class="nav-search"><input type="text" placeholder="Rechercher dans Sandaga..."/><button class="nav-search-btn">🔍 Rechercher</button></div>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
+    <button class="nav-btn nav-btn-primary nav-btn-shop" onclick="toast('Boutique...')">🏪 Ma boutique</button>
+    <button class="nav-cart" onclick="toast('Panier...')">🛒<div class="cart-badge" id="cart-count">0</div></button>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher dans Sandaga..."/><button class="nav-search-btn">🔍</button></div>
+  <div class="nav-drawer-row">
+    <button class="nav-btn" style="flex:1;justify-content:center" onclick="toast('Connexion...')">Se connecter</button>
+    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center" onclick="toast('Boutique...')">🏪 Ma boutique</button>
+  </div>
+</div>
+<!-- BREADCRUMB -->
+<div class="breadcrumb"><a href="marche-senegal-accueil.html" class="bc-link">Accueil</a><span class="bc-sep">›</span><span class="bc-link">Marchés</span><span class="bc-sep">›</span><span class="bc-current">Marché Sandaga</span></div>
+<!-- MARKET HERO -->
+<section class="market-hero">
+  <div class="mh-inner">
+    <div>
+      <div class="mh-badge"><span class="mh-badge-dot"></span>Marché ouvert · Ferme à 20h00</div>
+      <div class="mh-title">Marché <em>Sandaga</em></div>
+      <div class="mh-location">📍 Rue Mohamed V, Dakar Centre, Sénégal</div>
+      <div class="mh-stats">
+        <div><div class="mhstat-n">142</div><div class="mhstat-l">Boutiques en ligne</div></div>
+        <div><div class="mhstat-n">3 840</div><div class="mhstat-l">Produits disponibles</div></div>
+        <div><div class="mhstat-n">4.7 ⭐</div><div class="mhstat-l">Note moyenne</div></div>
+        <div><div class="mhstat-n">12K+</div><div class="mhstat-l">Ventes ce mois</div></div>
+      </div>
+    </div>
+    <div class="mh-right">
+      <div class="mh-info-card">
+        <div class="mic-title">Horaires du marché</div>
+        <div class="mic-row"><div class="mic-dot dot-open"></div>Lun – Sam : 7h00 – 20h00</div>
+        <div class="mic-row"><div class="mic-dot dot-open"></div>Dimanche : 8h00 – 14h00</div>
+        <div class="mic-row" style="margin-top:5px"><div class="mic-dot dot-open"></div>Livraison disponible</div>
+        <div class="mic-row"><div class="mic-dot dot-open"></div>Paiement Wave & OM</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- MARKETS BAR -->
+<div class="markets-bar">
+  <span class="mb-label">Autres marchés :</span>
+  <div class="mb-chips">
+    <button class="mb-chip active">🏛️ Sandaga</button>
+    <button class="mb-chip" onclick="changeMarket('Tilène')">🧵 Tilène</button>
+    <button class="mb-chip" onclick="changeMarket('HLM')">🛍️ HLM</button>
+    <button class="mb-chip" onclick="changeMarket('Colobane')">🔧 Colobane</button>
+    <button class="mb-chip" onclick="changeMarket('Kermel')">🥩 Kermel</button>
+    <button class="mb-chip" onclick="changeMarket('Pikine')">🏙️ Pikine</button>
+    <button class="mb-chip" onclick="changeMarket('Thiès')">🏭 Thiès</button>
+    <button class="mb-chip" onclick="changeMarket('Touba')">🕌 Touba</button>
+  </div>
+</div>
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-section"><div class="sb-title">Catégorie</div><div class="sb-btns"><button class="sb-btn active" onclick="toggleSb(this)">Tout</button><button class="sb-btn" onclick="toggleSb(this)">Mode</button><button class="sb-btn" onclick="toggleSb(this)">Alimentation</button><button class="sb-btn" onclick="toggleSb(this)">Artisanat</button><button class="sb-btn" onclick="toggleSb(this)">Beauté</button><button class="sb-btn" onclick="toggleSb(this)">Maison</button></div></div>
+    <div class="sb-section"><div class="sb-title">Prix (FCFA)</div><div class="price-range"><div class="range-inputs"><input class="range-input" type="number" placeholder="Min" value="0"/><span class="range-sep">—</span><input class="range-input" type="number" placeholder="Max" id="pmax" value="100000"/></div><input type="range" class="range-slider" min="0" max="500000" value="100000" step="1000" oninput="document.getElementById('pmax').value=this.value"/><div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)"><span>0</span><span>500 000</span></div></div></div>
+    <div class="sb-section"><div class="sb-title">Type de vendeur</div><div class="cb-list"><div class="cb-item checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur Vérifié ✓</span><span class="cb-count">118</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle 🎥</span><span class="cb-count">74</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span><span class="cb-count">43</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span><span class="cb-count">89</span></div></div></div>
+    <div class="sb-section"><div class="sb-title">Note minimale</div><div class="star-filters"><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★★★</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:65%"></div></div><span class="star-label">65%</span></div><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★★☆</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:25%"></div></div><span class="star-label">25%</span></div><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★☆☆</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:8%"></div></div><span class="star-label">8%</span></div></div></div>
+    <div class="sb-section"><div class="sb-title">Livraison</div><div class="cb-list"><div class="cb-item checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison disponible</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Retrait en boutique</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span></div></div></div>
+    <button class="sb-apply" onclick="toast('✓ Filtres appliqués');closeSidebar()">Appliquer les filtres</button>
+    <button class="sb-reset" onclick="toast('Filtres réinitialisés')">Réinitialiser</button>
+  </aside>
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="content-topbar">
+      <div class="ct-result"><strong>3 840</strong> produits dans <strong>Sandaga</strong></div>
+      <div class="ct-right">
+        <select class="sort-select"><option>Pertinence</option><option>Prix croissant</option><option>Prix décroissant</option><option>Mieux notés</option><option>Plus récents</option></select>
+        <div class="view-btns"><button class="view-btn active" title="Grille">⊞</button><button class="view-btn" title="Liste">☰</button></div>
+      </div>
+    </div>
+    <div class="view-tabs">
+      <div class="vtab active" onclick="switchTab('shops',this)">🏪 Boutiques (142)</div>
+      <div class="vtab" onclick="switchTab('products',this)">📦 Produits (3 840)</div>
+      <div class="vtab" onclick="switchTab('promos',this)">🔥 Promotions (43)</div>
+    </div>
+    <div class="promo-strip">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;flex-wrap:wrap"><div class="ps-badge">🔥 HOT</div><div><div class="ps-text">Code promo exclusif Sandaga</div><div class="ps-sub">-15% sur toutes les boutiques Mode · Valable jusqu'à 20h</div></div></div>
+      <div class="ps-code" onclick="copyCode()">SANDAGA15</div>
+    </div>
+    <!-- BOUTIQUES TAB -->
+    <div id="shops-view">
+      <div class="sec-hd"><div class="sec-hd-title">Boutiques du marché Sandaga</div><div class="sec-hd-count">142 boutiques</div></div>
+      <div class="shops-grid">
+        <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#F0EAF8">👗<div class="shop-live-badge">🔴 LIVE</div><div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-loc">Allée 3 · Mode & Vêtements</div><div class="shop-tags"><span class="shop-tag">🎥 Visite virtuelle</span><span class="shop-tag">-15% promo</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.8⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
+        <div class="shop-card"><div class="shop-banner" style="background:#FFF8E7">🧵<div class="shop-avatar" style="background:var(--gold);color:var(--dark)">TA</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Tissus Aminata Fall</div><div class="shop-loc">Allée 1 · Tissu & Wax</div><div class="shop-tags"><span class="shop-tag">🎥 Visite virtuelle</span><span class="shop-tag">Livraison express</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.9⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">412</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">2 800</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
+        <div class="shop-card"><div class="shop-banner" style="background:#FDF3DC">🫙<div class="shop-avatar" style="background:#8B3A8A">BN</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Beauté Naturelle Sénégal</div><div class="shop-loc">Allée 5 · Beauté & Soins</div><div class="shop-tags"><span class="shop-tag">-10% code BEAUTE</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.7⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">189</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">980</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
+        <div class="shop-card"><div class="shop-banner" style="background:#E8F5EC">📱<div class="shop-avatar" style="background:#1A1F71">IT</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">IT Store Dakar</div><div class="shop-loc">Allée 7 · Électronique</div><div class="shop-tags"><span class="shop-tag">🎥 Visite virtuelle</span><span class="shop-tag">Garantie</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.6⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">87</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">340</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
+      </div>
+      <div class="sec-hd" style="margin-top:28px"><div class="sec-hd-title">Produits populaires dans Sandaga</div><a class="sec-hd-link">Voir tous →</a></div>
+      <div class="prods-grid">
+        <div class="prod-card"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Boubou wax tissé main — L</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.8 (234)</div><div class="prod-footer"><div><span class="prod-price">15 300 FCFA</span><span class="prod-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FFF8E7">🧵<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Bazin brodé cérémonie grand boubou</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.9 (176)</div><div class="prod-footer"><div><span class="prod-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Beurre de karité pur naturel 500g</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.7 (312)</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#E8F5EC">📱<div class="prod-badge hot">-20%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Écouteurs Bluetooth sport</div><div class="prod-shop">IT Store Dakar · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★☆</span> 4.5 (67)</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span><span class="prod-old">15 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FDE8E6">👘<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Robe wax brodée col rond</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.9 (98)</div><div class="prod-footer"><div><span class="prod-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FFF8E7">👒<div class="prod-badge">Artisanat</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Chapeau tressé fibre naturelle</div><div class="prod-shop">Artisan Cheikh · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 5.0 (44)</div><div class="prod-footer"><div><span class="prod-price">4 200 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      </div>
+      <div class="pagination"><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><span class="pg-dots">...</span><button class="pg-btn">24</button><button class="pg-btn">›</button></div>
+    </div>
+    <!-- PRODUCTS TAB -->
+    <div id="products-view" style="display:none">
+      <div class="sec-hd"><div class="sec-hd-title">Tous les produits — Sandaga</div><div class="sec-hd-count">3 840 produits</div></div>
+      <div class="prods-grid">
+        <div class="prod-card"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.8 (234)</div><div class="prod-footer"><div><span class="prod-price">15 300 FCFA</span><span class="prod-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Beurre de karité 500g</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.7 (312)</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#E8F5EC">📱<div class="prod-badge hot">-20%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Écouteurs Bluetooth sport</div><div class="prod-shop">IT Store · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★☆</span> 4.5 (67)</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span><span class="prod-old">15 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FFF8E7">🧵<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Bazin brodé cérémonie</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.9 (176)</div><div class="prod-footer"><div><span class="prod-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      </div>
+    </div>
+    <!-- PROMOS TAB -->
+    <div id="promos-view" style="display:none">
+      <div class="sec-hd"><div class="sec-hd-title">Promotions actives — Sandaga</div><div class="sec-hd-count">43 offres aujourd'hui</div></div>
+      <div class="prods-grid">
+        <div class="prod-card"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Promo active</div><div class="prod-name">Boubou wax — Code SANDAGA15</div><div class="prod-shop">Mode Fatou · Valable jusqu'à 20h</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.8 (234)</div><div class="prod-footer"><div><span class="prod-price">15 300 FCFA</span><span class="prod-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#E8F5EC">📱<div class="prod-badge hot">-20%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Promo active</div><div class="prod-name">Écouteurs — Solde du jour</div><div class="prod-shop">IT Store · Aujourd'hui seulement</div><div class="prod-rating"><span class="stars">★★★★☆</span> 4.5 (67)</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span><span class="prod-old">15 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+        <div class="prod-card"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-badge">2+1 gratuit</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Offre spéciale</div><div class="prod-name">Karité — Achetez 2, 1 gratuit</div><div class="prod-shop">Beauté Naturelle · 3 jours restants</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.7 (312)</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<button class="filter-toggle" onclick="openSidebar()">⚙️ Filtres</button>
+<nav class="mobile-nav">
+  <div class="mn-items">
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item act"><div class="mn-icon act">🗺️</div><div class="mn-label act">Marchés</div></div>
+    <div class="mn-item"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="toast('Panier...')"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
+    <div class="mn-item"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+  </div>
+</nav>
+<script>
+// ════════════════════════════════════════
+//   PAGE MARCHÉ — Données dynamiques
+// ════════════════════════════════════════
+
+let cartCount = 0;
+let currentMarketId = null;
+let currentTab = 'shops';
+
+// ── Récupérer l'ID du marché depuis l'URL ──
+function getMarketIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+// ── Charger les infos du marché ──
+async function loadMarket(marketId) {
+  const result = await getMarket(marketId);
+
+  if (!result.success) {
+    showToast('Marché introuvable', 'error');
+    return;
+  }
+
+  const market = result.data;
+
+  // Mettre à jour le hero
+  document.querySelector('.mh-title').innerHTML =
+    `Marché <em>${market.name.replace('Marché ', '')}</em>`;
+
+  document.querySelector('.mh-location').textContent =
+    `📍 ${market.address || market.city + ', ' + market.region}`;
+
+  // Mettre à jour les stats
+  const stats = document.querySelectorAll('.mhstat-n');
+  if (stats[0]) stats[0].textContent = market._count.shops;
+
+  // Mettre à jour le titre de la page
+  document.title = `${market.name} — Marché Sénégal`;
+}
+
+// ── Charger les boutiques du marché ──
+async function loadShops(marketId) {
+  showLoading('shops-view', 'Chargement des boutiques...');
+
+  const result = await getShops({ marketId, page: 1 });
+
+  if (!result.success) {
+    showError('shops-view', 'Impossible de charger les boutiques');
+    return;
+  }
+
+  const container = document.getElementById('shops-view');
+
+  if (result.data.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:14px">🏪</div>
+        <div style="font-size:1rem;font-weight:600">Aucune boutique dans ce marché</div>
+        <div style="font-size:.86rem;margin-top:6px">Les boutiques arrivent bientôt !</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="sec-hd">
+      <div class="sec-hd-title">Boutiques du marché</div>
+      <div class="sec-hd-count">${result.pagination.total} boutiques</div>
+    </div>
+    <div class="shops-grid">
+      ${result.data.map(shop => `
+        <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html?id=${shop.id}'">
+          <div class="shop-banner" style="background:#F0EAF8">
+            ${shop.avatarUrl
+              ? `<img src="${shop.avatarUrl}" style="width:100%;height:100%;object-fit:cover"/>`
+              : '🏪'
+            }
+            <div class="shop-avatar" style="background:var(--green)">
+              ${shop.name.charAt(0)}${shop.name.split(' ')[1] ? shop.name.split(' ')[1].charAt(0) : ''}
+            </div>
+          </div>
+          <div class="shop-body">
+            <div class="shop-verified">
+              ${shop.isVerified ? '✓ Vérifié · ' : ''}${shop.market.name}
+            </div>
+            <div class="shop-name">${shop.name}</div>
+            <div class="shop-loc">${shop.market.city}</div>
+            <div class="shop-stats-row">
+              <div class="ss-item">
+                <div class="ss-val">${shop.rating > 0 ? shop.rating + '⭐' : 'Nouveau'}</div>
+                <div class="ss-lbl">Note</div>
+              </div>
+              <div class="ss-item">
+                <div class="ss-val">${shop.totalReviews}</div>
+                <div class="ss-lbl">Avis</div>
+              </div>
+              <div class="ss-item">
+                <div class="ss-val">${shop._count.products}</div>
+                <div class="ss-lbl">Produits</div>
+              </div>
+            </div>
+            <button class="shop-cta">Visiter la boutique →</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    ${result.pagination.totalPages > 1 ? `
+      <div class="pagination" style="margin-top:24px">
+        ${Array.from({length: result.pagination.totalPages}, (_, i) => `
+          <div class="pg-btn ${i === 0 ? 'active' : ''}"
+               onclick="loadShops('${marketId}')">
+            ${i + 1}
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+// ── Charger les produits du marché ──
+async function loadMarketProducts(marketId) {
+  showLoading('products-view', 'Chargement des produits...');
+
+  const result = await getProducts({ marketId, limit: 12 });
+
+  if (!result.success) {
+    showError('products-view', 'Impossible de charger les produits');
+    return;
+  }
+
+  const container = document.getElementById('products-view');
+
+  if (result.data.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:14px">📦</div>
+        <div>Aucun produit dans ce marché</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="sec-hd">
+      <div class="sec-hd-title">Tous les produits</div>
+      <div class="sec-hd-count">${result.pagination.total} produits</div>
+    </div>
+    <div class="prods-grid">
+      ${result.data.map(prod => `
+        <div class="prod-card"
+             onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+          <div class="prod-img" style="background:#F0EAF8">
+            ${prod.images.length > 0
+              ? `<img src="${prod.images[0]}" style="width:100%;height:100%;object-fit:cover"/>`
+              : '👗'
+            }
+            ${prod.originalPrice
+              ? `<div class="prod-badge">
+                  -${Math.round((1 - prod.price/prod.originalPrice)*100)}%
+                </div>`
+              : ''
+            }
+            <div class="prod-wish" onclick="wish(event)">🤍</div>
+          </div>
+          <div class="prod-body">
+            <div class="prod-market-tag">🏛️ ${prod.shop.market.name}</div>
+            <div class="prod-name">${prod.name}</div>
+            <div class="prod-shop">${prod.shop.name} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
+            <div class="prod-rating">
+              <span class="stars">★★★★★</span>
+              ${prod.rating} (${prod.totalReviews})
+            </div>
+            <div class="prod-footer">
+              <div>
+                <span class="prod-price">${formatPrice(prod.price)}</span>
+                ${prod.originalPrice
+                  ? `<span class="prod-old">${formatPrice(prod.originalPrice)}</span>`
+                  : ''
+                }
+              </div>
+              <button class="add-btn"
+                onclick="addToCart(event, '${prod.id}', '${prod.name}', ${prod.price})">
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── Changer d'onglet ──
+function switchTab(tab, el) {
+  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  currentTab = tab;
+
+  // Cacher tous les onglets
+  document.getElementById('shops-view').style.display = 'none';
+  document.getElementById('products-view').style.display = 'none';
+  document.getElementById('promos-view').style.display = 'none';
+
+  // Afficher l'onglet sélectionné
+  document.getElementById(tab + '-view').style.display = '';
+
+  // Charger les données si nécessaire
+  if (tab === 'shops' && currentMarketId) {
+    loadShops(currentMarketId);
+  } else if (tab === 'products' && currentMarketId) {
+    loadMarketProducts(currentMarketId);
+  }
+}
+
+// ── Ajouter au panier ──
+function addToCart(event, productId, productName, price) {
+  event.stopPropagation();
+
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(item => item.productId === productId);
+
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ productId, name: productName, price, quantity: 1 });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('cart-count').textContent = cartCount;
+
+  showToast('✓ ' + productName + ' ajouté au panier');
+}
+
+// ── Ajouter aux favoris ──
+function wish(event) {
+  event.stopPropagation();
+  const btn = event.target;
+  btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
+  showToast(btn.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+}
+
+// ── Changer de marché ──
+function changeMarket(name) {
+  showToast('🗺️ Marché ' + name + ' sélectionné');
+}
+
+// ── Copier le code promo ──
+function copyCode() {
+  navigator.clipboard?.writeText('SANDAGA15').catch(() => {});
+  showToast('✓ Code copié !');
+}
+
+// ── Ouvrir/fermer sidebar filtres ──
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ── Hamburger menu ──
+function toggleMenu() {
+  const h = document.getElementById('nav-hamburger');
+  const d = document.getElementById('nav-drawer');
+  h.classList.toggle('open');
+  d.classList.toggle('open');
+}
+
+// ── Mettre à jour le compteur panier ──
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const el = document.getElementById('cart-count');
+  if (el) el.textContent = cartCount;
+}
+
+// ── Fermer le drawer en cliquant dehors ──
+document.addEventListener('click', function(e) {
+  const d = document.getElementById('nav-drawer');
+  const h = document.getElementById('nav-hamburger');
+  if (d && d.classList.contains('open') &&
+      !d.contains(e.target) && !h.contains(e.target)) {
+    d.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  updateCartCount();
+
+  // Récupérer l'ID du marché depuis l'URL
+  currentMarketId = getMarketIdFromURL();
+
+  if (!currentMarketId) {
+    // Si pas d'ID dans l'URL — charger le premier marché
+    const marketsResult = await getMarkets();
+    if (marketsResult.success && marketsResult.data.length > 0) {
+      currentMarketId = marketsResult.data[0].id;
+    }
+  }
+
+  if (currentMarketId) {
+    await loadMarket(currentMarketId);
+    await loadShops(currentMarketId);
+  }
+});
+</script>
+<script src="api.js"></script>
+</body>
+</html>
