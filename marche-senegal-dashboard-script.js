@@ -446,11 +446,6 @@ function updatePreview() {
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
-  if (!user) { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
-  if (user.role !== 'SELLER' && user.role !== 'ADMIN') {
-    showToast('Accès réservé aux vendeurs');
-    setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
-    return;
-  }
+  if (!user || user.role !== 'SELLER') { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   await loadDashboard();
 });
