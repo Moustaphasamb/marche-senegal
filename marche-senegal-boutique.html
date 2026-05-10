@@ -598,20 +598,26 @@ a{text-decoration:none;color:inherit}
 
     <!-- TAB PRODUITS -->
     <div id="tab-produits" style="display:none">
-      <div class="sec-hd" style="margin-bottom:14px"><div class="sec-title">Tous les produits (48)</div></div>
-      <div class="pf-row">
-        <button class="pf active">Tout</button>
-        <button class="pf">Boubou</button><button class="pf">Bazin</button>
-        <button class="pf">Robe</button><button class="pf">Tissu wax</button>
-        <button class="pf">Promo</button>
+      <div class="sec-hd" style="margin-bottom:14px">
+        <div class="sec-title" id="tab-produits-title">Tous les produits</div>
       </div>
-      <div class="prods-grid">
-        <div class="prod-card"><div class="pc-img" style="background:#F0EAF8">👗<div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Boubou wax tissé main L</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (89)</div><div class="pc-footer"><div><span class="pc-price">15 300 FCFA</span><span class="pc-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="pc-img" style="background:#FFF8E7">🧵<div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Bazin brodé cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 5.0 (42)</div><div class="pc-footer"><div><span class="pc-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="pc-img" style="background:#FDE8E6">👘<div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Robe wax brodée col rond</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (67)</div><div class="pc-footer"><div><span class="pc-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="pc-img" style="background:#E8F5EC">🎨<div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Tissu wax hollandais 6y</div><div class="pc-rating"><span class="pc-stars">★★★★☆</span> 4.7 (112)</div><div class="pc-footer"><div><span class="pc-price">4 050 FCFA</span><span class="pc-old">4 500</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="pc-img" style="background:#F0EAF8">🥻<div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Ensemble 3 pièces femme</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (33)</div><div class="pc-footer"><div><span class="pc-price">28 000 FCFA</span><span class="pc-old">35 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="pc-img" style="background:#FDF3DC">👒<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div><div class="pc-body"><div class="pc-name">Kaftan bazin riche homme</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (28)</div><div class="pc-footer"><div><span class="pc-price">22 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      <div class="pf-row">
+        <button class="pf active" onclick="filterAllProds('all',this)">Tout</button>
+        <button class="pf" onclick="filterAllProds('boubou',this)">Boubou</button>
+        <button class="pf" onclick="filterAllProds('bazin',this)">Bazin</button>
+        <button class="pf" onclick="filterAllProds('wax',this)">Tissu wax</button>
+        <button class="pf" onclick="filterAllProds('promo',this)">🔥 Promo</button>
+      </div>
+      <div class="prods-grid" id="tab-produits-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+          <div style="font-size:2rem;margin-bottom:10px">⏳</div>
+          <div>Chargement des produits…</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <button id="btn-voir-plus" class="nav-btn" style="display:none;margin:0 auto" onclick="loadMoreProds()">
+          Voir plus de produits <span id="voir-plus-count"></span>
+        </button>
       </div>
     </div>
 
@@ -627,6 +633,23 @@ a{text-decoration:none;color:inherit}
           <div class="rb-row"><span class="rb-star">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct">0%</span></div>
         </div>
       </div>
+      <div id="review-form-wrap" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;display:none">
+        <div style="font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:12px">✍️ Laisser un avis</div>
+        <div style="margin-bottom:10px">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Votre note</div>
+          <div id="star-picker" style="display:flex;gap:6px;font-size:1.6rem;cursor:pointer">
+            <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
+          </div>
+        </div>
+        <textarea id="review-comment" rows="3"
+          style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:.82rem;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s"
+          placeholder="Partagez votre expérience avec cette boutique…"></textarea>
+        <button onclick="submitReview()"
+          style="margin-top:10px;background:var(--green);color:#fff;border:none;border-radius:99px;padding:9px 22px;font-size:.82rem;font-weight:600;cursor:pointer;width:100%;transition:background .2s">
+          Publier mon avis
+        </button>
+      </div>
+
       <div class="review-list">
         <div class="review-card">
           <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 2 jours</div></div><div class="rv-stars">★★★★★</div></div>
@@ -672,7 +695,7 @@ a{text-decoration:none;color:inherit}
       <div class="pc-code">FATOU15</div>
       <div class="pc-detail">-15% sur toute la boutique<br/>Valable jusqu'à 20h00 · Max 50 utilisations</div>
       <button class="pc-copy" onclick="copyCode('FATOU15')">Copier le code promo</button>
-      <div class="pc-timer"><span class="pt-dot"></span>Expire dans 4h 32min</div>
+      <div class="pc-timer"><span class="pt-dot"></span><span id="promo-countdown">Calcul en cours…</span></div>
     </div>
 
     <div class="contact-card">
@@ -682,11 +705,11 @@ a{text-decoration:none;color:inherit}
           <div class="cc-icon" style="background:rgba(255,255,255,.2)">💬</div>
           <span>Chat dans l'application</span>
         </button>
-        <button class="cc-btn" onclick="toast('Ouverture WhatsApp...')">
+        <button class="cc-btn" id="btn-whatsapp" onclick="openWhatsApp()">
           <div class="cc-icon" style="background:#E8F5E9">📱</div>
           <span>WhatsApp direct</span>
         </button>
-        <button class="cc-btn" onclick="toast('Appel en cours...')">
+        <button class="cc-btn" id="btn-call" onclick="callShop()">
           <div class="cc-icon" style="background:var(--gp)">📞</div>
           <span>Appeler la boutique</span>
         </button>
@@ -705,7 +728,7 @@ a{text-decoration:none;color:inherit}
       <div class="map-body">
         <div class="map-address">Marché Sandaga — Allée 3, Stand 12</div>
         <div class="map-sub">Rue Mohamed V, Dakar Centre</div>
-        <button class="map-btn" onclick="toast('Ouverture de la carte...')">📍 Voir sur la carte</button>
+        <button class="map-btn" id="btn-map" onclick="openMap()">📍 Voir sur la carte</button>
       </div>
     </div>
 
@@ -814,13 +837,29 @@ async function loadShop(shopId) {
   // Mettre à jour les stats
   const stats = document.querySelectorAll('.sh-stat-n');
   if (stats[0]) stats[0].textContent = shop.rating > 0 ? shop.rating + ' ⭐' : 'Nouveau';
-  if (stats[1]) stats[1].textContent = shop.totalReviews;
-  if (stats[2]) stats[2].textContent = shop.totalSales;
+  if (stats[1]) stats[1].textContent = shop.totalReviews || 0;
+  if (stats[2]) stats[2].textContent = (shop.totalSales || 0).toLocaleString('fr-FR');
   if (stats[3]) stats[3].textContent = shop._count?.products || 0;
+  if (stats[4]) stats[4].textContent = (shop.followersCount || shop._count?.favorites || 0).toLocaleString('fr-FR');
 
   // Mettre à jour le breadcrumb
   const bcCurrent = document.querySelector('.bc-current');
   if (bcCurrent) bcCurrent.textContent = shop.name;
+
+  // Mettre à jour le numéro de téléphone dans Infos
+  const itPhone = document.querySelector('.it-row .it-sub');
+  if (itPhone && shop.phone) {
+    itPhone.textContent = shop.phone + ' · WhatsApp disponible';
+  }
+
+  if (shop.market) {
+    const bcLinks = document.querySelectorAll('.bc-link');
+    // bcLinks[1] = "Marchés", bcLinks[2] = nom du marché
+    if (bcLinks[2]) {
+      bcLinks[2].textContent = shop.market.name;
+      bcLinks[2].href = 'marche-senegal-marche.html?id=' + shop.market.id;
+    }
+  }
 
   // Charger les produits
   loadShopProducts(shop);
@@ -829,66 +868,175 @@ async function loadShop(shopId) {
   loadShopReviews(shop);
 }
 
+// ── Construire une carte produit (DOM pur — pas d'innerHTML) ──
+function buildProdCard(prod) {
+  const card = document.createElement('div');
+  card.className = 'prod-card';
+  card.dataset.cat = (prod.category?.name || '').toLowerCase();
+  card.addEventListener('click', () => {
+    window.location.href = 'marche-senegal-produit.html?id=' + prod.id;
+  });
+
+  const imgDiv = document.createElement('div');
+  imgDiv.className = 'pc-img';
+  imgDiv.style.background = '#F0EAF8';
+
+  if (prod.images?.length > 0) {
+    const img = document.createElement('img');
+    img.src = prod.images[0];
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+    imgDiv.appendChild(img);
+  } else {
+    imgDiv.append('👗');
+  }
+
+  if (prod.originalPrice) {
+    const badge = document.createElement('div');
+    badge.className = 'pc-badge';
+    badge.textContent = '-' + Math.round((1 - prod.price / prod.originalPrice) * 100) + '%';
+    imgDiv.appendChild(badge);
+  }
+
+  const wishBtn = document.createElement('div');
+  wishBtn.className = 'pc-wish';
+  wishBtn.textContent = '🤍';
+  wishBtn.addEventListener('click', wish);
+  imgDiv.appendChild(wishBtn);
+
+  const body = document.createElement('div');
+  body.className = 'pc-body';
+
+  const name = document.createElement('div');
+  name.className = 'pc-name';
+  name.textContent = prod.name;
+
+  const ratingDiv = document.createElement('div');
+  ratingDiv.className = 'pc-rating';
+  const stars = document.createElement('span');
+  stars.className = 'pc-stars';
+  stars.textContent = '★★★★★';
+  ratingDiv.appendChild(stars);
+  ratingDiv.append(' ' + (prod.rating || 0) + ' (' + (prod.totalReviews || 0) + ')');
+
+  const footer = document.createElement('div');
+  footer.className = 'pc-footer';
+
+  const priceWrap = document.createElement('div');
+  const priceSpan = document.createElement('span');
+  priceSpan.className = 'pc-price';
+  priceSpan.textContent = formatPrice(prod.price);
+  priceWrap.appendChild(priceSpan);
+  if (prod.originalPrice) {
+    const oldSpan = document.createElement('span');
+    oldSpan.className = 'pc-old';
+    oldSpan.textContent = formatPrice(prod.originalPrice);
+    priceWrap.appendChild(oldSpan);
+  }
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-btn';
+  addBtn.textContent = '+';
+  addBtn.addEventListener('click', e => addCart(e, prod.id, prod.name, prod.price));
+
+  footer.appendChild(priceWrap);
+  footer.appendChild(addBtn);
+  body.appendChild(name);
+  body.appendChild(ratingDiv);
+  body.appendChild(footer);
+  card.appendChild(imgDiv);
+  card.appendChild(body);
+  return card;
+}
+
 // ── Charger les produits de la boutique ──
 function loadShopProducts(shop) {
-  const prodsGrid = document.querySelector('.prods-grid');
-  if (!prodsGrid) return;
+  const featuredGrid = document.querySelector('#tab-boutique .prods-grid');
+  const allGrid = document.getElementById('tab-produits-grid');
+  const allTitle = document.getElementById('tab-produits-title');
 
-  if (!shop.products || shop.products.length === 0) {
-    prodsGrid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
-        <div style="font-size:2.5rem;margin-bottom:12px">📦</div>
-        <div>Aucun produit dans cette boutique</div>
-      </div>
-    `;
+  const count = shop.products?.length || 0;
+
+  // Mettre à jour le label de l'onglet et le titre
+  const prodTab = document.querySelectorAll('.tab')[1];
+  if (prodTab) prodTab.textContent = '📦 Produits (' + count + ')';
+  if (allTitle) allTitle.textContent = 'Tous les produits (' + count + ')';
+
+  const emptyNode = () => {
+    const w = document.createElement('div');
+    w.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)';
+    const icon = document.createElement('div');
+    icon.style.cssText = 'font-size:2.5rem;margin-bottom:12px';
+    icon.textContent = '📦';
+    const txt = document.createElement('div');
+    txt.textContent = 'Aucun produit dans cette boutique';
+    w.appendChild(icon);
+    w.appendChild(txt);
+    return w;
+  };
+
+  if (!count) {
+    if (featuredGrid) { featuredGrid.replaceChildren(emptyNode()); }
+    if (allGrid) { allGrid.replaceChildren(emptyNode()); }
     return;
   }
 
-  prodsGrid.innerHTML = shop.products.map(prod => `
-    <div class="prod-card"
-         onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
-      <div class="pc-img" style="background:#F0EAF8">
-        ${prod.images?.length > 0
-          ? `<img src="${prod.images[0]}"
-                  style="width:100%;height:100%;object-fit:cover"/>`
-          : '👗'
-        }
-        ${prod.originalPrice
-          ? `<div class="pc-badge">
-              -${Math.round((1-prod.price/prod.originalPrice)*100)}%
-             </div>`
-          : ''
-        }
-        <div class="pc-wish" onclick="wish(event)">🤍</div>
-      </div>
-      <div class="pc-body">
-        <div class="pc-name">${prod.name}</div>
-        <div class="pc-rating">
-          <span class="pc-stars">★★★★★</span>
-          ${prod.rating} (${prod.totalReviews})
-        </div>
-        <div class="pc-footer">
-          <div>
-            <span class="pc-price">${formatPrice(prod.price)}</span>
-            ${prod.originalPrice
-              ? `<span class="pc-old">${formatPrice(prod.originalPrice)}</span>`
-              : ''
-            }
-          </div>
-          <button class="add-btn"
-            onclick="addCart(event,'${prod.id}','${prod.name}',${prod.price})">
-            +
-          </button>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  // Stocker pour la pagination
+  allProductsData = shop.products;
+  prodsPage = 0;
+
+  const firstPage = shop.products.slice(0, PRODS_PER_PAGE);
+  const remaining = shop.products.length - PRODS_PER_PAGE;
+
+  if (featuredGrid) {
+    featuredGrid.replaceChildren(...shop.products.slice(0, 6).map(p => buildProdCard(p)));
+  }
+  if (allGrid) {
+    allGrid.replaceChildren(...firstPage.map(p => buildProdCard(p)));
+  }
+
+  const btn = document.getElementById('btn-voir-plus');
+  if (btn) {
+    if (remaining > 0) {
+      btn.style.display = 'inline-flex';
+      const countEl = document.getElementById('voir-plus-count');
+      if (countEl) countEl.textContent = '(' + remaining + ' restants)';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+}
+
+// ── Mettre à jour le résumé de notation (barres de pourcentage) ──
+function updateRatingSummary(reviews) {
+  if (!reviews || !reviews.length) return;
+
+  const total = reviews.length;
+  const counts = [0, 0, 0, 0, 0]; // index 0 = 1 étoile, index 4 = 5 étoiles
+  reviews.forEach(r => { if (r.rating >= 1 && r.rating <= 5) counts[r.rating - 1]++; });
+
+  const avg = reviews.reduce((s, r) => s + r.rating, 0) / total;
+
+  const rsNum = document.querySelector('.rs-num');
+  const rsCount = document.querySelector('.rs-count');
+  if (rsNum) rsNum.textContent = avg.toFixed(1);
+  if (rsCount) rsCount.textContent = total + ' avis';
+
+  const fills = document.querySelectorAll('.rb-fill');
+  const pcts = document.querySelectorAll('.rb-pct');
+  // Les barres sont affichées 5★ en premier, donc index 4→0
+  [4, 3, 2, 1, 0].forEach((starIdx, i) => {
+    const pct = total > 0 ? Math.round(counts[starIdx] / total * 100) : 0;
+    if (fills[i]) fills[i].style.width = pct + '%';
+    if (pcts[i]) pcts[i].textContent = pct + '%';
+  });
 }
 
 // ── Charger les avis ──
 function loadShopReviews(shop) {
   const reviewList = document.querySelector('.review-list');
   if (!reviewList) return;
+
+  updateRatingSummary(shop.reviews);
 
   if (!shop.reviews || shop.reviews.length === 0) {
     reviewList.innerHTML = `
@@ -1034,6 +1182,172 @@ function sendMsg() {
   }, 1200);
 }
 
+// ── Alias toast (nav HTML) → showToast ──
+function toast(msg) { showToast(msg); }
+
+// ── WhatsApp ──
+function openWhatsApp() {
+  const phone = currentShop?.phone;
+  if (!phone) { showToast('Numéro non disponible'); return; }
+  const cleaned = phone.replace(/\D/g, '');
+  window.open('https://wa.me/' + cleaned, '_blank');
+}
+
+// ── Appel téléphonique ──
+function callShop() {
+  const phone = currentShop?.phone;
+  if (!phone) { showToast('Numéro non disponible'); return; }
+  window.location.href = 'tel:' + phone;
+}
+
+// ── Ouvrir Google Maps ──
+function openMap() {
+  const shop = currentShop;
+  const query = shop?.address || shop?.market?.name || 'Marché Sandaga Dakar';
+  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query), '_blank');
+}
+
+// ── Compte à rebours promo (expire à 20h00 du jour) ──
+function startPromoCountdown() {
+  const el = document.getElementById('promo-countdown');
+  if (!el) return;
+
+  function tick() {
+    const now = new Date();
+    const end = new Date();
+    end.setHours(20, 0, 0, 0);
+    const diff = end - now;
+
+    if (diff <= 0) {
+      el.textContent = 'Promotion expirée';
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = 'Expire dans ' + h + 'h ' + String(m).padStart(2,'0') + 'min ' + String(s).padStart(2,'0') + 's';
+    setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+// ── Pagination produits ──
+let allProductsData = [];
+let prodsPage = 0;
+const PRODS_PER_PAGE = 12;
+
+function loadMoreProds() {
+  prodsPage++;
+  const grid = document.getElementById('tab-produits-grid');
+  const btn = document.getElementById('btn-voir-plus');
+  const start = prodsPage * PRODS_PER_PAGE;
+  const slice = allProductsData.slice(start, start + PRODS_PER_PAGE);
+
+  slice.forEach(prod => grid.appendChild(buildProdCard(prod)));
+
+  const remaining = allProductsData.length - (start + PRODS_PER_PAGE);
+  if (remaining <= 0) {
+    if (btn) btn.style.display = 'none';
+  } else {
+    const countEl = document.getElementById('voir-plus-count');
+    if (countEl) countEl.textContent = '(' + remaining + ' restants)';
+  }
+}
+
+// ── Évaluations étoiles interactives ──
+let selectedRating = 0;
+document.addEventListener('DOMContentLoaded', () => {
+  const picker = document.getElementById('star-picker');
+  if (!picker) return;
+  const stars = picker.querySelectorAll('span');
+
+  function paint(n) {
+    stars.forEach((s, i) => { s.textContent = i < n ? '★' : '☆'; });
+  }
+
+  stars.forEach(s => {
+    s.addEventListener('mouseenter', () => paint(+s.dataset.v));
+    s.addEventListener('mouseleave', () => paint(selectedRating));
+    s.addEventListener('click', () => {
+      selectedRating = +s.dataset.v;
+      paint(selectedRating);
+    });
+  });
+});
+
+// ── Soumettre un avis ──
+function submitReview() {
+  if (!selectedRating) { showToast('Veuillez choisir une note ★'); return; }
+  const comment = document.getElementById('review-comment')?.value.trim();
+  if (!comment) { showToast('Veuillez écrire un commentaire'); return; }
+
+  showToast('✓ Avis envoyé — merci !');
+
+  // Réinitialiser le formulaire
+  selectedRating = 0;
+  document.querySelectorAll('#star-picker span').forEach(s => { s.textContent = '☆'; });
+  const ta = document.getElementById('review-comment');
+  if (ta) ta.value = '';
+}
+
+// ── Ajouter au panier depuis les tags vidéo ──
+function addToCart2(productName, price) {
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(i => i.name === productName);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({
+      productId: 'video_' + Date.now(),
+      name: productName,
+      price,
+      quantity: 1,
+      shopId: currentShop?.id,
+      shopName: currentShop?.name
+    });
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+  document.getElementById('cart-count').textContent = cartCount;
+  showToast('✓ ' + productName + ' ajouté au panier');
+}
+
+// ── Lecture de la visite virtuelle ──
+function playVideo() {
+  const overlay = document.getElementById('vp-overlay');
+  const dur = document.getElementById('vp-dur');
+  if (overlay) {
+    overlay.style.background = 'rgba(0,0,0,.55)';
+    while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'color:#fff;font-size:.88rem;font-weight:600;padding:10px 18px;background:rgba(0,0,0,.5);border-radius:99px';
+    lbl.textContent = '▶ Lecture en cours…';
+    overlay.appendChild(lbl);
+  }
+  if (dur) dur.textContent = '▶ En lecture';
+  showToast('▶ Visite virtuelle en cours de lecture');
+}
+
+// ── Filtrer les produits vedettes (onglet Boutique) ──
+function filterP(cat, el) {
+  document.querySelectorAll('#tab-boutique .pf').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('#tab-boutique .prod-card').forEach(card => {
+    const cardCat = card.dataset.cat || '';
+    card.style.display = (cat === 'all' || cardCat.includes(cat)) ? '' : 'none';
+  });
+}
+
+// ── Filtrer tous les produits (onglet Produits) ──
+function filterAllProds(cat, el) {
+  document.querySelectorAll('#tab-produits .pf').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('#tab-produits-grid .prod-card').forEach(card => {
+    const cardCat = card.dataset.cat || '';
+    card.style.display = (cat === 'all' || cardCat.includes(cat)) ? '' : 'none';
+  });
+}
+
 // ── Hamburger ──
 function toggleMenu() {
   const h = document.getElementById('nav-hamburger');
@@ -1064,13 +1378,19 @@ document.addEventListener('click', function(e) {
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
+  startPromoCountdown();
+
+  // Afficher le formulaire d'avis si connecté
+  if (isLoggedIn()) {
+    const form = document.getElementById('review-form-wrap');
+    if (form) form.style.display = 'block';
+  }
 
   const shopId = getShopIdFromURL();
 
   if (shopId) {
     await loadShop(shopId);
   } else {
-    // Si pas d'ID — charger la première boutique
     const result = await getShops({ page: 1 });
     if (result.success && result.data.length > 0) {
       await loadShop(result.data[0].id);

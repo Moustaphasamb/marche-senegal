@@ -203,7 +203,7 @@ a{text-decoration:none;color:inherit}
   <div class="sn-item" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
   <div class="sn-item active">🛒 Mes commandes</div>
   <div class="sn-item" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</div>
-  <div class="sn-item" onclick="var u=getCurrentUser();window.location.href='marche-senegal-boutique.html'+(u&&u.shop?'?id='+u.shop.id:'')">🏪 Ma boutique</div>
+  <div class="sn-item" onclick="window.location.href='marche-senegal-ma-boutique.html'">🏪 Ma boutique</div>
 </nav>
 
 <!-- MAIN -->
@@ -300,12 +300,12 @@ function updateStats(stats) {
   document.getElementById('stat-delivered').textContent =
     allOrders.filter(o => o.status === 'DELIVERED').length;
   document.getElementById('stat-revenue').textContent =
-    stats.totalRevenue > 0
-      ? (stats.totalRevenue / 1000).toFixed(0) + 'K FCFA'
+    stats.revenue > 0
+      ? (stats.revenue / 1000).toFixed(0) + 'K FCFA'
       : '0 FCFA';
 
   // Badge en attente
-  const pendingCount = stats.pendingOrders || 0;
+  const pendingCount = stats.pending || 0;
   const badge = document.getElementById('pending-badge');
   if (badge && pendingCount > 0) {
     badge.textContent = pendingCount;
@@ -425,6 +425,15 @@ function getOrderActions(order) {
       <button class="oa-btn deliver"
         onclick="updateStatus('${order.id}','DELIVERING')">
         🛵 Livrer
+      </button>
+    `);
+  }
+
+  if (order.status === 'DELIVERING') {
+    actions.push(`
+      <button class="oa-btn confirm"
+        onclick="updateStatus('${order.id}','DELIVERED')">
+        ✅ Marquer livré
       </button>
     `);
   }
@@ -573,6 +582,12 @@ async function openDetail(orderId) {
         <button class="dp-action-btn dp-btn-green"
           onclick="updateStatus('${order.id}','DELIVERING');closeDetail()">
           🛵 Envoyer en livraison
+        </button>
+      ` : ''}
+      ${order.status === 'DELIVERING' ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','DELIVERED');closeDetail()">
+          ✅ Confirmer la livraison
         </button>
       ` : ''}
       <button class="dp-action-btn dp-btn-outline" onclick="closeDetail()">

@@ -250,14 +250,13 @@ a{text-decoration:none;color:inherit}
     <div class="content-card" id="tab-favorites" style="display:none">
       <div class="cc-head">
         <div class="cc-title">❤️ Mes favoris</div>
+        <div class="cc-action" onclick="loadFavorites()">Actualiser</div>
       </div>
-      <div class="empty-state">
-        <div class="es-icon">❤️</div>
-        <div class="es-title">Aucun favori</div>
-        <div class="es-sub">Ajoutez des produits à vos favoris en cliquant sur 🤍</div>
-        <button class="es-btn" onclick="window.location.href='marche-senegal-accueil.html'">
-          🛍️ Explorer les produits
-        </button>
+      <div id="favorites-container">
+        <div class="empty-state">
+          <div class="es-icon">⏳</div>
+          <div class="es-title">Chargement...</div>
+        </div>
       </div>
     </div>
 

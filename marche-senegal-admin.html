@@ -164,8 +164,8 @@
   <nav class="sb-nav">
     <div class="sb-sec">Vue d'ensemble</div>
     <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-icon">📊</span>Tableau de bord</div>
-    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon">👥</span>Utilisateurs<span class="sb-badge gold">48 260</span></div>
-    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon">🏪</span>Vendeurs<span class="sb-badge">12</span></div>
+    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon">👥</span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">48 260</span></div>
+    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon">🏪</span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">12</span></div>
     <div class="sb-sec">Commerce</div>
     <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green">3 840</span></div>
     <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge">8</span></div>
@@ -206,10 +206,10 @@
   <!-- ── OVERVIEW ── -->
   <div class="ps active" id="ps-overview">
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🛒</div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🏪</div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val">2 412</div><div class="kpi-label">Boutiques actives</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">👥</div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val" id="kpi-revenue">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🛒</div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val" id="kpi-orders">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🏪</div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val" id="kpi-shops">2 412</div><div class="kpi-label">Boutiques actives</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">👥</div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val" id="kpi-users">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">⚖️</div><div class="kpi-chg down">↑ +3</div></div><div class="kpi-val">8</div><div class="kpi-label">Litiges ouverts</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🚚</div><div class="kpi-chg up">↑ +2%</div></div><div class="kpi-val">94%</div><div class="kpi-label">Taux livraison réussie</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">⭐</div><div class="kpi-chg up">↑ +0.1</div></div><div class="kpi-val">4.7</div><div class="kpi-label">Note moyenne globale</div></div>
@@ -331,13 +331,13 @@
   <!-- ── VENDORS ── -->
   <div class="ps" id="ps-vendors">
     <div class="sec-header">
-      <div class="sec-title">🏪 Vendeurs (2 412 actifs · 12 en attente)</div>
+      <div class="sec-title" id="vendors-title">🏪 Vendeurs</div>
       <button class="sec-btn sec-btn-outline" onclick="toast('Exporter la liste...')">📊 Exporter</button>
     </div>
     <div class="card">
       <table class="t">
         <thead><tr><th>Vendeur</th><th>Marché</th><th>Boutique</th><th>Ventes</th><th>Note</th><th>CNI</th><th>Actions</th></tr></thead>
-        <tbody>
+        <tbody id="vendors-tbody">
           <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div></div></div></td><td>🏛️ Sandaga</td><td>Mode Fatou</td><td>1 240</td><td>4.8 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Voir</button><button class="ta reject" onclick="toast('Boutique suspendue')">Suspendre</button></div></td></tr>
           <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">FD</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ferme Diallo</div></div></div></td><td>🌊 Ziguinchor</td><td>Ferme Diallo Casamance</td><td>2 100</td><td>4.9 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir boutique...')">Voir</button><button class="ta reject" onclick="toast('Suspendu')">Suspendre</button></div></td></tr>
           <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div></div></div></td><td>🛍️ HLM</td><td>HLM Alimentation</td><td>En attente</td><td>—</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Validé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
@@ -388,10 +388,10 @@
   <!-- ── MARKETS ── -->
   <div class="ps" id="ps-markets">
     <div class="sec-header">
-      <div class="sec-title">🗺️ Gestion des marchés (14 régions)</div>
+      <div class="sec-title" id="markets-title">🗺️ Gestion des marchés</div>
       <button class="sec-btn sec-btn-green" onclick="toast('Ajouter un marché...')">+ Ajouter un marché</button>
     </div>
-    <div class="grid-3">
+    <div class="grid-3" id="markets-grid">
       <div class="card"><div class="card-header"><div class="card-title">🏛️ Sandaga — Dakar</div><div class="card-action" onclick="window.location.href='marche-senegal-marche.html'">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong style="color:var(--dark)">142</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong style="color:var(--dark)">12 400</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">3,2M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="window.location.href='marche-senegal-marche.html'">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
       <div class="card"><div class="card-header"><div class="card-title">🕌 Touba</div><div class="card-action" onclick="toast('Voir marché Touba...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>120</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>9 800</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.7 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,8M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Touba...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
       <div class="card"><div class="card-header"><div class="card-title">🧵 Tilène — Médina</div><div class="card-action" onclick="toast('Voir marché Tilène...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>98</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>7 600</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,1M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Tilène...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
@@ -406,107 +406,346 @@
 //   DASHBOARD ADMIN — Données dynamiques
 // ════════════════════════════════════════
 
-function toast(msg){
-  const t=document.getElementById('toast');
-  if(!t) return;
-  t.textContent=msg;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2400);
+  setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-const pageTitles={
-  overview:'Tableau de bord',
-  users:'Gestion des utilisateurs',
-  vendors:'Gestion des vendeurs',
-  orders:'Toutes les commandes',
-  disputes:'Gestion des litiges',
-  markets:'Gestion des marchés'
+const pageTitles = {
+  overview: 'Tableau de bord',
+  users: 'Gestion des utilisateurs',
+  vendors: 'Gestion des vendeurs',
+  orders: 'Toutes les commandes',
+  disputes: 'Gestion des litiges',
+  markets: 'Gestion des marchés'
 };
 
-function showPage(id, navItem){
-  document.querySelectorAll('.ps').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById('ps-'+id);
-  if(el) el.classList.add('active');
-  if(navItem){
-    document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+let vendorsLoaded = false;
+let marketsLoaded = false;
+
+function showPage(id, navItem) {
+  document.querySelectorAll('.ps').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('ps-' + id);
+  if (el) el.classList.add('active');
+  if (navItem) {
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     navItem.classList.add('active');
   }
-  document.getElementById('page-title').textContent = pageTitles[id]||'Admin';
+  const pt = document.getElementById('page-title');
+  if (pt) pt.textContent = pageTitles[id] || 'Admin';
   closeSidebar();
+  if (id === 'vendors' && !vendorsLoaded) loadVendors();
+  if (id === 'markets' && !marketsLoaded) loadMarkets();
 }
 
 function logoutAdmin() {
-  localStorage.clear();
+  logout();
   window.location.href = 'marche-senegal-connexion-admin.html';
 }
 
-function toggleSidebar(){
+function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sb-overlay').classList.toggle('show');
 }
 
-function closeSidebar(){
+function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sb-overlay').classList.remove('show');
 }
 
-function filterTgl(btn){
-  btn.closest('.filters-row').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+function filterTgl(btn) {
+  btn.closest('.filters-row').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// ── Charger les stats globales ──
+// ── KPIs globaux depuis /api/admin/stats ──
 async function loadAdminStats() {
-  // Charger les marchés réels
-  const marketsResult = await getMarkets();
-  if (marketsResult.success) {
-    const marketCount = document.getElementById('stat-markets');
-    if (marketCount) marketCount.textContent = marketsResult.data.length;
-  }
+  try {
+    const res = await apiCall('/api/admin/stats');
+    const d = res.data || {};
 
-  // Charger les produits réels
-  const productsResult = await getProducts({ limit: 1 });
-  if (productsResult.success) {
-    const prodCount = document.getElementById('stat-products');
-    if (prodCount) prodCount.textContent = productsResult.pagination.total;
-  }
+    const rev = document.getElementById('kpi-revenue');
+    if (rev) rev.textContent = d.revenue ? (d.revenue / 1000000).toFixed(1) + 'M' : '—';
 
-  // Charger les boutiques réelles
-  const shopsResult = await getShops({ limit: 1 });
-  if (shopsResult.success) {
-    const shopCount = document.getElementById('stat-shops');
-    if (shopCount) shopCount.textContent = shopsResult.pagination.total;
+    const ord = document.getElementById('kpi-orders');
+    if (ord) ord.textContent = d.orders != null ? d.orders.toLocaleString('fr-FR') : '—';
+
+    const shops = document.getElementById('kpi-shops');
+    if (shops) shops.textContent = d.shops != null ? d.shops.toLocaleString('fr-FR') : '—';
+
+    const usr = document.getElementById('kpi-users');
+    if (usr) usr.textContent = d.users != null ? d.users.toLocaleString('fr-FR') : '—';
+
+    const sbUsr = document.getElementById('sb-users-count');
+    if (sbUsr) sbUsr.textContent = d.users != null ? d.users.toLocaleString('fr-FR') : '—';
+
+    const sbPend = document.getElementById('sb-vendors-pending');
+    if (sbPend) sbPend.textContent = d.pendingVendors != null ? d.pendingVendors : '—';
+
+    const vTitle = document.getElementById('vendors-title');
+    if (vTitle) vTitle.textContent = '🏪 Vendeurs (' + (d.shops || '—') + ' actifs · ' + (d.pendingVendors || 0) + ' en attente)';
+
+  } catch (e) {
+    console.error('Erreur stats admin:', e);
   }
 }
 
-// ── Approuver un vendeur ──
-function approveVendor(btn, name) {
-  const row = btn.closest('tr');
-  const statusCell = row.querySelector('.badge');
-  if (statusCell) {
-    statusCell.textContent = 'Approuvé ✓';
-    statusCell.className = 'badge b-green';
+// ── Liste vendeurs depuis /api/admin/vendors ──
+async function loadVendors() {
+  vendorsLoaded = true;
+  const tbody = document.getElementById('vendors-tbody');
+  if (!tbody) return;
+
+  tbody.replaceChildren();
+  const loadRow = document.createElement('tr');
+  const loadTd = document.createElement('td');
+  loadTd.setAttribute('colspan', '7');
+  loadTd.style.cssText = 'text-align:center;padding:24px;color:var(--muted)';
+  loadTd.textContent = 'Chargement…';
+  loadRow.appendChild(loadTd);
+  tbody.appendChild(loadRow);
+
+  try {
+    const res = await apiCall('/api/admin/vendors');
+    const vendors = res.data || [];
+    tbody.replaceChildren();
+
+    if (!vendors.length) {
+      const emRow = document.createElement('tr');
+      const emTd = document.createElement('td');
+      emTd.setAttribute('colspan', '7');
+      emTd.style.cssText = 'text-align:center;padding:24px;color:var(--muted)';
+      emTd.textContent = 'Aucun vendeur';
+      emRow.appendChild(emTd);
+      tbody.appendChild(emRow);
+      return;
+    }
+
+    const palette = ['#1B6B3A', '#8B3A8A', '#E6A817', '#1565C0', '#C0392B'];
+    vendors.forEach((v, idx) => {
+      const shop = v.shop;
+      const initials = ((v.firstName || '')[0] || '') + ((v.lastName || '')[0] || '');
+      const color = palette[idx % palette.length];
+
+      const tr = document.createElement('tr');
+
+      // Nom vendeur
+      const td1 = document.createElement('td');
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:8px';
+      const av = document.createElement('div');
+      av.className = 'av';
+      av.style.background = color;
+      av.textContent = initials.toUpperCase() || '?';
+      const info = document.createElement('div');
+      const nm = document.createElement('div');
+      nm.style.cssText = 'font-size:.82rem;font-weight:600;color:var(--dark)';
+      nm.textContent = ((v.firstName || '') + ' ' + (v.lastName || '')).trim() || '—';
+      const ph = document.createElement('div');
+      ph.style.cssText = 'font-size:.7rem;color:var(--muted)';
+      ph.textContent = v.phone || '—';
+      info.appendChild(nm);
+      info.appendChild(ph);
+      wrap.appendChild(av);
+      wrap.appendChild(info);
+      td1.appendChild(wrap);
+
+      // Marché
+      const td2 = document.createElement('td');
+      td2.textContent = shop?.market?.name ? '📍 ' + shop.market.name : '—';
+
+      // Boutique
+      const td3 = document.createElement('td');
+      td3.textContent = shop?.name || '—';
+
+      // Ventes
+      const td4 = document.createElement('td');
+      td4.textContent = shop?.totalSales != null ? shop.totalSales.toLocaleString('fr-FR') : '—';
+
+      // Note
+      const td5 = document.createElement('td');
+      td5.textContent = shop?.rating ? shop.rating.toFixed(1) + ' ⭐' : '—';
+
+      // Statut CNI
+      const td6 = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      if (!shop) {
+        badge.classList.add('b-rej'); badge.textContent = 'Sans boutique';
+      } else if (shop.isVerified && shop.status === 'ACTIVE') {
+        badge.classList.add('b-ok'); badge.textContent = 'Validé';
+      } else if (shop.status === 'PENDING') {
+        badge.classList.add('b-wait'); badge.textContent = 'En attente';
+      } else if (shop.status === 'REJECTED') {
+        badge.classList.add('b-rej'); badge.textContent = 'Refusé';
+      } else {
+        badge.classList.add('b-wait'); badge.textContent = shop.status || '—';
+      }
+      td6.appendChild(badge);
+
+      // Actions
+      const td7 = document.createElement('td');
+      const actDiv = document.createElement('div');
+      actDiv.className = 'tb-act';
+      buildVendorActions(actDiv, v, shop, badge);
+      td7.appendChild(actDiv);
+
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      tr.appendChild(td4); tr.appendChild(td5); tr.appendChild(td6);
+      tr.appendChild(td7);
+      tbody.appendChild(tr);
+    });
+
+  } catch (e) {
+    tbody.replaceChildren();
+    const errRow = document.createElement('tr');
+    const errTd = document.createElement('td');
+    errTd.setAttribute('colspan', '7');
+    errTd.style.cssText = 'text-align:center;padding:24px;color:var(--red)';
+    errTd.textContent = 'Erreur de chargement';
+    errRow.appendChild(errTd);
+    tbody.appendChild(errRow);
   }
-  btn.closest('.tb-act').innerHTML =
-    '<button class="ta view" onclick="toast(\'Voir boutique...\')">Voir</button>';
-  toast('✓ ' + name + ' approuvé !');
 }
 
-// ── Refuser un vendeur ──
-function rejectVendor(btn, name) {
-  const row = btn.closest('tr');
-  const statusCell = row.querySelector('.badge');
-  if (statusCell) {
-    statusCell.textContent = 'Refusé ✗';
-    statusCell.className = 'badge b-red';
+function buildVendorActions(actDiv, vendor, shop, badge) {
+  actDiv.replaceChildren();
+  if (!shop) {
+    const b = document.createElement('button');
+    b.className = 'ta view';
+    b.textContent = 'Dossier';
+    b.onclick = () => toast('Dossier de ' + (vendor.firstName || ''));
+    actDiv.appendChild(b);
+  } else if (shop.status === 'PENDING') {
+    const approve = document.createElement('button');
+    approve.className = 'ta approve';
+    approve.textContent = '✓ Valider';
+    approve.onclick = () => verifyVendor(vendor.id, shop.name, 'approve', badge, actDiv, vendor);
+    const reject = document.createElement('button');
+    reject.className = 'ta reject';
+    reject.textContent = '✕';
+    reject.onclick = () => verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    actDiv.appendChild(approve);
+    actDiv.appendChild(reject);
+  } else if (shop.status === 'ACTIVE') {
+    const view = document.createElement('button');
+    view.className = 'ta view';
+    view.textContent = 'Voir';
+    view.onclick = () => window.open('marche-senegal-boutique.html?id=' + shop.id, '_blank');
+    const susp = document.createElement('button');
+    susp.className = 'ta reject';
+    susp.textContent = 'Suspendre';
+    susp.onclick = () => verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    actDiv.appendChild(view);
+    actDiv.appendChild(susp);
+  } else {
+    const view = document.createElement('button');
+    view.className = 'ta view';
+    view.textContent = 'Dossier';
+    view.onclick = () => toast('Dossier de ' + shop.name);
+    actDiv.appendChild(view);
   }
-  btn.closest('.tb-act').innerHTML = '';
-  toast('✗ ' + name + ' refusé');
 }
 
-// ── Vérifier accès admin ──
+async function verifyVendor(userId, shopName, action, badge, actDiv, vendor) {
+  if (action === 'reject') {
+    if (!confirm((action === 'reject' ? 'Refuser' : 'Valider') + ' "' + shopName + '" ?')) return;
+  }
+  try {
+    await apiCall('/api/admin/vendors/' + userId + '/verify', {
+      method: 'PATCH',
+      body: JSON.stringify({ action })
+    });
+    if (action === 'approve') {
+      badge.className = 'badge b-ok';
+      badge.textContent = 'Validé';
+      toast('✓ ' + shopName + ' approuvé !');
+    } else {
+      badge.className = 'badge b-rej';
+      badge.textContent = 'Refusé';
+      toast('✗ ' + shopName + ' refusé');
+    }
+    buildVendorActions(actDiv, vendor, { id: vendor.shop?.id, name: shopName, status: action === 'approve' ? 'ACTIVE' : 'REJECTED', isVerified: action === 'approve' }, badge);
+  } catch (e) {
+    toast('Erreur lors de l\'action');
+  }
+}
+
+// ── Marchés depuis /api/markets ──
+async function loadMarkets() {
+  marketsLoaded = true;
+  const grid = document.getElementById('markets-grid');
+  if (!grid) return;
+  try {
+    const res = await getMarkets();
+    const markets = res.data || [];
+    grid.replaceChildren();
+
+    markets.forEach(mkt => {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = (mkt.emoji || '🏛️') + ' ' + mkt.name + (mkt.city ? ' — ' + mkt.city : '');
+      const action = document.createElement('div');
+      action.className = 'card-action';
+      action.textContent = 'Voir →';
+      action.onclick = () => window.location.href = 'marche-senegal-marche.html?id=' + mkt.id;
+      header.appendChild(title);
+      header.appendChild(action);
+
+      const body = document.createElement('div');
+      body.style.cssText = 'padding:14px 18px;display:flex;flex-direction:column;gap:7px';
+
+      [
+        ['Boutiques actives', mkt._count?.shops ?? '—'],
+        ['Produits listés', mkt._count?.products ?? '—'],
+        ['Note moyenne', mkt.rating ? mkt.rating.toFixed(1) + ' ⭐' : '—']
+      ].forEach(([label, val]) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;font-size:.82rem';
+        const lbl = document.createElement('span');
+        lbl.style.color = 'var(--muted)';
+        lbl.textContent = label;
+        const v = document.createElement('strong');
+        v.style.color = 'var(--dark)';
+        v.textContent = String(val);
+        row.appendChild(lbl);
+        row.appendChild(v);
+        body.appendChild(row);
+      });
+
+      const btnWrap = document.createElement('div');
+      btnWrap.style.cssText = 'margin-top:8px;display:flex;gap:6px';
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'ta view';
+      viewBtn.textContent = 'Voir marché';
+      viewBtn.onclick = () => window.location.href = 'marche-senegal-marche.html?id=' + mkt.id;
+      btnWrap.appendChild(viewBtn);
+      body.appendChild(btnWrap);
+
+      card.appendChild(header);
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+
+    const mTitle = document.getElementById('markets-title');
+    if (mTitle) mTitle.textContent = '🗺️ Gestion des marchés (' + markets.length + ')';
+
+  } catch (e) {
+    console.error('Erreur marchés:', e);
+  }
+}
+
+// ── Auth + initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = getCurrentUser();
 
   if (!user) {
     window.location.href = 'marche-senegal-connexion-admin.html';
@@ -514,16 +753,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (user.role !== 'ADMIN') {
-    toast('❌ Accès réservé aux administrateurs');
-    setTimeout(() => {
-      window.location.href = 'marche-senegal-accueil.html';
-    }, 2000);
+    toast('Accès réservé aux administrateurs');
+    setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
     return;
   }
 
-  // Charger les vraies stats
+  const sbName = document.querySelector('.sb-user-name');
+  if (sbName && user.email) sbName.textContent = user.email;
+
   await loadAdminStats();
 });
 </script>
 </body>
 </html>
+

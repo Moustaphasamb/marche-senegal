@@ -4,353 +4,376 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Ma boutique — Marché Sénégal</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--shadow:0 2px 16px rgba(27,107,58,.09);--radius:14px;--nav-h:64px}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font-family:inherit}a{text-decoration:none;color:inherit}
-.flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-.st-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
-.st-nav{display:flex;gap:0;flex:1;overflow-x:auto;scrollbar-width:none}.st-nav::-webkit-scrollbar{display:none}
-.st-link{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-.st-link:hover{color:rgba(255,255,255,.8)}.st-link.active{color:#fff;border-bottom-color:var(--green)}
-.st-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
-.st-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
-.st-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}.st-btn-outline:hover{background:rgba(255,255,255,.18)}
-.st-btn-green{background:var(--green);color:#fff}.st-btn-green:hover{background:var(--gl)}
-.page{margin-top:var(--nav-h);max-width:760px;margin-left:auto;margin-right:auto;padding:28px 4vw 60px}
-.page-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:4px}
-.page-sub{font-size:.84rem;color:var(--muted);margin-bottom:22px}
-.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
-.card-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.field:last-child{margin-bottom:0}
-.fl{font-size:.8rem;font-weight:600;color:var(--text)}.fl-req{color:var(--red);margin-left:2px}
-.fi{height:42px;border:1.5px solid var(--border);border-radius:9px;padding:0 13px;font-size:.86rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s}.fi:focus{border-color:var(--green)}
-.fi-ta{height:auto;padding:10px 13px;resize:vertical;min-height:90px}
-.fi-hint{font-size:.74rem;color:var(--muted);margin-top:3px}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-/* Photo banner */
-.banner-zone{height:140px;border-radius:12px;border:1.5px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative;margin-bottom:14px}
-.banner-zone:hover{border-color:var(--green);background:var(--gp)}
-.banner-zone.filled{border-style:solid;border-color:var(--g2)}
-.avatar-row{display:flex;align-items:flex-end;gap:14px;margin-bottom:16px}
-.avatar-zone{width:80px;height:80px;border-radius:50%;border:2px dashed var(--border);background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:all .2s;position:relative}
-.avatar-zone:hover{border-color:var(--green)}
-.avatar-zone.filled{border-style:solid;border-color:var(--g2)}
-.avatar-info{flex:1}
-.avatar-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:3px}
-.avatar-market{font-size:.8rem;color:var(--muted)}
-/* Badge statut */
-.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:.73rem;font-weight:600}
-.badge-active{background:#E8F5EC;color:var(--green)}
-.badge-pending{background:#FDF3DC;color:#8A6100}
-.badge-rejected{background:var(--rp);color:var(--red)}
-/* Horaires */
-.hours-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
-.hour-row{display:flex;flex-direction:column;gap:4px}
-.hour-label{font-size:.72rem;font-weight:600;color:var(--muted)}
-.hour-input{border:1.5px solid var(--border);border-radius:7px;padding:5px 8px;font-size:.78rem;color:var(--text);outline:none;background:#fff}
-.hour-input:focus{border-color:var(--green)}
-/* Actions */
-.actions{display:flex;gap:10px;margin-top:8px}
-.btn-save{flex:1;background:var(--green);color:#fff;border:none;border-radius:99px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
-.btn-save:hover{background:var(--gl)}.btn-save:disabled{background:var(--muted);cursor:not-allowed}
-.btn-cancel{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:99px;padding:13px 22px;font-size:.86rem;font-weight:500;cursor:pointer;transition:all .2s}
-.btn-cancel:hover{border-color:var(--red);color:var(--red)}
-/* CNI status */
-.cni-card{display:flex;align-items:center;gap:12px;background:var(--gp);border:1.5px solid var(--g2);border-radius:10px;padding:14px 16px}
-.cni-icon{font-size:1.6rem;flex-shrink:0}
-.cni-text{flex:1}
-.cni-title{font-size:.86rem;font-weight:600;color:var(--dark)}
-.cni-sub{font-size:.76rem;color:var(--muted);margin-top:2px}
-.upload-cni-btn{background:var(--green);color:#fff;border:none;border-radius:99px;padding:7px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
-@media(max-width:600px){.fgrid{grid-template-columns:1fr}.hours-grid{grid-template-columns:1fr 1fr}}
+:root{--primary:#e8611a;--primary-dark:#c9520f;--secondary:#2d6a4f;--accent:#f4a261;--bg:#f8f5f0;--white:#fff;--text:#1a1a2e;--text-light:#6b7280;--border:#e5e7eb;--shadow:0 2px 8px rgba(0,0,0,.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+/* topbar */
+.topbar{background:var(--white);border-bottom:2px solid var(--primary);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+.logo{font-weight:800;font-size:1.1rem;color:var(--primary);text-decoration:none;}
+.nav{display:flex;gap:4px;}
+.nav a{padding:6px 14px;border-radius:8px;text-decoration:none;font-size:.85rem;color:var(--text-light);transition:.2s;}
+.nav a:hover,.nav a.active{background:var(--primary);color:var(--white);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.tb-name{font-size:.85rem;font-weight:600;color:var(--text);}
+.tb-logout{background:none;border:1px solid var(--border);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:.8rem;color:var(--text-light);transition:.2s;}
+.tb-logout:hover{border-color:var(--primary);color:var(--primary);}
+/* loading */
+.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-state p{color:var(--text-light);font-size:.95rem;}
+/* layout */
+.page-wrap{max-width:1100px;margin:0 auto;padding:28px 20px;display:none;}
+.page-header{margin-bottom:24px;}
+.page-header h1{font-size:1.4rem;font-weight:800;color:var(--text);}
+.page-header p{font-size:.85rem;color:var(--text-light);margin-top:4px;}
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;}
+/* cards */
+.card{background:var(--white);border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.card h2{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+/* form */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px;}
+.field input,.field textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;color:var(--text);background:var(--white);transition:.2s;font-family:inherit;}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,97,26,.1);}
+.field textarea{resize:vertical;min-height:90px;}
+.field-hint{font-size:.75rem;color:var(--text-light);margin-top:4px;}
+/* badge marché */
+.market-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:.85rem;color:var(--text-light);}
+.market-badge strong{color:var(--text);}
+/* preview boutique */
+.preview-card{background:var(--white);border-radius:16px;padding:20px;box-shadow:var(--shadow);position:sticky;top:76px;}
+.preview-card h2{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.pv-banner{width:100%;height:90px;border-radius:10px;background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);margin-bottom:-28px;overflow:hidden;position:relative;}
+.pv-banner img{width:100%;height:100%;object-fit:cover;}
+.pv-body{background:var(--bg);border-radius:12px;padding:36px 14px 14px;text-align:center;}
+.pv-avatar{width:52px;height:52px;border-radius:50%;background:var(--white);border:3px solid var(--white);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 10px;overflow:hidden;box-shadow:var(--shadow);}
+.pv-avatar img{width:100%;height:100%;object-fit:cover;}
+.pv-name{font-weight:800;font-size:1rem;color:var(--text);margin-bottom:4px;}
+.pv-desc{font-size:.78rem;color:var(--text-light);line-height:1.4;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.pv-market{font-size:.75rem;color:var(--primary);font-weight:600;}
+.pv-hours{font-size:.75rem;color:var(--text-light);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);}
+/* stats preview */
+.pv-stats{display:flex;justify-content:center;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.pv-stat{text-align:center;}
+.pv-stat strong{display:block;font-size:.95rem;font-weight:800;color:var(--text);}
+.pv-stat span{font-size:.7rem;color:var(--text-light);}
+/* status badge */
+.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:#dcfce7;color:#16a34a;margin-top:8px;}
+/* buttons */
+.save-btn{width:100%;padding:14px;background:var(--primary);color:var(--white);border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;margin-top:16px;margin-bottom:10px;}
+.save-btn:hover{background:var(--primary-dark);}
+.save-btn:disabled{opacity:.6;cursor:not-allowed;}
+.view-btn{width:100%;padding:11px;background:var(--white);color:var(--secondary);border:1.5px solid var(--secondary);border-radius:12px;font-size:.88rem;cursor:pointer;transition:.2s;text-decoration:none;display:block;text-align:center;}
+.view-btn:hover{background:#f0fdf4;}
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:var(--white);padding:12px 24px;border-radius:30px;font-size:.88rem;z-index:9999;transition:.3s;opacity:0;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:#dc2626;}
+/* responsive */
+@media(max-width:768px){
+.two-col{grid-template-columns:1fr;}
+.preview-card{position:static;}
+}
 </style>
 </head>
 <body>
-<div class="toast" id="toast"></div>
 
 <div class="topbar">
-  <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
-  <div class="st-nav">
-    <div class="st-link" onclick="location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
-    <div class="st-link" onclick="location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
-    <div class="st-link" onclick="location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
-    <div class="st-link active">🏪 Ma boutique</div>
+  <a class="logo" href="marche-senegal-dashboard.html">🇸🇳 Marché Sénégal</a>
+  <nav class="nav">
+    <a href="marche-senegal-dashboard.html">Dashboard</a>
+    <a href="marche-senegal-mes-produits.html">Mes produits</a>
+    <a href="marche-senegal-ma-boutique.html" class="active">Ma boutique</a>
+    <a href="marche-senegal-mes-commandes.html">Commandes</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="tb-name" id="sellerName">—</span>
+    <button class="tb-logout" onclick="logoutVendeur()">Déconnexion</button>
   </div>
-  <div class="st-actions">
-    <button class="st-btn st-btn-green" onclick="saveShop()">💾 Enregistrer</button>
+</div>
+
+<div class="loading-state" id="loadingState">
+  <div class="spinner"></div>
+  <p>Chargement de votre boutique…</p>
+</div>
+
+<div class="page-wrap" id="pageWrap">
+  <div class="page-header">
+    <h1>Ma boutique</h1>
+    <p>Modifiez les informations visibles par vos acheteurs.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <!-- Marché (non modifiable) -->
+      <div class="card">
+        <h2>Marché associé</h2>
+        <div class="market-badge">
+          <span>📍</span>
+          <span>Boutique dans le marché <strong id="marketName">—</strong></span>
+        </div>
+        <p class="field-hint" style="margin-top:10px;">Le marché ne peut pas être modifié après l'inscription.</p>
+      </div>
+
+      <!-- Identité -->
+      <div class="card">
+        <h2>Identité de la boutique</h2>
+        <div class="field">
+          <label>Nom de la boutique *</label>
+          <input type="text" id="shopName" placeholder="Ex : Mode Fatou Ndoye" maxlength="80" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="shopDesc" placeholder="Décrivez votre boutique, vos spécialités, ce qui vous distingue…" oninput="updatePreview()"></textarea>
+          <p class="field-hint">Visible sur votre page boutique publique.</p>
+        </div>
+      </div>
+
+      <!-- Médias -->
+      <div class="card">
+        <h2>Photos (URL)</h2>
+        <div class="field">
+          <label>URL du logo / avatar</label>
+          <input type="url" id="shopAvatar" placeholder="https://exemple.com/logo.jpg" oninput="updatePreview()">
+          <p class="field-hint">Image carrée recommandée (ex : photo du vendeur ou logo).</p>
+        </div>
+        <div class="field">
+          <label>URL de la bannière</label>
+          <input type="url" id="shopBanner" placeholder="https://exemple.com/banniere.jpg" oninput="updatePreview()">
+          <p class="field-hint">Image large recommandée (ex : photo de votre étalage).</p>
+        </div>
+      </div>
+
+      <!-- Infos pratiques -->
+      <div class="card">
+        <h2>Infos pratiques</h2>
+        <div class="field">
+          <label>Horaires d'ouverture</label>
+          <textarea id="shopHours" placeholder="Ex : Lun – Sam : 8h – 19h&#10;Dimanche : 9h – 14h" oninput="updatePreview()" style="min-height:70px;"></textarea>
+        </div>
+        <div class="field">
+          <label>Lien visite virtuelle</label>
+          <input type="url" id="shopTour" placeholder="https://youtube.com/watch?v=…">
+          <p class="field-hint">YouTube, Google Maps 360° ou tout autre lien vidéo.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-card">
+      <h2>Aperçu acheteur</h2>
+      <div class="pv-banner" id="pvBanner"><img id="pvBannerImg" src="" alt="" style="display:none;"></div>
+      <div class="pv-body">
+        <div class="pv-avatar" id="pvAvatar">🏪</div>
+        <div class="pv-name" id="pvName">Nom de la boutique</div>
+        <div class="pv-desc" id="pvDesc">Description de votre boutique…</div>
+        <div class="pv-market" id="pvMarket">📍 —</div>
+        <div class="pv-hours" id="pvHours" style="display:none;"></div>
+        <div class="pv-stats">
+          <div class="pv-stat"><strong id="pvProdCount">0</strong><span>produits</span></div>
+          <div class="pv-stat"><strong id="pvOrders">0</strong><span>commandes</span></div>
+          <div class="pv-stat"><strong id="pvRating">—</strong><span>note</span></div>
+        </div>
+        <div class="status-badge" id="pvStatus">Boutique active</div>
+      </div>
+      <button class="save-btn" id="saveBtn" onclick="saveShop()">Enregistrer les modifications</button>
+      <a class="view-btn" id="viewLink" href="#" target="_blank">Voir ma boutique publique</a>
+    </div>
   </div>
 </div>
 
-<div class="page">
-  <div class="page-title">🏪 Ma boutique</div>
-  <div class="page-sub">Modifier les informations de votre boutique</div>
-
-  <!-- APERÇU BOUTIQUE -->
-  <div class="card">
-    <div class="card-title">🖼️ Apparence</div>
-
-    <input type="file" id="banner-input" accept="image/*" style="display:none"/>
-    <input type="file" id="avatar-input" accept="image/*" style="display:none"/>
-
-    <div class="banner-zone" id="banner-zone" onclick="document.getElementById('banner-input').click()">
-      <span style="font-size:1.4rem">🖼️</span>
-      <div>
-        <div style="font-size:.84rem;font-weight:600;color:var(--text)">Bannière de boutique</div>
-        <div style="font-size:.74rem;color:var(--muted)">Format paysage · 1200×400 recommandé</div>
-      </div>
-    </div>
-
-    <div class="avatar-row">
-      <div class="avatar-zone" id="avatar-zone" onclick="document.getElementById('avatar-input').click()">
-        <span style="font-size:1.8rem" id="avatar-emoji">🏪</span>
-      </div>
-      <div class="avatar-info">
-        <div class="avatar-name" id="shop-name-preview">Chargement...</div>
-        <div class="avatar-market" id="shop-market-preview">Chargement du marché...</div>
-        <div style="margin-top:5px" id="shop-status-badge"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INFOS -->
-  <div class="card">
-    <div class="card-title">📝 Informations générales</div>
-    <div class="field">
-      <label class="fl">Nom de la boutique <span class="fl-req">*</span></label>
-      <input class="fi" type="text" id="shop-name" placeholder="Nom de votre boutique"/>
-    </div>
-    <div class="field">
-      <label class="fl">Description</label>
-      <textarea class="fi fi-ta" id="shop-desc" placeholder="Décrivez votre boutique, vos spécialités, votre histoire..."></textarea>
-    </div>
-    <div class="field">
-      <label class="fl">Lien visite virtuelle (optionnel)</label>
-      <input class="fi" type="url" id="shop-tour" placeholder="https://..."/>
-      <span class="fi-hint">YouTube, Google Maps, Matterport...</span>
-    </div>
-  </div>
-
-  <!-- HORAIRES -->
-  <div class="card">
-    <div class="card-title">🕐 Horaires d'ouverture</div>
-    <div style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Laissez vide si fermé ce jour</div>
-    <div class="hours-grid">
-      <div class="hour-row"><span class="hour-label">Lundi</span><input class="hour-input" id="h-lun" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Mardi</span><input class="hour-input" id="h-mar" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Mercredi</span><input class="hour-input" id="h-mer" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Jeudi</span><input class="hour-input" id="h-jeu" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Vendredi</span><input class="hour-input" id="h-ven" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Samedi</span><input class="hour-input" id="h-sam" placeholder="08:00–20:00"/></div>
-      <div class="hour-row"><span class="hour-label">Dimanche</span><input class="hour-input" id="h-dim" placeholder="Fermé"/></div>
-      <div class="hour-row"><span class="hour-label">Jours fériés</span><input class="hour-input" id="h-fer" placeholder="Fermé"/></div>
-    </div>
-  </div>
-
-  <!-- CNI -->
-  <div class="card">
-    <div class="card-title">🪪 Vérification CNI</div>
-    <div class="cni-card" id="cni-card">
-      <div class="cni-icon">🪪</div>
-      <div class="cni-text">
-        <div class="cni-title" id="cni-title">Chargement...</div>
-        <div class="cni-sub" id="cni-sub"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button class="btn-cancel" onclick="location.href='marche-senegal-dashboard.html'">Annuler</button>
-    <button class="btn-save" id="btn-save" onclick="saveShop()">💾 Enregistrer les modifications</button>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script src="api.js"></script>
 <script>
-let shopData = null;
-let bannerUrl = null;
-let avatarUrl = null;
+let shopId = null;
 
-function toast(msg){
+function showToastLocal(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'error' ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 2800);
 }
 
-document.addEventListener('DOMContentLoaded', async function(){
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if(!user || user.role !== 'SELLER'){ location.href = 'marche-senegal-connexion-vendeur.html'; return; }
+function logoutVendeur() {
+  logout();
+  window.location.href = 'marche-senegal-connexion-vendeur.html';
+}
 
-  document.getElementById('banner-input').addEventListener('change', function(){ uploadImage(this.files[0], 'banner'); this.value=''; });
-  document.getElementById('avatar-input').addEventListener('change', function(){ uploadImage(this.files[0], 'avatar'); this.value=''; });
+function updatePreview() {
+  const name = document.getElementById('shopName').value.trim();
+  const desc = document.getElementById('shopDesc').value.trim();
+  const avatarUrl = document.getElementById('shopAvatar').value.trim();
+  const bannerUrl = document.getElementById('shopBanner').value.trim();
+  const hours = document.getElementById('shopHours').value.trim();
 
-  await loadShop();
-});
+  const pvName = document.getElementById('pvName');
+  if (pvName) pvName.textContent = name || 'Nom de la boutique';
 
-async function loadShop(){
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/api/shops/dashboard', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    const data = await res.json();
-    if(!data.success){ toast('Impossible de charger la boutique'); return; }
+  const pvDesc = document.getElementById('pvDesc');
+  if (pvDesc) pvDesc.textContent = desc || 'Description de votre boutique…';
 
-    shopData = data.data.shop;
-    bannerUrl = shopData.bannerUrl;
-    avatarUrl = shopData.avatarUrl;
-
-    // Remplir les champs
-    document.getElementById('shop-name').value = shopData.name || '';
-    document.getElementById('shop-name-preview').textContent = shopData.name || '';
-    document.getElementById('shop-desc').value = shopData.description || '';
-    document.getElementById('shop-tour').value = shopData.virtualTourUrl || '';
-    document.getElementById('shop-market-preview').textContent =
-      (shopData.market?.name || '') + ' · ' + (shopData.market?.city || '');
-
-    // Badge statut
-    const badge = document.getElementById('shop-status-badge');
-    const statusMap = { ACTIVE: ['badge-active','✅ Boutique active'], PENDING: ['badge-pending','⏳ En attente de validation'], REJECTED: ['badge-rejected','❌ Non validée'], SUSPENDED: ['badge-rejected','⚠️ Suspendue'] };
-    const [cls, label] = statusMap[shopData.status] || ['badge-pending', shopData.status];
-    badge.className = 'badge ' + cls; badge.textContent = label;
-
-    // Banner
-    if(bannerUrl){
-      const zone = document.getElementById('banner-zone');
-      zone.className = 'banner-zone filled'; zone.replaceChildren();
-      const img = document.createElement('img');
-      img.src = bannerUrl; img.alt = 'Bannière';
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-      zone.appendChild(img);
-    }
-
-    // Avatar
-    if(avatarUrl){
-      const zone = document.getElementById('avatar-zone');
-      zone.className = 'avatar-zone filled'; zone.replaceChildren();
-      const img = document.createElement('img');
-      img.src = avatarUrl; img.alt = 'Logo';
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-      zone.appendChild(img);
-    }
-
-    // Horaires
-    const h = shopData.openingHours || {};
-    if(h.lundi) document.getElementById('h-lun').value = h.lundi;
-    if(h.mardi) document.getElementById('h-mar').value = h.mardi;
-    if(h.mercredi) document.getElementById('h-mer').value = h.mercredi;
-    if(h.jeudi) document.getElementById('h-jeu').value = h.jeudi;
-    if(h.vendredi) document.getElementById('h-ven').value = h.vendredi;
-    if(h.samedi) document.getElementById('h-sam').value = h.samedi;
-    if(h.dimanche) document.getElementById('h-dim').value = h.dimanche;
-    if(h.feries) document.getElementById('h-fer').value = h.feries;
-
-    // CNI
-    const cniTitle = document.getElementById('cni-title');
-    const cniSub = document.getElementById('cni-sub');
-    if(shopData.isVerified){
-      cniTitle.textContent = 'CNI vérifiée — Boutique de confiance';
-      cniSub.textContent = 'Votre identité a été validée par l\'équipe Marché Sénégal';
-    } else if(shopData.cniNumber){
-      cniTitle.textContent = 'CNI en cours de vérification';
-      cniSub.textContent = 'CNI n°' + shopData.cniNumber + ' — Vérification sous 24–48h';
+  const pvBannerImg = document.getElementById('pvBannerImg');
+  const pvBanner = document.getElementById('pvBanner');
+  if (pvBannerImg && pvBanner) {
+    if (bannerUrl) {
+      pvBannerImg.src = bannerUrl;
+      pvBannerImg.style.display = 'block';
     } else {
-      cniTitle.textContent = 'CNI non fournie';
-      cniSub.textContent = 'Fournissez votre CNI pour valider votre boutique';
+      pvBannerImg.style.display = 'none';
     }
+  }
 
-  } catch(e){ toast('Erreur de chargement'); }
-}
-
-async function uploadImage(file, type){
-  if(!file) return;
-  const token = localStorage.getItem('token');
-  const zone = document.getElementById(type === 'banner' ? 'banner-zone' : 'avatar-zone');
-  zone.style.opacity = '0.5';
-
-  const fd = new FormData(); fd.append('image', file);
-  try {
-    const r = await fetch('http://localhost:3000/api/upload/image', {
-      method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd
-    });
-    const d = await r.json();
-    zone.style.opacity = '1';
-    if(d.success){
-      if(type === 'banner'){ bannerUrl = d.url; renderBanner(d.url); }
-      else { avatarUrl = d.url; renderAvatar(d.url); }
-      toast('Photo uploadée !');
-    } else { toast(d.message || 'Erreur upload'); }
-  } catch(e){ zone.style.opacity='1'; toast('Erreur serveur'); }
-}
-
-function renderBanner(url){
-  const zone = document.getElementById('banner-zone');
-  zone.className = 'banner-zone filled'; zone.replaceChildren();
-  const img = document.createElement('img');
-  img.src = url; img.alt = 'Bannière';
-  img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-  zone.appendChild(img);
-  zone.onclick = () => document.getElementById('banner-input').click();
-}
-
-function renderAvatar(url){
-  const zone = document.getElementById('avatar-zone');
-  zone.className = 'avatar-zone filled'; zone.replaceChildren();
-  const img = document.createElement('img');
-  img.src = url; img.alt = 'Logo';
-  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
-  zone.appendChild(img);
-  zone.onclick = () => document.getElementById('avatar-input').click();
-}
-
-async function saveShop(){
-  const name = document.getElementById('shop-name').value.trim();
-  if(!name){ toast('Le nom est obligatoire'); return; }
-
-  const openingHours = {
-    lundi: document.getElementById('h-lun').value,
-    mardi: document.getElementById('h-mar').value,
-    mercredi: document.getElementById('h-mer').value,
-    jeudi: document.getElementById('h-jeu').value,
-    vendredi: document.getElementById('h-ven').value,
-    samedi: document.getElementById('h-sam').value,
-    dimanche: document.getElementById('h-dim').value,
-    feries: document.getElementById('h-fer').value
-  };
-
-  const btn = document.getElementById('btn-save');
-  btn.textContent = 'Enregistrement...'; btn.disabled = true;
-
-  try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/api/shops/me', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({
-        name,
-        description: document.getElementById('shop-desc').value.trim() || null,
-        virtualTourUrl: document.getElementById('shop-tour').value.trim() || null,
-        bannerUrl: bannerUrl || null,
-        avatarUrl: avatarUrl || null,
-        openingHours
-      })
-    });
-    const data = await res.json();
-    if(data.success){
-      document.getElementById('shop-name-preview').textContent = name;
-      toast('Boutique mise à jour !');
-      btn.textContent = '✅ Enregistré !';
-      setTimeout(() => { btn.textContent = '💾 Enregistrer les modifications'; btn.disabled = false; }, 2000);
+  const pvAvatar = document.getElementById('pvAvatar');
+  if (pvAvatar) {
+    pvAvatar.replaceChildren();
+    if (avatarUrl) {
+      const img = document.createElement('img');
+      img.src = avatarUrl;
+      img.alt = 'Avatar boutique';
+      pvAvatar.appendChild(img);
     } else {
-      toast(data.message || 'Erreur'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+      pvAvatar.textContent = '🏪';
     }
-  } catch(e){
-    toast('Erreur de connexion'); btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+  }
+
+  const pvHours = document.getElementById('pvHours');
+  if (pvHours) {
+    if (hours) {
+      pvHours.textContent = '🕐 ' + hours.split('\n')[0];
+      pvHours.style.display = 'block';
+    } else {
+      pvHours.style.display = 'none';
+    }
   }
 }
+
+function fillForm(shop, stats) {
+  shopId = shop.id;
+
+  const n = document.getElementById('shopName');
+  if (n) n.value = shop.name || '';
+
+  const d = document.getElementById('shopDesc');
+  if (d) d.value = shop.description || '';
+
+  const av = document.getElementById('shopAvatar');
+  if (av) av.value = shop.avatarUrl || '';
+
+  const bn = document.getElementById('shopBanner');
+  if (bn) bn.value = shop.bannerUrl || '';
+
+  const ho = document.getElementById('shopHours');
+  if (ho) ho.value = shop.openingHours || '';
+
+  const to = document.getElementById('shopTour');
+  if (to) to.value = shop.virtualTourUrl || '';
+
+  const mkt = document.getElementById('marketName');
+  if (mkt) mkt.textContent = shop.market?.name || '—';
+
+  const pvMarket = document.getElementById('pvMarket');
+  if (pvMarket) pvMarket.textContent = '📍 ' + (shop.market?.name || '—');
+
+  const pvProd = document.getElementById('pvProdCount');
+  if (pvProd) pvProd.textContent = stats?.totalProducts ?? shop._count?.products ?? 0;
+
+  const pvOrd = document.getElementById('pvOrders');
+  if (pvOrd) pvOrd.textContent = stats?.totalOrders ?? 0;
+
+  const pvRat = document.getElementById('pvRating');
+  if (pvRat) pvRat.textContent = shop.rating ? shop.rating.toFixed(1) : '—';
+
+  const pvSt = document.getElementById('pvStatus');
+  if (pvSt) {
+    if (shop.status === 'ACTIVE') {
+      pvSt.textContent = 'Boutique active';
+      pvSt.style.background = '#dcfce7';
+      pvSt.style.color = '#16a34a';
+    } else {
+      pvSt.textContent = 'En attente de validation';
+      pvSt.style.background = '#fef3c7';
+      pvSt.style.color = '#d97706';
+    }
+  }
+
+  const viewLink = document.getElementById('viewLink');
+  if (viewLink) viewLink.href = 'marche-senegal-boutique.html?id=' + shop.id;
+
+  updatePreview();
+}
+
+async function loadShop() {
+  try {
+    const res = await getDashboard();
+    const shop = res.data?.shop;
+    const stats = res.data?.stats;
+    const seller = res.data?.seller;
+
+    if (!shop) {
+      showToastLocal('Boutique introuvable', 'error');
+      return;
+    }
+
+    const nameEl = document.getElementById('sellerName');
+    if (nameEl && seller) nameEl.textContent = seller.firstName || '';
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('pageWrap').style.display = 'block';
+
+    fillForm(shop, stats);
+  } catch (e) {
+    showToastLocal('Erreur de chargement', 'error');
+  }
+}
+
+async function saveShop() {
+  const name = document.getElementById('shopName').value.trim();
+  if (!name) {
+    showToastLocal('Le nom de la boutique est obligatoire', 'error');
+    return;
+  }
+
+  const body = {
+    name,
+    description: document.getElementById('shopDesc').value.trim(),
+    avatarUrl: document.getElementById('shopAvatar').value.trim() || null,
+    bannerUrl: document.getElementById('shopBanner').value.trim() || null,
+    openingHours: document.getElementById('shopHours').value.trim() || null,
+    virtualTourUrl: document.getElementById('shopTour').value.trim() || null
+  };
+
+  const btn = document.getElementById('saveBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+
+  try {
+    await apiCall('/api/shops/me', {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    });
+    showToastLocal('Boutique mise à jour avec succès !');
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
+  } catch (e) {
+    showToastLocal('Erreur lors de la mise à jour', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  const user = getCurrentUser();
+  if (user && user.role !== 'SELLER') {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  loadShop();
+});
 </script>
 </body>
 </html>

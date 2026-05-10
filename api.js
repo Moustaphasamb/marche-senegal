@@ -206,6 +206,67 @@ async function updateOrderStatus(id, status) {
 }
 
 // ────────────────────────────────
+// FAVORIS
+// ────────────────────────────────
+
+async function getFavorites() {
+  return await apiCall('/api/favorites');
+}
+
+async function addFavorite(productId) {
+  return await apiCall('/api/favorites', {
+    method: 'POST',
+    body: JSON.stringify({ productId })
+  });
+}
+
+async function removeFavorite(productId) {
+  return await apiCall('/api/favorites/' + productId, { method: 'DELETE' });
+}
+
+async function checkFavorite(productId) {
+  return await apiCall('/api/favorites/check/' + productId);
+}
+
+// ────────────────────────────────
+// PROMOTIONS
+// ────────────────────────────────
+
+async function getMyPromotions() {
+  return await apiCall('/api/promotions/mine');
+}
+
+async function createPromotion(data) {
+  return await apiCall('/api/promotions', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function togglePromotion(id) {
+  return await apiCall('/api/promotions/' + id + '/toggle', { method: 'PATCH' });
+}
+
+async function deletePromotion(id) {
+  return await apiCall('/api/promotions/' + id, { method: 'DELETE' });
+}
+
+async function validatePromoCode(code, shopId, amount) {
+  return await apiCall('/api/promotions/validate', {
+    method: 'POST',
+    body: JSON.stringify({ code, shopId, amount })
+  });
+}
+
+// ────────────────────────────────
+// STATISTIQUES VENDEUR
+// ────────────────────────────────
+
+async function getShopStats(period) {
+  return await apiCall('/api/shops/stats?period=' + (period || '7d'));
+}
+
+// ────────────────────────────────
 // UTILITAIRES
 // ────────────────────────────────
 

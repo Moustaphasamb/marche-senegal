@@ -378,7 +378,7 @@ a{text-decoration:none;color:inherit}
     <div class="sc-sub">Votre paiement a bien été reçu via Wave. Votre commande est en cours de préparation.</div>
     <div class="sc-order">
       <div class="sc-order-label">Numéro de commande</div>
-      <div class="sc-order-num">#MS-2025-00847</div>
+      <div class="sc-order-num" id="sc-order-num">#MS-2025-00847</div>
       <div class="sc-order-detail">Livraison estimée : Demain avant 18h · Dakar</div>
     </div>
     <div class="sc-track">
@@ -389,8 +389,8 @@ a{text-decoration:none;color:inherit}
       <div class="sc-step waiting"><div class="sc-step-dot"></div><span>Livré</span></div>
     </div>
     <div class="sc-btns">
-      <button class="sc-btn-primary" onclick="closeSuccess()">📦 Suivre ma commande</button>
-      <button class="sc-btn-secondary" onclick="closeSuccess()">Retour à l'accueil</button>
+      <button class="sc-btn-primary" onclick="closeSuccess('track')">📦 Suivre ma commande</button>
+      <button class="sc-btn-secondary" onclick="closeSuccess('home')">Retour à l'accueil</button>
     </div>
   </div>
 </div>
@@ -467,124 +467,7 @@ a{text-decoration:none;color:inherit}
       <!-- CART ITEMS -->
       <div class="sec-title">🛒 Mon panier <span class="sec-count">(3 articles)</span></div>
 
-      <!-- Boutique 1 -->
-      <div class="shop-group">
-        <div class="sg-header">
-          <div class="sg-icon">👗</div>
-          <div class="sg-name">Mode Fatou Ndoye</div>
-          <div class="sg-verified">✓ Vérifié</div>
-          <div class="sg-market">🏛️ Sandaga</div>
-        </div>
-
-        <div class="cart-item">
-          <div class="ci-img" style="background:#F0EAF8">👗</div>
-          <div class="ci-info">
-            <div class="ci-market-tag">🏛️ Sandaga</div>
-            <div class="ci-name">Boubou wax tissé main</div>
-            <div class="ci-variant">Taille : L · Couleur : Bleu/Or</div>
-            <div class="ci-bottom">
-              <div><span class="ci-price">15 300 FCFA</span><span class="ci-old-price">18 000</span></div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <div class="qty-ctrl">
-                  <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-                  <div class="qty-num" id="q1">1</div>
-                  <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-                </div>
-                <button class="ci-delete" onclick="removeItem(this)" title="Supprimer">🗑</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="cart-item">
-          <div class="ci-img" style="background:#FDE8E6">👘</div>
-          <div class="ci-info">
-            <div class="ci-market-tag">🏛️ Sandaga</div>
-            <div class="ci-name">Robe wax africaine brodée col rond</div>
-            <div class="ci-variant">Taille : M · Couleur : Rouge/Wax</div>
-            <div class="ci-bottom">
-              <div><span class="ci-price">9 500 FCFA</span></div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <div class="qty-ctrl">
-                  <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-                  <div class="qty-num" id="q2">1</div>
-                  <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-                </div>
-                <button class="ci-delete" onclick="removeItem(this)" title="Supprimer">🗑</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Delivery choice for boutique 1 -->
-        <div class="delivery-choice">
-          <div class="dc-btn selected" onclick="selectDelivery(this,'livraison')">
-            <div class="dc-icon">🚚</div>
-            <div>
-              <div class="dc-label">Livraison à domicile</div>
-              <div class="dc-sub">1 000 FCFA · Demain avant 18h</div>
-            </div>
-            <div class="dc-radio"></div>
-          </div>
-          <div class="dc-btn" onclick="selectDelivery(this,'retrait')">
-            <div class="dc-icon">🏪</div>
-            <div>
-              <div class="dc-label">Retrait en boutique</div>
-              <div class="dc-sub">Gratuit · Disponible maintenant</div>
-            </div>
-            <div class="dc-radio"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Boutique 2 -->
-      <div class="shop-group">
-        <div class="sg-header">
-          <div class="sg-icon">🌾</div>
-          <div class="sg-name">Ferme Diallo Casamance</div>
-          <div class="sg-verified">✓ Vérifié</div>
-          <div class="sg-market">🌊 Ziguinchor</div>
-        </div>
-
-        <div class="cart-item">
-          <div class="ci-img" style="background:#FFF8E7">🥭</div>
-          <div class="ci-info">
-            <div class="ci-market-tag">🌊 Ziguinchor</div>
-            <div class="ci-name">Mangues fraîches Casamance — 2kg</div>
-            <div class="ci-variant">Variété : Keitt · Frais de ce matin</div>
-            <div class="ci-bottom">
-              <div><span class="ci-price">2 160 FCFA</span><span class="ci-old-price">2 400</span></div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <div class="qty-ctrl">
-                  <button class="qty-btn" onclick="changeQty(this,-1)">−</button>
-                  <div class="qty-num" id="q3">2</div>
-                  <button class="qty-btn" onclick="changeQty(this,1)">+</button>
-                </div>
-                <button class="ci-delete" onclick="removeItem(this)" title="Supprimer">🗑</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="delivery-choice">
-          <div class="dc-btn selected" onclick="selectDelivery(this,'livraison')">
-            <div class="dc-icon">🚚</div>
-            <div>
-              <div class="dc-label">Livraison à domicile</div>
-              <div class="dc-sub">2 500 FCFA · 2–3 jours (inter-villes)</div>
-            </div>
-            <div class="dc-radio"></div>
-          </div>
-          <div class="dc-btn" onclick="selectDelivery(this,'retrait')">
-            <div class="dc-icon">🏪</div>
-            <div>
-              <div class="dc-label">Retrait en boutique</div>
-              <div class="dc-sub">Gratuit · À Ziguinchor</div>
-            </div>
-            <div class="dc-radio"></div>
-          </div>
-        </div>
-      </div>
+      <div class="cart-section"></div>
 
       <!-- ADRESSE DE LIVRAISON -->
       <div class="sec-title" style="margin-top:8px">📍 Adresse de livraison</div>
@@ -632,23 +515,8 @@ a{text-decoration:none;color:inherit}
       <!-- SUGGESTED -->
       <div class="suggested-section">
         <div class="sg-title">💡 Vous pourriez aussi aimer</div>
-        <div class="sg-grid">
-          <div class="sg-card" onclick="toast('Ajouté au panier !')">
-            <div class="sg-img" style="background:#FDF3DC">🫙</div>
-            <div class="sg-body"><div class="sg-name">Beurre de karité 500g</div><div class="sg-price">3 500 FCFA</div><div class="sg-shop">Beauté Naturelle · Sandaga</div></div>
-          </div>
-          <div class="sg-card" onclick="toast('Ajouté au panier !')">
-            <div class="sg-img" style="background:#FFF8E7">🧵</div>
-            <div class="sg-body"><div class="sg-name">Bazin brodé cérémonie</div><div class="sg-price">25 000 FCFA</div><div class="sg-shop">Tissus Aminata · Sandaga</div></div>
-          </div>
-          <div class="sg-card" onclick="toast('Ajouté au panier !')">
-            <div class="sg-img" style="background:#E8F5EC">🥜</div>
-            <div class="sg-body"><div class="sg-name">Arachides grillées</div><div class="sg-price">500 FCFA</div><div class="sg-shop">Boutique HLM</div></div>
-          </div>
-          <div class="sg-card" onclick="toast('Ajouté au panier !')">
-            <div class="sg-img" style="background:#FDE8E6">🏺</div>
-            <div class="sg-body"><div class="sg-name">Poterie artisanale</div><div class="sg-price">7 500 FCFA</div><div class="sg-shop">Artisan Mbaye · Mbour</div></div>
-          </div>
+        <div class="sg-grid" id="suggested-grid">
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:.84rem">Chargement...</div>
         </div>
       </div>
 
@@ -660,9 +528,7 @@ a{text-decoration:none;color:inherit}
       <div class="summary-card">
         <div class="summary-title">Récapitulatif de commande</div>
         <div class="summary-rows">
-          <div class="sr"><span class="sr-label">Boubou wax × 1</span><span class="sr-value" id="p1-total">15 300 FCFA</span></div>
-          <div class="sr"><span class="sr-label">Robe wax × 1</span><span class="sr-value" id="p2-total">9 500 FCFA</span></div>
-          <div class="sr"><span class="sr-label">Mangues × 2</span><span class="sr-value" id="p3-total">4 320 FCFA</span></div>
+          <div id="summary-items"></div>
           <div class="sr-divider"></div>
           <div class="sr"><span class="sr-label">Sous-total</span><span class="sr-value" id="subtotal">29 120 FCFA</span></div>
           <div class="sr"><span class="sr-label">Livraison</span><span class="sr-value delivery" id="delivery-total">3 500 FCFA</span></div>
@@ -761,9 +627,10 @@ a{text-decoration:none;color:inherit}
 
 let cart = [];
 let promoApplied = null;
-let deliveryFee = 1000;
+let deliveryFees = {};
 let selectedPayment = 'WAVE';
 let selectedAddressId = null;
+let lastOrderId = null;
 
 // ── Charger le panier depuis localStorage ──
 function loadCart() {
@@ -878,6 +745,13 @@ function loadCart() {
     </div>
   `).join('');
 
+  // Associer data-shop-id et initialiser les frais par boutique
+  cartSection.querySelectorAll('.shop-group').forEach((sg, i) => {
+    const id = Object.keys(byShop)[i];
+    sg.dataset.shopId = id;
+    if (deliveryFees[id] === undefined) deliveryFees[id] = 1000;
+  });
+
   updateSummary();
 }
 
@@ -907,7 +781,9 @@ function selectDelivery(btn, type) {
   const group = btn.closest('.delivery-choice');
   group.querySelectorAll('.dc-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  deliveryFee = type === 'livraison' ? 1000 : 0;
+  const shopGroup = group.closest('.shop-group');
+  const shopId = shopGroup?.dataset.shopId || 'default';
+  deliveryFees[shopId] = type === 'livraison' ? 1000 : 0;
   updateSummary();
   showToast(type === 'livraison'
     ? '🚚 Livraison à domicile sélectionnée'
@@ -971,7 +847,28 @@ function removePromo() {
 function updateSummary() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = promoApplied ? Math.floor(subtotal * promoApplied.pct / 100) : 0;
-  const total = subtotal + deliveryFee - discount;
+  const totalDeliveryFee = Object.values(deliveryFees).reduce((s, f) => s + f, 0);
+  const total = subtotal + totalDeliveryFee - discount;
+
+  // Lignes produits dynamiques
+  const summaryItems = document.getElementById('summary-items');
+  if (summaryItems) {
+    while (summaryItems.firstChild) summaryItems.removeChild(summaryItems.firstChild);
+    cart.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'sr';
+      const lbl = document.createElement('span');
+      lbl.className = 'sr-label';
+      const name = item.name.length > 22 ? item.name.substring(0, 22) + '…' : item.name;
+      lbl.textContent = name + ' × ' + item.quantity;
+      const val = document.createElement('span');
+      val.className = 'sr-value';
+      val.textContent = formatPrice(item.price * item.quantity);
+      row.appendChild(lbl);
+      row.appendChild(val);
+      summaryItems.appendChild(row);
+    });
+  }
 
   // Mettre à jour les lignes du récapitulatif
   const subtotalEl = document.getElementById('subtotal');
@@ -983,7 +880,7 @@ function updateSummary() {
   const cartCountEl = document.getElementById('cart-count');
 
   if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
-  if (deliveryEl) deliveryEl.textContent = formatPrice(deliveryFee);
+  if (deliveryEl) deliveryEl.textContent = formatPrice(totalDeliveryFee);
   if (totalEl) totalEl.textContent = formatPrice(total);
   if (payBtnEl) payBtnEl.textContent = formatPrice(total);
 
@@ -1041,19 +938,26 @@ async function payNow() {
           size: item.size || null,
           color: item.color || null
         })),
-        deliveryType: deliveryFee === 0 ? 'PICKUP' : 'DELIVERY',
+        deliveryType: (deliveryFees[shopId] ?? 1000) === 0 ? 'PICKUP' : 'DELIVERY',
         promoCode: promoApplied ? document.getElementById('applied-code')?.textContent : null
       };
 
       const result = await createOrder(orderData);
 
       if (!result.success) {
-        showToast('❌ ' + result.message, 'error');
+        showToast('❌ ' + result.message);
         payBtn.innerHTML = '🔒 Payer';
         payBtn.style.background = '';
         payBtn.disabled = false;
         return;
       }
+      lastOrderId = result.data?.id || result.data?.order?.id || null;
+    }
+
+    // Numéro de commande dans l'overlay
+    const orderNumEl = document.getElementById('sc-order-num');
+    if (orderNumEl && lastOrderId) {
+      orderNumEl.textContent = '#MS-' + String(lastOrderId).padStart(6, '0');
     }
 
     // Commande réussie — vider le panier
@@ -1063,7 +967,7 @@ async function payNow() {
     document.getElementById('success-overlay').classList.add('show');
 
   } catch (error) {
-    showToast('❌ Erreur lors de la commande', 'error');
+    showToast('❌ Erreur lors de la commande');
     payBtn.innerHTML = '🔒 Payer';
     payBtn.style.background = '';
     payBtn.disabled = false;
@@ -1071,10 +975,93 @@ async function payNow() {
 }
 
 // ── Fermer le succès ──
-function closeSuccess() {
+function closeSuccess(dest) {
   document.getElementById('success-overlay').classList.remove('show');
-  window.location.href = 'marche-senegal-profil.html';
+  if (dest === 'home') {
+    window.location.href = 'marche-senegal-accueil.html';
+  } else if (lastOrderId) {
+    window.location.href = 'marche-senegal-commande.html?id=' + lastOrderId;
+  } else {
+    window.location.href = 'marche-senegal-profil.html';
+  }
 }
+
+// ── Ajouter au panier depuis les suggestions ──
+function addToCartFromSuggested(prod) {
+  const stored = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = stored.find(i => i.productId === String(prod.id));
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    stored.push({
+      productId: String(prod.id),
+      name: prod.name,
+      price: prod.price,
+      quantity: 1,
+      shopId: prod.shopId || null,
+      shopName: prod.shop?.name || null,
+      image: (prod.images || [])[0] || null
+    });
+  }
+  localStorage.setItem('cart', JSON.stringify(stored));
+  loadCart();
+  showToast('✓ ' + prod.name + ' ajouté au panier');
+}
+
+// ── Charger les produits suggérés depuis l'API ──
+async function loadSuggestedProducts() {
+  const grid = document.getElementById('suggested-grid');
+  if (!grid) return;
+  try {
+    const result = await getProducts({ limit: 6 });
+    const products = (result.success && (result.data?.products || result.data)) || [];
+    if (!products.length) {
+      const section = document.querySelector('.suggested-section');
+      if (section) section.style.display = 'none';
+      return;
+    }
+    while (grid.firstChild) grid.removeChild(grid.firstChild);
+    products.slice(0, 4).forEach(prod => {
+      const card = document.createElement('div');
+      card.className = 'sg-card';
+      const imgDiv = document.createElement('div');
+      imgDiv.className = 'sg-img';
+      const firstImg = (prod.images || [])[0];
+      if (firstImg && (firstImg.startsWith('http') || firstImg.startsWith('/'))) {
+        const img = document.createElement('img');
+        img.src = firstImg;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+        imgDiv.appendChild(img);
+      } else {
+        imgDiv.textContent = firstImg || '🛍️';
+      }
+      const body = document.createElement('div');
+      body.className = 'sg-body';
+      const name = document.createElement('div');
+      name.className = 'sg-name';
+      name.textContent = prod.name;
+      const price = document.createElement('div');
+      price.className = 'sg-price';
+      price.textContent = formatPrice(prod.price);
+      const shop = document.createElement('div');
+      shop.className = 'sg-shop';
+      shop.textContent = prod.shop?.name || '';
+      body.appendChild(name);
+      body.appendChild(price);
+      body.appendChild(shop);
+      card.appendChild(imgDiv);
+      card.appendChild(body);
+      card.addEventListener('click', () => addToCartFromSuggested(prod));
+      grid.appendChild(card);
+    });
+  } catch (e) {
+    const section = document.querySelector('.suggested-section');
+    if (section) section.style.display = 'none';
+  }
+}
+
+// ── Alias toast ──
+function toast(msg) { showToast(msg); }
 
 // ── Hamburger menu ──
 function toggleMenu() {
@@ -1098,6 +1085,7 @@ document.addEventListener('click', function(e) {
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', () => {
   loadCart();
+  loadSuggestedProducts();
 });
 </script>
 </body>

@@ -124,6 +124,7 @@
     <div class="st-link" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
     <div class="st-link active">➕ Ajouter un produit</div>
     <div class="st-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
+    <div class="st-link" onclick="window.location.href='marche-senegal-ma-boutique.html'">🏪 Ma boutique</div>
     <div class="st-link" onclick="toast('Promotions — bientôt disponible')">🎯 Promotions</div>
     <div class="st-link" onclick="window.location.href='marche-senegal-boutique.html'">🏪 Ma boutique</div>
   </div>
@@ -388,7 +389,7 @@ async function handleFileChange(file){
       renderFilledSlot(activeSlot, data.url);
       updateChecklist();
       updatePreview();
-      toast('Photo ajoutee !');
+      toast('Photo ajoutée !');
     } else {
       renderEmptySlot(activeSlot);
       toast(data.message || 'Erreur upload');
@@ -478,7 +479,7 @@ function removePhoto(index){
   renderEmptySlot(index);
   updateChecklist();
   updatePreview();
-  toast('Photo supprimee');
+  toast('Photo supprimée');
 }
 
 function updateChecklist(){
@@ -493,11 +494,11 @@ function updateChecklist(){
     text.className = 'cl-text err';
   } else if(count < 3){
     dot.className = 'cl-dot cl-warn';
-    text.textContent = 'Photos ajoutees (' + count + '/5) — ajoutez-en plus pour plus de vues';
+    text.textContent = 'Photos ajoutées (' + count + '/5) — ajoutez-en plus pour plus de vues';
     text.className = 'cl-text warn';
   } else {
     dot.className = 'cl-dot cl-ok';
-    text.textContent = 'Photos ajoutees (' + count + '/5)';
+    text.textContent = 'Photos ajoutées (' + count + '/5)';
     text.className = 'cl-text';
   }
 }
@@ -548,6 +549,31 @@ function updatePreview(){
     }
   }
 
+  // Checklist nom et prix
+  const clItems = document.querySelectorAll('.cl-item');
+  if (clItems[1]) {
+    const dot = clItems[1].querySelector('.cl-dot');
+    const txt = clItems[1].querySelector('.cl-text');
+    if (!name || name === 'Nom du produit') {
+      if (dot) dot.className = 'cl-dot cl-err';
+      if (txt) { txt.className = 'cl-text err'; txt.textContent = '✗ Nom du produit manquant'; }
+    } else {
+      if (dot) dot.className = 'cl-dot cl-ok';
+      if (txt) { txt.className = 'cl-text'; txt.textContent = '✓ Nom du produit renseigné'; }
+    }
+  }
+  if (clItems[2]) {
+    const dot = clItems[2].querySelector('.cl-dot');
+    const txt = clItems[2].querySelector('.cl-text');
+    if (!price) {
+      if (dot) dot.className = 'cl-dot cl-err';
+      if (txt) { txt.className = 'cl-text err'; txt.textContent = '✗ Prix manquant'; }
+    } else {
+      if (dot) dot.className = 'cl-dot cl-ok';
+      if (txt) { txt.className = 'cl-text'; txt.textContent = '✓ Prix défini — ' + price.toLocaleString() + ' FCFA'; }
+    }
+  }
+
   // Calcul commission
   const commission = Math.round(price * 0.08);
   const net = price - commission;
@@ -555,7 +581,7 @@ function updatePreview(){
   if(calc){
     calc.replaceChildren();
     [['Prix de vente', price.toLocaleString() + ' FCFA'],
-     ['Commission Marche SN (8%)', '- ' + commission.toLocaleString() + ' FCFA']
+     ['Commission Marché SN (8%)', '- ' + commission.toLocaleString() + ' FCFA']
     ].forEach(function(pair){
       const row = document.createElement('div');
       row.className = 'pc-row';
@@ -589,7 +615,7 @@ async function publishProduct(){
     return;
   }
   if(user.role !== 'SELLER' && user.role !== 'ADMIN'){
-    toast('Acces reserve aux vendeurs');
+    toast('Accès réservé aux vendeurs');
     return;
   }
 
@@ -609,6 +635,7 @@ async function publishProduct(){
   if(topBtn){ topBtn.textContent = '...'; topBtn.disabled = true; }
 
   const sizes = Array.from(document.querySelectorAll('.vtag.sel')).map(t => t.textContent.trim());
+  const colors = Array.from(document.querySelectorAll('.cs.sel')).map(c => c.getAttribute('title') || '').filter(Boolean);
   const selectedCat = document.querySelector('.cg-btn.sel');
   const images = uploadedImages.filter(Boolean);
 
@@ -621,14 +648,14 @@ async function publishProduct(){
     categoryId: selectedCat ? selectedCat.getAttribute('data-id') : null,
     images,
     sizes,
-    colors: []
+    colors
   };
 
   const result = await createProduct(productData);
 
   if(result.success){
-    if(btn){ btn.textContent = 'Produit publie !'; btn.style.background = 'var(--gl)'; }
-    toast('Produit publie avec succes !');
+    if(btn){ btn.textContent = 'Produit publié !'; btn.style.background = 'var(--gl)'; }
+    toast('Produit publié avec succès !');
     setTimeout(() => window.location.href = 'marche-senegal-dashboard.html', 2000);
   } else {
     if(btn){ btn.textContent = 'Publier le produit'; btn.style.background = ''; btn.disabled = false; }
@@ -645,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return;
   }
   if(user.role !== 'SELLER' && user.role !== 'ADMIN'){
-    toast('Acces reserve aux vendeurs');
+    toast('Accès réservé aux vendeurs');
     setTimeout(() => window.location.href = 'marche-senegal-accueil.html', 2000);
     return;
   }
