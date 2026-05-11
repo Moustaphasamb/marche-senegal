@@ -4,44 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Marché Sénégal — Accueil</title>
+<meta name="description" content="La marketplace des marchés du Sénégal. Achetez auprès des boutiques de Sandaga, Tilène, HLM, Touba et Ziguinchor. Paiement Wave et Orange Money."/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 <style>
-:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:68px}
-*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
-.flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
-.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
-.nav-logo:hover{color:var(--gl)}
-.nav-search{flex:1;min-width:0;max-width:520px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
-.nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
-.nav-search input{flex:1;min-width:0;border:none;outline:none;font-size:.88rem;color:var(--text);background:transparent}
-.nav-search input::placeholder{color:var(--muted)}
-.nav-search-btn{flex-shrink:0;background:var(--green);color:#fff;border:none;border-radius:99px;height:32px;padding:0 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .2s;white-space:nowrap}
-.nav-search-btn:hover{background:var(--gl)}
-.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
-.nav-btn{display:flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:99px;font-size:.82rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s;white-space:nowrap;flex-shrink:0}
-.nav-btn:hover{border-color:var(--green);color:var(--green);background:var(--gp)}
-.nav-btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
-.nav-btn-primary:hover{background:var(--gl);color:#fff}
-.nav-cart{position:relative;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0}
-.nav-cart:hover{border-color:var(--green);background:var(--gp)}
-.cart-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--dark);font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
-.nav-hamburger{display:none;flex-direction:column;gap:5px;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
-.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
-.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}.nav-hamburger.open span:nth-child(2){opacity:0}.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.nav-drawer{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;border-bottom:1.5px solid var(--border);padding:16px 4vw 20px;z-index:190;box-shadow:0 8px 32px rgba(0,0,0,.1);flex-direction:column;gap:12px}
-.nav-drawer.open{display:flex}
-.nav-drawer .nav-search{max-width:100%;width:100%}
-.nav-drawer-row{display:flex;gap:8px}.nav-drawer-row .nav-btn{flex:1;justify-content:center;height:42px}
-/* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* MOBILE NAV */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0 max(10px,env(safe-area-inset-bottom))}
-.mn-items{display:flex}.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer}
-.mn-icon{width:24px;height:24px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:background .18s}
-.mn-item.act .mn-icon{background:var(--green)}.mn-label{font-size:.62rem;color:var(--muted);font-weight:500}.mn-item.act .mn-label{color:var(--green)}
 /* HERO */
 .hero{margin-top:var(--nav-h);background:var(--dark);min-height:500px;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:60px 5vw;gap:40px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.14),transparent 70%);pointer-events:none}
@@ -352,7 +318,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   <div class="footer-grid">
     <div class="footer-brand"><div class="footer-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</div><p>La marketplace qui réunit tous les commerçants du Sénégal. Achetez local.</p></div>
     <div class="footer-col"><h4>Acheteurs</h4><a href="marche-senegal-recherche.html">Rechercher</a><a href="marche-senegal-marche.html">Choisir un marché</a><a href="marche-senegal-profil.html">Mes commandes</a><a href="#">Livraison</a></div>
-    <div class="footer-col"><h4>Vendeurs</h4><a href="marche-senegal-connexion-acheteur.html">Ouvrir ma boutique</a><a href="marche-senegal-ajout-produit.html">Mes produits</a><a href="marche-senegal-dashboard.html">Mes promotions</a><a href="#">Tarifs</a></div>
+    <div class="footer-col"><h4>Vendeurs</h4><a href="marche-senegal-connexion-vendeur.html">Ouvrir ma boutique</a><a href="marche-senegal-ajout-produit.html">Mes produits</a><a href="marche-senegal-dashboard.html">Mes promotions</a><a href="#">Tarifs</a></div>
     <div class="footer-col"><h4>Support</h4><a href="#">Aide & FAQ</a><a href="#">Nous contacter</a><a href="#">WhatsApp</a></div>
   </div>
   <div class="footer-bottom"><span>© 2025 Marché Sénégal. Fait avec ❤️ au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
@@ -417,10 +383,10 @@ async function loadProducts(filters = {}) {
       </div>
       <div class="prod-body">
         <div class="prod-market">
-          🏛️ ${prod.shop.market.name}
+          🏛️ ${escapeHtml(prod.shop.market.name)}
         </div>
-        <div class="prod-name">${prod.name}</div>
-        <div class="prod-shop">${prod.shop.name} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
+        <div class="prod-name">${escapeHtml(prod.name)}</div>
+        <div class="prod-shop">${escapeHtml(prod.shop.name)} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
         <div class="prod-rating">
           <span class="prod-stars">★★★★★</span>
           ${prod.rating} (${prod.totalReviews})
@@ -433,7 +399,7 @@ async function loadProducts(filters = {}) {
               : ''
             }
           </div>
-          <button class="prod-cart-btn" onclick="addToCart(event, '${prod.id}', '${prod.name}', ${prod.price})">+</button>
+          <button class="prod-cart-btn" onclick="addToCart(event, ${JSON.stringify(prod.id)}, ${JSON.stringify(prod.name)}, ${prod.price})">+</button>
         </div>
       </div>
     </div>
@@ -454,21 +420,18 @@ async function loadMarkets() {
     return `
     <div class="market-card ${market.name.includes('Sandaga') ? 'featured' : ''}"
          data-zone="${zone}"
-         onclick="goMarket('${market.id}', '${market.name}')">
+         onclick="goMarket('${market.id}')">
       <div class="market-emoji">🏛️</div>
-      <div class="market-name">${market.name.replace('Marché ', '')}</div>
-      <div class="market-city">${market.city}</div>
+      <div class="market-name">${escapeHtml(market.name.replace('Marché ', ''))}</div>
+      <div class="market-city">${escapeHtml(market.city)}</div>
       <div class="market-count">${market._count.shops} boutiques</div>
     </div>`;
   }).join('');
 }
 
 // ── Aller vers un marché ──
-function goMarket(marketId, marketName) {
-  showToast('🗺️ ' + marketName + ' sélectionné');
-  setTimeout(() => {
-    window.location.href = `marche-senegal-marche.html?id=${marketId}`;
-  }, 600);
+function goMarket(marketId) {
+  window.location.href = `marche-senegal-marche.html?id=${marketId}`;
 }
 
 // ── Ajouter au panier ──

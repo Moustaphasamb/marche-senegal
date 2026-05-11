@@ -34,6 +34,16 @@ async function apiCall(endpoint, options = {}) {
     // Convertir la réponse en JSON
     const data = await response.json();
 
+    // Session expirée → déconnexion automatique
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      if (!window.location.pathname.includes('connexion')) {
+        window.location.href = 'marche-senegal-accueil.html';
+      }
+      return { success: false, message: 'Session expirée, veuillez vous reconnecter' };
+    }
+
     return data;
 
   } catch (error) {
@@ -259,6 +269,25 @@ async function validatePromoCode(code, shopId, amount) {
 }
 
 // ────────────────────────────────
+// AVIS CLIENTS
+// ────────────────────────────────
+
+async function createReview(data) {
+  return await apiCall('/api/reviews', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function getShopReviews(shopId, page = 1) {
+  return await apiCall(`/api/reviews/shop/${shopId}?page=${page}`);
+}
+
+async function getProductReviews(productId) {
+  return await apiCall(`/api/reviews/product/${productId}`);
+}
+
+// ────────────────────────────────
 // STATISTIQUES VENDEUR
 // ────────────────────────────────
 
@@ -270,9 +299,21 @@ async function getShopStats(period) {
 // UTILITAIRES
 // ────────────────────────────────
 
+// Échapper les caractères HTML pour prévenir les injections XSS
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Formater un prix en FCFA
 function formatPrice(price) {
-  return price.toLocaleString('fr-FR') + ' FCFA';
+  if (price == null || isNaN(price)) return '—';
+  return Number(price).toLocaleString('fr-FR') + ' FCFA';
 }
 
 // Afficher un message toast

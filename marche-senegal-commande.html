@@ -4,7 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Suivi de commande — Marché Sénégal</title>
+<meta name="description" content="Suivez votre commande Marché Sénégal en temps réel."/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
   --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
@@ -185,10 +187,53 @@ a{text-decoration:none;color:inherit}
   .mobile-nav{display:block}
   body{padding-bottom:64px}
 }
+
+/* MODAL AVIS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:440px;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dark)}
+.modal-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.18s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.stars-row{display:flex;gap:6px;margin-bottom:20px;justify-content:center}
+.star-btn{font-size:2.2rem;background:none;border:none;cursor:pointer;color:#d1d5db;transition:color .15s,transform .12s;line-height:1}
+.star-btn.active,.star-btn:hover{color:var(--gold);transform:scale(1.12)}
+.review-textarea{width:100%;min-height:100px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:.9rem;font-family:inherit;resize:vertical;color:var(--text);transition:.18s}
+.review-textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.08)}
+.modal-shop-name{font-size:.82rem;color:var(--muted);margin-bottom:16px;text-align:center}
+.submit-review-btn{width:100%;margin-top:16px;padding:14px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer;transition:.2s}
+.submit-review-btn:hover{background:var(--gl)}
+.submit-review-btn:disabled{background:var(--muted);cursor:not-allowed}
+.review-hint{font-size:.75rem;color:var(--muted);text-align:center;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
+
+<!-- MODAL AVIS -->
+<div class="modal-overlay" id="review-modal" onclick="closeReviewModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <span class="modal-title">⭐ Laisser un avis</span>
+      <button class="modal-close" onclick="closeReviewModal()">✕</button>
+    </div>
+    <p class="modal-shop-name" id="review-shop-name"></p>
+    <div class="stars-row" id="stars-row">
+      <button class="star-btn" data-val="1" onclick="selectStar(1)">★</button>
+      <button class="star-btn" data-val="2" onclick="selectStar(2)">★</button>
+      <button class="star-btn" data-val="3" onclick="selectStar(3)">★</button>
+      <button class="star-btn" data-val="4" onclick="selectStar(4)">★</button>
+      <button class="star-btn" data-val="5" onclick="selectStar(5)">★</button>
+    </div>
+    <textarea class="review-textarea" id="review-comment" placeholder="Décrivez votre expérience avec cette boutique (optionnel)..." maxlength="500"></textarea>
+    <button class="submit-review-btn" id="submit-review-btn" onclick="submitReview()" disabled>
+      Envoyer mon avis
+    </button>
+    <p class="review-hint">Votre avis aide les autres acheteurs à choisir.</p>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="nav">
@@ -677,8 +722,57 @@ async function cancelOrder() {
   }
 }
 
+// ── Modal Avis ──
+let selectedRating = 0;
+
 function leaveReview() {
-  showToast('⭐ Merci ! Les avis arrivent bientôt.');
+  if (!currentOrder?.shopId) return;
+  selectedRating = 0;
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('review-comment').value = '';
+  document.getElementById('submit-review-btn').disabled = true;
+  document.getElementById('review-shop-name').textContent =
+    currentOrder.shop?.name ? `Boutique : ${escapeHtml(currentOrder.shop.name)}` : '';
+  document.getElementById('review-modal').classList.add('open');
+}
+
+function closeReviewModal(e) {
+  if (!e || e.target === document.getElementById('review-modal')) {
+    document.getElementById('review-modal').classList.remove('open');
+  }
+}
+
+function selectStar(val) {
+  selectedRating = val;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.val) <= val);
+  });
+  document.getElementById('submit-review-btn').disabled = false;
+}
+
+async function submitReview() {
+  if (!selectedRating || !currentOrder?.shopId) return;
+
+  const btn = document.getElementById('submit-review-btn');
+  btn.textContent = '⏳ Envoi...';
+  btn.disabled = true;
+
+  const comment = document.getElementById('review-comment').value.trim();
+
+  const result = await createReview({
+    shopId: currentOrder.shopId,
+    rating: selectedRating,
+    comment: comment || undefined
+  });
+
+  if (result.success) {
+    document.getElementById('review-modal').classList.remove('open');
+    showToast('⭐ Merci pour votre avis !');
+  } else {
+    showToast('❌ ' + (result.message || 'Erreur lors de l\'envoi'), 'error');
+    btn.textContent = 'Envoyer mon avis';
+    btn.disabled = false;
+  }
 }
 
 function reorder() {

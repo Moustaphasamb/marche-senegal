@@ -4,7 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Mes produits — Marché Sénégal Vendeur</title>
+<meta name="description" content="Gérez votre catalogue produits sur Marché Sénégal."/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
   --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
@@ -381,7 +383,7 @@ function renderProducts(products) {
             }
           </div>
           <div class="pc-body">
-            <div class="pc-name">${prod.name}</div>
+            <div class="pc-name">${escapeHtml(prod.name)}</div>
             <div class="pc-stats">
               <div class="pcs-item">
                 <strong>${prod.totalSales}</strong> ventes
