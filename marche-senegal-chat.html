@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Chat — Marché Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="api.js"></script>
+<style>
+:root{
+  --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;
+  --gold:#E6A817;--gdl:#FDF3DC;
+  --dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;
+  --bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;
+  --red:#C0392B;--rp:#FDE8E6;
+  --shadow:0 2px 16px rgba(27,107,58,.09);
+  --radius:14px;--nav-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+a{text-decoration:none;color:inherit}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* NAV */
+.nav{height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;box-shadow:var(--shadow)}
+.nav-back{display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:99px;border:1.5px solid var(--border);background:#fff;font-size:.82rem;font-weight:500;cursor:pointer;color:var(--text);transition:.18s;white-space:nowrap}
+.nav-back:hover{border-color:var(--green);color:var(--green)}
+.chat-header{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.ch-avatar{width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;flex-shrink:0}
+.ch-info{min-width:0}
+.ch-name{font-weight:700;font-size:.95rem;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-status{font-size:.72rem;color:var(--gl);font-weight:500}
+.online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gl);margin-right:4px}
+
+/* MESSAGES ZONE */
+.messages-wrap{flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:12px}
+.messages-wrap::-webkit-scrollbar{width:4px}
+.messages-wrap::-webkit-scrollbar-track{background:transparent}
+.messages-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* BULLES */
+.msg-row{display:flex;gap:8px;max-width:78%;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.mine{align-self:flex-end;flex-direction:row-reverse}
+.msg-row.theirs{align-self:flex-start}
+.msg-avatar{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;align-self:flex-end}
+.msg-row.mine .msg-avatar{background:var(--gold);color:var(--dark)}
+.bubble{padding:10px 14px;border-radius:18px;font-size:.87rem;line-height:1.5;word-break:break-word}
+.msg-row.mine .bubble{background:var(--green);color:#fff;border-bottom-right-radius:4px}
+.msg-row.theirs .bubble{background:#fff;color:var(--text);border:1.5px solid var(--border);border-bottom-left-radius:4px}
+.msg-time{font-size:.65rem;color:var(--muted);margin-top:4px;text-align:right}
+.msg-row.theirs .msg-time{text-align:left}
+
+/* DATE SÉPARATEUR */
+.date-sep{text-align:center;font-size:.72rem;color:var(--muted);padding:4px 12px;background:var(--bg);border-radius:99px;align-self:center;border:1px solid var(--border)}
+
+/* ÉTAT VIDE */
+.empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px;text-align:center;color:var(--muted)}
+.empty-chat .ec-icon{font-size:3rem;margin-bottom:4px}
+.empty-chat .ec-title{font-weight:600;color:var(--dark);font-size:1rem}
+.empty-chat .ec-sub{font-size:.84rem;line-height:1.6}
+
+/* INPUT */
+.input-bar{background:#fff;border-top:1.5px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.msg-input{flex:1;padding:10px 16px;border:1.5px solid var(--border);border-radius:99px;font-size:.9rem;font-family:inherit;color:var(--text);outline:none;transition:.18s;background:var(--bg)}
+.msg-input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(27,107,58,.08)}
+.send-btn{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:.18s}
+.send-btn:hover{background:var(--gl)}
+.send-btn:disabled{background:var(--muted);cursor:not-allowed}
+
+/* LOADING */
+.loading-chat{display:flex;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--muted);font-size:.9rem}
+.ls{width:6px;height:6px;border-radius:50%;background:var(--green);animation:bounce .8s infinite}
+.ls:nth-child(2){animation-delay:.15s}
+.ls:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media(max-width:480px){
+  .msg-row{max-width:88%}
+  .nav{padding:0 12px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-back" onclick="history.back()">← Retour</button>
+  <div class="chat-header" id="chat-header">
+    <div class="ch-avatar" id="ch-avatar">?</div>
+    <div class="ch-info">
+      <div class="ch-name" id="ch-name">Chargement...</div>
+      <div class="ch-status"><span class="online-dot"></span>En ligne</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+<div class="messages-wrap" id="messages-wrap">
+  <div class="loading-chat">
+    <div class="ls"></div><div class="ls"></div><div class="ls"></div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div class="input-bar">
+  <input class="msg-input" id="msg-input" type="text" placeholder="Écrire un message..." maxlength="500" autocomplete="off"/>
+  <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
+</div>
+
+<script>
+const API_URL_WS = 'http://localhost:3000';
+let currentShopId = null;
+let currentUser = null;
+let socket = null;
+let lastDate = null;
+
+// ── Récupérer shopId depuis l'URL ──
+function getShopIdFromURL() {
+  return new URLSearchParams(window.location.search).get('shopId');
+}
+
+// ── Formater l'heure ──
+function formatTime(dateStr) {
+  return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return 'Aujourd\'hui';
+  if (d.toDateString() === yesterday.toDateString()) return 'Hier';
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+}
+
+// ── Construire une bulle de message (DOM sûr) ──
+function buildBubble(msg, isMine) {
+  const msgDate = formatDate(msg.createdAt);
+  const wrap = document.createDocumentFragment();
+
+  if (msgDate !== lastDate) {
+    lastDate = msgDate;
+    const sep = document.createElement('div');
+    sep.className = 'date-sep';
+    sep.textContent = msgDate;
+    wrap.appendChild(sep);
+  }
+
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (isMine ? 'mine' : 'theirs');
+
+  const av = document.createElement('div');
+  av.className = 'msg-avatar';
+  av.textContent = (msg.sender?.firstName || '?').charAt(0).toUpperCase();
+
+  const col = document.createElement('div');
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = msg.content;
+
+  const time = document.createElement('div');
+  time.className = 'msg-time';
+  time.textContent = formatTime(msg.createdAt);
+
+  col.appendChild(bubble);
+  col.appendChild(time);
+
+  if (isMine) {
+    row.appendChild(col);
+    row.appendChild(av);
+  } else {
+    row.appendChild(av);
+    row.appendChild(col);
+  }
+
+  wrap.appendChild(row);
+  return wrap;
+}
+
+// ── Afficher tous les messages ──
+function renderMessages(messages, userId) {
+  const wrap = document.getElementById('messages-wrap');
+  wrap.replaceChildren();
+  lastDate = null;
+
+  if (!messages.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-chat';
+    const icon = document.createElement('div');
+    icon.className = 'ec-icon';
+    icon.textContent = '💬';
+    const title = document.createElement('div');
+    title.className = 'ec-title';
+    title.textContent = 'Démarrez la conversation';
+    const sub = document.createElement('div');
+    sub.className = 'ec-sub';
+    sub.textContent = 'Posez votre question au vendeur. Il vous répondra dès que possible.';
+    empty.appendChild(icon);
+    empty.appendChild(title);
+    empty.appendChild(sub);
+    wrap.appendChild(empty);
+    return;
+  }
+
+  messages.forEach(msg => {
+    wrap.appendChild(buildBubble(msg, msg.senderId === userId));
+  });
+
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+// ── Ajouter un seul message en temps réel ──
+function appendMessage(msg) {
+  const wrap = document.getElementById('messages-wrap');
+  const isMine = msg.senderId === currentUser?.id;
+
+  // Retirer l'état vide si présent
+  const empty = wrap.querySelector('.empty-chat');
+  if (empty) empty.remove();
+
+  wrap.appendChild(buildBubble(msg, isMine));
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+// ── Charger les messages ──
+async function loadChat(shopId) {
+  const result = await getChatMessages(shopId);
+  if (!result.success) {
+    showToast('❌ Impossible de charger les messages', 'error');
+    return;
+  }
+
+  // Header boutique
+  const shop = result.shop;
+  if (shop) {
+    const nameEl = document.getElementById('ch-name');
+    const avEl = document.getElementById('ch-avatar');
+    if (nameEl) nameEl.textContent = shop.name;
+    if (avEl) avEl.textContent = shop.name.charAt(0).toUpperCase();
+  }
+
+  renderMessages(result.data, currentUser?.id);
+  markMessagesRead(shopId);
+}
+
+// ── Envoyer un message ──
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const content = input.value.trim();
+  if (!content || !currentShopId) return;
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  input.value = '';
+
+  const result = await sendChatMessage(currentShopId, content);
+  if (!result.success) {
+    showToast('❌ Erreur d\'envoi', 'error');
+    input.value = content;
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+// ── Connecter Socket.io ──
+function connectSocket(shopId, userId) {
+  socket = io(API_URL_WS, { transports: ['websocket', 'polling'] });
+
+  socket.on('connect', () => {
+    socket.emit('join_chat', { shopId, userId });
+  });
+
+  socket.on('new_message', (msg) => {
+    if (msg.senderId !== userId) {
+      appendMessage(msg);
+      markMessagesRead(shopId);
+    }
+  });
+
+  socket.on('connect_error', () => {
+    // Silencieux — dégradation gracieuse
+  });
+}
+
+// ── Touche Entrée pour envoyer ──
+document.getElementById('msg-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+document.getElementById('msg-input').addEventListener('input', (e) => {
+  document.getElementById('send-btn').disabled = !e.target.value.trim();
+});
+
+// ── Initialisation ──
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'marche-senegal-connexion-acheteur.html';
+    return;
+  }
+
+  currentUser = getCurrentUser();
+  currentShopId = getShopIdFromURL();
+
+  if (!currentShopId) {
+    window.location.href = 'marche-senegal-accueil.html';
+    return;
+  }
+
+  await loadChat(currentShopId);
+  connectSocket(currentShopId, currentUser?.id);
+});
+</script>
+</body>
+</html>

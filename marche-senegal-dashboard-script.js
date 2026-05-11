@@ -409,6 +409,18 @@ function showPage(pageId, navItem) {
   if (pageId === 'commandes') loadMyOrders();
 }
 
+function goToMessages() {
+  const user = getCurrentUser();
+  if (!user?.shopId) {
+    getDashboard().then(r => {
+      const shopId = r?.data?.shop?.id;
+      if (shopId) window.location.href = 'marche-senegal-chat.html?shopId=' + shopId;
+    });
+  } else {
+    window.location.href = 'marche-senegal-chat.html?shopId=' + user.shopId;
+  }
+}
+
 function logoutVendeur() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');

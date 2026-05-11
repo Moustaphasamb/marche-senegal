@@ -288,6 +288,25 @@ async function getProductReviews(productId) {
 }
 
 // ────────────────────────────────
+// CHAT / MESSAGES
+// ────────────────────────────────
+
+async function getChatMessages(shopId) {
+  return await apiCall(`/api/messages/${shopId}`);
+}
+
+async function sendChatMessage(shopId, content) {
+  return await apiCall(`/api/messages/${shopId}`, {
+    method: 'POST',
+    body: JSON.stringify({ content })
+  });
+}
+
+async function markMessagesRead(shopId) {
+  return await apiCall(`/api/messages/${shopId}/read`, { method: 'PATCH' });
+}
+
+// ────────────────────────────────
 // STATISTIQUES VENDEUR
 // ────────────────────────────────
 

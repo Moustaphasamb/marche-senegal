@@ -1006,8 +1006,13 @@ function copyCode(code) {
 
 // ── Chat ──
 function openChat() {
-  document.getElementById('chat-panel').classList.add('open');
-  setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+  if (!isLoggedIn()) {
+    showToast('Connectez-vous pour contacter le vendeur');
+    setTimeout(() => { window.location.href = 'marche-senegal-connexion-acheteur.html'; }, 1500);
+    return;
+  }
+  if (!currentShop?.id) return;
+  window.location.href = 'marche-senegal-chat.html?shopId=' + currentShop.id;
 }
 
 function closeChat() {
