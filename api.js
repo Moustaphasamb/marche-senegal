@@ -157,6 +157,14 @@ async function createProduct(productData) {
   });
 }
 
+// Modifier un produit (vendeur)
+async function updateProduct(id, productData) {
+  return await apiCall(`/api/products/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(productData)
+  });
+}
+
 // ────────────────────────────────
 // BOUTIQUES
 // ────────────────────────────────
