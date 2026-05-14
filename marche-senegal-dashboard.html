@@ -430,23 +430,22 @@
         <div class="cc-header">
           <div class="cc-title">Revenus (FCFA)</div>
           <div class="cc-period">
-            <button class="cc-per-btn active">7J</button>
-            <button class="cc-per-btn" onclick="this.parentElement.querySelectorAll('.cc-per-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">1M</button>
-            <button class="cc-per-btn" onclick="this.parentElement.querySelectorAll('.cc-per-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">3M</button>
+            <button class="cc-per-btn active" onclick="switchPeriod(this,'7d')">7J</button>
+            <button class="cc-per-btn" onclick="switchPeriod(this,'30d')">1M</button>
+            <button class="cc-per-btn" onclick="switchPeriod(this,'90d')">3M</button>
           </div>
         </div>
-        <div class="mini-chart">
-          <div class="mc-bar-wrap"><div class="mc-bar" style="height:35%"></div><div class="mc-label">Lun</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar" style="height:55%"></div><div class="mc-label">Mar</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar" style="height:40%"></div><div class="mc-label">Mer</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar" style="height:80%"></div><div class="mc-label">Jeu</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar" style="height:95%"></div><div class="mc-label">Ven</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar gold" style="height:100%"></div><div class="mc-label">Sam</div></div>
-          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:20%"></div><div class="mc-label">Dim</div></div>
+        <div class="mini-chart" id="chart-bars">
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
+          <div class="mc-bar-wrap"><div class="mc-bar dim" style="height:10%"></div><div class="mc-label">...</div></div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:.74rem;color:var(--muted)">
-          <span>Total semaine : <strong style="color:var(--green)">342 500 FCFA</strong></span>
-          <span>Moy. jour : <strong style="color:var(--text)">48 928 FCFA</strong></span>
+        <div id="chart-footer" style="display:flex;justify-content:space-between;margin-top:10px;font-size:.74rem;color:var(--muted)">
+          <span>Chargement...</span>
         </div>
       </div>
 
@@ -454,19 +453,16 @@
         <div class="cc-header"><div class="cc-title">Répartition des ventes</div></div>
         <div class="donut-wrap">
           <div class="donut">
-            <svg width="90" height="90" viewBox="0 0 90 90">
+            <svg id="donut-svg" width="90" height="90" viewBox="0 0 90 90">
               <circle cx="45" cy="45" r="35" fill="none" stroke="#D8E8DE" stroke-width="12"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#1B6B3A" stroke-width="12" stroke-dasharray="132 88" stroke-linecap="round"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#E6A817" stroke-width="12" stroke-dasharray="52 168" stroke-dashoffset="-132" stroke-linecap="round"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#4A90D9" stroke-width="12" stroke-dasharray="26 194" stroke-dashoffset="-184" stroke-linecap="round"/>
             </svg>
-            <div class="donut-center"><div class="donut-pct">48%</div><div class="donut-sub">Boubou</div></div>
+            <div class="donut-center">
+              <div class="donut-pct" id="donut-center-pct">—</div>
+              <div class="donut-sub" id="donut-center-sub">...</div>
+            </div>
           </div>
-          <div class="donut-legend">
-            <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div><span>Boubou wax — 48%</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--gold)"></div><span>Bazin brodé — 28%</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:#4A90D9"></div><span>Robe wax — 14%</span></div>
-            <div class="dl-item"><div class="dl-dot" style="background:var(--border)"></div><span>Autres — 10%</span></div>
+          <div class="donut-legend" id="donut-legend">
+            <div class="dl-item" style="font-size:.78rem;color:var(--muted)">Chargement...</div>
           </div>
         </div>
       </div>
@@ -590,12 +586,7 @@
       <table class="prod-table">
         <thead><tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Ventes</th><th>Statut</th><th>Actions</th></tr></thead>
         <tbody>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👗</div><div><div class="pt-name">Boubou wax tissé main</div><div class="pt-cat">Mode · Ref: MFN-BWX-001</div></div></div></td><td style="font-weight:600">15 300 FCFA<br/><span style="font-size:.7rem;color:var(--muted);text-decoration:line-through">18 000</span></td><td class="pt-stock-low">4 restants</td><td>89 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🧵</div><div><div class="pt-name">Bazin brodé cérémonie</div><div class="pt-cat">Mode · Ref: MFN-BAZ-002</div></div></div></td><td style="font-weight:600">25 000 FCFA</td><td class="pt-stock-ok">12 restants</td><td>42 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👘</div><div><div class="pt-name">Robe wax africaine brodée</div><div class="pt-cat">Mode · Ref: MFN-RBW-003</div></div></div></td><td style="font-weight:600">9 500 FCFA</td><td class="pt-stock-ok">18 restants</td><td>67 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🎨</div><div><div class="pt-name">Tissu wax hollandais 6y</div><div class="pt-cat">Tissu · Ref: MFN-TWX-004</div></div></div></td><td style="font-weight:600">4 500 FCFA</td><td class="pt-stock-out">0 — Rupture</td><td>112 ventes</td><td><span class="pt-status pts-paused">En pause</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">🥻</div><div><div class="pt-name">Ensemble 3 pièces femme</div><div class="pt-cat">Mode · Ref: MFN-ENS-005</div></div></div></td><td style="font-weight:600">28 000 FCFA<br/><span style="font-size:.7rem;color:var(--muted);text-decoration:line-through">35 000</span></td><td class="pt-stock-low">2 restants</td><td>33 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:10px"><div class="pt-img">👒</div><div><div class="pt-name">Kaftan bazin riche homme</div><div class="pt-cat">Mode · Ref: MFN-KAF-006</div></div></div></td><td style="font-weight:600">22 000 FCFA</td><td class="pt-stock-ok">7 restants</td><td>28 ventes</td><td><span class="pt-status pts-active">Actif</span></td><td><div class="pt-actions"><button class="pta-btn" onclick="toast('Modifier...')">✏️</button><button class="pta-btn" onclick="toast('Dupliquer...')">📋</button><button class="pta-btn del" onclick="toast('Supprimer...')">🗑️</button></div></td></tr>
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chargement des produits...</td></tr>
         </tbody>
       </table>
     </div>
@@ -691,84 +682,34 @@
     </div>
 
     <!-- Active promos -->
-    <div style="font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:12px">Promotions actives (3)</div>
-    <div class="promo-cards">
-      <div class="promo-card-item">
-        <div class="pci-header">
-          <div class="pci-type code">🏷️ Code promo</div>
-          <div class="pci-status pci-active">● Actif</div>
-        </div>
-        <div class="pci-code">FATOU15</div>
-        <div class="pci-desc">-15% sur toute la boutique · Valable jusqu'à ce soir 20h · Max 50 utilisations</div>
-        <div class="pci-stats">
-          <div><div class="pcis-val">23/50</div><div class="pcis-lbl">Utilisations</div></div>
-          <div><div class="pcis-val">-51 750 FCFA</div><div class="pcis-lbl">Économies offertes</div></div>
-        </div>
-        <div class="pci-actions">
-          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
-          <div class="pci-btn primary" onclick="toast('Code copié !')">📋 Copier</div>
-          <div class="pci-btn" onclick="toast('Promo partagée !')">↗ Partager</div>
-        </div>
-      </div>
-
-      <div class="promo-card-item">
-        <div class="pci-header">
-          <div class="pci-type solde">💸 Soldes</div>
-          <div class="pci-status pci-active">● Actif</div>
-        </div>
-        <div class="pci-code">-20% Cérémonie</div>
-        <div class="pci-desc">20% de réduction sur tous les ensembles cérémonie · Valable 7 jours</div>
-        <div class="pci-stats">
-          <div><div class="pcis-val">8 ventes</div><div class="pcis-lbl">Ce mois</div></div>
-          <div><div class="pcis-val">5 jours</div><div class="pcis-lbl">Restants</div></div>
-        </div>
-        <div class="pci-actions">
-          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
-          <div class="pci-btn" onclick="toast('Arrêter la promo...')">⏸ Mettre en pause</div>
-        </div>
-      </div>
-
-      <div class="promo-card-item">
-        <div class="pci-header">
-          <div class="pci-type offre">🎁 Offre spéciale</div>
-          <div class="pci-status pci-active">● Actif</div>
-        </div>
-        <div class="pci-code">2+1 Tissus</div>
-        <div class="pci-desc">Achetez 2 tissus wax, obtenez le 3ème gratuit · Valable cette semaine</div>
-        <div class="pci-stats">
-          <div><div class="pcis-val">14 ventes</div><div class="pcis-lbl">Ce mois</div></div>
-          <div><div class="pcis-val">3 jours</div><div class="pcis-lbl">Restants</div></div>
-        </div>
-        <div class="pci-actions">
-          <div class="pci-btn" onclick="toast('Modifier...')">✏️ Modifier</div>
-          <div class="pci-btn" onclick="toast('Partager...')">↗ Partager</div>
-        </div>
-      </div>
+    <div id="promo-count-label" style="font-size:.86rem;font-weight:600;color:var(--dark);margin-bottom:12px">Chargement...</div>
+    <div class="promo-cards" id="promo-list">
+      <div style="text-align:center;padding:24px;color:var(--muted)">Chargement des promotions...</div>
     </div>
 
     <!-- New promo form -->
     <div class="new-promo-card">
       <div class="npc-title">✨ Créer une nouvelle promotion</div>
       <div class="promo-type-grid">
-        <div class="ptg-btn selected" onclick="selPromoType(this)"><div class="ptg-icon">🏷️</div><div class="ptg-name">Code promo</div></div>
-        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">💸</div><div class="ptg-name">Soldes</div></div>
-        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">🎁</div><div class="ptg-name">Offre spéciale</div></div>
-        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">📢</div><div class="ptg-name">Annonce</div></div>
-        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">⭐</div><div class="ptg-name">Produit vedette</div></div>
-        <div class="ptg-btn" onclick="selPromoType(this)"><div class="ptg-icon">🚚</div><div class="ptg-name">Livraison gratuite</div></div>
+        <div class="ptg-btn selected" data-type="CODE" onclick="selPromoType(this)"><div class="ptg-icon">🏷️</div><div class="ptg-name">Code promo</div></div>
+        <div class="ptg-btn" data-type="SALE" onclick="selPromoType(this)"><div class="ptg-icon">💸</div><div class="ptg-name">Soldes</div></div>
+        <div class="ptg-btn" data-type="OFFER" onclick="selPromoType(this)"><div class="ptg-icon">🎁</div><div class="ptg-name">Offre spéciale</div></div>
+        <div class="ptg-btn" data-type="ANNOUNCEMENT" onclick="selPromoType(this)"><div class="ptg-icon">📢</div><div class="ptg-name">Annonce</div></div>
+        <div class="ptg-btn" data-type="FEATURED" onclick="selPromoType(this)"><div class="ptg-icon">⭐</div><div class="ptg-name">Produit vedette</div></div>
+        <div class="ptg-btn" data-type="FREE_DELIVERY" onclick="selPromoType(this)"><div class="ptg-icon">🚚</div><div class="ptg-name">Livraison gratuite</div></div>
       </div>
       <div class="form-grid">
-        <div class="form-field"><div class="form-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex: SANDAGA20" id="promo-code-input" oninput="updatePreview()"/></div>
+        <div class="form-field"><div class="form-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex: SANDAGA20" id="promo-code-input" oninput="updatePreview()" style="text-transform:uppercase"/></div>
         <div class="form-field"><div class="form-label">Réduction (%)</div><input class="form-input" type="number" placeholder="Ex: 20" id="promo-pct-input" min="1" max="80" oninput="updatePreview()"/></div>
-        <div class="form-field"><div class="form-label">Durée</div><select class="form-input"><option>1 jour</option><option>3 jours</option><option selected>7 jours</option><option>14 jours</option><option>30 jours</option></select></div>
-        <div class="form-field"><div class="form-label">Utilisations max.</div><input class="form-input" type="number" placeholder="Ex: 50" value="50"/></div>
+        <div class="form-field"><div class="form-label">Durée</div><select class="form-input" id="promo-duration-select"><option value="1">1 jour</option><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
+        <div class="form-field"><div class="form-label">Utilisations max.</div><input class="form-input" type="number" id="promo-maxuses-input" placeholder="Illimité si vide"/></div>
       </div>
       <div class="form-preview" id="promo-preview">
         <div><div class="fp-label">Aperçu du code</div><div class="fp-val" id="preview-code">SANDAGA20</div></div>
         <div><div class="fp-label">Réduction</div><div class="fp-val" id="preview-pct">-20%</div></div>
-        <div><div class="fp-label">Durée</div><div class="fp-val">7 jours</div></div>
+        <div><div class="fp-label">Durée</div><div class="fp-val" id="preview-duration">7 jours</div></div>
       </div>
-      <button class="promo-submit" onclick="toast('✓ Promotion créée et activée !')">🎯 Activer la promotion</button>
+      <button class="promo-submit" id="promo-submit-btn" onclick="submitPromo()">🎯 Activer la promotion</button>
     </div>
   </div>
 

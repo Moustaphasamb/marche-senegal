@@ -395,6 +395,156 @@ async function changeOrderStatus(orderId, status) {
   else showToast('Erreur', 'error');
 }
 
+// ════════════════════════════════════════
+//   PROMOTIONS — Données réelles
+// ════════════════════════════════════════
+
+const PROMO_TYPE_INFO = {
+  CODE:          { icon: '🏷️', label: 'Code promo',        cls: 'code'  },
+  SALE:          { icon: '💸', label: 'Soldes',             cls: 'solde' },
+  OFFER:         { icon: '🎁', label: 'Offre spéciale',     cls: 'offre' },
+  ANNOUNCEMENT:  { icon: '📢', label: 'Annonce',            cls: 'code'  },
+  FEATURED:      { icon: '⭐', label: 'Produit vedette',    cls: 'code'  },
+  FREE_DELIVERY: { icon: '🚚', label: 'Livraison gratuite', cls: 'code'  }
+};
+
+async function loadPromotions() {
+  const promoList = document.getElementById('promo-list');
+  const countLabel = document.getElementById('promo-count-label');
+  if (!promoList) return;
+
+  const result = await getMyPromotions();
+  if (!result.success) {
+    setEmpty(promoList, 'Impossible de charger les promotions');
+    return;
+  }
+
+  const promos = result.data;
+  const activeCount = promos.filter(p => p.isActive).length;
+  if (countLabel) countLabel.textContent = 'Promotions actives (' + activeCount + ')';
+
+  if (!promos.length) {
+    setEmpty(promoList, 'Aucune promotion — créez votre première ci-dessous');
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  promos.forEach(promo => {
+    const info = PROMO_TYPE_INFO[promo.type] || PROMO_TYPE_INFO.CODE;
+    const daysLeft = promo.endDate
+      ? Math.max(0, Math.ceil((new Date(promo.endDate) - Date.now()) / 86400000))
+      : null;
+    const isActive = promo.isActive && (daysLeft === null || daysLeft > 0);
+
+    const card = mk('div', 'promo-card-item');
+
+    const header = mk('div', 'pci-header');
+    header.appendChild(mk('div', 'pci-type ' + info.cls, info.icon + ' ' + info.label));
+    header.appendChild(mk('div', 'pci-status ' + (isActive ? 'pci-active' : 'pci-expired'), isActive ? '● Actif' : '○ Inactif'));
+    card.appendChild(header);
+
+    card.appendChild(mk('div', 'pci-code', promo.code || promo.title));
+
+    let descText = '-' + promo.discount + '% de réduction';
+    if (promo.maxUses) descText += ' · Max ' + promo.maxUses + ' utilisations';
+    if (daysLeft !== null) descText += daysLeft > 0 ? ' · ' + daysLeft + ' jour(s) restant(s)' : ' · Expiré';
+    card.appendChild(mk('div', 'pci-desc', descText));
+
+    const stats = mk('div', 'pci-stats');
+    const s1 = mk('div');
+    s1.appendChild(mk('div', 'pcis-val', promo.maxUses ? promo.usedCount + '/' + promo.maxUses : String(promo.usedCount)));
+    s1.appendChild(mk('div', 'pcis-lbl', 'Utilisations'));
+    const s2 = mk('div');
+    s2.appendChild(mk('div', 'pcis-val', daysLeft !== null ? daysLeft + ' j.' : '∞'));
+    s2.appendChild(mk('div', 'pcis-lbl', 'Restants'));
+    stats.appendChild(s1); stats.appendChild(s2);
+    card.appendChild(stats);
+
+    const actions = mk('div', 'pci-actions');
+
+    if (promo.code) {
+      const copyBtn = mk('div', 'pci-btn', '📋 Copier');
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(promo.code).then(() => showToast('Code ' + promo.code + ' copié !'));
+      };
+      actions.appendChild(copyBtn);
+    }
+
+    const toggleBtn = mk('div', 'pci-btn', promo.isActive ? '⏸ Désactiver' : '▶ Activer');
+    toggleBtn.onclick = () => togglePromo(promo.id);
+    actions.appendChild(toggleBtn);
+
+    const delBtn = mk('div', 'pci-btn', '🗑️ Supprimer');
+    delBtn.style.cssText = 'color:var(--red);border-color:rgba(192,57,43,.3)';
+    delBtn.onclick = () => deletePromo(promo.id);
+    actions.appendChild(delBtn);
+
+    card.appendChild(actions);
+    frag.appendChild(card);
+  });
+  promoList.replaceChildren(frag);
+}
+
+async function submitPromo() {
+  const typeBtn = document.querySelector('.ptg-btn.selected');
+  const code    = document.getElementById('promo-code-input')?.value.trim().toUpperCase();
+  const discount = document.getElementById('promo-pct-input')?.value;
+  const durationDays = parseInt(document.getElementById('promo-duration-select')?.value || '7');
+  const maxUses = document.getElementById('promo-maxuses-input')?.value;
+
+  const type = typeBtn?.getAttribute('data-type') || 'CODE';
+
+  if (!discount || parseInt(discount) < 1 || parseInt(discount) > 80) {
+    showToast('Entrez une réduction entre 1 et 80%', 'error');
+    return;
+  }
+  if (type === 'CODE' && !code) {
+    showToast('Entrez un code promo (ex: SANDAGA20)', 'error');
+    return;
+  }
+
+  const info = PROMO_TYPE_INFO[type] || PROMO_TYPE_INFO.CODE;
+  const title = type === 'CODE' ? code : info.label + ' -' + discount + '%';
+
+  const btn = document.getElementById('promo-submit-btn');
+  if (btn) { btn.textContent = '⏳ Création...'; btn.disabled = true; }
+
+  const result = await createPromotion({
+    title,
+    type,
+    code: code || null,
+    discount: parseInt(discount),
+    durationDays,
+    maxUses: maxUses ? parseInt(maxUses) : null
+  });
+
+  if (btn) { btn.textContent = '🎯 Activer la promotion'; btn.disabled = false; }
+
+  if (result.success) {
+    showToast('✓ Promotion créée et activée !');
+    if (document.getElementById('promo-code-input')) document.getElementById('promo-code-input').value = '';
+    if (document.getElementById('promo-pct-input'))  document.getElementById('promo-pct-input').value = '';
+    if (document.getElementById('promo-maxuses-input')) document.getElementById('promo-maxuses-input').value = '';
+    updatePreview();
+    loadPromotions();
+  } else {
+    showToast(result.message || 'Erreur lors de la création', 'error');
+  }
+}
+
+async function togglePromo(id) {
+  const result = await togglePromotion(id);
+  if (result.success) { showToast('Promotion mise à jour'); loadPromotions(); }
+  else showToast('Erreur', 'error');
+}
+
+async function deletePromo(id) {
+  if (!confirm('Supprimer cette promotion ?')) return;
+  const result = await deletePromotion(id);
+  if (result.success) { showToast('Promotion supprimée'); loadPromotions(); }
+  else showToast('Erreur', 'error');
+}
+
 // ── Navigation entre pages ──
 function showPage(pageId, navItem) {
   document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
@@ -405,8 +555,9 @@ function showPage(pageId, navItem) {
   }
   const titles = { dashboard:'Tableau de bord', produits:'Mes produits', commandes:'Mes commandes', promotions:'Mes promotions' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
-  if (pageId === 'produits') loadMyProducts();
-  if (pageId === 'commandes') loadMyOrders();
+  if (pageId === 'produits')    loadMyProducts();
+  if (pageId === 'commandes')   loadMyOrders();
+  if (pageId === 'promotions')  loadPromotions();
 }
 
 function goToMessages() {
@@ -447,12 +598,168 @@ function selPromoType(btn) {
   btn.classList.add('selected');
 }
 function updatePreview() {
-  const code = document.getElementById('promo-code-input') ? document.getElementById('promo-code-input').value.toUpperCase() : 'SANDAGA20';
-  const pct  = document.getElementById('promo-pct-input') ? document.getElementById('promo-pct-input').value : '20';
-  const pc = document.getElementById('preview-code');
-  const pp = document.getElementById('preview-pct');
-  if (pc) pc.textContent = code || 'SANDAGA20';
-  if (pp) pp.textContent = '-' + (pct || '20') + '%';
+  const code = document.getElementById('promo-code-input')?.value.toUpperCase() || 'SANDAGA20';
+  const pct  = document.getElementById('promo-pct-input')?.value || '20';
+  const sel  = document.getElementById('promo-duration-select');
+  const durVal = sel ? sel.options[sel.selectedIndex]?.text : '7 jours';
+  if (document.getElementById('preview-code'))    document.getElementById('preview-code').textContent    = code || 'SANDAGA20';
+  if (document.getElementById('preview-pct'))     document.getElementById('preview-pct').textContent     = '-' + (pct || '20') + '%';
+  if (document.getElementById('preview-duration')) document.getElementById('preview-duration').textContent = durVal;
+}
+
+// ════════════════════════════════════════
+//   GRAPHIQUES — Données réelles
+// ════════════════════════════════════════
+
+const DONUT_COLORS = ['#1B6B3A', '#E6A817', '#4A90D9', '#C0392B', '#9B59B6'];
+const DAY_LABELS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+
+async function loadCharts(period) {
+  const result = await getShopStats(period || '7d');
+  if (!result.success) return;
+
+  const { revenueByDay, categories, currentRevenue, revenueChange, currentOrderCount, orderChange, days } = result.data;
+
+  // Mettre à jour les variations KPI
+  const kpiChanges = document.querySelectorAll('.kpi-change');
+  if (kpiChanges[0]) {
+    const up = revenueChange >= 0;
+    kpiChanges[0].className = 'kpi-change ' + (up ? 'up' : 'down');
+    kpiChanges[0].textContent = (up ? '↑ +' : '↓ ') + revenueChange + '%';
+  }
+  if (kpiChanges[1]) {
+    const up = orderChange >= 0;
+    kpiChanges[1].className = 'kpi-change ' + (up ? 'up' : 'down');
+    kpiChanges[1].textContent = (up ? '↑ +' : '↓ ') + orderChange + '%';
+  }
+
+  renderBarChart(revenueByDay, currentRevenue, days);
+  renderDonutChart(categories);
+}
+
+function switchPeriod(btn, period) {
+  btn.closest('.cc-period').querySelectorAll('.cc-per-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadCharts(period);
+}
+
+function groupByN(arr, n) {
+  const groups = [];
+  for (let i = 0; i < arr.length; i += n) groups.push(arr.slice(i, i + n));
+  return groups;
+}
+
+function renderBarChart(revenueByDay, totalRevenue, days) {
+  const chartBars = document.getElementById('chart-bars');
+  const chartFooter = document.getElementById('chart-footer');
+  if (!chartBars) return;
+
+  const entries = Object.entries(revenueByDay);
+
+  let bars;
+  if (days <= 7) {
+    bars = entries.map(([date, revenue]) => ({
+      label: DAY_LABELS_FR[new Date(date + 'T12:00:00').getDay()],
+      revenue
+    }));
+  } else if (days <= 30) {
+    bars = groupByN(entries, 5).map(group => {
+      const d = new Date(group[0][0] + 'T12:00:00');
+      return { label: d.getDate() + '/' + (d.getMonth() + 1), revenue: group.reduce((s, [, v]) => s + v, 0) };
+    });
+  } else {
+    bars = groupByN(entries, 15).map(group => {
+      const d = new Date(group[0][0] + 'T12:00:00');
+      return { label: MONTHS_FR[d.getMonth()], revenue: group.reduce((s, [, v]) => s + v, 0) };
+    });
+  }
+
+  const maxRev = Math.max(...bars.map(b => b.revenue), 1);
+  const avgRev = bars.length > 0 ? Math.round(totalRevenue / bars.length) : 0;
+  const todayIdx = days <= 7 ? bars.length - 1 : -1;
+
+  const frag = document.createDocumentFragment();
+  bars.forEach((bar, i) => {
+    const pct = bar.revenue > 0 ? Math.max(Math.round(bar.revenue / maxRev * 100), 4) : 0;
+    const wrap = mk('div', 'mc-bar-wrap');
+    const isToday = i === todayIdx;
+    const cls = 'mc-bar' + (bar.revenue === 0 ? ' dim' : isToday ? ' gold' : '');
+    const b = mk('div', cls);
+    b.style.height = pct + '%';
+    b.title = formatPrice(bar.revenue);
+    wrap.appendChild(b);
+    wrap.appendChild(mk('div', 'mc-label', bar.label));
+    frag.appendChild(wrap);
+  });
+  chartBars.replaceChildren(frag);
+
+  if (chartFooter) {
+    chartFooter.replaceChildren();
+    const s1 = document.createElement('span');
+    const b1 = mk('strong', '', formatPrice(totalRevenue));
+    b1.style.color = 'var(--green)';
+    s1.append('Total : ', b1);
+    const s2 = document.createElement('span');
+    const b2 = mk('strong', '', formatPrice(avgRev));
+    b2.style.color = 'var(--text)';
+    s2.append('Moy./jour : ', b2);
+    chartFooter.appendChild(s1);
+    chartFooter.appendChild(s2);
+  }
+}
+
+function renderDonutChart(categories) {
+  const svg = document.getElementById('donut-svg');
+  const centerPct = document.getElementById('donut-center-pct');
+  const centerSub = document.getElementById('donut-center-sub');
+  const legend = document.getElementById('donut-legend');
+  if (!svg || !legend) return;
+
+  // Supprimer les anciens segments (garder le cercle de fond)
+  Array.from(svg.querySelectorAll('circle')).slice(1).forEach(c => c.remove());
+
+  if (!categories.length) {
+    if (centerPct) centerPct.textContent = '—';
+    if (centerSub) centerSub.textContent = 'Aucune vente';
+    const msg = mk('div', '', 'Aucune donnée');
+    msg.style.cssText = 'font-size:.78rem;color:var(--muted);padding:8px 0';
+    legend.replaceChildren(msg);
+    return;
+  }
+
+  const CIRCUMFERENCE = 2 * Math.PI * 35; // ≈ 220
+  const top = categories[0];
+  if (centerPct) centerPct.textContent = top.pct + '%';
+  if (centerSub) centerSub.textContent = (top.emoji || '') + ' ' + top.name.split(' ')[0];
+
+  let accumulated = 0;
+  categories.forEach((cat, i) => {
+    const dashLength = (cat.pct / 100) * CIRCUMFERENCE;
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', '45');
+    circle.setAttribute('cy', '45');
+    circle.setAttribute('r', '35');
+    circle.setAttribute('fill', 'none');
+    circle.setAttribute('stroke', DONUT_COLORS[i % DONUT_COLORS.length]);
+    circle.setAttribute('stroke-width', '12');
+    circle.setAttribute('stroke-dasharray', dashLength + ' ' + CIRCUMFERENCE);
+    circle.setAttribute('stroke-dashoffset', '-' + accumulated);
+    circle.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(circle);
+    accumulated += dashLength;
+  });
+
+  const frag = document.createDocumentFragment();
+  categories.forEach((cat, i) => {
+    const item = mk('div', 'dl-item');
+    const dot = mk('div', 'dl-dot');
+    dot.style.background = DONUT_COLORS[i % DONUT_COLORS.length];
+    item.appendChild(dot);
+    item.appendChild(mk('span', '', (cat.emoji || '') + ' ' + cat.name + ' — ' + cat.pct + '%'));
+    frag.appendChild(item);
+  });
+  legend.replaceChildren(frag);
 }
 
 // ── Initialisation ──
@@ -460,4 +767,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
   if (!user || user.role !== 'SELLER') { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   await loadDashboard();
+  await loadCharts('7d');
 });

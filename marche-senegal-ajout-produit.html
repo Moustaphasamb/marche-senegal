@@ -128,7 +128,7 @@
     <div class="st-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
     <div class="st-link" onclick="window.location.href='marche-senegal-ma-boutique.html'">🏪 Ma boutique</div>
     <div class="st-link" onclick="toast('Promotions — bientôt disponible')">🎯 Promotions</div>
-    <div class="st-link" onclick="window.location.href='marche-senegal-boutique.html'">🏪 Ma boutique</div>
+    <div class="st-link" onclick="viewMyShop()">🌐 Voir ma boutique</div>
   </div>
   <div class="st-actions">
     <button class="st-btn st-btn-outline" onclick="toast('💾 Brouillon sauvegardé !')">💾 Brouillon</button>
@@ -664,6 +664,14 @@ async function publishProduct(){
     if(topBtn){ topBtn.textContent = 'Publier'; topBtn.disabled = false; }
     toast(result.message || 'Erreur lors de la publication');
   }
+}
+
+// ── Voir la boutique publique ──
+function viewMyShop() {
+  const user = getCurrentUser();
+  const shopId = user?.shop?.id;
+  if (shopId) window.location.href = 'marche-senegal-boutique.html?id=' + shopId;
+  else window.location.href = 'marche-senegal-accueil.html';
 }
 
 // ── Init ──
