@@ -737,10 +737,6 @@ let wished = false;
 // ── Alias toast → showToast (boutons HTML) ──
 function toast(msg) { showToast(msg); }
 
-// ── Stubs favoris — à remplacer quand api.js expose ces routes ──
-async function checkFavorite() { return { success: false, isFavorite: false }; }
-async function addFavorite()   { return { success: false }; }
-async function removeFavorite(){ return { success: false }; }
 
 // ── Récupérer l'ID du produit depuis l'URL ──
 function getProductIdFromURL() {
