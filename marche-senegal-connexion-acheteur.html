@@ -272,7 +272,7 @@ async function submitRegister() {
     showSuccess('Bienvenue ' + firstName + ' ! 🎉', 'Votre compte est créé. Redirection vers l\'accueil...');
     setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1500);
   } else {
-    showToast(result.message || 'Erreur lors de la création du compte');
+    showToast((result.debug || result.message) || 'Erreur lors de la création du compte');
     btn.disabled = false;
     btn.textContent = 'Créer mon compte';
   }
