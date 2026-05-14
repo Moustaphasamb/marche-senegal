@@ -379,7 +379,7 @@ async function handleFileChange(file){
   formData.append('image', file);
 
   try {
-    const res = await fetch('http://localhost:3000/api/upload/image', {
+    const res = await fetch(API_URL + '/api/upload/image', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: formData
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 async function loadCategories(){
   try {
-    const res = await fetch('http://localhost:3000/api/categories');
+    const res = await fetch(API_URL + '/api/categories');
     const data = await res.json();
     if(!data.success || !data.data.length) return;
     const grid = document.getElementById('cat-grid');
