@@ -130,6 +130,27 @@
 .ds-open{background:var(--rp);color:var(--red)}.ds-resolved{background:var(--gp);color:var(--green)}
 /* OVERLAY */
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}.sb-overlay.show{display:block}
+/* MODAL CNI */
+.cni-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;align-items:center;justify-content:center;padding:16px}
+.cni-overlay.open{display:flex}
+.cni-box{background:#fff;border-radius:18px;padding:24px;width:100%;max-width:560px;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:cniIn .22s ease}
+@keyframes cniIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.cni-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cni-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark)}
+.cni-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.18s}.cni-close:hover{border-color:var(--red);color:var(--red)}
+.cni-vendor-info{display:flex;align-items:center;gap:10px;background:var(--gp);border-radius:10px;padding:10px 14px;margin-bottom:18px}
+.cni-av{width:38px;height:38px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.cni-vendor-name{font-size:.9rem;font-weight:600;color:var(--dark)}
+.cni-vendor-sub{font-size:.76rem;color:var(--muted)}
+.cni-photos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.cni-photo{border-radius:10px;overflow:hidden;border:1.5px solid var(--border);aspect-ratio:16/10;position:relative;background:var(--bg)}
+.cni-photo img{width:100%;height:100%;object-fit:cover}
+.cni-photo-label{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px}
+.cni-photo-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:.78rem}
+.cni-photo-empty span{font-size:1.8rem}
+.cni-actions{display:flex;gap:10px}
+.cni-btn-approve{flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s}.cni-btn-approve:hover{background:var(--gl)}
+.cni-btn-reject{flex:1;padding:12px;background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.2s}.cni-btn-reject:hover{background:var(--rp)}
 /* RESPONSIVE */
 @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
 @media(max-width:860px){
@@ -149,6 +170,34 @@
 <body>
 <div class="toast" id="toast"></div>
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- MODAL CNI -->
+<div class="cni-overlay" id="cni-overlay" onclick="closeCNI(event)">
+  <div class="cni-box" onclick="event.stopPropagation()">
+    <div class="cni-head">
+      <span class="cni-title">📋 Dossier CNI — Vérification</span>
+      <button class="cni-close" onclick="closeCNI()">✕</button>
+    </div>
+    <div class="cni-vendor-info">
+      <div class="cni-av" id="cni-av">?</div>
+      <div>
+        <div class="cni-vendor-name" id="cni-vendor-name">—</div>
+        <div class="cni-vendor-sub" id="cni-vendor-sub">—</div>
+      </div>
+    </div>
+    <div class="cni-photos">
+      <div class="cni-photo" id="cni-front-wrap">
+        <div class="cni-photo-empty"><span>🪪</span>Recto non fourni</div>
+        <div class="cni-photo-label">Recto CNI</div>
+      </div>
+      <div class="cni-photo" id="cni-back-wrap">
+        <div class="cni-photo-empty"><span>🪪</span>Verso non fourni</div>
+        <div class="cni-photo-label">Verso CNI</div>
+      </div>
+    </div>
+    <div class="cni-actions" id="cni-actions"></div>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
@@ -622,33 +671,126 @@ function buildVendorActions(actDiv, vendor, shop, badge) {
     b.onclick = () => toast('Dossier de ' + (vendor.firstName || ''));
     actDiv.appendChild(b);
   } else if (shop.status === 'PENDING') {
+    const cni = document.createElement('button');
+    cni.className = 'ta view';
+    cni.textContent = '🪪 CNI';
+    cni.onclick = () => openCNI(vendor, shop, badge, actDiv);
     const approve = document.createElement('button');
     approve.className = 'ta approve';
-    approve.textContent = '✓ Valider';
+    approve.textContent = '✓';
     approve.onclick = () => verifyVendor(vendor.id, shop.name, 'approve', badge, actDiv, vendor);
     const reject = document.createElement('button');
     reject.className = 'ta reject';
     reject.textContent = '✕';
     reject.onclick = () => verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    actDiv.appendChild(cni);
     actDiv.appendChild(approve);
     actDiv.appendChild(reject);
   } else if (shop.status === 'ACTIVE') {
+    const cni = document.createElement('button');
+    cni.className = 'ta view';
+    cni.textContent = '🪪 CNI';
+    cni.onclick = () => openCNI(vendor, shop, badge, actDiv);
     const view = document.createElement('button');
     view.className = 'ta view';
-    view.textContent = 'Voir';
+    view.textContent = 'Boutique';
     view.onclick = () => window.open('marche-senegal-boutique.html?id=' + shop.id, '_blank');
     const susp = document.createElement('button');
     susp.className = 'ta reject';
     susp.textContent = 'Suspendre';
     susp.onclick = () => verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    actDiv.appendChild(cni);
     actDiv.appendChild(view);
     actDiv.appendChild(susp);
   } else {
-    const view = document.createElement('button');
-    view.className = 'ta view';
-    view.textContent = 'Dossier';
-    view.onclick = () => toast('Dossier de ' + shop.name);
-    actDiv.appendChild(view);
+    const cni = document.createElement('button');
+    cni.className = 'ta view';
+    cni.textContent = '🪪 CNI';
+    cni.onclick = () => openCNI(vendor, shop, badge, actDiv);
+    actDiv.appendChild(cni);
+  }
+}
+
+// ── Modal CNI ──
+let _cniContext = null;
+
+function openCNI(vendor, shop, badge, actDiv) {
+  _cniContext = { vendor, shop, badge, actDiv };
+
+  const initials = ((vendor.firstName || '')[0] || '') + ((vendor.lastName || '')[0] || '');
+  document.getElementById('cni-av').textContent = initials.toUpperCase() || '?';
+  document.getElementById('cni-vendor-name').textContent =
+    ((vendor.firstName || '') + ' ' + (vendor.lastName || '')).trim() || '—';
+  document.getElementById('cni-vendor-sub').textContent =
+    (shop?.name || '—') + ' · ' + (shop?.market?.name || '—') + ' · ' + (vendor.phone || '');
+
+  // Photo recto
+  const front = document.getElementById('cni-front-wrap');
+  front.replaceChildren();
+  if (shop?.cniFrontUrl) {
+    const img = document.createElement('img');
+    img.src = shop.cniFrontUrl;
+    img.alt = 'CNI Recto';
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
+    img.onclick = () => window.open(shop.cniFrontUrl, '_blank');
+    front.appendChild(img);
+  } else {
+    front.innerHTML = '<div class="cni-photo-empty"><span>🪪</span>Recto non fourni</div>';
+  }
+  const fl = document.createElement('div');
+  fl.className = 'cni-photo-label'; fl.textContent = 'Recto CNI';
+  front.appendChild(fl);
+
+  // Photo verso
+  const back = document.getElementById('cni-back-wrap');
+  back.replaceChildren();
+  if (shop?.cniBackUrl) {
+    const img2 = document.createElement('img');
+    img2.src = shop.cniBackUrl;
+    img2.alt = 'CNI Verso';
+    img2.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
+    img2.onclick = () => window.open(shop.cniBackUrl, '_blank');
+    back.appendChild(img2);
+  } else {
+    back.innerHTML = '<div class="cni-photo-empty"><span>🪪</span>Verso non fourni</div>';
+  }
+  const bl = document.createElement('div');
+  bl.className = 'cni-photo-label'; bl.textContent = 'Verso CNI';
+  back.appendChild(bl);
+
+  // Boutons selon statut
+  const actionsEl = document.getElementById('cni-actions');
+  actionsEl.replaceChildren();
+  if (shop?.status === 'PENDING') {
+    const btnA = document.createElement('button');
+    btnA.className = 'cni-btn-approve';
+    btnA.textContent = '✓ Approuver la boutique';
+    btnA.onclick = () => {
+      closeCNI();
+      verifyVendor(vendor.id, shop.name, 'approve', badge, actDiv, vendor);
+    };
+    const btnR = document.createElement('button');
+    btnR.className = 'cni-btn-reject';
+    btnR.textContent = '✕ Refuser';
+    btnR.onclick = () => {
+      closeCNI();
+      verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    };
+    actionsEl.appendChild(btnA);
+    actionsEl.appendChild(btnR);
+  } else {
+    const info = document.createElement('div');
+    info.style.cssText = 'font-size:.82rem;color:var(--muted);padding:8px 0;text-align:center;width:100%';
+    info.textContent = shop?.isVerified ? '✅ CNI validée — boutique active' : '📋 Dossier consulté';
+    actionsEl.appendChild(info);
+  }
+
+  document.getElementById('cni-overlay').classList.add('open');
+}
+
+function closeCNI(e) {
+  if (!e || e.target === document.getElementById('cni-overlay')) {
+    document.getElementById('cni-overlay').classList.remove('open');
   }
 }
 
