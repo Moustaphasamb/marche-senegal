@@ -1,15 +1,15 @@
 {
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
-  "rewrites": [
-    { "source": "/", "destination": "/marche-senegal-accueil.html" }
+  "routes": [
+    { "src": "/", "dest": "/marche-senegal-accueil.html" },
+    { "src": "/accueil", "dest": "/marche-senegal-accueil.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     }
   ]
