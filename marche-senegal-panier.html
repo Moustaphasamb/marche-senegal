@@ -965,7 +965,7 @@ async function payNow() {
       + Object.values(deliveryFees).reduce((s, f) => s + f, 0)
       - (promoApplied ? Math.floor(cart.reduce((s, i) => s + i.price * i.quantity, 0) * promoApplied.pct / 100) : 0);
 
-    const initRes = await fetch('http://localhost:3000/api/payments/initiate', {
+    const initRes = await fetch(API_URL + '/api/payments/initiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ orderId: lastOrderId, method: selectedPayment })
@@ -1027,7 +1027,7 @@ async function confirmPayment() {
 
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/api/payments/confirm', {
+    const res = await fetch(API_URL + '/api/payments/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ paymentId: currentPaymentId, phone })

@@ -114,7 +114,9 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <script>
-const API_URL_WS = 'http://localhost:3000';
+const API_URL_WS = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : 'https://marche-senegal-backend-production.up.railway.app';
 let currentShopId = null;
 let currentUser = null;
 let socket = null;
