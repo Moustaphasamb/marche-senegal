@@ -206,6 +206,59 @@
 }
 .addr-add:hover{border-color:var(--green);color:var(--green)}
 
+/* ══ WAVE PAYMENT MODAL ══ */
+.wave-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.wave-overlay.show{display:flex}
+.wave-card{
+  border-radius:24px;max-width:380px;width:100%;
+  overflow:hidden;animation:popIn .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 60px rgba(0,0,0,.35);
+}
+.wave-header{
+  padding:28px 28px 20px;
+  background:linear-gradient(135deg,#1B6B3A 0%,#0f4726 100%);
+  text-align:center;color:#fff;
+}
+.wave-header.orange{background:linear-gradient(135deg,#FF6B00 0%,#cc4400 100%)}
+.wave-header.free{background:linear-gradient(135deg,#6B21D8 0%,#4a1599 100%)}
+.wave-logo{font-size:1.8rem;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+.wave-method-label{font-size:.75rem;opacity:.8;margin-bottom:16px}
+.wave-amount{font-size:2rem;font-weight:700;letter-spacing:-1px}
+.wave-amount-label{font-size:.78rem;opacity:.75;margin-top:2px}
+.wave-body{background:#fff;padding:24px 28px}
+.wave-input-label{font-size:.8rem;font-weight:600;color:#555;margin-bottom:6px}
+.wave-input{
+  width:100%;padding:13px 16px;border:1.5px solid #e0e0e0;border-radius:12px;
+  font-size:1rem;outline:none;box-sizing:border-box;transition:border .2s;
+  font-family:inherit;
+}
+.wave-input:focus{border-color:#1B6B3A}
+.wave-input.orange:focus{border-color:#FF6B00}
+.wave-input.free:focus{border-color:#6B21D8}
+.wave-hint{font-size:.75rem;color:#999;margin-top:5px;margin-bottom:18px}
+.wave-confirm-btn{
+  width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;
+  font-size:1rem;font-weight:700;color:#fff;background:#1B6B3A;
+  transition:background .2s;font-family:inherit;
+}
+.wave-confirm-btn:hover{background:#0f4726}
+.wave-confirm-btn:disabled{background:#ccc;cursor:not-allowed}
+.wave-confirm-btn.orange{background:#FF6B00}.wave-confirm-btn.orange:hover{background:#cc4400}
+.wave-confirm-btn.free{background:#6B21D8}.wave-confirm-btn.free:hover{background:#4a1599}
+.wave-cancel-btn{
+  width:100%;padding:10px;margin-top:10px;border:none;background:none;
+  cursor:pointer;font-size:.85rem;color:#999;font-family:inherit;
+}
+.wave-cancel-btn:hover{color:#333}
+.wave-security{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:.72rem;color:#bbb;margin-top:10px;
+}
+
 /* ══ SUCCESS OVERLAY ══ */
 .success-overlay{
   display:none;position:fixed;inset:0;z-index:400;
@@ -299,6 +352,28 @@
 <body>
 
 <div class="toast" id="toast"></div>
+
+<!-- WAVE PAYMENT MODAL -->
+<div class="wave-overlay" id="wave-overlay">
+  <div class="wave-card">
+    <div class="wave-header" id="wave-header">
+      <div class="wave-logo" id="wave-logo">Wave</div>
+      <div class="wave-method-label" id="wave-method-label">Paiement sécurisé</div>
+      <div class="wave-amount" id="wave-amount">0 FCFA</div>
+      <div class="wave-amount-label">à payer</div>
+    </div>
+    <div class="wave-body">
+      <div class="wave-input-label" id="wave-phone-label">Votre numéro Wave</div>
+      <input class="wave-input" id="wave-phone-input" type="tel" placeholder="+221 77 000 00 00"/>
+      <div class="wave-hint" id="wave-hint">Entrez le numéro associé à votre compte Wave</div>
+      <button class="wave-confirm-btn" id="wave-confirm-btn" onclick="confirmPayment()">
+        Payer maintenant
+      </button>
+      <button class="wave-cancel-btn" onclick="cancelPayment()">Annuler</button>
+      <div class="wave-security">🔒 Paiement sécurisé — Simulation dev</div>
+    </div>
+  </div>
+</div>
 
 <!-- SUCCESS OVERLAY -->
 <div class="success-overlay" id="success-overlay">
@@ -561,6 +636,7 @@ let deliveryFees = {};
 let selectedPayment = 'WAVE';
 let selectedAddressId = null;
 let lastOrderId = null;
+let currentPaymentId = null;
 
 // ── Charger le panier depuis localStorage ──
 function loadCart() {
@@ -846,11 +922,10 @@ async function payNow() {
   }
 
   const payBtn = document.querySelector('.pay-btn');
-  payBtn.innerHTML = '⏳ Traitement en cours...';
+  payBtn.innerHTML = '⏳ Création de la commande...';
   payBtn.style.background = 'var(--muted)';
   payBtn.disabled = true;
 
-  // Grouper par boutique et créer une commande par boutique
   const byShop = {};
   cart.forEach(item => {
     const shopId = item.shopId || 'default';
@@ -884,17 +959,30 @@ async function payNow() {
       lastOrderId = result.data?.id || result.data?.order?.id || null;
     }
 
-    // Numéro de commande dans l'overlay
-    const orderNumEl = document.getElementById('sc-order-num');
-    if (orderNumEl && lastOrderId) {
-      orderNumEl.textContent = '#MS-' + String(lastOrderId).padStart(6, '0');
+    // Initier le paiement
+    const token = localStorage.getItem('token');
+    const total = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+      + Object.values(deliveryFees).reduce((s, f) => s + f, 0)
+      - (promoApplied ? Math.floor(cart.reduce((s, i) => s + i.price * i.quantity, 0) * promoApplied.pct / 100) : 0);
+
+    const initRes = await fetch('http://localhost:3000/api/payments/initiate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ orderId: lastOrderId, method: selectedPayment })
+    });
+    const initData = await initRes.json();
+
+    payBtn.innerHTML = '🔒 Payer';
+    payBtn.style.background = '';
+    payBtn.disabled = false;
+
+    if (!initData.success) {
+      showToast('❌ ' + initData.message);
+      return;
     }
 
-    // Commande réussie — vider le panier
-    localStorage.removeItem('cart');
-
-    // Afficher l'overlay de succès
-    document.getElementById('success-overlay').classList.add('show');
+    currentPaymentId = initData.paymentId;
+    openWaveModal(initData.amount, selectedPayment);
 
   } catch (error) {
     showToast('❌ Erreur lors de la commande');
@@ -902,6 +990,82 @@ async function payNow() {
     payBtn.style.background = '';
     payBtn.disabled = false;
   }
+}
+
+// ── Ouvrir le modal de paiement ──
+function openWaveModal(amount, method) {
+  const config = {
+    WAVE:         { label: 'Wave',         theme: '',        phoneTxt: 'Votre numéro Wave',         hint: 'Numéro associé à votre compte Wave' },
+    ORANGE_MONEY: { label: 'Orange Money', theme: 'orange',  phoneTxt: 'Votre numéro Orange',        hint: 'Numéro associé à votre compte Orange Money' },
+    FREE_MONEY:   { label: 'Free Money',   theme: 'free',    phoneTxt: 'Votre numéro Free',          hint: 'Numéro associé à votre compte Free Money' }
+  };
+  const c = config[method] || config.WAVE;
+
+  document.getElementById('wave-header').className = 'wave-header ' + c.theme;
+  document.getElementById('wave-logo').textContent = c.label;
+  document.getElementById('wave-amount').textContent = amount.toLocaleString('fr-FR') + ' FCFA';
+  document.getElementById('wave-phone-label').textContent = c.phoneTxt;
+  document.getElementById('wave-hint').textContent = c.hint;
+  document.getElementById('wave-confirm-btn').className = 'wave-confirm-btn ' + c.theme;
+  document.getElementById('wave-input').className = 'wave-input ' + c.theme;
+
+  // Pré-remplir le numéro de l'utilisateur
+  const user = getCurrentUser();
+  if (user?.phone) document.getElementById('wave-phone-input').value = user.phone;
+
+  document.getElementById('wave-overlay').classList.add('show');
+}
+
+// ── Confirmer le paiement ──
+async function confirmPayment() {
+  const phone = document.getElementById('wave-phone-input').value.trim();
+  if (!phone) { showToast('Entrez votre numéro'); return; }
+
+  const btn = document.getElementById('wave-confirm-btn');
+  btn.textContent = '⏳ Traitement...';
+  btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:3000/api/payments/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ paymentId: currentPaymentId, phone })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      showToast('❌ ' + data.message);
+      btn.textContent = 'Payer maintenant';
+      btn.disabled = false;
+      return;
+    }
+
+    // Fermer le modal Wave
+    document.getElementById('wave-overlay').classList.remove('show');
+
+    // Vider le panier
+    localStorage.removeItem('cart');
+
+    // Afficher le numéro de commande et l'overlay succès
+    const orderNumEl = document.getElementById('sc-order-num');
+    if (orderNumEl && lastOrderId) {
+      orderNumEl.textContent = '#MS-' + String(lastOrderId).substring(0, 8).toUpperCase();
+    }
+    document.getElementById('success-overlay').classList.add('show');
+
+  } catch (error) {
+    showToast('❌ Erreur de connexion');
+    btn.textContent = 'Payer maintenant';
+    btn.disabled = false;
+  }
+}
+
+// ── Annuler le paiement ──
+function cancelPayment() {
+  document.getElementById('wave-overlay').classList.remove('show');
+  currentPaymentId = null;
+  showToast('Paiement annulé');
 }
 
 // ── Fermer le succès ──

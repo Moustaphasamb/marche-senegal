@@ -4,7 +4,10 @@
 //   les pages HTML du frontend
 // ════════════════════════════════════════
 
-const API_URL = 'http://localhost:3000';
+const PROD_API_URL = 'https://RAILWAY_URL_ICI.railway.app';
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : PROD_API_URL;
 
 // ────────────────────────────────
 // Fonction principale pour appeler l'API
