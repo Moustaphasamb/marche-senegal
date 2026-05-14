@@ -341,7 +341,7 @@ async function loadCategories(selectedId) {
       btn.setAttribute('data-id', cat.id);
       btn.setAttribute('onclick', 'selCat(this)');
       btn.addEventListener('click', function() { selCat(this); });
-      btn.textContent = (cat.icon || '') + ' ' + cat.name;
+      btn.textContent = (cat.emoji || '') + ' ' + cat.name;
       grid.appendChild(btn);
     });
   } catch {
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
   const nameEl = document.getElementById('sellerName');
-  if (nameEl && user) nameEl.textContent = user.name || user.phone || '';
+  if (nameEl && user) nameEl.textContent = user.firstName ? (user.firstName + ' ' + (user.lastName || '')).trim() : (user.phone || '');
   loadProduct();
 });
 </script>
