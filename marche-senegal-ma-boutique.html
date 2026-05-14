@@ -267,7 +267,10 @@ function fillForm(shop, stats) {
   if (bn) bn.value = shop.bannerUrl || '';
 
   const ho = document.getElementById('shopHours');
-  if (ho) ho.value = shop.openingHours || '';
+  if (ho) {
+    const hours = shop.openingHours;
+    ho.value = typeof hours === 'string' ? hours : (hours?.text || '');
+  }
 
   const to = document.getElementById('shopTour');
   if (to) to.value = shop.virtualTourUrl || '';
