@@ -794,7 +794,12 @@ function reorder() {
 }
 
 function contactSeller() {
-  showToast('💬 Chat vendeur — bientôt disponible !');
+  if (!isLoggedIn()) {
+    showToast('Connectez-vous pour contacter le vendeur');
+    return;
+  }
+  if (!currentOrder?.shopId) return;
+  window.location.href = 'marche-senegal-chat.html?shopId=' + currentOrder.shopId;
 }
 
 function reportProblem() {
