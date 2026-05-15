@@ -816,28 +816,42 @@ async function applyPromo() {
   const code = document.getElementById('promo-input').value.trim().toUpperCase();
   if (!code) { showToast('Entrez un code promo'); return; }
 
-  // Codes de test
-  const testCodes = {
-    'FATOU15':   { pct: 15, label: '-15% sur toute la commande' },
-    'SANDAGA15': { pct: 15, label: '-15% boutiques Sandaga' },
-    'BIENVENUE': { pct: 10, label: '-10% première commande' }
-  };
+  const btn = document.querySelector('.ps-btn');
+  btn.textContent = '...';
+  btn.disabled = true;
 
-  const promo = testCodes[code];
-  if (promo) {
-    promoApplied = promo;
+  try {
+    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+    const token = localStorage.getItem('token');
+    const res = await fetch(API_URL + '/api/promotions/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify({ code, amount: subtotal })
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      showToast('❌ ' + data.message);
+      document.getElementById('promo-input').style.borderColor = 'var(--red)';
+      setTimeout(() => { document.getElementById('promo-input').style.borderColor = ''; }, 1500);
+      return;
+    }
+
+    promoApplied = { pct: data.data.discount, label: data.data.title, id: data.data.promoId };
     document.getElementById('promo-applied').style.display = 'flex';
-    document.getElementById('applied-code').textContent = code;
-    document.getElementById('applied-desc').textContent = promo.label;
+    document.getElementById('applied-code').textContent = data.data.code;
+    document.getElementById('applied-desc').textContent = data.data.description || data.data.title;
     document.getElementById('promo-input').value = '';
     updateSummary();
-    showToast('✓ Code ' + code + ' appliqué !');
-  } else {
-    showToast('❌ Code promo invalide');
-    document.getElementById('promo-input').style.borderColor = 'var(--red)';
-    setTimeout(() => {
-      document.getElementById('promo-input').style.borderColor = '';
-    }, 1500);
+    showToast('✓ Code ' + data.data.code + ' appliqué ! −' + data.data.discount + '%');
+  } catch (e) {
+    showToast('❌ Erreur réseau, réessayez');
+  } finally {
+    btn.textContent = 'Appliquer';
+    btn.disabled = false;
   }
 }
 
