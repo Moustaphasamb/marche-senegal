@@ -565,6 +565,85 @@ function getStatusLabel(status) {
   return labels[status] || status;
 }
 
+// ── Charger les favoris ──
+async function loadFavorites() {
+  const container = document.getElementById('favorites-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="es-icon">⏳</div>
+      <div class="es-title">Chargement...</div>
+    </div>
+  `;
+
+  const result = await getFavorites();
+
+  if (!result.success) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">❌</div>
+        <div class="es-title">Erreur de chargement</div>
+        <div class="es-sub">Impossible de charger vos favoris</div>
+      </div>
+    `;
+    return;
+  }
+
+  const favorites = result.data;
+  const statFav = document.getElementById('stat-favorites');
+  if (statFav) statFav.textContent = favorites.length;
+
+  if (favorites.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">❤️</div>
+        <div class="es-title">Aucun favori</div>
+        <div class="es-sub">Explorez les produits et ajoutez vos coups de cœur !</div>
+        <button class="es-btn" onclick="window.location.href='marche-senegal-accueil.html'">
+          🛍️ Explorer les produits
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="orders-list">
+      ${favorites.map(fav => {
+        const prod = fav.product;
+        return `
+          <div class="order-item" onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'" style="cursor:pointer">
+            <div class="oi-img" style="font-size:2rem;display:flex;align-items:center;justify-content:center">
+              ${prod.images?.[0]
+                ? `<img src="${prod.images[0]}" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>`
+                : '🛍️'}
+            </div>
+            <div class="oi-info" style="flex:1;min-width:0">
+              <div class="oi-id">${prod.name}</div>
+              <div class="oi-meta" style="font-size:.8rem;color:var(--muted);margin-top:2px">${prod.shop?.name || ''} ${prod.category?.emoji || ''}</div>
+              <div style="font-size:.9rem;font-weight:700;color:var(--green);margin-top:4px">${prod.price?.toLocaleString('fr-FR')} FCFA</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+              <button class="es-btn" style="padding:6px 14px;font-size:.78rem" onclick="event.stopPropagation();window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+                Voir
+              </button>
+              <button style="padding:5px 10px;border-radius:99px;border:1.5px solid rgba(192,57,43,.3);background:#fff;color:var(--red);font-size:.72rem;cursor:pointer" onclick="event.stopPropagation();removeFavAndReload('${prod.id}')">
+                ✕ Retirer
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+async function removeFavAndReload(productId) {
+  await removeFavorite(productId);
+  loadFavorites();
+}
+
 // ── Changer d'onglet ──
 function showTab(tabId, navItem) {
   const tabs = ['orders', 'favorites', 'addresses', 'payments', 'settings'];
@@ -575,6 +654,7 @@ function showTab(tabId, navItem) {
 
   document.querySelectorAll('.sn-item').forEach(i => i.classList.remove('active'));
   if (navItem) navItem.classList.add('active');
+  if (tabId === 'favorites') loadFavorites();
 }
 
 // ── Se déconnecter ──

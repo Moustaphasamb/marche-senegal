@@ -480,12 +480,20 @@ function addToCart(event, productId, productName, price) {
   }, 500);
 }
 
-// ── Ajouter aux favoris ──
-function wish(event, productId) {
+// ── Ajouter/Retirer des favoris ──
+async function wish(event, productId) {
   event.stopPropagation();
+  if (!isLoggedIn()) { showToast('Connectez-vous pour ajouter aux favoris'); return; }
   const btn = event.target;
-  btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
-  showToast(btn.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+  const adding = btn.textContent === '🤍';
+  btn.textContent = adding ? '❤️' : '🤍';
+  if (!productId) return;
+  const result = adding ? await addFavorite(productId) : await removeFavorite(productId);
+  if (result.success) {
+    showToast(adding ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+  } else {
+    btn.textContent = adding ? '🤍' : '❤️';
+  }
 }
 
 // ── Aller vers la boutique selon le rôle ──

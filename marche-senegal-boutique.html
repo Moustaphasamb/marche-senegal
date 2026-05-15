@@ -771,7 +771,7 @@ function buildProdCard(prod) {
   const wishBtn = document.createElement('div');
   wishBtn.className = 'pc-wish';
   wishBtn.textContent = '🤍';
-  wishBtn.addEventListener('click', wish);
+  wishBtn.addEventListener('click', (e) => wish(e, prod.id));
   imgDiv.appendChild(wishBtn);
 
   const body = document.createElement('div');
@@ -979,12 +979,20 @@ function addCart(event, productId, productName, price) {
   showToast('✓ ' + productName + ' ajouté au panier');
 }
 
-// ── Ajouter aux favoris ──
-function wish(event) {
+// ── Ajouter/Retirer des favoris ──
+async function wish(event, productId) {
   event.stopPropagation();
+  if (!isLoggedIn()) { showToast('Connectez-vous pour ajouter aux favoris'); return; }
   const btn = event.target;
-  btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
-  showToast(btn.textContent === '❤️' ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+  const adding = btn.textContent === '🤍';
+  btn.textContent = adding ? '❤️' : '🤍';
+  if (!productId) return;
+  const result = adding ? await addFavorite(productId) : await removeFavorite(productId);
+  if (result.success) {
+    showToast(adding ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
+  } else {
+    btn.textContent = adding ? '🤍' : '❤️';
+  }
 }
 
 // ── Suivre la boutique ──
