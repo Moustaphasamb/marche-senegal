@@ -1054,16 +1054,20 @@ function buildReviewCard(review) {
   return card;
 }
 
-// ── Charger les avis ──
-function loadReviews(prod) {
+// ── Charger les avis depuis l'API ──
+async function loadReviews(prod) {
   const reviewsTab = document.getElementById('tab-avis');
   if (!reviewsTab) return;
 
-  const reviews = prod.reviews || [];
-  updateProdRatingSummary(reviews, prod.rating, prod.totalReviews);
+  updateProdRatingSummary([], prod.rating, prod.totalReviews);
 
   const reviewsList = reviewsTab.querySelector('.reviews-list');
   if (!reviewsList) return;
+
+  const result = await getProductReviews(prod.id);
+  const reviews = result.success ? result.data : [];
+
+  updateProdRatingSummary(reviews, prod.rating, prod.totalReviews);
 
   if (!reviews.length) {
     const empty = document.createElement('div');
@@ -1373,15 +1377,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function submitProdReview() {
+async function submitProdReview() {
+  if (!isLoggedIn()) { showToast('Connectez-vous pour laisser un avis'); return; }
   if (!prodSelectedRating) { showToast('Veuillez choisir une note ★'); return; }
   const comment = document.getElementById('prod-review-comment')?.value.trim();
   if (!comment) { showToast('Veuillez écrire un commentaire'); return; }
-  showToast('✓ Avis publié — merci !');
-  prodSelectedRating = 0;
-  document.querySelectorAll('#prod-star-picker span').forEach(s => { s.textContent = '☆'; });
-  const ta = document.getElementById('prod-review-comment');
-  if (ta) ta.value = '';
+
+  const btn = document.querySelector('#prod-review-form button');
+  if (btn) { btn.textContent = '⏳ Envoi...'; btn.disabled = true; }
+
+  const result = await createReview({
+    shopId: currentProduct?.shop?.id,
+    productId: currentProduct?.id,
+    rating: prodSelectedRating,
+    comment
+  });
+
+  if (btn) { btn.textContent = 'Publier mon avis'; btn.disabled = false; }
+
+  if (result.success) {
+    showToast('⭐ Merci pour votre avis !');
+    prodSelectedRating = 0;
+    document.querySelectorAll('#prod-star-picker span').forEach(s => { s.textContent = '☆'; });
+    const ta = document.getElementById('prod-review-comment');
+    if (ta) ta.value = '';
+    document.getElementById('prod-review-form').style.display = 'none';
+    loadReviews(currentProduct);
+  } else {
+    showToast('❌ ' + (result.message || 'Erreur lors de l\'envoi'));
+  }
 }
 
 // ── Formulaire Q&A ──
