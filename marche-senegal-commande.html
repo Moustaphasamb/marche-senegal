@@ -881,15 +881,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const params = new URLSearchParams(location.search);
   const orderId = getOrderIdFromURL();
 
-  if (orderId) {
-    await loadOrder(orderId);
-  } else {
-    // Pas d'ID — aller vers le profil
+  if (!orderId) {
     window.location.href = 'marche-senegal-profil.html';
+    return;
+  }
+
+  await loadOrder(orderId);
+
+  // Retour depuis Wave Checkout — attendre la confirmation webhook puis afficher succès
+  if (params.get('wave_ok') === '1') {
+    showToast('✅ Paiement Wave reçu ! Confirmation en cours...');
+    pollWavePayment(orderId, 0);
   }
 });
+
+async function pollWavePayment(orderId, attempts) {
+  if (attempts > 15) {
+    showToast('ℹ️ Paiement reçu — confirmation en cours, veuillez patienter.');
+    return;
+  }
+  try {
+    const result = await apiCall('/api/payments/' + orderId + '/status');
+    if (result.paid) {
+      showToast('✅ Paiement confirmé ! Commande en cours de traitement.');
+      // Nettoyer l'URL sans recharger la page
+      history.replaceState(null, '', '?id=' + orderId);
+      // Recharger l'ordre pour afficher le bon statut
+      await loadOrder(orderId);
+    } else {
+      setTimeout(() => pollWavePayment(orderId, attempts + 1), 2000);
+    }
+  } catch (e) {
+    setTimeout(() => pollWavePayment(orderId, attempts + 1), 3000);
+  }
+}
 </script>
 </body>
 </html>

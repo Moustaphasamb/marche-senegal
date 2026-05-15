@@ -981,6 +981,15 @@ async function payNow() {
       return;
     }
 
+    // Wave réel → redirection vers Wave Checkout
+    if (initData.wave_launch_url) {
+      localStorage.removeItem('cart');
+      showToast('Redirection vers Wave...');
+      setTimeout(() => { window.location.href = initData.wave_launch_url; }, 600);
+      return;
+    }
+
+    // Simulation (pas de WAVE_API_KEY)
     currentPaymentId = initData.paymentId;
     openWaveModal(initData.amount, selectedPayment);
 
@@ -1180,6 +1189,11 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   loadCart();
   loadSuggestedProducts();
+
+  // Retour d'erreur Wave
+  if (new URLSearchParams(location.search).get('wave_error') === '1') {
+    setTimeout(() => showToast('❌ Paiement Wave annulé ou échoué. Réessayez.'), 500);
+  }
 });
 </script>
 </body>
