@@ -545,8 +545,12 @@ function goToShop() {
   } else if (user.role === 'ADMIN') {
     window.location.href = 'marche-senegal-admin.html';
   } else {
-    // Acheteur qui veut devenir vendeur
-    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    // Acheteur qui veut devenir vendeur → déconnecter et rediriger vers inscription vendeur
+    showToast('Pour ouvrir une boutique, créez un compte vendeur.');
+    setTimeout(() => {
+      logout();
+      window.location.href = 'marche-senegal-connexion-vendeur.html';
+    }, 1800);
   }
 }
 
