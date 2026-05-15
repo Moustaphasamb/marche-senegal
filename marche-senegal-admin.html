@@ -108,6 +108,28 @@
 .ms-name{font-size:.76rem;font-weight:600;color:var(--dark);margin-bottom:2px}
 .ms-val{font-size:.82rem;font-weight:700;color:var(--green)}
 .ms-sub{font-size:.64rem;color:var(--muted)}
+/* MARKETS PAGE */
+.region-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.filter-chip{padding:5px 14px;border-radius:99px;font-size:.76rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--muted);transition:all .18s}
+.filter-chip.active,.filter-chip:hover{border-color:var(--green);background:var(--gp);color:var(--green)}
+.mkt-region-header{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:8px 14px 4px;background:var(--bg);border-bottom:1px solid var(--border)}
+.mkt-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.mkt-dot-active{background:var(--green)}.mkt-dot-inactive{background:var(--red)}
+/* MARKET MODAL */
+.mkt-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:400;align-items:center;justify-content:center;padding:16px}
+.mkt-overlay.open{display:flex}
+.mkt-box{background:#fff;border-radius:18px;padding:26px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:cniIn .22s ease}
+.mkt-box h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.mkt-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.mkt-form-row.full{grid-template-columns:1fr}
+.mkt-field{display:flex;flex-direction:column;gap:4px}
+.mkt-field label{font-size:.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.mkt-field input,.mkt-field select,.mkt-field textarea{border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.84rem;font-family:inherit;outline:none;transition:border-color .2s;background:#fff}
+.mkt-field input:focus,.mkt-field select:focus,.mkt-field textarea:focus{border-color:var(--green)}
+.mkt-field textarea{resize:vertical;min-height:70px}
+.mkt-actions{display:flex;gap:10px;margin-top:18px}
+.mkt-btn-save{flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s}.mkt-btn-save:hover{background:var(--gl)}
+.mkt-btn-cancel{padding:12px 22px;background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;cursor:pointer;transition:.2s}.mkt-btn-cancel:hover{border-color:var(--red);color:var(--red)}
 /* ACTIVITY LOG */
 .log-list{display:flex;flex-direction:column;gap:0}
 .log{display:flex;align-items:flex-start;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border)}
@@ -196,6 +218,73 @@
       </div>
     </div>
     <div class="cni-actions" id="cni-actions"></div>
+  </div>
+</div>
+
+<!-- MODAL MARCHÉ (Ajouter / Modifier) -->
+<div class="mkt-overlay" id="mkt-overlay" onclick="closeMktModal(event)">
+  <div class="mkt-box" onclick="event.stopPropagation()">
+    <h3>
+      <span id="mkt-modal-title">🗺️ Nouveau marché</span>
+      <button style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted)" onclick="closeMktModal()">✕</button>
+    </h3>
+    <input type="hidden" id="mkt-edit-id"/>
+    <div class="mkt-form-row">
+      <div class="mkt-field">
+        <label>Nom du marché *</label>
+        <input type="text" id="mkt-name" placeholder="ex: Marché Sandaga"/>
+      </div>
+      <div class="mkt-field">
+        <label>Ville *</label>
+        <input type="text" id="mkt-city" placeholder="ex: Dakar"/>
+      </div>
+    </div>
+    <div class="mkt-form-row">
+      <div class="mkt-field">
+        <label>Région *</label>
+        <select id="mkt-region">
+          <option value="">— Choisir une région —</option>
+          <option>Dakar</option>
+          <option>Thiès</option>
+          <option>Diourbel</option>
+          <option>Saint-Louis</option>
+          <option>Tambacounda</option>
+          <option>Kaolack</option>
+          <option>Kaffrine</option>
+          <option>Ziguinchor</option>
+          <option>Sédhiou</option>
+          <option>Kolda</option>
+          <option>Louga</option>
+          <option>Fatick</option>
+          <option>Matam</option>
+          <option>Kédougou</option>
+        </select>
+      </div>
+      <div class="mkt-field">
+        <label>Adresse</label>
+        <input type="text" id="mkt-address" placeholder="ex: Rue Mohamed V, Plateau"/>
+      </div>
+    </div>
+    <div class="mkt-form-row">
+      <div class="mkt-field">
+        <label>Latitude</label>
+        <input type="number" id="mkt-lat" placeholder="ex: 14.6937" step="0.0001"/>
+      </div>
+      <div class="mkt-field">
+        <label>Longitude</label>
+        <input type="number" id="mkt-lng" placeholder="ex: -17.4441" step="0.0001"/>
+      </div>
+    </div>
+    <div class="mkt-form-row full">
+      <div class="mkt-field">
+        <label>Description</label>
+        <textarea id="mkt-desc" placeholder="Description du marché…"></textarea>
+      </div>
+    </div>
+    <div class="mkt-actions">
+      <button class="mkt-btn-cancel" onclick="closeMktModal()">Annuler</button>
+      <button class="mkt-btn-save" onclick="saveMarket()">💾 Enregistrer</button>
+    </div>
   </div>
 </div>
 
@@ -440,12 +529,43 @@
   <div class="ps" id="ps-markets">
     <div class="sec-header">
       <div class="sec-title" id="markets-title">🗺️ Gestion des marchés</div>
-      <button class="sec-btn sec-btn-green" onclick="toast('Ajouter un marché...')">+ Ajouter un marché</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="sec-btn sec-btn-outline" id="seed-btn" onclick="seedMarkets()">🌱 Charger tous les marchés</button>
+        <button class="sec-btn sec-btn-green" onclick="openMarketModal()">+ Ajouter un marché</button>
+      </div>
     </div>
-    <div class="grid-3" id="markets-grid">
-      <div class="card"><div class="card-header"><div class="card-title">🏛️ Sandaga — Dakar</div><div class="card-action" onclick="window.location.href='marche-senegal-marche.html'">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong style="color:var(--dark)">142</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong style="color:var(--dark)">12 400</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">3,2M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="window.location.href='marche-senegal-marche.html'">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
-      <div class="card"><div class="card-header"><div class="card-title">🕌 Touba</div><div class="card-action" onclick="toast('Voir marché Touba...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>120</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>9 800</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.7 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,8M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Touba...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
-      <div class="card"><div class="card-header"><div class="card-title">🧵 Tilène — Médina</div><div class="card-action" onclick="toast('Voir marché Tilène...')">Voir →</div></div><div style="padding:14px 18px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Boutiques actives</span><strong>98</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Produits listés</span><strong>7 600</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Note moyenne</span><strong style="color:var(--gold)">4.8 ⭐</strong></div><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--muted)">Revenus ce mois</span><strong style="color:var(--green)">2,1M FCFA</strong></div><div style="margin-top:8px;display:flex;gap:6px"><button class="ta view" onclick="toast('Marché Tilène...')">Voir marché</button><button class="ta approve" onclick="toast('Paramètres...')">Paramètres</button></div></div></div>
+
+    <!-- KPIs marchés -->
+    <div class="kpi-grid" id="markets-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">🗺️</div></div><div class="kpi-val" id="mk-total">—</div><div class="kpi-label">Marchés au total</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🟢</div></div><div class="kpi-val" id="mk-active">—</div><div class="kpi-label">Marchés actifs</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📍</div></div><div class="kpi-val" id="mk-regions">—</div><div class="kpi-label">Régions couvertes</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">🏪</div></div><div class="kpi-val" id="mk-shops">—</div><div class="kpi-label">Boutiques inscrits</div></div>
+    </div>
+
+    <!-- Filtres par région -->
+    <div class="region-filter" id="region-filter">
+      <div class="filter-chip active" onclick="filterMarkets('', this)">Toutes les régions</div>
+    </div>
+
+    <!-- Tableau marchés -->
+    <div class="card">
+      <table class="t" id="markets-table">
+        <thead>
+          <tr>
+            <th>Marché</th>
+            <th>Ville</th>
+            <th>Région</th>
+            <th>Boutiques</th>
+            <th>Coordonnées</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="markets-tbody">
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -856,72 +976,268 @@ async function verifyVendor(userId, shopName, action, badge, actDiv, vendor) {
   }
 }
 
-// ── Marchés depuis /api/markets ──
+// ══════════════════════════════════════
+//   GESTION DES MARCHÉS
+// ══════════════════════════════════════
+
+let _allMarkets = [];
+let _activeRegionFilter = '';
+
 async function loadMarkets() {
   marketsLoaded = true;
-  const grid = document.getElementById('markets-grid');
-  if (!grid) return;
+  const tbody = document.getElementById('markets-tbody');
+  if (!tbody) return;
+
   try {
-    const res = await getMarkets();
-    const markets = res.data || [];
-    grid.replaceChildren();
+    const data = await apiCall('/api/admin/markets');
+    _allMarkets = data.data || [];
+    const meta = data.meta || {};
 
-    markets.forEach(mkt => {
-      const card = document.createElement('div');
-      card.className = 'card';
+    // KPIs
+    const active = _allMarkets.filter(m => m.isActive).length;
+    const regions = meta.regions || [...new Set(_allMarkets.map(m => m.region))];
+    const totalShops = _allMarkets.reduce((acc, m) => acc + (m._count?.shops || 0), 0);
 
-      const header = document.createElement('div');
-      header.className = 'card-header';
-      const title = document.createElement('div');
-      title.className = 'card-title';
-      title.textContent = (mkt.emoji || '🏛️') + ' ' + mkt.name + (mkt.city ? ' — ' + mkt.city : '');
-      const action = document.createElement('div');
-      action.className = 'card-action';
-      action.textContent = 'Voir →';
-      action.onclick = () => window.location.href = 'marche-senegal-marche.html?id=' + mkt.id;
-      header.appendChild(title);
-      header.appendChild(action);
+    document.getElementById('mk-total').textContent = _allMarkets.length;
+    document.getElementById('mk-active').textContent = active;
+    document.getElementById('mk-regions').textContent = regions.length;
+    document.getElementById('mk-shops').textContent = totalShops.toLocaleString('fr-FR');
 
-      const body = document.createElement('div');
-      body.style.cssText = 'padding:14px 18px;display:flex;flex-direction:column;gap:7px';
+    // Chips région
+    const filterEl = document.getElementById('region-filter');
+    filterEl.replaceChildren();
+    const allChip = document.createElement('div');
+    allChip.className = 'filter-chip active';
+    allChip.textContent = 'Toutes les régions';
+    allChip.onclick = () => filterMarkets('', allChip);
+    filterEl.appendChild(allChip);
 
-      [
-        ['Boutiques actives', mkt._count?.shops ?? '—'],
-        ['Produits listés', mkt._count?.products ?? '—'],
-        ['Note moyenne', mkt.rating ? mkt.rating.toFixed(1) + ' ⭐' : '—']
-      ].forEach(([label, val]) => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;font-size:.82rem';
-        const lbl = document.createElement('span');
-        lbl.style.color = 'var(--muted)';
-        lbl.textContent = label;
-        const v = document.createElement('strong');
-        v.style.color = 'var(--dark)';
-        v.textContent = String(val);
-        row.appendChild(lbl);
-        row.appendChild(v);
-        body.appendChild(row);
-      });
-
-      const btnWrap = document.createElement('div');
-      btnWrap.style.cssText = 'margin-top:8px;display:flex;gap:6px';
-      const viewBtn = document.createElement('button');
-      viewBtn.className = 'ta view';
-      viewBtn.textContent = 'Voir marché';
-      viewBtn.onclick = () => window.location.href = 'marche-senegal-marche.html?id=' + mkt.id;
-      btnWrap.appendChild(viewBtn);
-      body.appendChild(btnWrap);
-
-      card.appendChild(header);
-      card.appendChild(body);
-      grid.appendChild(card);
+    regions.forEach(r => {
+      const chip = document.createElement('div');
+      chip.className = 'filter-chip';
+      chip.textContent = r;
+      chip.onclick = () => filterMarkets(r, chip);
+      filterEl.appendChild(chip);
     });
 
+    renderMarketsTable(_allMarkets);
+
     const mTitle = document.getElementById('markets-title');
-    if (mTitle) mTitle.textContent = '🗺️ Gestion des marchés (' + markets.length + ')';
+    if (mTitle) mTitle.textContent = `🗺️ Gestion des marchés (${_allMarkets.length})`;
 
   } catch (e) {
     console.error('Erreur marchés:', e);
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+function filterMarkets(region, chipEl) {
+  _activeRegionFilter = region;
+  document.querySelectorAll('#region-filter .filter-chip').forEach(c => c.classList.remove('active'));
+  if (chipEl) chipEl.classList.add('active');
+
+  const filtered = region ? _allMarkets.filter(m => m.region === region) : _allMarkets;
+  renderMarketsTable(filtered);
+}
+
+function renderMarketsTable(markets) {
+  const tbody = document.getElementById('markets-tbody');
+  tbody.replaceChildren();
+
+  if (!markets.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.setAttribute('colspan', '7');
+    td.style.cssText = 'text-align:center;padding:32px;color:var(--muted)';
+    td.textContent = 'Aucun marché trouvé';
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  // Grouper par région
+  const byRegion = {};
+  markets.forEach(m => {
+    if (!byRegion[m.region]) byRegion[m.region] = [];
+    byRegion[m.region].push(m);
+  });
+
+  Object.entries(byRegion).sort(([a], [b]) => a.localeCompare(b)).forEach(([region, list]) => {
+    // En-tête de région
+    const htr = document.createElement('tr');
+    const htd = document.createElement('td');
+    htd.setAttribute('colspan', '7');
+    htd.className = 'mkt-region-header';
+    htd.textContent = `📍 Région de ${region} — ${list.length} marché${list.length > 1 ? 's' : ''}`;
+    htr.appendChild(htd);
+    tbody.appendChild(htr);
+
+    list.forEach(mkt => {
+      const tr = document.createElement('tr');
+
+      // Nom
+      const td1 = document.createElement('td');
+      td1.innerHTML = `<span style="font-weight:600;color:var(--dark)">🏛️ ${mkt.name}</span>`;
+
+      // Ville
+      const td2 = document.createElement('td');
+      td2.textContent = mkt.city;
+      td2.style.color = 'var(--muted)';
+
+      // Région
+      const td3 = document.createElement('td');
+      td3.innerHTML = `<span class="badge b-blue">${mkt.region}</span>`;
+
+      // Boutiques
+      const td4 = document.createElement('td');
+      const count = mkt._count?.shops ?? 0;
+      td4.innerHTML = `<strong style="color:${count > 0 ? 'var(--green)' : 'var(--muted)'}">${count}</strong>`;
+
+      // Coordonnées
+      const td5 = document.createElement('td');
+      td5.style.fontSize = '.72rem';
+      td5.style.color = 'var(--muted)';
+      td5.textContent = (mkt.latitude && mkt.longitude)
+        ? mkt.latitude.toFixed(4) + ', ' + mkt.longitude.toFixed(4)
+        : '—';
+
+      // Statut
+      const td6 = document.createElement('td');
+      const dot = document.createElement('span');
+      dot.className = 'mkt-status-dot ' + (mkt.isActive ? 'mkt-dot-active' : 'mkt-dot-inactive');
+      const lbl = document.createElement('span');
+      lbl.style.fontSize = '.78rem';
+      lbl.textContent = mkt.isActive ? 'Actif' : 'Inactif';
+      td6.appendChild(dot);
+      td6.appendChild(lbl);
+
+      // Actions
+      const td7 = document.createElement('td');
+      const actDiv = document.createElement('div');
+      actDiv.className = 'tb-act';
+
+      const viewBtn = document.createElement('button');
+      viewBtn.className = 'ta view';
+      viewBtn.textContent = 'Voir';
+      viewBtn.onclick = () => window.open('marche-senegal-marche.html?id=' + mkt.id, '_blank');
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'ta approve';
+      editBtn.textContent = '✏️';
+      editBtn.title = 'Modifier';
+      editBtn.onclick = () => openMarketModal(mkt);
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = mkt.isActive ? 'ta reject' : 'ta approve';
+      toggleBtn.textContent = mkt.isActive ? '⛔' : '✓';
+      toggleBtn.title = mkt.isActive ? 'Désactiver' : 'Activer';
+      toggleBtn.onclick = () => toggleMarket(mkt, dot, lbl, toggleBtn);
+
+      actDiv.appendChild(viewBtn);
+      actDiv.appendChild(editBtn);
+      actDiv.appendChild(toggleBtn);
+      td7.appendChild(actDiv);
+
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      tr.appendChild(td4); tr.appendChild(td5); tr.appendChild(td6);
+      tr.appendChild(td7);
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+// ── Modal ajouter / modifier marché ──
+function openMarketModal(mkt) {
+  document.getElementById('mkt-edit-id').value = mkt?.id || '';
+  document.getElementById('mkt-modal-title').textContent = mkt ? '✏️ Modifier le marché' : '🗺️ Nouveau marché';
+  document.getElementById('mkt-name').value = mkt?.name || '';
+  document.getElementById('mkt-city').value = mkt?.city || '';
+  document.getElementById('mkt-region').value = mkt?.region || '';
+  document.getElementById('mkt-address').value = mkt?.address || '';
+  document.getElementById('mkt-lat').value = mkt?.latitude || '';
+  document.getElementById('mkt-lng').value = mkt?.longitude || '';
+  document.getElementById('mkt-desc').value = mkt?.description || '';
+  document.getElementById('mkt-overlay').classList.add('open');
+}
+
+function closeMktModal(e) {
+  if (!e || e.target === document.getElementById('mkt-overlay')) {
+    document.getElementById('mkt-overlay').classList.remove('open');
+  }
+}
+
+async function saveMarket() {
+  const id = document.getElementById('mkt-edit-id').value;
+  const name = document.getElementById('mkt-name').value.trim();
+  const city = document.getElementById('mkt-city').value.trim();
+  const region = document.getElementById('mkt-region').value;
+  const address = document.getElementById('mkt-address').value.trim();
+  const latitude = document.getElementById('mkt-lat').value;
+  const longitude = document.getElementById('mkt-lng').value;
+  const description = document.getElementById('mkt-desc').value.trim();
+
+  if (!name || !city || !region) {
+    toast('❌ Nom, ville et région sont requis');
+    return;
+  }
+
+  const body = { name, city, region, address, latitude, longitude, description };
+
+  try {
+    const endpoint = id ? `/api/admin/markets/${id}` : '/api/admin/markets';
+    const method = id ? 'PUT' : 'POST';
+    const data = await apiCall(endpoint, { method, body: JSON.stringify(body) });
+
+    if (!data.success) { toast('❌ ' + (data.message || 'Erreur')); return; }
+
+    toast('✅ ' + (data.message || 'Marché enregistré'));
+    closeMktModal();
+    marketsLoaded = false;
+    loadMarkets();
+  } catch (e) {
+    toast('❌ Erreur de connexion');
+  }
+}
+
+async function seedMarkets() {
+  const btn = document.getElementById('seed-btn');
+  if (!confirm('Charger tous les marchés du Sénégal en base de données ?')) return;
+  btn.textContent = '⏳ En cours…';
+  btn.disabled = true;
+  try {
+    const data = await apiCall('/api/admin/seed-markets', { method: 'POST' });
+    if (data.success) {
+      toast('✅ ' + data.message);
+      marketsLoaded = false;
+      await loadMarkets();
+    } else {
+      toast('❌ ' + (data.message || 'Erreur'));
+    }
+  } catch (e) {
+    toast('❌ Erreur de connexion');
+  } finally {
+    btn.textContent = '🌱 Charger tous les marchés';
+    btn.disabled = false;
+  }
+}
+
+async function toggleMarket(mkt, dotEl, lblEl, btnEl) {
+  const action = mkt.isActive ? 'désactiver' : 'activer';
+  if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} "${mkt.name}" ?`)) return;
+
+  try {
+    const data = await apiCall(`/api/admin/markets/${mkt.id}/toggle`, { method: 'PATCH' });
+    if (!data.success) { toast('❌ ' + (data.message || 'Erreur')); return; }
+
+    mkt.isActive = data.data.isActive;
+    dotEl.className = 'mkt-status-dot ' + (mkt.isActive ? 'mkt-dot-active' : 'mkt-dot-inactive');
+    lblEl.textContent = mkt.isActive ? 'Actif' : 'Inactif';
+    btnEl.className = mkt.isActive ? 'ta reject' : 'ta approve';
+    btnEl.textContent = mkt.isActive ? '⛔' : '✓';
+    btnEl.title = mkt.isActive ? 'Désactiver' : 'Activer';
+    toast('✅ ' + data.message);
+  } catch (e) {
+    toast('❌ Erreur de connexion');
   }
 }
 

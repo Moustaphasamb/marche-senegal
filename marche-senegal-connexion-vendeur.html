@@ -65,10 +65,15 @@
 .fi-ta{height:auto;padding:11px 13px;resize:none;min-height:80px}
 .fi-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.market-search{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:.84rem;font-family:inherit;outline:none;margin-bottom:8px;transition:border-color .2s}
+.market-search:focus{border-color:var(--green)}
+.market-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:260px;overflow-y:auto;padding-right:2px}
+.market-grid::-webkit-scrollbar{width:4px}.market-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 .market-btn{padding:9px 10px;border-radius:9px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:500;color:var(--text);width:100%}
 .market-btn:hover,.market-btn.sel{border-color:var(--green);background:var(--gp);color:var(--green);font-weight:600}
 .market-emoji{font-size:.95rem}
+.market-region-label{grid-column:1/-1;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:5px 0 2px;border-top:1px solid var(--border);margin-top:4px}
+.market-region-label:first-child{border-top:none;margin-top:0}
 
 .submit-btn{width:100%;height:46px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(27,107,58,.22)}
 .submit-btn:hover{background:var(--gl)}
@@ -308,7 +313,9 @@
 
         <div class="field">
           <label class="fl">Choisissez votre marché *</label>
+          <input class="market-search" id="market-search" type="text" placeholder="🔍 Rechercher un marché ou une ville..." oninput="filterMarketBtns(this.value)"/>
           <div class="market-grid" id="market-grid"></div>
+          <div id="market-no-result" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;padding:12px">Aucun marché trouvé</div>
         </div>
 
         <div class="pending-box" style="margin-top:12px">
@@ -358,9 +365,24 @@ let selectedMarketName = '';
 let regData = {};
 
 const MARKET_EMOJIS = {
-  'Sandaga':'🏛️','Tilène':'🧵','HLM':'🛍️',
-  'Touba':'🕌','Thiès':'🏭','Ziguinchor':'🌊',
-  'Mbour':'🏖️','Kaolack':'🌾','Saint-Louis':'🏰'
+  'Sandaga':'🏛️','Tilène':'🧵','HLM':'🛍️','Kermel':'🥩','Colobane':'🔧',
+  'Castors':'🌾','Liberté 6':'🏙️','Grand Yoff':'🏘️','Parcelles Assainies':'🏘️',
+  'Gueule Tapée':'🏙️','Thiaroye':'🏘️','Pikine':'🏙️','Guédiawaye':'🏙️',
+  'Rufisque':'⚓','Bargny':'⚓','Thiès':'🏭','Thiès-Nord':'🏭',
+  'Mbour':'🏖️','Saly Portudal':'🌴','Tivaouane':'🕌','Khombole':'🌾',
+  'Joal-Fadiouth':'🏝️','Pout':'🌿','Ocas de Touba':'🕌','Darou Khoudoss':'🕌',
+  'Mbacké':'🕌','Touba':'🕌','Diourbel':'🏛️','Bambey':'🌾',
+  'Sor de Saint-Louis':'🏰','Potosham':'🏰','Richard Toll':'🌊','Podor':'🌊','Dagana':'🌊',
+  'Saint-Louis':'🏰','Tambacounda':'🌍','Bakel':'🌍','Goudiry':'🌍','Koumpentoum':'🌍',
+  'Kaolack':'🐟','HLM Kaolack':'🐟','Nioro du Rip':'🌾','Guinguinéo':'🌾',
+  'Kaffrine':'🌾','Koungheul':'🌾','Birkelane':'🌾','Malem Hodar':'🌾',
+  'Ziguinchor':'🌊','St-Maur de Ziguinchor':'🌊','Bignona':'🌿',"d'Oussouye":'🌿',
+  'Sédhiou':'🌿','Bounkiling':'🌿','Goudomp':'🌿',
+  'Kolda':'🌍','Vélingara':'🌍','Médina Yoro Foulah':'🌍',
+  'Louga':'🐪','Kébémer':'🐪','Linguère':'🐪','Dahra':'🐪',
+  'Fatick':'🌊','Foundiougne':'🌊','Gossas':'🌾','Sokone':'🌊',
+  'Matam':'🌍','Kanel':'🌍','Ranérou':'🌍','Ourossogui':'🌍',
+  'Kédougou':'⛏️','Saraya':'⛏️','Salémata':'⛏️'
 };
 
 const FALLBACK_MARKETS = [
@@ -393,26 +415,66 @@ async function loadMarkets() {
   renderMarkets(markets);
 }
 
+let _allMarketsVendeur = [];
+
 function renderMarkets(markets) {
+  _allMarketsVendeur = markets;
+  _renderFiltered(markets);
+}
+
+function _renderFiltered(markets) {
   const grid = document.getElementById('market-grid');
-  const buttons = markets.map(market => {
-    const shortName = market.name.replace('Marché ', '');
-    const emoji = MARKET_EMOJIS[shortName] || '🏪';
+  const noResult = document.getElementById('market-no-result');
+  grid.replaceChildren();
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'market-btn';
-    btn.onclick = () => selMarket(btn, market.id, market.name);
+  if (!markets.length) {
+    if (noResult) noResult.style.display = 'block';
+    return;
+  }
+  if (noResult) noResult.style.display = 'none';
 
-    const emojiSpan = document.createElement('span');
-    emojiSpan.className = 'market-emoji';
-    emojiSpan.textContent = emoji;
-
-    btn.appendChild(emojiSpan);
-    btn.appendChild(document.createTextNode(' ' + shortName));
-    return btn;
+  const byRegion = {};
+  markets.forEach(m => {
+    const r = m.region || 'Autre';
+    if (!byRegion[r]) byRegion[r] = [];
+    byRegion[r].push(m);
   });
-  grid.replaceChildren(...buttons);
+
+  Object.entries(byRegion).sort(([a], [b]) => a.localeCompare(b)).forEach(([region, list]) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'market-region-label';
+    lbl.textContent = '📍 ' + region;
+    grid.appendChild(lbl);
+
+    list.forEach(market => {
+      const shortName = market.name.replace(/^Marchés+/i, '');
+      const emoji = MARKET_EMOJIS[shortName] || '🏪';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'market-btn';
+      btn.onclick = () => selMarket(btn, market.id, market.name);
+
+      const emojiSpan = document.createElement('span');
+      emojiSpan.className = 'market-emoji';
+      emojiSpan.textContent = emoji;
+
+      btn.appendChild(emojiSpan);
+      btn.appendChild(document.createTextNode(' ' + shortName));
+      grid.appendChild(btn);
+    });
+  });
+}
+
+function filterMarketBtns(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { _renderFiltered(_allMarketsVendeur); return; }
+  const filtered = _allMarketsVendeur.filter(m =>
+    m.name.toLowerCase().includes(q) ||
+    (m.city || '').toLowerCase().includes(q) ||
+    (m.region || '').toLowerCase().includes(q)
+  );
+  _renderFiltered(filtered);
 }
 
 // ── Changer de mode ──

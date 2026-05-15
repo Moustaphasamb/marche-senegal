@@ -87,6 +87,15 @@ a{text-decoration:none;color:inherit;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.error{background:var(--red);}
+/* sélecteur de marché */
+.mkt-search{width:100%;padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.87rem;color:var(--text);background:var(--white);margin-bottom:10px;font-family:inherit;transition:.2s;}
+.mkt-search:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.08);}
+.mkt-scroll{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;border:1.5px solid var(--border);border-radius:10px;padding:8px;}
+.mkt-region-label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:5px 6px 2px;margin-top:4px;}
+.mkt-region-label:first-child{margin-top:0;}
+.mkt-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;font-size:.83rem;cursor:pointer;text-align:left;transition:.18s;color:var(--text);font-family:inherit;}
+.mkt-btn:hover{border-color:var(--gl);background:var(--gp);}
+.mkt-btn.selected{background:var(--gp);border-color:var(--green);color:var(--green);font-weight:600;}
 /* responsive */
 @media(max-width:860px){.two-col{grid-template-columns:1fr;}.preview-card{position:static;}}
 @media(max-width:600px){.page-wrap{padding:16px 4vw 40px;}.nav a{display:none;}.nav a.active{display:flex;}}
@@ -121,14 +130,15 @@ a{text-decoration:none;color:inherit;}
 
   <div class="two-col">
     <div>
-      <!-- Marché (non modifiable) -->
+      <!-- Marché (sélecteur) -->
       <div class="card">
         <h2>Marché associé</h2>
-        <div class="market-badge">
-          <span>📍</span>
-          <span>Boutique dans le marché <strong id="marketName">—</strong></span>
+        <input class="mkt-search" id="mktSearch" type="text" placeholder="Rechercher un marché, une ville…" oninput="filterMktBtns(this.value)">
+        <div class="mkt-scroll" id="mktGrid">
+          <p style="text-align:center;color:var(--muted);font-size:.84rem;padding:16px;">Chargement des marchés…</p>
         </div>
-        <p class="field-hint" style="margin-top:10px;">Le marché ne peut pas être modifié après l'inscription.</p>
+        <div id="mktNoResult" style="display:none;text-align:center;padding:16px;color:var(--muted);font-size:.84rem;">Aucun marché trouvé</div>
+        <p class="field-hint" style="margin-top:10px;">Sélectionnez le marché où se trouve votre boutique.</p>
       </div>
 
       <!-- Identité -->
@@ -203,6 +213,24 @@ a{text-decoration:none;color:inherit;}
 <script src="api.js"></script>
 <script>
 let shopId = null;
+let _selectedMarketId = null;
+let _selectedMarketName = null;
+let _allMktsBoutique = [];
+
+const MKT_EMOJIS_B = {
+  'Sandaga':'🏬','Tilène':'🧵','HLM':'🏘️','Touba':'🕌','Ziguinchor':'🌴',
+  'Thiaroye':'🚉','Rufisque':'⚓','Mbour':'🎣','Saint-Louis':'🏛️',
+  'Thiès':'🚂','Kaolack':'🧂','Tambacounda':'🦁','Kolda':'🌿','Sédhiou':'🌊',
+  'Kédougou':'⛏️','Matam':'🌾','Louga':'🐄','Diourbel':'🕍','Fatick':'🦅',
+  'Kaffrine':'🌻'
+};
+
+function getMktEmojiB(name) {
+  for (const [k, v] of Object.entries(MKT_EMOJIS_B)) {
+    if (name.toLowerCase().includes(k.toLowerCase())) return v;
+  }
+  return '🏪';
+}
 
 function showToastLocal(msg, type) {
   const t = document.getElementById('toast');
@@ -231,14 +259,9 @@ function updatePreview() {
   if (pvDesc) pvDesc.textContent = desc || 'Description de votre boutique…';
 
   const pvBannerImg = document.getElementById('pvBannerImg');
-  const pvBanner = document.getElementById('pvBanner');
-  if (pvBannerImg && pvBanner) {
-    if (bannerUrl) {
-      pvBannerImg.src = bannerUrl;
-      pvBannerImg.style.display = 'block';
-    } else {
-      pvBannerImg.style.display = 'none';
-    }
+  if (pvBannerImg) {
+    if (bannerUrl) { pvBannerImg.src = bannerUrl; pvBannerImg.style.display = 'block'; }
+    else { pvBannerImg.style.display = 'none'; }
   }
 
   const pvAvatar = document.getElementById('pvAvatar');
@@ -246,8 +269,7 @@ function updatePreview() {
     pvAvatar.replaceChildren();
     if (avatarUrl) {
       const img = document.createElement('img');
-      img.src = avatarUrl;
-      img.alt = 'Avatar boutique';
+      img.src = avatarUrl; img.alt = 'Avatar boutique';
       pvAvatar.appendChild(img);
     } else {
       pvAvatar.textContent = '🏪';
@@ -256,51 +278,109 @@ function updatePreview() {
 
   const pvHours = document.getElementById('pvHours');
   if (pvHours) {
-    if (hours) {
-      pvHours.textContent = '🕐 ' + hours.split('\n')[0];
-      pvHours.style.display = 'block';
-    } else {
-      pvHours.style.display = 'none';
-    }
+    if (hours) { pvHours.textContent = '🕐 ' + hours.split('\n')[0]; pvHours.style.display = 'block'; }
+    else { pvHours.style.display = 'none'; }
   }
 }
 
+/* ── Sélecteur de marché ── */
+function _renderMktFiltered(markets) {
+  const grid = document.getElementById('mktGrid');
+  const noResult = document.getElementById('mktNoResult');
+  if (!markets.length) {
+    grid.style.display = 'none';
+    noResult.style.display = 'block';
+    return;
+  }
+  noResult.style.display = 'none';
+  grid.style.display = 'flex';
+
+  const byRegion = {};
+  markets.forEach(m => { (byRegion[m.region] = byRegion[m.region] || []).push(m); });
+
+  const items = [];
+  Object.entries(byRegion).sort(([a],[b]) => a.localeCompare(b, 'fr')).forEach(([region, list]) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'mkt-region-label';
+    lbl.textContent = region;
+    items.push(lbl);
+
+    list.forEach(m => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mkt-btn' + (m.id === _selectedMarketId ? ' selected' : '');
+      btn.textContent = getMktEmojiB(m.name) + ' ' + m.name;
+      btn.title = m.city;
+      btn.dataset.id = m.id;
+      btn.onclick = () => selectMarket(m.id, m.name);
+      items.push(btn);
+    });
+  });
+
+  grid.replaceChildren(...items);
+}
+
+function filterMktBtns(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { _renderMktFiltered(_allMktsBoutique); return; }
+  _renderMktFiltered(_allMktsBoutique.filter(m =>
+    m.name.toLowerCase().includes(q) ||
+    m.city.toLowerCase().includes(q) ||
+    (m.region || '').toLowerCase().includes(q)
+  ));
+}
+
+function selectMarket(id, name) {
+  _selectedMarketId = id;
+  _selectedMarketName = name;
+  document.querySelectorAll('.mkt-btn').forEach(btn =>
+    btn.classList.toggle('selected', btn.dataset.id === id)
+  );
+  const pvMarket = document.getElementById('pvMarket');
+  if (pvMarket) pvMarket.textContent = '📍 ' + name;
+}
+
+async function loadMarkets(currentMarketId) {
+  try {
+    const res = await apiCall('/api/markets');
+    if (res.success && res.data?.length) {
+      _allMktsBoutique = res.data;
+      _renderMktFiltered(res.data);
+      if (currentMarketId) {
+        const m = res.data.find(x => x.id === currentMarketId);
+        if (m) selectMarket(m.id, m.name);
+      }
+    }
+  } catch (e) {
+    const grid = document.getElementById('mktGrid');
+    if (grid) grid.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:.84rem;padding:16px;">Impossible de charger les marchés</p>';
+  }
+}
+
+/* ── Formulaire ── */
 function fillForm(shop, stats) {
   shopId = shop.id;
+  _selectedMarketId = shop.marketId || null;
+  _selectedMarketName = shop.market?.name || null;
 
-  const n = document.getElementById('shopName');
-  if (n) n.value = shop.name || '';
-
-  const d = document.getElementById('shopDesc');
-  if (d) d.value = shop.description || '';
-
-  const av = document.getElementById('shopAvatar');
-  if (av) av.value = shop.avatarUrl || '';
-
-  const bn = document.getElementById('shopBanner');
-  if (bn) bn.value = shop.bannerUrl || '';
-
+  const n = document.getElementById('shopName');   if (n) n.value = shop.name || '';
+  const d = document.getElementById('shopDesc');   if (d) d.value = shop.description || '';
+  const av = document.getElementById('shopAvatar'); if (av) av.value = shop.avatarUrl || '';
+  const bn = document.getElementById('shopBanner'); if (bn) bn.value = shop.bannerUrl || '';
   const ho = document.getElementById('shopHours');
   if (ho) {
     const hours = shop.openingHours;
     ho.value = typeof hours === 'string' ? hours : (hours?.text || '');
   }
-
-  const to = document.getElementById('shopTour');
-  if (to) to.value = shop.virtualTourUrl || '';
-
-  const mkt = document.getElementById('marketName');
-  if (mkt) mkt.textContent = shop.market?.name || '—';
+  const to = document.getElementById('shopTour'); if (to) to.value = shop.virtualTourUrl || '';
 
   const pvMarket = document.getElementById('pvMarket');
-  if (pvMarket) pvMarket.textContent = '📍 ' + (shop.market?.name || '—');
+  if (pvMarket) pvMarket.textContent = '📍 ' + (_selectedMarketName || '—');
 
   const pvProd = document.getElementById('pvProdCount');
   if (pvProd) pvProd.textContent = stats?.totalProducts ?? shop._count?.products ?? 0;
-
   const pvOrd = document.getElementById('pvOrders');
   if (pvOrd) pvOrd.textContent = stats?.totalOrders ?? 0;
-
   const pvRat = document.getElementById('pvRating');
   if (pvRat) pvRat.textContent = shop.rating ? shop.rating.toFixed(1) : '—';
 
@@ -308,12 +388,10 @@ function fillForm(shop, stats) {
   if (pvSt) {
     if (shop.status === 'ACTIVE') {
       pvSt.textContent = 'Boutique active';
-      pvSt.style.background = '#dcfce7';
-      pvSt.style.color = '#16a34a';
+      pvSt.style.background = '#dcfce7'; pvSt.style.color = '#16a34a';
     } else {
       pvSt.textContent = 'En attente de validation';
-      pvSt.style.background = '#fef3c7';
-      pvSt.style.color = '#d97706';
+      pvSt.style.background = '#fef3c7'; pvSt.style.color = '#d97706';
     }
   }
 
@@ -330,10 +408,7 @@ async function loadShop() {
     const stats = res.data?.stats;
     const seller = res.data?.seller;
 
-    if (!shop) {
-      showToastLocal('Boutique introuvable', 'error');
-      return;
-    }
+    if (!shop) { showToastLocal('Boutique introuvable', 'error'); return; }
 
     const nameEl = document.getElementById('sellerName');
     if (nameEl && seller) nameEl.textContent = seller.firstName || '';
@@ -342,6 +417,7 @@ async function loadShop() {
     document.getElementById('pageWrap').style.display = 'block';
 
     fillForm(shop, stats);
+    loadMarkets(shop.marketId);
   } catch (e) {
     showToastLocal('Erreur de chargement', 'error');
   }
@@ -349,10 +425,7 @@ async function loadShop() {
 
 async function saveShop() {
   const name = document.getElementById('shopName').value.trim();
-  if (!name) {
-    showToastLocal('Le nom de la boutique est obligatoire', 'error');
-    return;
-  }
+  if (!name) { showToastLocal('Le nom de la boutique est obligatoire', 'error'); return; }
 
   const body = {
     name,
@@ -362,17 +435,19 @@ async function saveShop() {
     openingHours: document.getElementById('shopHours').value.trim() || null,
     virtualTourUrl: document.getElementById('shopTour').value.trim() || null
   };
+  if (_selectedMarketId) body.marketId = _selectedMarketId;
 
   const btn = document.getElementById('saveBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
 
-  const result = await apiCall('/api/shops/me', {
-    method: 'PUT',
-    body: JSON.stringify(body)
-  });
+  const result = await apiCall('/api/shops/me', { method: 'PUT', body: JSON.stringify(body) });
 
   if (result.success) {
     showToastLocal('Boutique mise à jour avec succès !');
+    if (_selectedMarketName) {
+      const pvMarket = document.getElementById('pvMarket');
+      if (pvMarket) pvMarket.textContent = '📍 ' + _selectedMarketName;
+    }
   } else {
     showToastLocal(result.message || 'Erreur lors de la mise à jour', 'error');
   }
@@ -380,15 +455,9 @@ async function saveShop() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!isLoggedIn()) {
-    window.location.href = 'marche-senegal-connexion-vendeur.html';
-    return;
-  }
+  if (!isLoggedIn()) { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   const user = getCurrentUser();
-  if (user && user.role !== 'SELLER') {
-    window.location.href = 'marche-senegal-connexion-vendeur.html';
-    return;
-  }
+  if (user && user.role !== 'SELLER') { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   loadShop();
 });
 </script>

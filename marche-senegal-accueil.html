@@ -414,7 +414,7 @@ async function loadMarkets() {
 
   const grid = document.getElementById('markets-grid');
 
-  const dakarCities = ['Dakar', 'Médina', 'Plateau', 'Pikine', 'Thiaroye', 'Guédiawaye', 'Banlieue'];
+  const dakarCities = ['Dakar', 'Médina', 'Plateau', 'Pikine', 'Thiaroye', 'Guédiawaye', 'Banlieue', 'Rufisque', 'Bargny', 'Sébikotane'];
   grid.innerHTML = result.data.map(market => {
     const zone = dakarCities.some(c => market.city.includes(c)) ? 'dakar' : 'region';
     const isFeatured = market.name.toLowerCase().includes('sandaga');
