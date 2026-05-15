@@ -153,7 +153,7 @@
 <div class="search-layout">
   <aside class="filters-sidebar" id="filters-sidebar">
     <div class="fs-section">
-      <div class="fs-title">Prix (FCFA) <span class="fs-clear" onclick="toast('Réinitialisé')">Effacer</span></div>
+      <div class="fs-title">Prix (FCFA) <span class="fs-clear" onclick="resetPrice()">Effacer</span></div>
       <div class="range-track"><div class="range-fill" id="range-fill"></div></div>
       <input type="range" class="range-slider" min="0" max="500000" value="350000" oninput="updatePrice(this.value)"/>
       <div class="price-labels"><span>0 FCFA</span><span id="price-max">350 000 FCFA</span></div>
@@ -176,14 +176,14 @@
       </div>
     </div>
     <div class="fs-section">
-      <div class="fs-title">Marché <span class="fs-clear" onclick="toast('Réinitialisé')">Effacer</span></div>
+      <div class="fs-title">Marché <span class="fs-clear" onclick="clearMarkets()">Effacer</span></div>
       <div class="market-pills">
-        <div class="mp-item sel" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🏛️</span><span class="mp-name">Sandaga</span><span class="mp-count">142</span></div>
-        <div class="mp-item sel" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🧵</span><span class="mp-name">Tilène</span><span class="mp-count">98</span></div>
-        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🛍️</span><span class="mp-name">HLM</span><span class="mp-count">76</span></div>
-        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🕌</span><span class="mp-name">Touba</span><span class="mp-count">120</span></div>
-        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🏭</span><span class="mp-name">Thiès</span><span class="mp-count">83</span></div>
-        <div class="mp-item" onclick="this.classList.toggle('sel')"><span class="mp-emoji">🌊</span><span class="mp-name">Ziguinchor</span><span class="mp-count">44</span></div>
+        <div class="mp-item sel" onclick="toggleMarket(this)"><span class="mp-emoji">🏛️</span><span class="mp-name">Sandaga</span><span class="mp-count">142</span></div>
+        <div class="mp-item sel" onclick="toggleMarket(this)"><span class="mp-emoji">🧵</span><span class="mp-name">Tilène</span><span class="mp-count">98</span></div>
+        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🛍️</span><span class="mp-name">HLM</span><span class="mp-count">76</span></div>
+        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🕌</span><span class="mp-name">Touba</span><span class="mp-count">120</span></div>
+        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🏭</span><span class="mp-name">Thiès</span><span class="mp-count">83</span></div>
+        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🌊</span><span class="mp-name">Ziguinchor</span><span class="mp-count">44</span></div>
       </div>
     </div>
     <div class="fs-section">
@@ -196,23 +196,18 @@
         <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>En stock uniquement</span></div>
       </div>
     </div>
-    <button class="apply-btn" onclick="toast('✓ Filtres appliqués');closeSidebar()">Appliquer les filtres</button>
-    <button class="reset-link" onclick="toast('Filtres réinitialisés')">Tout réinitialiser</button>
+    <button class="apply-btn" onclick="applyFilters()">Appliquer les filtres</button>
+    <button class="reset-link" onclick="resetFilters()">Tout réinitialiser</button>
   </aside>
   <div class="results-area">
     <div class="results-topbar">
       <div class="rt-count"><strong>241</strong> résultats pour "<span id="result-query">boubou wax</span>"</div>
       <div class="rt-right">
-        <select class="rt-sort" onchange="toast('Tri : '+this.options[this.selectedIndex].text)"><option>Pertinence</option><option>Prix croissant</option><option>Prix décroissant</option><option>Mieux notés</option><option>Plus vendus</option></select>
+        <select class="rt-sort" onchange="updateSort(this.value)"><option value="">Pertinence</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option><option value="rating">Mieux notés</option><option value="newest">Nouveautés</option></select>
         <div class="rt-views"><button class="rv-btn active">⊞</button><button class="rv-btn">☰</button></div>
       </div>
     </div>
-    <div class="active-chips">
-      <div class="ac-chip">Mode & Vêtements <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
-      <div class="ac-chip">🏛️ Sandaga <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
-      <div class="ac-chip">🧵 Tilène <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
-      <div class="ac-chip">Vendeur vérifié ✓ <span class="ac-remove" onclick="this.parentElement.remove()">✕</span></div>
-    </div>
+    <div class="active-chips" id="active-chips"></div>
     <div class="results-grid">
       <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-badge">-15%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Boubou wax tissé main</div><div class="rc-shop">Mode Fatou Ndoye · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (89)</div><div class="rc-footer"><div><span class="rc-price">15 300 FCFA</span><span class="rc-old">18 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
       <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF8E7">🧵<div class="rc-badge new">Nouveau</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🧵 Tilène</div><div class="rc-name">Bazin brodé cérémonie</div><div class="rc-shop">Tissus Aminata · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (176)</div><div class="rc-footer"><div><span class="rc-price">25 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
@@ -223,9 +218,7 @@
       <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF3E0">🧣<div class="rc-badge">-10%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏭 Thiès</div><div class="rc-name">Foulard wax femme élégant</div><div class="rc-shop">Mode Thiès · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★☆</span> 4.5 (54)</div><div class="rc-footer"><div><span class="rc-price">3 600 FCFA</span><span class="rc-old">4 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
       <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🛍️ HLM</div><div class="rc-name">Boubou wax grande taille femme</div><div class="rc-shop">Boutique HLM · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.6 (41)</div><div class="rc-footer"><div><span class="rc-price">14 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
     </div>
-    <div class="pagination">
-      <div class="pg active">1</div><div class="pg" onclick="toast('Page 2...')">2</div><div class="pg" onclick="toast('Page 3...')">3</div><div class="pg-dots">...</div><div class="pg" onclick="toast('Page 25...')">25</div><div class="pg" onclick="toast('Suivant...')">›</div>
-    </div>
+    <div class="pagination" id="pagination"></div>
   </div>
 </div>
 <button class="mobile-filter-btn" onclick="openSidebar()">⚙️ Filtres</button>
@@ -300,6 +293,8 @@ async function loadResults() {
     `;
     return;
   }
+
+  renderPagination(result.pagination?.total || 0);
 
   grid.innerHTML = result.data.map(prod => `
     <div class="rc"
@@ -376,6 +371,7 @@ function updatePrice(val) {
 
 // ── Appliquer les filtres ──
 async function applyFilters() {
+  updateMarketFilter();
   currentPage = 1;
   await loadResults();
   closeSidebar();
@@ -384,10 +380,85 @@ async function applyFilters() {
 
 // ── Reset filtres ──
 function resetFilters() {
+  const q = currentFilters.q;
   currentFilters = {};
+  if (q) currentFilters.q = q;
   document.querySelectorAll('.cb-row').forEach(cb => cb.classList.remove('checked'));
-  toast('Filtres réinitialisés');
+  document.querySelectorAll('.mp-item').forEach(p => p.classList.remove('sel'));
+  document.querySelector('.range-slider').value = 500000;
+  updatePrice(500000);
+  document.getElementById('active-chips').innerHTML = '';
+  document.querySelector('.rt-sort').value = '';
+  currentPage = 1;
   loadResults();
+  toast('Filtres réinitialisés');
+}
+
+// ── Réinitialiser prix ──
+function resetPrice() {
+  document.querySelector('.range-slider').value = 500000;
+  updatePrice(500000);
+  delete currentFilters.maxPrice;
+}
+
+// ── Marché toggle ──
+function toggleMarket(el) {
+  el.classList.toggle('sel');
+  updateMarketFilter();
+}
+
+// ── Lire les marchés sélectionnés ──
+function updateMarketFilter() {
+  const selected = [...document.querySelectorAll('.mp-item.sel')];
+  if (selected.length === 1 && selected[0].dataset.marketId) {
+    currentFilters.marketId = selected[0].dataset.marketId;
+  } else {
+    delete currentFilters.marketId;
+  }
+}
+
+// ── Effacer tous les marchés ──
+function clearMarkets() {
+  document.querySelectorAll('.mp-item').forEach(p => p.classList.remove('sel'));
+  delete currentFilters.marketId;
+}
+
+// ── Tri ──
+function updateSort(val) {
+  if (val) currentFilters.sortBy = val;
+  else delete currentFilters.sortBy;
+  currentPage = 1;
+  loadResults();
+}
+
+// ── Supprimer un chip ──
+function removeChip(btn) {
+  btn.parentElement.remove();
+  applyFilters();
+}
+
+// ── Pagination ──
+function goPage(n) {
+  currentPage = n;
+  loadResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / 12);
+  const pg = document.getElementById('pagination');
+  if (!pg || totalPages <= 1) { if (pg) pg.innerHTML = ''; return; }
+  let html = '';
+  if (currentPage > 1) html += `<div class="pg" onclick="goPage(${currentPage-1})">‹</div>`;
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 1) {
+      html += `<div class="pg${i === currentPage ? ' active' : ''}" onclick="goPage(${i})">${i}</div>`;
+    } else if (Math.abs(i - currentPage) === 2) {
+      html += `<div class="pg-dots">...</div>`;
+    }
+  }
+  if (currentPage < totalPages) html += `<div class="pg" onclick="goPage(${currentPage+1})">›</div>`;
+  pg.innerHTML = html;
 }
 
 // ── Checkbox ──
@@ -476,6 +547,18 @@ function getQueryFromURL() {
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
+
+  // Charger les IDs réels des marchés depuis l'API
+  const marketsResult = await getMarkets();
+  if (marketsResult.success) {
+    marketsResult.data.forEach(market => {
+      document.querySelectorAll('.mp-item').forEach(pill => {
+        if (pill.querySelector('.mp-name')?.textContent.trim() === market.name) {
+          pill.dataset.marketId = market.id;
+        }
+      });
+    });
+  }
 
   // Récupérer le terme depuis l'URL si présent
   const urlQuery = getQueryFromURL();
