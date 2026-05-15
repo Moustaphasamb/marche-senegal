@@ -366,17 +366,17 @@ async function saveShop() {
   const btn = document.getElementById('saveBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
 
-  try {
-    await apiCall('/api/shops/me', {
-      method: 'PUT',
-      body: JSON.stringify(body)
-    });
+  const result = await apiCall('/api/shops/me', {
+    method: 'PUT',
+    body: JSON.stringify(body)
+  });
+
+  if (result.success) {
     showToastLocal('Boutique mise à jour avec succès !');
-    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
-  } catch (e) {
-    showToastLocal('Erreur lors de la mise à jour', 'error');
-    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
+  } else {
+    showToastLocal(result.message || 'Erreur lors de la mise à jour', 'error');
   }
+  if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -441,6 +441,13 @@ async function loadProfile() {
 
   // Charger les commandes
   await loadOrders();
+  // Charger le compte des favoris en arrière-plan pour afficher le bon chiffre dans les stats
+  getFavorites().then(result => {
+    if (result.success) {
+      const statFav = document.getElementById('stat-favorites');
+      if (statFav) statFav.textContent = result.data.length;
+    }
+  });
 }
 
 // ── Charger les commandes ──
