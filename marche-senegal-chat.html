@@ -267,6 +267,8 @@ async function sendMessage() {
   if (!result.success) {
     showToast('❌ Erreur d\'envoi', 'error');
     input.value = content;
+  } else {
+    appendMessage(result.data);
   }
   btn.disabled = false;
   input.focus();
