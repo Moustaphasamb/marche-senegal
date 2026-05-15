@@ -77,7 +77,7 @@
 .t tr:last-child td{border-bottom:none}.t tr:hover td{background:#fafcfa}
 .av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0}
 .badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
-.b-wait{background:var(--gdl);color:#8A6100}.b-ok{background:var(--gp);color:var(--green)}.b-rej{background:var(--rp);color:var(--red)}.b-blue{background:var(--bluep);color:var(--blue)}
+.b-wait{background:var(--gdl);color:#8A6100}.b-ok{background:var(--gp);color:var(--green)}.b-rej{background:var(--rp);color:var(--red)}.b-susp{background:#FFF3E0;color:#E65100}.b-blue{background:var(--bluep);color:var(--blue)}
 .tb-act{display:flex;gap:5px}
 .ta{padding:4px 9px;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;transition:all .18s}
 .ta.approve{border-color:var(--green);color:var(--green)}.ta.approve:hover{background:var(--green);color:#fff}
@@ -630,6 +630,8 @@ async function loadVendors() {
         badge.classList.add('b-ok'); badge.textContent = 'Validé';
       } else if (shop.status === 'PENDING') {
         badge.classList.add('b-wait'); badge.textContent = 'En attente';
+      } else if (shop.status === 'SUSPENDED') {
+        badge.classList.add('b-susp'); badge.textContent = 'Suspendu';
       } else if (shop.status === 'REJECTED') {
         badge.classList.add('b-rej'); badge.textContent = 'Refusé';
       } else {
@@ -698,10 +700,21 @@ function buildVendorActions(actDiv, vendor, shop, badge) {
     const susp = document.createElement('button');
     susp.className = 'ta reject';
     susp.textContent = 'Suspendre';
-    susp.onclick = () => verifyVendor(vendor.id, shop.name, 'reject', badge, actDiv, vendor);
+    susp.onclick = () => suspendShop(shop.id, shop.name, 'suspend', badge, actDiv, vendor);
     actDiv.appendChild(cni);
     actDiv.appendChild(view);
     actDiv.appendChild(susp);
+  } else if (shop.status === 'SUSPENDED') {
+    const view = document.createElement('button');
+    view.className = 'ta view';
+    view.textContent = 'Boutique';
+    view.onclick = () => window.open('marche-senegal-boutique.html?id=' + shop.id, '_blank');
+    const react = document.createElement('button');
+    react.className = 'ta approve';
+    react.textContent = '↺ Réactiver';
+    react.onclick = () => suspendShop(shop.id, shop.name, 'reactivate', badge, actDiv, vendor);
+    actDiv.appendChild(view);
+    actDiv.appendChild(react);
   } else {
     const cni = document.createElement('button');
     cni.className = 'ta view';
@@ -791,6 +804,31 @@ function openCNI(vendor, shop, badge, actDiv) {
 function closeCNI(e) {
   if (!e || e.target === document.getElementById('cni-overlay')) {
     document.getElementById('cni-overlay').classList.remove('open');
+  }
+}
+
+async function suspendShop(shopId, shopName, action, badge, actDiv, vendor) {
+  const label = action === 'suspend' ? 'Suspendre' : 'Réactiver';
+  if (!confirm(label + ' la boutique "' + shopName + '" ?')) return;
+  try {
+    const result = await apiCall('/api/admin/shops/' + shopId + '/suspend', {
+      method: 'PATCH',
+      body: JSON.stringify({ action })
+    });
+    if (!result.success) { toast('❌ ' + (result.message || 'Erreur')); return; }
+    if (action === 'suspend') {
+      badge.className = 'badge b-susp';
+      badge.textContent = 'Suspendu';
+      toast('⛔ ' + shopName + ' suspendu');
+      buildVendorActions(actDiv, vendor, { ...vendor.shop, id: shopId, name: shopName, status: 'SUSPENDED' }, badge);
+    } else {
+      badge.className = 'badge b-ok';
+      badge.textContent = 'Validé';
+      toast('✅ ' + shopName + ' réactivé');
+      buildVendorActions(actDiv, vendor, { ...vendor.shop, id: shopId, name: shopName, status: 'ACTIVE', isVerified: true }, badge);
+    }
+  } catch (e) {
+    toast('❌ Erreur lors de l\'action');
   }
 }
 
