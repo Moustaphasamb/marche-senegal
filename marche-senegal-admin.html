@@ -307,8 +307,8 @@
     <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon">👥</span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">48 260</span></div>
     <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon">🏪</span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">12</span></div>
     <div class="sb-sec">Commerce</div>
-    <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green">3 840</span></div>
-    <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge">8</span></div>
+    <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green" id="sb-orders-count">—</span></div>
+    <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge" id="sb-disputes-count">—</span></div>
     <div class="sb-item" onclick="showPage('products',this)"><span class="sb-icon">📦</span>Produits</div>
     <div class="sb-sec">Plateforme</div>
     <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon">🗺️</span>Marchés</div>
@@ -399,24 +399,16 @@
     <div class="grid-2">
       <!-- Vendor verif -->
       <div class="card">
-        <div class="card-header"><div class="card-title">🔍 Vérifications en attente (12)</div><div class="card-action" onclick="showPage('vendors',document.querySelector('.sb-item:nth-child(4)'))">Voir tout →</div></div>
+        <div class="card-header"><div class="card-title" id="overview-verif-title">🔍 Vérifications en attente</div><div class="card-action" onclick="showPage('vendors',document.querySelector('.sb-item:nth-child(4)'))">Voir tout →</div></div>
         <table class="t">
           <thead><tr><th>Vendeur</th><th>Marché</th><th>Statut</th><th>Actions</th></tr></thead>
-          <tbody>
-            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">FN</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Fatou Ndiaye</div><div style="font-size:.7rem;color:var(--muted)">Mode · Sandaga</div></div></div></td><td>🏛️ Sandaga</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Vendeur approuvé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
-            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div><div style="font-size:.7rem;color:var(--muted)">Alimentation · HLM</div></div></div></td><td>🛍️ HLM</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Vendeur approuvé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
-            <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">AS</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Aminata Sow</div><div style="font-size:.7rem;color:var(--muted)">Artisanat · Tilène</div></div></div></td><td>🧵 Tilène</td><td><span class="badge b-ok">Approuvé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir dossier...')">Voir</button></div></td></tr>
-          </tbody>
+          <tbody id="overview-verif-tbody"><tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted)">Chargement…</td></tr></tbody>
         </table>
       </div>
       <!-- Disputes -->
       <div class="card">
-        <div class="card-header"><div class="card-title">⚖️ Litiges ouverts (8)</div><div class="card-action" onclick="showPage('disputes',null)">Gérer →</div></div>
-        <div class="dispute-list">
-          <div class="disp" onclick="toast('Gérer le litige...')"><div class="disp-icon" style="background:var(--rp)">⚖️</div><div class="disp-info"><div class="disp-title">Produit non conforme — #MS-847</div><div class="disp-sub">Fatou N. vs Mode Fatou · Il y a 2h</div></div><div class="disp-amount">15 300 FCFA</div><div class="disp-status ds-open">Ouvert</div></div>
-          <div class="disp" onclick="toast('Gérer le litige...')"><div class="disp-icon" style="background:var(--rp)">⚖️</div><div class="disp-info"><div class="disp-title">Livraison non reçue — #MS-841</div><div class="disp-sub">Ousmane D. vs Ferme Diallo · Il y a 1j</div></div><div class="disp-amount">4 320 FCFA</div><div class="disp-status ds-open">Ouvert</div></div>
-          <div class="disp" onclick="toast('Voir détails...')"><div class="disp-icon" style="background:var(--gp)">✓</div><div class="disp-info"><div class="disp-title">Taille incorrecte — #MS-835</div><div class="disp-sub">Remboursé · Résolu il y a 2j</div></div><div class="disp-amount">9 500 FCFA</div><div class="disp-status ds-resolved">Résolu</div></div>
-        </div>
+        <div class="card-header"><div class="card-title" id="overview-disputes-title">⚖️ Litiges ouverts</div><div class="card-action" onclick="showPage('disputes',null)">Gérer →</div></div>
+        <div class="dispute-list" id="overview-disputes-list"><div style="text-align:center;padding:16px;color:var(--muted)">Chargement…</div></div>
       </div>
     </div>
 
@@ -424,14 +416,7 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-header"><div class="card-title">🗺️ Stats par marché</div><div class="card-action" onclick="showPage('markets',null)">Voir tout →</div></div>
-        <div class="market-stats">
-          <div class="ms"><div class="ms-emoji">🏛️</div><div class="ms-name">Sandaga</div><div class="ms-val">142 boutiques</div><div class="ms-sub">12 400 produits</div></div>
-          <div class="ms"><div class="ms-emoji">🕌</div><div class="ms-name">Touba</div><div class="ms-val">120 boutiques</div><div class="ms-sub">9 800 produits</div></div>
-          <div class="ms"><div class="ms-emoji">🧵</div><div class="ms-name">Tilène</div><div class="ms-val">98 boutiques</div><div class="ms-sub">7 600 produits</div></div>
-          <div class="ms"><div class="ms-emoji">🏭</div><div class="ms-name">Thiès</div><div class="ms-val">83 boutiques</div><div class="ms-sub">6 200 produits</div></div>
-          <div class="ms"><div class="ms-emoji">🛍️</div><div class="ms-name">HLM</div><div class="ms-val">76 boutiques</div><div class="ms-sub">5 400 produits</div></div>
-          <div class="ms"><div class="ms-emoji">🏙️</div><div class="ms-name">Pikine</div><div class="ms-val">61 boutiques</div><div class="ms-sub">4 200 produits</div></div>
-        </div>
+        <div class="market-stats" id="overview-markets-list"><div style="text-align:center;padding:16px;color:var(--muted)">Chargement…</div></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">📋 Activité en temps réel</div><div class="card-action" onclick="showPage('logs',document.querySelector('.sb-item:last-child'))">Voir tout →</div></div>
@@ -846,6 +831,12 @@ async function loadAdminStats() {
 
     const sbPend = document.getElementById('sb-vendors-pending');
     if (sbPend) sbPend.textContent = d.pendingVendors != null ? d.pendingVendors : '—';
+
+    const sbOrds = document.getElementById('sb-orders-count');
+    if (sbOrds) sbOrds.textContent = d.orders != null ? d.orders.toLocaleString('fr-FR') : '—';
+
+    const sbDisp = document.getElementById('sb-disputes-count');
+    if (sbDisp) sbDisp.textContent = d.disputes != null ? d.disputes : '—';
 
     const vTitle = document.getElementById('vendors-title');
     if (vTitle) vTitle.textContent = '🏪 Vendeurs (' + (d.shops || '—') + ' actifs · ' + (d.pendingVendors || 0) + ' en attente)';
@@ -1921,6 +1912,7 @@ async function loadRevenue() {
     const res = await apiCall('/api/admin/revenue');
     if (!res.success) return;
     const d = res.data;
+    window._revenueData = d;
 
     // KPIs
     const growth = d.prevMonth ? Math.round(((d.currentMonth - d.prevMonth) / d.prevMonth) * 100) : 0;
@@ -1996,7 +1988,24 @@ async function loadRevenue() {
 }
 
 function exportRevenue() {
-  toast('Export CSV — fonctionnalité à venir');
+  if (!window._revenueData) { toast('Chargez les revenus d\'abord'); return; }
+  const d = window._revenueData;
+  const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const rows = [['Mois','Commandes','Revenus (FCFA)']];
+  (d.monthly || []).forEach(m => rows.push([MONTHS[m.month - 1] + ' ' + m.year, m.orders, m.revenue]));
+  rows.push([]);
+  rows.push(['Mode de paiement','Commandes','Revenus (FCFA)']);
+  (d.byMethod || []).forEach(m => rows.push([m.method, m.orders, m.revenue]));
+  rows.push([]);
+  rows.push(['Marché','Commandes','Revenus (FCFA)']);
+  (d.byMarket || []).forEach(m => rows.push([m.market, m.orders, m.revenue]));
+  const csv = rows.map(r => r.join(';')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'revenus-marche-senegal.csv'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Export CSV téléchargé !');
 }
 
 // ══════════════════════════════════════
@@ -2141,6 +2150,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadAdminStats();
   loadOverviewActivity();
+  loadOverviewPending();
+  loadOverviewDisputes();
+  loadOverviewMarkets();
 });
 
 async function loadOverviewActivity() {
@@ -2166,6 +2178,128 @@ async function loadOverviewActivity() {
     });
   } catch (e) {
     container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem">Non disponible</div>';
+  }
+}
+
+// ── Overview: Vendeurs en attente de validation ──
+async function loadOverviewPending() {
+  const tbody = document.getElementById('overview-verif-tbody');
+  const title = document.getElementById('overview-verif-title');
+  if (!tbody) return;
+  try {
+    const res = await apiCall('/api/admin/vendors?status=PENDING');
+    const vendors = (res.data || []).slice(0, 5);
+    if (title) title.textContent = '🔍 Vérifications en attente (' + vendors.length + ')';
+    if (!vendors.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucune vérification en attente</td></tr>';
+      return;
+    }
+    tbody.innerHTML = vendors.map(v => {
+      const shop = v.shop || {};
+      const name = escapeHtml((v.firstName || '') + ' ' + (v.lastName || ''));
+      const init = ((v.firstName || ' ')[0] + (v.lastName || ' ')[0]).toUpperCase();
+      const market = escapeHtml(shop.market?.name || '—');
+      const cat = escapeHtml(shop.description ? shop.description.slice(0, 20) : '');
+      const colors = ['var(--green)','var(--gold)','#8B3A8A','var(--red)','#1B6B3A'];
+      const bg = colors[Math.floor(Math.random() * colors.length)];
+      return '<tr>' +
+        '<td><div style="display:flex;align-items:center;gap:8px">' +
+          '<div class="av" style="background:' + bg + '">' + init + '</div>' +
+          '<div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">' + name + '</div>' +
+          '<div style="font-size:.7rem;color:var(--muted)">' + cat + ' · ' + market + '</div></div>' +
+        '</div></td>' +
+        '<td>' + market + '</td>' +
+        '<td><span class="badge b-wait">En attente</span></td>' +
+        '<td><div class="tb-act">' +
+          '<button class="ta approve" onclick="verifyVendorOverview(\'' + escapeHtml(v.id) + '\',\'approve\',this)">✓ Valider</button>' +
+          '<button class="ta reject" onclick="verifyVendorOverview(\'' + escapeHtml(v.id) + '\',\'reject\',this)">✕</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Erreur de chargement</td></tr>';
+  }
+}
+
+async function verifyVendorOverview(vendorId, action, btn) {
+  const row = btn.closest('tr');
+  try {
+    const res = await apiCall('/api/admin/vendors/' + vendorId + '/verify', {
+      method: 'PATCH',
+      body: JSON.stringify({ action })
+    });
+    if (res.success) {
+      toast(action === 'approve' ? '✅ Vendeur validé !' : '❌ Vendeur refusé');
+      row.remove();
+      const tbody = document.getElementById('overview-verif-tbody');
+      const title = document.getElementById('overview-verif-title');
+      const remaining = tbody ? tbody.querySelectorAll('tr').length : 0;
+      if (title) title.textContent = '🔍 Vérifications en attente (' + remaining + ')';
+      if (remaining === 0 && tbody) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucune vérification en attente</td></tr>';
+      }
+    } else {
+      toast('❌ ' + (res.message || 'Erreur'));
+    }
+  } catch (e) {
+    toast('❌ Erreur de connexion');
+  }
+}
+
+// ── Overview: Litiges récents ──
+async function loadOverviewDisputes() {
+  const list = document.getElementById('overview-disputes-list');
+  const title = document.getElementById('overview-disputes-title');
+  if (!list) return;
+  try {
+    const res = await apiCall('/api/admin/disputes');
+    const disputes = (res.data || []).slice(0, 3);
+    if (title) title.textContent = '⚖️ Litiges ouverts (' + (res.data || []).length + ')';
+    if (!disputes.length) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucun litige</div>';
+      return;
+    }
+    list.innerHTML = disputes.map(o => {
+      const buyer = escapeHtml((o.buyer?.firstName || '') + ' ' + (o.buyer?.lastName || '').slice(0, 1) + '.');
+      const shop = escapeHtml(o.shop?.name || '—');
+      const amt = (o.total || 0).toLocaleString('fr-FR');
+      const label = o.status === 'CANCELLED' ? 'Annulée' : 'Remboursée';
+      const cls = o.status === 'CANCELLED' ? 'ds-open' : 'ds-resolved';
+      const icon = o.status === 'CANCELLED' ? 'var(--rp)' : 'var(--gp)';
+      return '<div class="disp"><div class="disp-icon" style="background:' + icon + '">⚖️</div>' +
+        '<div class="disp-info"><div class="disp-title">Commande ' + escapeHtml(o.orderNumber || '') + '</div>' +
+        '<div class="disp-sub">' + buyer + ' vs ' + shop + ' · ' + formatTimeAgo(new Date(o.updatedAt)) + '</div></div>' +
+        '<div class="disp-amount">' + amt + ' FCFA</div>' +
+        '<div class="disp-status ' + cls + '">' + label + '</div></div>';
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Erreur de chargement</div>';
+  }
+}
+
+// ── Overview: Stats par marché ──
+const MARKET_EMOJI = { 'Sandaga': '🏛️', 'Touba': '🕌', 'Tilène': '🧵', 'Thiès': '🏭', 'HLM': '🛍️', 'Pikine': '🏙️', 'Ziguinchor': '🌴' };
+
+async function loadOverviewMarkets() {
+  const list = document.getElementById('overview-markets-list');
+  if (!list) return;
+  try {
+    const res = await apiCall('/api/admin/markets');
+    const markets = res.data || [];
+    if (!markets.length) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted)">Aucun marché</div>';
+      return;
+    }
+    list.innerHTML = markets.map(m => {
+      const emoji = MARKET_EMOJI[m.name] || '🏪';
+      const shops = (m._count?.shops || 0).toLocaleString('fr-FR');
+      return '<div class="ms"><div class="ms-emoji">' + emoji + '</div>' +
+        '<div class="ms-name">' + escapeHtml(m.name) + '</div>' +
+        '<div class="ms-val">' + shops + ' boutique' + (m._count?.shops !== 1 ? 's' : '') + '</div>' +
+        '<div class="ms-sub">' + escapeHtml(m.city || '') + '</div></div>';
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Erreur de chargement</div>';
   }
 }
 </script>

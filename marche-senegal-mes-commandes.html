@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -17,7 +17,7 @@
   --blue:#1565C0;--bluep:#E3F2FD;
   --shadow:0 2px 16px rgba(27,107,58,.09);
   --shadow-lg:0 8px 40px rgba(27,107,58,.14);
-  --radius:14px;--topbar-h:56px;--seller-nav-h:48px;
+  --radius:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
@@ -33,28 +33,13 @@ a{text-decoration:none;color:inherit}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-.tb-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
-.tb-breadcrumb{display:flex;align-items:center;gap:7px;font-size:.82rem;color:rgba(255,255,255,.4)}
-.tb-bc-link{cursor:pointer;color:rgba(255,255,255,.55);transition:color .18s}
-.tb-bc-link:hover{color:#fff}
-.tb-bc-sep{color:rgba(255,255,255,.2)}
-.tb-bc-current{color:rgba(255,255,255,.85);font-weight:500}
-.tb-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
-.tb-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
-.tb-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}
-.tb-btn-outline:hover{background:rgba(255,255,255,.18)}
-
-/* SELLER NAV */
-.seller-nav{position:fixed;top:var(--topbar-h);left:0;right:0;z-index:190;height:var(--seller-nav-h);background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;overflow-x:auto;scrollbar-width:none}
-.seller-nav::-webkit-scrollbar{display:none}
-.sn-item{display:flex;align-items:center;gap:6px;padding:0 16px;height:var(--seller-nav-h);font-size:.84rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.sn-item:hover{color:var(--green)}
-.sn-item.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+/* SIDEBAR OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}
+.sidebar-overlay.show{display:block}
 
 /* MAIN */
-.main{margin-top:calc(var(--topbar-h) + var(--seller-nav-h));padding:22px 4vw 60px}
+.main{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:22px 28px 60px}
+
 
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
@@ -156,13 +141,17 @@ a{text-decoration:none;color:inherit}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}  .sidebar.open{transform:translateX(0)}  .topbar{left:0}  .main{margin-left:0}  .hamburger-btn{display:flex}
+}
 @media(max-width:900px){
   .stats-row{grid-template-columns:repeat(2,1fr)}
-  .tb-breadcrumb{display:none}
+}
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}  .sidebar.open{transform:translateX(0)}  .topbar{left:0}  .main{margin-left:0}  .hamburger-btn{display:flex}
 }
 @media(max-width:600px){
-  :root{--topbar-h:50px}
-  .main{padding:16px 3vw 40px}
+.main{padding:16px 3vw 40px}
   .stats-row{grid-template-columns:repeat(2,1fr);gap:8px}
 }
 </style>
@@ -183,31 +172,58 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="tb-logo">
+<div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
     <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
-    Marché Sénégal
+    <span class="sb-logo-text">Marché Sénégal</span>
   </div>
-  <div class="tb-breadcrumb">
-    <span class="tb-bc-link" onclick="window.location.href='marche-senegal-dashboard.html'">Dashboard</span>
-    <span class="tb-bc-sep">›</span>
-    <span class="tb-bc-current">Mes commandes</span>
+  <div class="sb-shop">
+    <div class="sb-shop-row">
+      <div class="sb-avatar" id="sb-avatar">MF</div>
+      <div>
+        <div class="sb-shop-name" id="sb-shop-name">Ma boutique</div>
+        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+      </div>
+    </div>
   </div>
+  <nav class="sb-nav">
+    <div class="sb-section-label">Principal</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-dashboard.html'"><span class="sb-icon">📊</span>Tableau de bord</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-produits.html'"><span class="sb-icon">📦</span>Mes produits</div>
+    <div class="sb-item active"><span class="sb-icon">🛒</span>Mes commandes</div>
+    <div class="sb-section-label">Boutique</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-ajout-produit.html'"><span class="sb-icon">➕</span>Ajouter un produit</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-ma-boutique.html'"><span class="sb-icon">🏪</span>Ma boutique</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-accueil.html'"><span class="sb-icon">🌐</span>Voir ma boutique</div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-help" onclick="toast('Aide &amp; Support...')">
+      <span style="font-size:1rem">❓</span>
+      <span class="sb-help-text">Aide &amp; Support</span>
+    </div>
+    <div class="sb-logout" onclick="logoutVendeur()">
+      <span>🚪</span> Se déconnecter
+    </div>
+  </div>
+</aside>
+
+<!-- TOPBAR (light) -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="tb-title">🛒 Mes commandes</div>
   <div class="tb-actions">
-    <button class="tb-btn tb-btn-outline" onclick="window.location.href='marche-senegal-dashboard.html'">← Dashboard</button>
+    
+    <div class="tb-profile">
+      <div class="tb-profile-av" id="tb-av">MF</div>
+      <span class="tb-profile-name" id="tb-name">Vendeur</span>
+    </div>
   </div>
-</div>
-
-<!-- SELLER NAV -->
-<nav class="seller-nav">
-  <div class="sn-item" onclick="window.location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
-  <div class="sn-item" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
-  <div class="sn-item active">🛒 Mes commandes</div>
-  <div class="sn-item" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</div>
-  <div class="sn-item" onclick="window.location.href='marche-senegal-ma-boutique.html'">🏪 Ma boutique</div>
-</nav>
-
+</header>
 <!-- MAIN -->
 <div class="main">
 
@@ -662,12 +678,26 @@ function showToast(msg) {
 }
 
 // ── Initialisation ──
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
+function logoutVendeur(){logout();window.location.href='marche-senegal-accueil.html';}
+function initSidebar(){
+  const user=getCurrentUser();if(!user)return;
+  const shop=user.shop||{};const nm=shop.name||'Ma boutique';
+  const fn=[user.firstName,user.lastName].filter(Boolean).join(' ');
+  const av=(fn||nm).slice(0,2).toUpperCase();
+  const avEl=document.getElementById('sb-avatar');const nmEl=document.getElementById('sb-shop-name');
+  const tbAv=document.getElementById('tb-av');const tbNm=document.getElementById('tb-name');
+  if(avEl)avEl.textContent=av;if(nmEl)nmEl.textContent=nm;
+  if(tbAv)tbAv.textContent=av;if(tbNm)tbNm.textContent=user.firstName||'Vendeur';
+}
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
   if (!user || user.role !== 'SELLER') {
     window.location.href = 'marche-senegal-connexion-vendeur.html';
     return;
   }
+  initSidebar();
   await loadOrders();
 });
 </script>

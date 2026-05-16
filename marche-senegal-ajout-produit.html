@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -8,26 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
-:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:64px}
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select,textarea{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 .flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}.flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:var(--shadow-lg)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* TOPBAR VENDEUR */
-.seller-topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:var(--dark);display:flex;align-items:center;padding:0 4vw;gap:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-.st-logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0}
-.st-sep{color:rgba(255,255,255,.2);flex-shrink:0}
-.st-title{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.7);flex-shrink:0}
-.st-nav{display:flex;gap:0;flex:1;overflow-x:auto;scrollbar-width:none}
-.st-nav::-webkit-scrollbar{display:none}
-.st-link{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.st-link:hover{color:rgba(255,255,255,.8)}.st-link.active{color:#fff;border-bottom-color:var(--green)}
-.st-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
-.st-btn{height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:6px}
-.st-btn-outline{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2)}.st-btn-outline:hover{background:rgba(255,255,255,.18)}
-.st-btn-green{background:var(--green);color:#fff}.st-btn-green:hover{background:var(--gl)}
+/* SIDEBAR OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}
+.sidebar-overlay.show{display:block}
 /* LAYOUT */
-.page{margin-top:var(--nav-h);display:grid;grid-template-columns:1fr 300px;gap:22px;padding:24px 4vw 60px;max-width:1200px;margin-left:auto;margin-right:auto}
-.page{margin-top:var(--nav-h)}
+.page{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);display:grid;grid-template-columns:1fr 300px;gap:22px;padding:24px 28px 60px;max-width:1400px}
 /* FORM CARD */
 .form-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
 .fc-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid var(--border)}
@@ -100,9 +89,15 @@
 .pc-row{display:flex;justify-content:space-between}.pc-total{font-weight:700;color:var(--green);border-top:1px solid var(--g2);padding-top:4px;margin-top:4px}
 /* RESPONSIVE */
 @media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}  .sidebar.open{transform:translateX(0)}  .topbar{left:0}  .page{margin-left:0}  .hamburger-btn{display:flex}
+}
+@media(max-width:960px){
   .page{grid-template-columns:1fr}
   .preview-card{position:static;margin-top:0}
-  .seller-topbar .st-link{display:none}.seller-topbar .st-link.active{display:flex}
+  
+}
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%)}  .sidebar.open{transform:translateX(0)}  .topbar{left:0}  .page{margin-left:0}  .hamburger-btn{display:flex}
 }
 @media(max-width:600px){
   .page{padding:16px 4vw 40px}
@@ -116,25 +111,59 @@
 <body>
 <div class="toast" id="toast"></div>
 
-<!-- TOPBAR VENDEUR -->
-<div class="seller-topbar">
-  <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
-  <span class="st-sep">›</span>
-  <span class="st-title">Espace Vendeur</span>
-  <div class="st-nav">
-    <div class="st-link" onclick="window.location.href='marche-senegal-dashboard.html'">📊 Dashboard</div>
-    <div class="st-link" onclick="window.location.href='marche-senegal-mes-produits.html'">📦 Mes produits</div>
-    <div class="st-link active">➕ Ajouter un produit</div>
-    <div class="st-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">🛒 Commandes</div>
-    <div class="st-link" onclick="window.location.href='marche-senegal-ma-boutique.html'">🏪 Ma boutique</div>
-    <div class="st-link" onclick="toast('Promotions — bientôt disponible')">🎯 Promotions</div>
-    <div class="st-link" onclick="viewMyShop()">🌐 Voir ma boutique</div>
+<div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
+    <span class="sb-logo-text">Marché Sénégal</span>
   </div>
-  <div class="st-actions">
-    <button class="st-btn st-btn-outline" onclick="toast('💾 Brouillon sauvegardé !')">💾 Brouillon</button>
-    <button class="st-btn st-btn-green" onclick="publishProduct()">🚀 Publier</button>
+  <div class="sb-shop">
+    <div class="sb-shop-row">
+      <div class="sb-avatar" id="sb-avatar">MF</div>
+      <div>
+        <div class="sb-shop-name" id="sb-shop-name">Ma boutique</div>
+        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+      </div>
+    </div>
   </div>
-</div>
+  <nav class="sb-nav">
+    <div class="sb-section-label">Principal</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-dashboard.html'"><span class="sb-icon">📊</span>Tableau de bord</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-produits.html'"><span class="sb-icon">📦</span>Mes produits</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-commandes.html'"><span class="sb-icon">🛒</span>Mes commandes</div>
+    <div class="sb-section-label">Boutique</div>
+    <div class="sb-item active"><span class="sb-icon">➕</span>Ajouter un produit</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-ma-boutique.html'"><span class="sb-icon">🏪</span>Ma boutique</div>
+    <div class="sb-item" onclick="viewMyShop()"><span class="sb-icon">🌐</span>Voir ma boutique</div>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-help" onclick="toast('Aide & Support...')">
+      <span style="font-size:1rem">❓</span>
+      <span class="sb-help-text">Aide & Support</span>
+    </div>
+    <div class="sb-logout" onclick="logoutVendeur()">
+      <span>🚪</span> Se déconnecter
+    </div>
+  </div>
+</aside>
+
+<!-- TOPBAR (light) -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="tb-title">➕ Ajouter un produit</div>
+  <div class="tb-actions">
+    <button onclick="toast('💾 Brouillon sauvegardé !')" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:#fff;color:var(--dark);border:1.5px solid var(--border);display:flex;align-items:center;gap:5px">💾 Brouillon</button>
+    <button onclick="publishProduct()" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px">🚀 Publier</button>
+    <div class="tb-profile">
+      <div class="tb-profile-av" id="tb-av">MF</div>
+      <span class="tb-profile-name" id="tb-name">Vendeur</span>
+    </div>
+  </div>
+</header>
 
 <!-- PAGE -->
 <div class="page">
@@ -675,12 +704,27 @@ function viewMyShop() {
 }
 
 // ── Init ──
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
+function logoutVendeur(){logout();window.location.href='marche-senegal-accueil.html';}
+function initSidebar(){
+  const user=getCurrentUser();if(!user)return;
+  const shop=user.shop||{};const nm=shop.name||'Ma boutique';
+  const fn=[user.firstName,user.lastName].filter(Boolean).join(' ');
+  const av=(fn||nm).slice(0,2).toUpperCase();
+  const avEl=document.getElementById('sb-avatar');const nmEl=document.getElementById('sb-shop-name');
+  const tbAv=document.getElementById('tb-av');const tbNm=document.getElementById('tb-name');
+  if(avEl)avEl.textContent=av;if(nmEl)nmEl.textContent=nm;
+  if(tbAv)tbAv.textContent=av;if(tbNm)tbNm.textContent=user.firstName||'Vendeur';
+}
 document.addEventListener('DOMContentLoaded', function(){
   const user = getCurrentUser();
   if(!user || user.role !== 'SELLER'){
     window.location.href = 'marche-senegal-connexion-vendeur.html';
     return;
   }
+  initSidebar();
+  initSidebar();
 
   document.getElementById('file-input').addEventListener('change', function(){
     handleFileChange(this.files[0]);
