@@ -47,7 +47,8 @@
 .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:700;color:var(--dark)}
 .section-link{font-size:.84rem;color:var(--green);font-weight:600}.section-link:hover{text-decoration:underline}
 /* MARKETS */
-.markets-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.4rem}
+.markets-tabs{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:1.4rem;padding-bottom:4px;scrollbar-width:thin}
+.markets-tabs::-webkit-scrollbar{height:3px}.markets-tabs::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 .mtab{padding:7px 15px;border-radius:99px;font-size:.8rem;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s}
 .mtab:hover,.mtab.active{background:var(--green);color:#fff;border-color:var(--green)}
 .markets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
@@ -217,26 +218,11 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <!-- MARCHÉS -->
 <section class="section-wrap white-bg">
   <div class="section-top"><div><div class="section-label">🗺️ Filtre par marché</div><div class="section-title">Choisissez votre marché</div></div><a href="marche-senegal-marche.html" class="section-link">Voir tous →</a></div>
-  <div class="markets-tabs">
-    <button class="mtab active" onclick="filterMarkets('dakar',this)">Dakar & Banlieue</button>
-    <button class="mtab" onclick="filterMarkets('region',this)">Autres régions</button>
-    <button class="mtab" onclick="filterMarkets('all',this)">Tous</button>
+  <div class="markets-tabs" id="markets-tabs-bar">
+    <button class="mtab active" onclick="filterMarketsByRegion('all',this)">Tous</button>
   </div>
   <div class="markets-grid" id="markets-grid">
-    <div class="market-card featured" data-zone="dakar" onclick="goMarket('Sandaga')"><div class="market-emoji">🏛️</div><div class="market-name">Sandaga</div><div class="market-city">Dakar Centre</div><div class="market-count">142 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Tilène')"><div class="market-emoji">🧵</div><div class="market-name">Tilène</div><div class="market-city">Médina</div><div class="market-count">98 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('HLM')"><div class="market-emoji">🛍️</div><div class="market-name">HLM</div><div class="market-city">Dakar</div><div class="market-count">76 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Colobane')"><div class="market-emoji">🔧</div><div class="market-name">Colobane</div><div class="market-city">Dakar</div><div class="market-count">54 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Kermel')"><div class="market-emoji">🥩</div><div class="market-name">Kermel</div><div class="market-city">Plateau</div><div class="market-count">38 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Castor')"><div class="market-emoji">🌾</div><div class="market-name">Castor</div><div class="market-city">Dakar</div><div class="market-count">29 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Pikine')"><div class="market-emoji">🏙️</div><div class="market-name">Pikine</div><div class="market-city">Banlieue</div><div class="market-count">61 boutiques</div></div>
-    <div class="market-card" data-zone="dakar" onclick="goMarket('Thiaroye')"><div class="market-emoji">🏘️</div><div class="market-name">Thiaroye</div><div class="market-city">Banlieue</div><div class="market-count">45 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Thiès')"><div class="market-emoji">🏭</div><div class="market-name">Thiès</div><div class="market-city">Thiès</div><div class="market-count">83 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Touba')"><div class="market-emoji">🕌</div><div class="market-name">Touba</div><div class="market-city">Touba</div><div class="market-count">120 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Kaolack')"><div class="market-emoji">🐟</div><div class="market-name">Kaolack</div><div class="market-city">Kaolack</div><div class="market-count">67 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Ziguinchor')"><div class="market-emoji">🌊</div><div class="market-name">Ziguinchor</div><div class="market-city">Casamance</div><div class="market-count">44 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Saint-Louis')"><div class="market-emoji">🏰</div><div class="market-name">Saint-Louis</div><div class="market-city">Nord</div><div class="market-count">52 boutiques</div></div>
-    <div class="market-card" data-zone="region" onclick="goMarket('Mbour')"><div class="market-emoji">🏖️</div><div class="market-name">Mbour</div><div class="market-city">Petite Côte</div><div class="market-count">36 boutiques</div></div>
+    <div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--muted);font-size:.9rem">Chargement des marchés…</div>
   </div>
 </section>
 <!-- PROMO BAND -->
@@ -406,24 +392,69 @@ async function loadProducts(filters = {}) {
   `).join('');
 }
 
+// ── Emojis des marchés (mapping client-side) ──
+const MKT_EMOJIS_ACC = {
+  'Sandaga':'🏛️','Tilène':'🧵','HLM':'🛍️','Kermel':'🥩','Colobane':'🔧',
+  'Castor':'🌾','Liberté':'🏙️','Thiaroye':'🏘️','Pikine':'🏙️',
+  'Guédiawaye':'🏙️','Grand Yoff':'🏘️','Parcelles':'🏘️','Rufisque':'⚓','Bargny':'⚓',
+  'Thiès':'🏭','Mbour':'🏖️','Saly':'🌴','Tivaouane':'🕌','Joal':'🏝️',
+  'Touba':'🕌','Mbacké':'🕌','Darou':'🕌',
+  'Kaolack':'🐟','Nioro':'🌾','Guinguinéo':'🌾',
+  'Kaffrine':'🌻','Koungheul':'🌻','Birkelane':'🌻','Malem':'🌻',
+  'Saint-Louis':'🏰','Podor':'🌊','Richard Toll':'🌊','Dagana':'🌊',
+  'Tambacounda':'🦁','Bakel':'🌍','Goudiry':'🌍','Koumpentoum':'🌍',
+  'Ziguinchor':'🌴','Bignona':'🌿','Oussouye':'🌿',
+  'Sédhiou':'🌊','Bounkiling':'🌿','Goudomp':'🌿',
+  'Kolda':'🌍','Vélingara':'🌍','Médina Yoro':'🌍',
+  'Louga':'🐪','Kébémer':'🐪','Linguère':'🐪','Dahra':'🐪',
+  'Fatick':'🦅','Foundiougne':'🌊','Gossas':'🌾','Sokone':'🌊',
+  'Matam':'🌾','Kanel':'🌾','Ranérou':'🌾','Ourossogui':'🌾',
+  'Kédougou':'⛏️','Saraya':'⛏️','Salémata':'⛏️',
+  'Diourbel':'🕍','Bambey':'🌾'
+};
+
+function getMktEmojiAcc(name) {
+  const short = name.replace(/^Marché\s+/i, '');
+  for (const [key, emoji] of Object.entries(MKT_EMOJIS_ACC)) {
+    if (short.toLowerCase().includes(key.toLowerCase())) return emoji;
+  }
+  return '🏪';
+}
+
 // ── Charger les marchés depuis l'API ──
 async function loadMarkets() {
   const result = await getMarkets();
+  if (!result.success || !result.data?.length) return;
 
-  if (!result.success) return;
-
+  const markets = result.data;
   const grid = document.getElementById('markets-grid');
+  const tabsBar = document.getElementById('markets-tabs-bar');
 
-  const dakarCities = ['Dakar', 'Médina', 'Plateau', 'Pikine', 'Thiaroye', 'Guédiawaye', 'Banlieue', 'Rufisque', 'Bargny', 'Sébikotane'];
-  grid.innerHTML = result.data.map(market => {
-    const zone = dakarCities.some(c => market.city.includes(c)) ? 'dakar' : 'region';
-    const isFeatured = market.name.toLowerCase().includes('sandaga');
+  // Grouper par région
+  const byRegion = {};
+  markets.forEach(m => { (byRegion[m.region || 'Autre'] = byRegion[m.region || 'Autre'] || []).push(m); });
+  const regions = Object.keys(byRegion).sort((a, b) => a.localeCompare(b, 'fr'));
+
+  // Générer les onglets par région
+  if (tabsBar) {
+    tabsBar.innerHTML =
+      `<button class="mtab active" onclick="filterMarketsByRegion('all',this)">Tous (${markets.length})</button>` +
+      regions.map(r =>
+        `<button class="mtab" onclick="filterMarketsByRegion('${r.replace(/'/g,"\\'")}',this)">${r} (${byRegion[r].length})</button>`
+      ).join('');
+  }
+
+  // Rendre les cartes marchés
+  grid.innerHTML = markets.map(market => {
+    const shortName = market.name.replace(/^Marché\s+/i, '');
+    const emoji = getMktEmojiAcc(market.name);
+    const isFeatured = shortName.toLowerCase().includes('sandaga');
     return `
     <div class="market-card ${isFeatured ? 'featured' : ''}"
-         data-zone="${zone}"
+         data-region="${escapeHtml(market.region || 'Autre')}"
          onclick="goMarket('${market.id}')">
-      <div class="market-emoji">${market.emoji || '🏛️'}</div>
-      <div class="market-name">${escapeHtml(market.name.replace(/^Marché\s+/i, ''))}</div>
+      <div class="market-emoji">${emoji}</div>
+      <div class="market-name">${escapeHtml(shortName)}</div>
       <div class="market-city">${escapeHtml(market.city)}</div>
       <div class="market-count">${market._count?.shops ?? 0} boutiques</div>
     </div>`;
@@ -578,12 +609,12 @@ async function filterProds(cat, el) {
   }
 }
 
-// ── Filtrer les marchés ──
-function filterMarkets(zone, el) {
-  document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.market-card').forEach(card => {
-    card.style.display = (zone === 'all' || card.dataset.zone === zone) ? '' : 'none';
+// ── Filtrer les marchés par région ──
+function filterMarketsByRegion(region, el) {
+  document.querySelectorAll('#markets-tabs-bar .mtab').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('#markets-grid .market-card').forEach(card => {
+    card.style.display = (region === 'all' || card.dataset.region === region) ? '' : 'none';
   });
 }
 
