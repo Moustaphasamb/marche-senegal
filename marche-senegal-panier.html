@@ -319,7 +319,7 @@
 /* ══ RESPONSIVE ══ */
 @media(max-width:900px){
   .nav-search{display:none}
-  .nav-btn.nav-btn-login,.nav-btn.nav-btn-shop{display:none}
+  .nav-btn.nav-btn-login{display:none}
   .nav-hamburger{display:flex}
   .mobile-nav{display:block}
   body{padding-bottom:64px}
@@ -412,7 +412,6 @@
   </div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
-    <button class="nav-btn nav-btn-primary nav-btn-shop" onclick="window.location.href='marche-senegal-panier.html'">🏪 Ma boutique</button>
     <button class="nav-cart" onclick="toast('Panier...')">
       🛒<div class="cart-badge" id="cart-count">3</div>
     </button>
@@ -428,7 +427,6 @@
   </div>
   <div class="nav-drawer-row">
     <button class="nav-btn" style="flex:1;justify-content:center">Se connecter</button>
-    <button class="nav-btn nav-btn-primary" style="flex:1;justify-content:center">🏪 Ma boutique</button>
   </div>
 </div>
 

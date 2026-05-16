@@ -128,6 +128,7 @@ a{text-decoration:none;color:inherit}
 /* ── Responsive commun ── */
 @media(max-width:768px){
   .nav-search{display:none}
+  .nav-btn.nav-btn-login{display:none}
   .nav-hamburger{display:flex}
   .mobile-nav{display:block}
   .sidebar{transform:translateX(-100%)}
