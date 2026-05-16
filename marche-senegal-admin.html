@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -309,15 +309,15 @@
     <div class="sb-sec">Commerce</div>
     <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green">3 840</span></div>
     <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge">8</span></div>
-    <div class="sb-item" onclick="toast('Produits...')"><span class="sb-icon">📦</span>Produits</div>
+    <div class="sb-item" onclick="showPage('products',this)"><span class="sb-icon">📦</span>Produits</div>
     <div class="sb-sec">Plateforme</div>
     <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon">🗺️</span>Marchés</div>
-    <div class="sb-item" onclick="toast('Revenus...')"><span class="sb-icon">💰</span>Revenus</div>
-    <div class="sb-item" onclick="toast('Livreurs...')"><span class="sb-icon">🛵</span>Livreurs</div>
-    <div class="sb-item" onclick="toast('Promotions...')"><span class="sb-icon">🎯</span>Promotions</div>
+    <div class="sb-item" onclick="showPage('revenue',this)"><span class="sb-icon">💰</span>Revenus</div>
+    <div class="sb-item" onclick="showPage('deliveries',this)"><span class="sb-icon">🛵</span>Livreurs</div>
+    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions</div>
     <div class="sb-sec">Système</div>
-    <div class="sb-item" onclick="toast('Paramètres...')"><span class="sb-icon">⚙️</span>Paramètres</div>
-    <div class="sb-item" onclick="toast('Logs système...')"><span class="sb-icon">📋</span>Logs</div>
+    <div class="sb-item" onclick="showPage('settings',this)"><span class="sb-icon">⚙️</span>Paramètres</div>
+    <div class="sb-item" onclick="showPage('logs',this)"><span class="sb-icon">📋</span>Logs</div>
   </nav>
   <div class="sb-bottom">
     <div class="sb-back" onclick="window.location.href='marche-senegal-accueil.html'"><span>🌐</span>Voir le site public</div>
@@ -434,13 +434,9 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">📋 Activité en temps réel</div><div class="card-action" onclick="toast('Tous les logs...')">Voir tout →</div></div>
-        <div class="log-list">
-          <div class="log"><div class="log-dot ld-g"></div><div class="log-text"><strong>Nouvelle boutique</strong> — Artisan Mbour · En attente vérification CNI</div><div class="log-time">2 min</div></div>
-          <div class="log"><div class="log-dot ld-gold"></div><div class="log-text"><strong>Commande</strong> — #MS-00848 · 22 000 FCFA via Wave · Dakar → Thiès</div><div class="log-time">5 min</div></div>
-          <div class="log"><div class="log-dot ld-g"></div><div class="log-text"><strong>Vendeur approuvé</strong> — Aminata Sow · Marché Tilène · CNI validée</div><div class="log-time">12 min</div></div>
-          <div class="log"><div class="log-dot ld-r"></div><div class="log-text"><strong>Litige ouvert</strong> — #MS-847 · 15 300 FCFA bloqués en escrow</div><div class="log-time">2h</div></div>
-          <div class="log"><div class="log-dot ld-b"></div><div class="log-text"><strong>Paiement</strong> — 342 500 FCFA retirés par Mode Fatou Ndoye</div><div class="log-time">3h</div></div>
+        <div class="card-header"><div class="card-title">📋 Activité en temps réel</div><div class="card-action" onclick="showPage('logs',document.querySelector('.sb-item:last-child'))">Voir tout →</div></div>
+        <div class="log-list" id="overview-activity">
+          <div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>
         </div>
       </div>
     </div>
@@ -449,21 +445,20 @@
   <!-- ── USERS ── -->
   <div class="ps" id="ps-users">
     <div class="sec-header">
-      <div class="sec-title">👥 Utilisateurs (48 260)</div>
+      <div class="sec-title" id="users-title">👥 Utilisateurs</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <input style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
-        <select style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none"><option>Tous</option><option>Acheteurs</option><option>Vendeurs</option></select>
+        <input id="users-search" oninput="debounceUsersSearch()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
+        <select id="users-role-filter" onchange="loadUsers()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
+          <option value="">Tous</option>
+          <option value="BUYER">Acheteurs</option>
+          <option value="SELLER">Vendeurs</option>
+        </select>
       </div>
     </div>
     <div class="card">
       <table class="t">
         <thead><tr><th>Utilisateur</th><th>Type</th><th>Région</th><th>Inscrit le</th><th>Activité</th><th>Statut</th><th>Actions</th></tr></thead>
-        <tbody>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">FN</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Fatou Ndiaye</div><div style="font-size:.7rem;color:var(--muted)">+221 77 XXX XX XX</div></div></div></td><td><span class="badge b-blue">Acheteur</span></td><td>Dakar</td><td>Jan 2025</td><td>12 commandes</td><td><span class="badge b-ok">Actif</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir profil...')">Voir</button><button class="ta reject" onclick="toast('Compte suspendu')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div><div style="font-size:.7rem;color:var(--muted)">+221 77 XXX XX XX</div></div></div></td><td><span class="badge b-ok">Vendeur ✓</span></td><td>Dakar · Sandaga</td><td>Mar 2024</td><td>1 240 ventes</td><td><span class="badge b-ok">Actif</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Boutique</button><button class="ta reject" onclick="toast('Compte suspendu')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div><div style="font-size:.7rem;color:var(--muted)">+221 76 XXX XX XX</div></div></div></td><td><span class="badge b-wait">Vendeur ⏳</span></td><td>Dakar · HLM</td><td>Avr 2025</td><td>En attente CNI</td><td><span class="badge b-wait">En vérif.</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('CNI validée !')">Valider CNI</button><button class="ta reject" onclick="toast('Compte refusé')">Refuser</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">ID</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ibrahima Diallo</div><div style="font-size:.7rem;color:var(--muted)">+221 78 XXX XX XX</div></div></div></td><td><span class="badge b-blue">Acheteur</span></td><td>Thiès</td><td>Fév 2025</td><td>3 commandes</td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Compte réactivé !')">Réactiver</button><button class="ta view" onclick="toast('Voir dossier...')">Dossier</button></div></td></tr>
-        </tbody>
+        <tbody id="users-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -489,39 +484,212 @@
 
   <!-- ── ORDERS ── -->
   <div class="ps" id="ps-orders">
-    <div class="sec-header"><div class="sec-title">🛒 Commandes (3 840 ce mois)</div><div style="font-size:.86rem;color:var(--muted)">Total encaissé : <strong style="color:var(--green)">98,4M FCFA</strong></div></div>
+    <div class="sec-header"><div class="sec-title" id="orders-title">🛒 Commandes</div><div style="font-size:.86rem;color:var(--muted)">Total livré : <strong id="orders-revenue" style="color:var(--green)">—</strong></div></div>
     <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">⏳</div></div><div class="kpi-val">124</div><div class="kpi-label">En attente de confirmation</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🚚</div></div><div class="kpi-val">287</div><div class="kpi-label">En cours de livraison</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val">3 381</div><div class="kpi-label">Livrées avec succès</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val">48</div><div class="kpi-label">Annulées ou litiges</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">⏳</div></div><div class="kpi-val" id="ord-pending">—</div><div class="kpi-label">En attente de confirmation</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🚚</div></div><div class="kpi-val" id="ord-delivering">—</div><div class="kpi-label">En cours de livraison</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val" id="ord-delivered">—</div><div class="kpi-label">Livrées avec succès</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val" id="ord-cancelled">—</div><div class="kpi-label">Annulées / Remboursées</div></div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">Dernières commandes</div><div class="card-action" onclick="toast('Toutes les commandes...')">Voir tout →</div></div>
+      <div class="card-header"><div class="card-title">Dernières commandes</div></div>
       <table class="t">
-        <thead><tr><th>Numéro</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Paiement</th><th>Statut</th><th>Actions</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:600;color:var(--dark)">#MS-00848</td><td>Moussa Sow · Dakar</td><td>Mode Fatou · Sandaga</td><td style="color:var(--green);font-weight:600">15 300 FCFA</td><td>Wave ✓</td><td><span class="badge b-ok">En livraison</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
-          <tr><td style="font-weight:600;color:var(--dark)">#MS-00847</td><td>Aissatou Ba · Thiès</td><td>Tissus Aminata · Tilène</td><td style="color:var(--green);font-weight:600">25 000 FCFA</td><td>OM ✓</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
-          <tr><td style="font-weight:600;color:var(--dark)">#MS-00841</td><td>Ibrahima Fall · Dakar</td><td>Ferme Diallo · Ziguinchor</td><td style="color:var(--green);font-weight:600">4 320 FCFA</td><td>Wave ✓</td><td><span class="badge b-ok">Livré ✓</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Détails...')">Détails</button></div></td></tr>
-          <tr><td style="font-weight:600;color:var(--dark)">#MS-00835</td><td>Rokhaya Faye · Kaolack</td><td>Beauté Naturelle · Sandaga</td><td style="color:var(--green);font-weight:600">3 500 FCFA</td><td>FM ✓</td><td><span class="badge b-rej">Litige ⚖️</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Gérer litige...')">Gérer</button></div></td></tr>
-        </tbody>
+        <thead><tr><th>Numéro</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Paiement</th><th>Statut</th><th>Date</th></tr></thead>
+        <tbody id="orders-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
       </table>
     </div>
   </div>
 
   <!-- ── DISPUTES ── -->
   <div class="ps" id="ps-disputes">
-    <div class="sec-header"><div class="sec-title">⚖️ Litiges (8 ouverts)</div><div style="font-size:.86rem;color:var(--muted)">Montant bloqué en escrow : <strong style="color:var(--red)">43 620 FCFA</strong></div></div>
+    <div class="sec-header"><div class="sec-title" id="disputes-title">⚖️ Litiges & annulations</div></div>
     <div class="card">
       <table class="t">
-        <thead><tr><th>Litige</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Motif</th><th>Ouvert</th><th>Actions</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:600">#DIS-047</td><td>Fatou Ndiaye</td><td>Mode Fatou Ndoye</td><td style="color:var(--red);font-weight:600">15 300 FCFA</td><td>Produit non conforme</td><td>Il y a 2h</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Remboursement acheteur !')">Rembourser</button><button class="ta reject" onclick="toast('Montant libéré au vendeur')">Libérer</button></div></td></tr>
-          <tr><td style="font-weight:600">#DIS-046</td><td>Ousmane Diop</td><td>Ferme Diallo</td><td style="color:var(--red);font-weight:600">4 320 FCFA</td><td>Livraison non reçue</td><td>Il y a 1j</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Remboursement acheteur !')">Rembourser</button><button class="ta reject" onclick="toast('Montant libéré')">Libérer</button></div></td></tr>
-          <tr><td style="font-weight:600">#DIS-044</td><td>Cheikh Ba</td><td>Boutique HLM</td><td style="color:var(--red);font-weight:600">9 500 FCFA</td><td>Taille incorrecte</td><td>Il y a 2j</td><td><div class="tb-act"><button class="ta approve" onclick="toast('Résolu — remboursement !')">Résoudre</button></div></td></tr>
-        </tbody>
+        <thead><tr><th>Commande</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+        <tbody id="disputes-tbody"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ── REVENUE ── -->
+  <div class="ps" id="ps-revenue">
+    <div class="sec-header">
+      <div class="sec-title" id="revenue-title">💰 Revenus</div>
+      <button class="sec-btn sec-btn-outline" onclick="exportRevenue()">📊 Exporter CSV</button>
+    </div>
+
+    <!-- KPIs revenus -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up" id="rev-growth">—</div></div><div class="kpi-val" id="rev-total">—</div><div class="kpi-label">Revenus totaux (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📅</div></div><div class="kpi-val" id="rev-month">—</div><div class="kpi-label">Ce mois-ci</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🛒</div></div><div class="kpi-val" id="rev-orders">—</div><div class="kpi-label">Commandes livrées</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">🧺</div></div><div class="kpi-val" id="rev-avg">—</div><div class="kpi-label">Panier moyen (FCFA)</div></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Graphique mensuel -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">📈 Revenus mensuels</div></div>
+        <div class="bar-chart" id="rev-chart" style="height:110px;align-items:flex-end">
+          <div style="text-align:center;width:100%;padding:20px;color:var(--muted)">Chargement…</div>
+        </div>
+        <div class="chart-footer" id="rev-chart-footer"></div>
+      </div>
+
+      <!-- Répartition paiements -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">💳 Répartition par moyen de paiement</div></div>
+        <div id="rev-methods" style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+          <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenus par marché -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">🗺️ Revenus par marché</div></div>
+      <table class="t">
+        <thead><tr><th>Marché</th><th>Commandes</th><th>Revenus (FCFA)</th><th>Part</th></tr></thead>
+        <tbody id="rev-markets"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── DELIVERIES ── -->
+  <div class="ps" id="ps-deliveries">
+    <div class="sec-header">
+      <div class="sec-title" id="deliveries-title">🛵 Livraisons</div>
+      <select id="deliveries-filter" onchange="loadDeliveries()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
+        <option value="">Toutes</option>
+        <option value="ASSIGNED">Assignées</option>
+        <option value="PICKED_UP">Récupérées</option>
+        <option value="ON_THE_WAY">En route</option>
+        <option value="DELIVERED">Livrées</option>
+        <option value="FAILED">Échouées</option>
+      </select>
+    </div>
+
+    <!-- KPIs livraisons -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📋</div></div><div class="kpi-val" id="del-assigned">—</div><div class="kpi-label">Assignées</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🛵</div></div><div class="kpi-val" id="del-onway">—</div><div class="kpi-label">En cours</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val" id="del-delivered">—</div><div class="kpi-label">Livrées</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val" id="del-failed">—</div><div class="kpi-label">Échouées</div></div>
+    </div>
+
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Commande</th><th>Livreur</th><th>Acheteur</th><th>Boutique</th><th>Statut</th><th>Code suivi</th><th>Date</th></tr></thead>
+        <tbody id="deliveries-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS ── -->
+  <div class="ps" id="ps-settings">
+    <div class="sec-header"><div class="sec-title">⚙️ Paramètres</div></div>
+
+    <div class="grid-2">
+      <!-- Profil admin -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">👤 Mon profil admin</div></div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+            <div style="width:56px;height:56px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0" id="settings-av">AD</div>
+            <div>
+              <div style="font-size:1rem;font-weight:700;color:var(--dark)" id="settings-name">—</div>
+              <div style="font-size:.78rem;color:var(--muted)" id="settings-email">—</div>
+              <div style="margin-top:4px"><span class="badge b-ok">Super Administrateur</span></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px">Changer le mot de passe</div>
+            <input id="settings-pw-old" type="password" placeholder="Mot de passe actuel" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.84rem;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+            <input id="settings-pw-new" type="password" placeholder="Nouveau mot de passe" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.84rem;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+            <input id="settings-pw-confirm" type="password" placeholder="Confirmer le nouveau mot de passe" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.84rem;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box"/>
+            <button onclick="changeAdminPassword()" style="width:100%;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s" onmouseover="this.style.background='var(--gl)'" onmouseout="this.style.background='var(--green)'">Changer le mot de passe</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infos plateforme -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">🇸🇳 Plateforme Marché Sénégal</div></div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:.84rem;color:var(--muted)">Version</span>
+            <span style="font-size:.84rem;font-weight:600;color:var(--dark)">v1.0.0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:.84rem;color:var(--muted)">Environnement</span>
+            <span class="badge b-ok" id="settings-env">Production</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:.84rem;color:var(--muted)">Utilisateurs inscrits</span>
+            <span style="font-size:.84rem;font-weight:600;color:var(--dark)" id="settings-users">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:.84rem;color:var(--muted)">Boutiques actives</span>
+            <span style="font-size:.84rem;font-weight:600;color:var(--dark)" id="settings-shops">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:.84rem;color:var(--muted)">Commandes totales</span>
+            <span style="font-size:.84rem;font-weight:600;color:var(--dark)" id="settings-orders">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+            <span style="font-size:.84rem;color:var(--muted)">Paiements</span>
+            <span style="font-size:.84rem;font-weight:500;color:var(--dark)">Wave · Orange Money · Free Money</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRODUCTS ── -->
+  <div class="ps" id="ps-products">
+    <div class="sec-header">
+      <div class="sec-title" id="products-title">📦 Produits</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="products-search" oninput="debounceProductsSearch()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
+        <select id="products-status-filter" onchange="loadProducts()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
+          <option value="">Tous</option>
+          <option value="ACTIVE">Actifs</option>
+          <option value="PAUSED">En pause</option>
+          <option value="OUT_OF_STOCK">Rupture de stock</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Produit</th><th>Boutique</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="products-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── PROMOTIONS ── -->
+  <div class="ps" id="ps-promotions">
+    <div class="sec-header">
+      <div class="sec-title" id="promotions-title">🎯 Promotions</div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Promotion</th><th>Boutique</th><th>Type</th><th>Remise</th><th>Utilisations</th><th>Statut</th><th>Expire le</th></tr></thead>
+        <tbody id="promotions-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── LOGS ── -->
+  <div class="ps" id="ps-logs">
+    <div class="sec-header">
+      <div class="sec-title" id="logs-title">📋 Activité système</div>
+      <button class="sec-btn sec-btn-outline" onclick="loadLogs()">↺ Rafraîchir</button>
+    </div>
+    <div class="card">
+      <div class="log-list" id="logs-list">
+        <div style="text-align:center;padding:32px;color:var(--muted)">Chargement…</div>
+      </div>
     </div>
   </div>
 
@@ -586,16 +754,30 @@ function toast(msg) {
 }
 
 const pageTitles = {
-  overview: 'Tableau de bord',
-  users: 'Gestion des utilisateurs',
-  vendors: 'Gestion des vendeurs',
-  orders: 'Toutes les commandes',
-  disputes: 'Gestion des litiges',
-  markets: 'Gestion des marchés'
+  overview:   'Tableau de bord',
+  users:      'Gestion des utilisateurs',
+  vendors:    'Gestion des vendeurs',
+  orders:     'Toutes les commandes',
+  disputes:   'Litiges & annulations',
+  markets:    'Gestion des marchés',
+  products:   'Modération des produits',
+  promotions: 'Promotions',
+  logs:       'Activité système',
+  revenue:    'Revenus & statistiques',
+  deliveries: 'Gestion des livraisons',
+  settings:   'Paramètres'
 };
 
-let vendorsLoaded = false;
-let marketsLoaded = false;
+let vendorsLoaded    = false;
+let marketsLoaded    = false;
+let usersLoaded      = false;
+let ordersLoaded     = false;
+let disputesLoaded   = false;
+let productsLoaded   = false;
+let promotionsLoaded = false;
+let logsLoaded       = false;
+let revenueLoaded    = false;
+let deliveriesLoaded = false;
 
 function showPage(id, navItem) {
   document.querySelectorAll('.ps').forEach(p => p.classList.remove('active'));
@@ -608,8 +790,17 @@ function showPage(id, navItem) {
   const pt = document.getElementById('page-title');
   if (pt) pt.textContent = pageTitles[id] || 'Admin';
   closeSidebar();
-  if (id === 'vendors' && !vendorsLoaded) loadVendors();
-  if (id === 'markets' && !marketsLoaded) loadMarkets();
+  if (id === 'vendors'    && !vendorsLoaded)    loadVendors();
+  if (id === 'markets'    && !marketsLoaded)    loadMarkets();
+  if (id === 'users'      && !usersLoaded)      loadUsers();
+  if (id === 'orders'     && !ordersLoaded)      loadOrders();
+  if (id === 'disputes'   && !disputesLoaded)   loadDisputes();
+  if (id === 'products'   && !productsLoaded)   loadProducts();
+  if (id === 'promotions' && !promotionsLoaded) loadPromotions();
+  if (id === 'logs')                            loadLogs();
+  if (id === 'revenue'    && !revenueLoaded)    loadRevenue();
+  if (id === 'deliveries' && !deliveriesLoaded) loadDeliveries();
+  if (id === 'settings')                        loadSettings();
 }
 
 function logoutAdmin() {
@@ -977,6 +1168,266 @@ async function verifyVendor(userId, shopName, action, badge, actDiv, vendor) {
 }
 
 // ══════════════════════════════════════
+//   GESTION DES UTILISATEURS
+// ══════════════════════════════════════
+
+let _usersSearchTimer = null;
+function debounceUsersSearch() {
+  clearTimeout(_usersSearchTimer);
+  _usersSearchTimer = setTimeout(loadUsers, 400);
+}
+
+async function loadUsers() {
+  usersLoaded = true;
+  const tbody = document.getElementById('users-tbody');
+  if (!tbody) return;
+
+  const q    = document.getElementById('users-search')?.value?.trim() || '';
+  const role = document.getElementById('users-role-filter')?.value || '';
+  const params = new URLSearchParams();
+  if (q)    params.append('q', q);
+  if (role) params.append('role', role);
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res   = await apiCall('/api/admin/users?' + params.toString());
+    const users = res.data || [];
+    const total = res.meta?.total || users.length;
+
+    const titleEl = document.getElementById('users-title');
+    if (titleEl) titleEl.textContent = '👥 Utilisateurs (' + total.toLocaleString('fr-FR') + ')';
+    const sbEl = document.getElementById('sb-users-count');
+    if (sbEl && !q && !role) sbEl.textContent = total.toLocaleString('fr-FR');
+
+    tbody.innerHTML = '';
+    if (!users.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucun utilisateur trouvé</td></tr>';
+      return;
+    }
+
+    const palette = ['#1B6B3A', '#8B3A8A', '#E6A817', '#1565C0', '#C0392B'];
+    users.forEach((u, idx) => {
+      const name    = [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email || '—';
+      const initials = (name.split(' ').map(w => w[0]).join('').slice(0, 2) || '?').toUpperCase();
+      const color   = palette[idx % palette.length];
+      const orderCount = u._count?.orders ?? 0;
+      const region  = u.shop?.market?.name
+        ? (u.city ? u.city + ' · ' : '') + u.shop.market.name
+        : (u.city || '—');
+      const activity = u.role === 'SELLER'
+        ? (u.shop?.totalSales || 0).toLocaleString('fr-FR') + ' vente(s)'
+        : orderCount.toLocaleString('fr-FR') + ' commande(s)';
+
+      let roleBadge;
+      if (u.role === 'SELLER') {
+        const s = u.shop?.status;
+        roleBadge = s === 'ACTIVE'  ? '<span class="badge b-ok">Vendeur ✓</span>'
+                  : s === 'PENDING' ? '<span class="badge b-wait">Vendeur ⏳</span>'
+                  :                   '<span class="badge b-susp">Vendeur</span>';
+      } else {
+        roleBadge = '<span class="badge b-blue">Acheteur</span>';
+      }
+
+      const statusBadge = u.isActive
+        ? '<span class="badge b-ok"  id="ust-' + u.id + '">Actif</span>'
+        : '<span class="badge b-rej" id="ust-' + u.id + '">Suspendu</span>';
+      const inscrit = new Date(u.createdAt).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><div style="display:flex;align-items:center;gap:8px">' +
+          '<div class="av" style="background:' + color + '">' + initials + '</div>' +
+          '<div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">' + escapeHtml(name) + '</div>' +
+          '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(u.phone || u.email || '—') + '</div></div>' +
+        '</div></td>' +
+        '<td>' + roleBadge + '</td>' +
+        '<td>' + escapeHtml(region) + '</td>' +
+        '<td>' + inscrit + '</td>' +
+        '<td>' + escapeHtml(activity) + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td><div class="tb-act" id="uact-' + u.id + '"></div></td>';
+      tbody.appendChild(tr);
+      buildUserActions(
+        document.getElementById('uact-' + u.id),
+        u,
+        document.getElementById('ust-' + u.id)
+      );
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+function buildUserActions(actDiv, user, badgeEl) {
+  if (!actDiv) return;
+  actDiv.innerHTML = '';
+  const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || '—';
+
+  if (user.role === 'SELLER' && user.shop?.id) {
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'ta view';
+    viewBtn.textContent = 'Boutique';
+    viewBtn.onclick = () => window.open('marche-senegal-boutique.html?id=' + user.shop.id, '_blank');
+    actDiv.appendChild(viewBtn);
+  }
+
+  if (user.isActive) {
+    const suspBtn = document.createElement('button');
+    suspBtn.className = 'ta reject';
+    suspBtn.textContent = 'Suspendre';
+    suspBtn.onclick = () => changeUserStatus(user.id, name, 'suspend', badgeEl, actDiv, user);
+    actDiv.appendChild(suspBtn);
+  } else {
+    const reactBtn = document.createElement('button');
+    reactBtn.className = 'ta approve';
+    reactBtn.textContent = '↺ Réactiver';
+    reactBtn.onclick = () => changeUserStatus(user.id, name, 'reactivate', badgeEl, actDiv, user);
+    actDiv.appendChild(reactBtn);
+  }
+}
+
+async function changeUserStatus(userId, userName, action, badgeEl, actDiv, user) {
+  const label = action === 'suspend' ? 'Suspendre' : 'Réactiver';
+  if (!confirm(label + ' "' + userName + '" ?')) return;
+  try {
+    const res = await apiCall('/api/admin/users/' + userId + '/status', {
+      method: 'PATCH',
+      body: JSON.stringify({ action })
+    });
+    if (!res.success) { toast('❌ ' + (res.message || 'Erreur')); return; }
+    const suspended = action === 'suspend';
+    if (badgeEl) {
+      badgeEl.className = suspended ? 'badge b-rej' : 'badge b-ok';
+      badgeEl.textContent = suspended ? 'Suspendu' : 'Actif';
+    }
+    toast(suspended ? '⛔ ' + userName + ' suspendu' : '✅ ' + userName + ' réactivé');
+    buildUserActions(actDiv, { ...user, isActive: !suspended }, badgeEl);
+  } catch (e) {
+    toast('❌ Erreur');
+  }
+}
+
+// ══════════════════════════════════════
+//   GESTION DES COMMANDES
+// ══════════════════════════════════════
+
+const ORDER_STATUS_LABELS = {
+  PENDING:    { label: '⏳ En attente',   cls: 'b-wait' },
+  CONFIRMED:  { label: '✅ Confirmé',     cls: 'b-ok'   },
+  PREPARING:  { label: '🔧 En prép.',     cls: 'b-wait' },
+  READY:      { label: '📦 Prêt',         cls: 'b-blue' },
+  DELIVERING: { label: '🚚 En livraison', cls: 'b-blue' },
+  DELIVERED:  { label: '✅ Livré',        cls: 'b-ok'   },
+  CANCELLED:  { label: '❌ Annulé',       cls: 'b-rej'  },
+  REFUNDED:   { label: '💸 Remboursé',    cls: 'b-rej'  }
+};
+
+const PAYMENT_LABELS = {
+  WAVE: 'Wave', ORANGE_MONEY: 'Orange Money',
+  FREE_MONEY: 'Free Money', CARD: 'Carte', CASH: 'Espèces'
+};
+
+async function loadOrders() {
+  ordersLoaded = true;
+  const tbody = document.getElementById('orders-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res    = await apiCall('/api/admin/orders');
+    const orders = res.data || [];
+    const meta   = res.meta || {};
+    const sum    = meta.summary || {};
+
+    const titleEl = document.getElementById('orders-title');
+    if (titleEl) titleEl.textContent = '🛒 Commandes (' + (meta.total || 0).toLocaleString('fr-FR') + ')';
+    const revEl = document.getElementById('orders-revenue');
+    if (revEl) revEl.textContent = sum.revenue ? (sum.revenue / 1000000).toFixed(1) + 'M FCFA' : '0 FCFA';
+
+    ['pending','delivering','delivered','cancelled'].forEach(k => {
+      const el = document.getElementById('ord-' + k);
+      if (el) el.textContent = (sum[k] ?? 0).toLocaleString('fr-FR');
+    });
+
+    tbody.innerHTML = '';
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucune commande</td></tr>';
+      return;
+    }
+
+    orders.forEach(o => {
+      const buyerName = [o.buyer?.firstName, o.buyer?.lastName].filter(Boolean).join(' ') || '—';
+      const shopName  = o.shop?.name || '—';
+      const statusInfo = ORDER_STATUS_LABELS[o.status] || { label: o.status, cls: 'b-wait' };
+      const payLabel   = o.payment
+        ? (PAYMENT_LABELS[o.payment.method] || o.payment.method) + (o.payment.status === 'COMPLETED' ? ' ✓' : '')
+        : '—';
+      const date = new Date(o.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-weight:600;color:var(--dark)">' + escapeHtml(o.orderNumber) + '</td>' +
+        '<td>' + escapeHtml(buyerName) + (o.buyer?.city ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(o.buyer.city) + '</div>' : '') + '</td>' +
+        '<td>' + escapeHtml(shopName)  + (o.shop?.market?.name ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(o.shop.market.name) + '</div>' : '') + '</td>' +
+        '<td style="color:var(--green);font-weight:600">' + formatPrice(o.total) + '</td>' +
+        '<td>' + escapeHtml(payLabel) + '</td>' +
+        '<td><span class="badge ' + statusInfo.cls + '">' + statusInfo.label + '</span></td>' +
+        '<td style="font-size:.76rem;color:var(--muted)">' + date + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+// ══════════════════════════════════════
+//   GESTION DES LITIGES
+// ══════════════════════════════════════
+
+async function loadDisputes() {
+  disputesLoaded = true;
+  const tbody = document.getElementById('disputes-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res    = await apiCall('/api/admin/disputes');
+    const orders = res.data || [];
+
+    const titleEl = document.getElementById('disputes-title');
+    if (titleEl) titleEl.textContent = '⚖️ Litiges & annulations (' + orders.length + ')';
+
+    tbody.innerHTML = '';
+    if (!orders.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Aucun litige ou annulation</td></tr>';
+      return;
+    }
+
+    orders.forEach(o => {
+      const buyerName  = [o.buyer?.firstName, o.buyer?.lastName].filter(Boolean).join(' ') || '—';
+      const shopName   = o.shop?.name || '—';
+      const statusInfo = ORDER_STATUS_LABELS[o.status] || { label: o.status, cls: 'b-rej' };
+      const date = new Date(o.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-weight:600;color:var(--dark)">' + escapeHtml(o.orderNumber) + '</td>' +
+        '<td>' + escapeHtml(buyerName) + (o.buyer?.phone ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(o.buyer.phone) + '</div>' : '') + '</td>' +
+        '<td>' + escapeHtml(shopName) + '</td>' +
+        '<td style="color:var(--red);font-weight:600">' + formatPrice(o.total) + '</td>' +
+        '<td><span class="badge ' + statusInfo.cls + '">' + statusInfo.label + '</span></td>' +
+        '<td style="font-size:.76rem;color:var(--muted)">' + date + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+// ══════════════════════════════════════
 //   GESTION DES MARCHÉS
 // ══════════════════════════════════════
 
@@ -1241,6 +1692,441 @@ async function toggleMarket(mkt, dotEl, lblEl, btnEl) {
   }
 }
 
+// ══════════════════════════════════════
+//   MODÉRATION DES PRODUITS
+// ══════════════════════════════════════
+
+let _productsSearchTimer = null;
+function debounceProductsSearch() {
+  clearTimeout(_productsSearchTimer);
+  _productsSearchTimer = setTimeout(loadProducts, 400);
+}
+
+const PRODUCT_STATUS = {
+  ACTIVE:       { label: 'Actif',       cls: 'b-ok'   },
+  PAUSED:       { label: 'En pause',    cls: 'b-wait' },
+  OUT_OF_STOCK: { label: 'Rupture',     cls: 'b-susp' },
+  DELETED:      { label: 'Supprimé',    cls: 'b-rej'  }
+};
+
+async function loadProducts() {
+  productsLoaded = true;
+  const tbody = document.getElementById('products-tbody');
+  if (!tbody) return;
+
+  const q      = document.getElementById('products-search')?.value?.trim() || '';
+  const status = document.getElementById('products-status-filter')?.value || '';
+  const params = new URLSearchParams();
+  if (q)      params.append('q', q);
+  if (status) params.append('status', status);
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res      = await apiCall('/api/admin/products?' + params.toString());
+    const products = res.data || [];
+    const total    = res.meta?.total || products.length;
+
+    const titleEl = document.getElementById('products-title');
+    if (titleEl) titleEl.textContent = '📦 Produits (' + total.toLocaleString('fr-FR') + ')';
+
+    tbody.innerHTML = '';
+    if (!products.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucun produit trouvé</td></tr>';
+      return;
+    }
+
+    products.forEach(p => {
+      const info    = PRODUCT_STATUS[p.status] || { label: p.status, cls: 'b-wait' };
+      const catName = (p.category?.emoji || '') + ' ' + (p.category?.name || '—');
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><div style="font-size:.82rem;font-weight:600;color:var(--dark)">' + escapeHtml(p.name) + '</div>' +
+          (p.images?.[0] ? '' : '<div style="font-size:.68rem;color:var(--muted)">Sans photo</div>') + '</td>' +
+        '<td>' + escapeHtml(p.shop?.name || '—') +
+          (p.shop?.market?.name ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(p.shop.market.name) + '</div>' : '') + '</td>' +
+        '<td style="font-size:.78rem">' + escapeHtml(catName) + '</td>' +
+        '<td style="font-weight:600;color:var(--green)">' + formatPrice(p.price) + '</td>' +
+        '<td style="text-align:center"><strong style="color:' + (p.stock > 0 ? 'var(--dark)' : 'var(--red)') + '">' + p.stock + '</strong></td>' +
+        '<td><span class="badge ' + info.cls + '" id="pst-' + p.id + '">' + info.label + '</span></td>' +
+        '<td><div class="tb-act" id="pact-' + p.id + '"></div></td>';
+      tbody.appendChild(tr);
+      buildProductActions(
+        document.getElementById('pact-' + p.id),
+        p,
+        document.getElementById('pst-' + p.id)
+      );
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+function buildProductActions(actDiv, product, badgeEl) {
+  if (!actDiv) return;
+  actDiv.innerHTML = '';
+
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'ta view';
+  viewBtn.textContent = 'Voir';
+  viewBtn.onclick = () => window.open('marche-senegal-produit.html?id=' + product.id, '_blank');
+  actDiv.appendChild(viewBtn);
+
+  if (product.status === 'ACTIVE') {
+    const pauseBtn = document.createElement('button');
+    pauseBtn.className = 'ta reject';
+    pauseBtn.textContent = '⏸ Pause';
+    pauseBtn.onclick = () => changeProductStatus(product.id, 'PAUSED', badgeEl, actDiv, product);
+    actDiv.appendChild(pauseBtn);
+  } else if (product.status === 'PAUSED') {
+    const activeBtn = document.createElement('button');
+    activeBtn.className = 'ta approve';
+    activeBtn.textContent = '▶ Activer';
+    activeBtn.onclick = () => changeProductStatus(product.id, 'ACTIVE', badgeEl, actDiv, product);
+    actDiv.appendChild(activeBtn);
+  }
+}
+
+async function changeProductStatus(productId, status, badgeEl, actDiv, product) {
+  try {
+    const res = await apiCall('/api/admin/products/' + productId + '/status', {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    });
+    if (!res.success) { toast('❌ ' + (res.message || 'Erreur')); return; }
+    const info = PRODUCT_STATUS[status] || { label: status, cls: 'b-wait' };
+    if (badgeEl) { badgeEl.className = 'badge ' + info.cls; badgeEl.textContent = info.label; }
+    toast(status === 'ACTIVE' ? '✅ Produit activé' : '⏸ Produit mis en pause');
+    buildProductActions(actDiv, { ...product, status }, badgeEl);
+  } catch (e) {
+    toast('❌ Erreur');
+  }
+}
+
+// ══════════════════════════════════════
+//   PROMOTIONS
+// ══════════════════════════════════════
+
+const PROMO_TYPE = {
+  CODE: 'Code promo', SALE: 'Soldes', OFFER: 'Offre',
+  FEATURED: 'Mise en avant', FREE_DELIVERY: 'Livraison offerte'
+};
+
+async function loadPromotions() {
+  promotionsLoaded = true;
+  const tbody = document.getElementById('promotions-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res   = await apiCall('/api/admin/promotions');
+    const promos = res.data || [];
+    const total  = res.meta?.total || promos.length;
+
+    const titleEl = document.getElementById('promotions-title');
+    if (titleEl) titleEl.textContent = '🎯 Promotions (' + total + ')';
+
+    tbody.innerHTML = '';
+    if (!promos.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucune promotion</td></tr>';
+      return;
+    }
+
+    promos.forEach(p => {
+      const isActive  = p.isActive && (!p.endDate || new Date(p.endDate) > new Date());
+      const statusCls = isActive ? 'b-ok' : 'b-rej';
+      const statusLbl = isActive ? 'Active' : 'Expirée';
+      const endDate   = p.endDate ? new Date(p.endDate).toLocaleDateString('fr-FR') : '—';
+      const maxUses   = p.maxUses ? p.usedCount + ' / ' + p.maxUses : p.usedCount + ' / ∞';
+      const remise    = p.discount + (p.type === 'FREE_DELIVERY' ? '' : ' %');
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><div style="font-weight:600;color:var(--dark)">' + escapeHtml(p.title) + '</div>' +
+          (p.code ? '<div style="font-size:.7rem;color:var(--green);font-weight:700;letter-spacing:.05em">' + escapeHtml(p.code) + '</div>' : '') + '</td>' +
+        '<td>' + escapeHtml(p.shop?.name || '—') +
+          (p.shop?.market?.name ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(p.shop.market.name) + '</div>' : '') + '</td>' +
+        '<td style="font-size:.78rem">' + escapeHtml(PROMO_TYPE[p.type] || p.type) + '</td>' +
+        '<td style="font-weight:600;color:var(--red)">-' + remise + '</td>' +
+        '<td style="font-size:.78rem">' + maxUses + '</td>' +
+        '<td><span class="badge ' + statusCls + '">' + statusLbl + '</span></td>' +
+        '<td style="font-size:.76rem;color:var(--muted)">' + endDate + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+// ══════════════════════════════════════
+//   LOGS — ACTIVITÉ SYSTÈME
+// ══════════════════════════════════════
+
+async function loadLogs() {
+  logsLoaded = true;
+  const container = document.getElementById('logs-list');
+  if (!container) return;
+
+  container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
+
+  try {
+    const res        = await apiCall('/api/admin/activity');
+    const activities = res.data || [];
+
+    const titleEl = document.getElementById('logs-title');
+    if (titleEl) titleEl.textContent = '📋 Activité système (' + activities.length + ' événements récents)';
+
+    container.innerHTML = '';
+    if (!activities.length) {
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted)">Aucune activité récente</div>';
+      return;
+    }
+
+    const DOT_CLS = { green: 'ld-g', gold: 'ld-gold', red: 'ld-r', blue: 'ld-b' };
+    activities.forEach(a => {
+      const timeAgo = formatTimeAgo(new Date(a.time));
+      const dotCls  = DOT_CLS[a.color] || 'ld-b';
+      const div = document.createElement('div');
+      div.className = 'log';
+      div.innerHTML =
+        '<div class="log-dot ' + dotCls + '"></div>' +
+        '<div class="log-text">' + escapeHtml(a.text) + '</div>' +
+        '<div class="log-time">' + timeAgo + '</div>';
+      container.appendChild(div);
+    });
+  } catch (e) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</div>';
+  }
+}
+
+function formatTimeAgo(date) {
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60)   return diff + 's';
+  if (diff < 3600) return Math.floor(diff / 60) + 'min';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+  return Math.floor(diff / 86400) + 'j';
+}
+
+// ══════════════════════════════════════
+//   REVENUS
+// ══════════════════════════════════════
+
+const MONTH_LABELS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+const METHOD_LABELS = { WAVE:'Wave', ORANGE_MONEY:'Orange Money', FREE_MONEY:'Free Money', CARD:'Carte', CASH:'Espèces', INCONNU:'Inconnu' };
+
+async function loadRevenue() {
+  revenueLoaded = true;
+  try {
+    const res = await apiCall('/api/admin/revenue');
+    if (!res.success) return;
+    const d = res.data;
+
+    // KPIs
+    const growth = d.prevMonth ? Math.round(((d.currentMonth - d.prevMonth) / d.prevMonth) * 100) : 0;
+    const growthEl = document.getElementById('rev-growth');
+    if (growthEl) {
+      growthEl.textContent = (growth >= 0 ? '↑ +' : '↓ ') + growth + '%';
+      growthEl.className = 'kpi-chg ' + (growth >= 0 ? 'up' : 'down');
+    }
+    const toM = v => v >= 1000000 ? (v / 1000000).toFixed(1) + 'M' : v >= 1000 ? Math.round(v / 1000) + 'K' : v;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('rev-total',  toM(d.total));
+    set('rev-month',  toM(d.currentMonth));
+    set('rev-orders', (d.orderCount || 0).toLocaleString('fr-FR'));
+    set('rev-avg',    (d.avgBasket || 0).toLocaleString('fr-FR'));
+    set('revenue-title', '💰 Revenus — ' + toM(d.total) + ' FCFA');
+
+    // Bar chart mensuel
+    const chartEl = document.getElementById('rev-chart');
+    if (chartEl && d.monthly?.length) {
+      const maxRev = Math.max(...d.monthly.map(m => m.revenue), 1);
+      chartEl.innerHTML = d.monthly.map((m, i) => {
+        const pct = Math.round((m.revenue / maxRev) * 100);
+        const label = MONTH_LABELS[parseInt(m.month.slice(5, 7)) - 1] || m.month.slice(0, 7);
+        const isLast = i === d.monthly.length - 1;
+        return '<div class="bc-wrap">' +
+          '<div class="bc-val">' + toM(m.revenue) + '</div>' +
+          '<div class="bc-bar ' + (isLast ? 'gold' : 'g') + '" style="height:' + pct + '%"></div>' +
+          '<div class="bc-label">' + label + '</div>' +
+          '</div>';
+      }).join('');
+      const footEl = document.getElementById('rev-chart-footer');
+      if (footEl) {
+        const total6 = d.monthly.slice(-6).reduce((s, m) => s + m.revenue, 0);
+        footEl.innerHTML = '<div class="cf-stat">6 derniers mois : <strong>' + toM(total6) + ' FCFA</strong></div>' +
+          '<div class="cf-stat">Croissance m/m : <strong style="color:var(--' + (growth >= 0 ? 'green' : 'red') + ')">' + (growth >= 0 ? '+' : '') + growth + '%</strong></div>';
+      }
+    }
+
+    // Méthodes de paiement
+    const methodsEl = document.getElementById('rev-methods');
+    if (methodsEl && d.byMethod?.length) {
+      const totalM = d.byMethod.reduce((s, m) => s + m.revenue, 0) || 1;
+      methodsEl.innerHTML = d.byMethod.sort((a, b) => b.revenue - a.revenue).map(m => {
+        const pct = Math.round((m.revenue / totalM) * 100);
+        return '<div style="display:flex;flex-direction:column;gap:4px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:.8rem">' +
+            '<span style="color:var(--dark);font-weight:500">' + (METHOD_LABELS[m.method] || m.method) + '</span>' +
+            '<span style="color:var(--muted)">' + toM(m.revenue) + ' FCFA — ' + pct + '%</span>' +
+          '</div>' +
+          '<div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden">' +
+            '<div style="height:100%;width:' + pct + '%;background:var(--green);border-radius:99px"></div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    // Tableau marchés
+    const marketsEl = document.getElementById('rev-markets');
+    if (marketsEl && d.byMarket?.length) {
+      const totalMkt = d.byMarket.reduce((s, m) => s + m.revenue, 0) || 1;
+      marketsEl.innerHTML = d.byMarket.map(m => {
+        const pct = Math.round((m.revenue / totalMkt) * 100);
+        return '<tr>' +
+          '<td style="font-weight:600;color:var(--dark)">🏛️ ' + escapeHtml(m.market) + '</td>' +
+          '<td>' + m.count.toLocaleString('fr-FR') + '</td>' +
+          '<td style="color:var(--green);font-weight:600">' + m.revenue.toLocaleString('fr-FR') + ' FCFA</td>' +
+          '<td><div style="display:flex;align-items:center;gap:8px"><div style="height:6px;width:80px;background:var(--border);border-radius:99px"><div style="height:100%;width:' + pct + '%;background:var(--green);border-radius:99px"></div></div><span style="font-size:.76rem;color:var(--muted)">' + pct + '%</span></div></td>' +
+          '</tr>';
+      }).join('');
+    }
+  } catch (e) {
+    toast('❌ Erreur chargement revenus');
+  }
+}
+
+function exportRevenue() {
+  toast('Export CSV — fonctionnalité à venir');
+}
+
+// ══════════════════════════════════════
+//   LIVRAISONS
+// ══════════════════════════════════════
+
+const DELIVERY_STATUS = {
+  ASSIGNED:  { label: 'Assignée',    cls: 'b-wait' },
+  PICKED_UP: { label: 'Récupérée',   cls: 'b-blue' },
+  ON_THE_WAY:{ label: 'En route 🛵', cls: 'b-blue' },
+  DELIVERED: { label: 'Livrée ✓',    cls: 'b-ok'   },
+  FAILED:    { label: 'Échouée',     cls: 'b-rej'  }
+};
+
+async function loadDeliveries() {
+  deliveriesLoaded = true;
+  const tbody = document.getElementById('deliveries-tbody');
+  if (!tbody) return;
+
+  const status = document.getElementById('deliveries-filter')?.value || '';
+  const params = status ? '?status=' + status : '';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+
+  try {
+    const res         = await apiCall('/api/admin/deliveries' + params);
+    const deliveries  = res.data || [];
+    const meta        = res.meta || {};
+    const sc          = meta.statusCounts || {};
+
+    const titleEl = document.getElementById('deliveries-title');
+    if (titleEl) titleEl.textContent = '🛵 Livraisons (' + (meta.total || 0).toLocaleString('fr-FR') + ')';
+
+    // KPIs
+    const setK = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = (v || 0).toLocaleString('fr-FR'); };
+    setK('del-assigned', (sc.ASSIGNED || 0) + (sc.PICKED_UP || 0));
+    setK('del-onway',    sc.ON_THE_WAY || 0);
+    setK('del-delivered',sc.DELIVERED || 0);
+    setK('del-failed',   sc.FAILED || 0);
+
+    tbody.innerHTML = '';
+    if (!deliveries.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucune livraison trouvée</td></tr>';
+      return;
+    }
+
+    deliveries.forEach(d => {
+      const buyerName  = [d.order?.buyer?.firstName, d.order?.buyer?.lastName].filter(Boolean).join(' ') || '—';
+      const shopName   = d.order?.shop?.name || '—';
+      const orderNum   = d.order?.orderNumber || '—';
+      const statusInfo = DELIVERY_STATUS[d.status] || { label: d.status, cls: 'b-wait' };
+      const date       = new Date(d.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-weight:600;color:var(--dark)">' + escapeHtml(orderNum) + '</td>' +
+        '<td>' + escapeHtml(d.deliveryName || '—') +
+          (d.deliveryPhone ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(d.deliveryPhone) + '</div>' : '') + '</td>' +
+        '<td>' + escapeHtml(buyerName) +
+          (d.order?.buyer?.phone ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(d.order.buyer.phone) + '</div>' : '') + '</td>' +
+        '<td>' + escapeHtml(shopName) + '</td>' +
+        '<td><span class="badge ' + statusInfo.cls + '">' + statusInfo.label + '</span></td>' +
+        '<td style="font-size:.76rem;color:var(--muted);letter-spacing:.04em">' + escapeHtml(d.trackingCode || '—') + '</td>' +
+        '<td style="font-size:.76rem;color:var(--muted)">' + date + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+  }
+}
+
+// ══════════════════════════════════════
+//   PARAMÈTRES
+// ══════════════════════════════════════
+
+function loadSettings() {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  const name  = user.email || 'Admin';
+  const init  = name.slice(0, 2).toUpperCase();
+  const avEl  = document.getElementById('settings-av');
+  const nmEl  = document.getElementById('settings-name');
+  const emEl  = document.getElementById('settings-email');
+  const envEl = document.getElementById('settings-env');
+  if (avEl) avEl.textContent = init;
+  if (nmEl) nmEl.textContent = 'Administrateur';
+  if (emEl) emEl.textContent = user.email || '—';
+  if (envEl) {
+    const isProd = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
+    envEl.textContent = isProd ? 'Production' : 'Développement';
+    envEl.className   = 'badge ' + (isProd ? 'b-ok' : 'b-wait');
+  }
+
+  // Charger les stats pour la section plateforme
+  apiCall('/api/admin/stats').then(res => {
+    const d = res.data || {};
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = (v ?? '—').toLocaleString?.('fr-FR') || v; };
+    set('settings-users',  d.users);
+    set('settings-shops',  d.shops);
+    set('settings-orders', d.orders);
+  }).catch(() => {});
+}
+
+async function changeAdminPassword() {
+  const oldPw  = document.getElementById('settings-pw-old')?.value;
+  const newPw  = document.getElementById('settings-pw-new')?.value;
+  const confPw = document.getElementById('settings-pw-confirm')?.value;
+
+  if (!oldPw || !newPw || !confPw) { toast('❌ Remplissez tous les champs'); return; }
+  if (newPw !== confPw) { toast('❌ Les mots de passe ne correspondent pas'); return; }
+  if (newPw.length < 8) { toast('❌ Minimum 8 caractères'); return; }
+
+  try {
+    const res = await apiCall('/api/auth/change-password', {
+      method: 'PATCH',
+      body: JSON.stringify({ currentPassword: oldPw, newPassword: newPw })
+    });
+    if (res.success) {
+      toast('✅ Mot de passe modifié avec succès');
+      document.getElementById('settings-pw-old').value = '';
+      document.getElementById('settings-pw-new').value = '';
+      document.getElementById('settings-pw-confirm').value = '';
+    } else {
+      toast('❌ ' + (res.message || 'Erreur'));
+    }
+  } catch (e) {
+    toast('❌ Erreur de connexion');
+  }
+}
+
 // ── Auth + initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
@@ -1254,7 +2140,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (sbName && user.email) sbName.textContent = user.email;
 
   await loadAdminStats();
+  loadOverviewActivity();
 });
+
+async function loadOverviewActivity() {
+  const container = document.getElementById('overview-activity');
+  if (!container) return;
+  try {
+    const res        = await apiCall('/api/admin/activity');
+    const activities = (res.data || []).slice(0, 5);
+    container.innerHTML = '';
+    if (!activities.length) {
+      container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem">Aucune activité récente</div>';
+      return;
+    }
+    const DOT_CLS = { green: 'ld-g', gold: 'ld-gold', red: 'ld-r', blue: 'ld-b' };
+    activities.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'log';
+      div.innerHTML =
+        '<div class="log-dot ' + (DOT_CLS[a.color] || 'ld-b') + '"></div>' +
+        '<div class="log-text">' + escapeHtml(a.text) + '</div>' +
+        '<div class="log-time">' + formatTimeAgo(new Date(a.time)) + '</div>';
+      container.appendChild(div);
+    });
+  } catch (e) {
+    container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.8rem">Non disponible</div>';
+  }
+}
 </script>
 </body>
 </html>
