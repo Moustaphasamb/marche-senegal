@@ -49,7 +49,10 @@
 .sr-stars{color:var(--gold);font-size:.82rem;flex-shrink:0;width:68px}
 .sr-bar{flex:1;height:6px;background:var(--border);border-radius:3px}.sr-fill{height:100%;background:var(--gold);border-radius:3px}
 .sr-pct{font-size:.72rem;color:var(--muted);width:28px;text-align:right}
-.market-pills{display:flex;flex-direction:column;gap:6px}
+.market-pills{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;scrollbar-width:thin}
+.market-pills::-webkit-scrollbar{width:3px}.market-pills::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.mp-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.8rem;font-family:inherit;outline:none;margin-bottom:6px;transition:border-color .2s}
+.mp-search:focus{border-color:var(--green)}
 .mp-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;font-size:.82rem}
 .mp-item:hover,.mp-item.sel{border-color:var(--green);background:var(--gp)}.mp-item.sel .mp-name{color:var(--green);font-weight:600}
 .mp-emoji{font-size:.95rem;flex-shrink:0;width:20px;text-align:center}.mp-name{flex:1;font-weight:500;color:var(--text)}.mp-count{font-size:.7rem;color:var(--muted)}
@@ -177,13 +180,9 @@
     </div>
     <div class="fs-section">
       <div class="fs-title">Marché <span class="fs-clear" onclick="clearMarkets()">Effacer</span></div>
-      <div class="market-pills">
-        <div class="mp-item sel" onclick="toggleMarket(this)"><span class="mp-emoji">🏛️</span><span class="mp-name">Sandaga</span><span class="mp-count">142</span></div>
-        <div class="mp-item sel" onclick="toggleMarket(this)"><span class="mp-emoji">🧵</span><span class="mp-name">Tilène</span><span class="mp-count">98</span></div>
-        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🛍️</span><span class="mp-name">HLM</span><span class="mp-count">76</span></div>
-        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🕌</span><span class="mp-name">Touba</span><span class="mp-count">120</span></div>
-        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🏭</span><span class="mp-name">Thiès</span><span class="mp-count">83</span></div>
-        <div class="mp-item" onclick="toggleMarket(this)"><span class="mp-emoji">🌊</span><span class="mp-name">Ziguinchor</span><span class="mp-count">44</span></div>
+      <input class="mp-search" id="mp-search" type="text" placeholder="Rechercher un marché…" oninput="filterMarketPills(this.value)">
+      <div class="market-pills" id="market-pills">
+        <div style="font-size:.78rem;color:var(--muted);padding:8px 0;text-align:center">Chargement…</div>
       </div>
     </div>
     <div class="fs-section">
@@ -401,6 +400,72 @@ function resetPrice() {
   delete currentFilters.maxPrice;
 }
 
+// ── Emojis des marchés ──
+const SEARCH_MKT_EMOJIS = {
+  'Sandaga':'🏛️','Tilène':'🧵','HLM':'🛍️','Kermel':'🥩','Colobane':'🔧',
+  'Castor':'🌾','Liberté':'🏙️','Thiaroye':'🏘️','Pikine':'🏙️','Guédiawaye':'🏙️',
+  'Grand Yoff':'🏘️','Parcelles':'🏘️','Rufisque':'⚓','Bargny':'⚓',
+  'Thiès':'🏭','Mbour':'🏖️','Saly':'🌴','Tivaouane':'🕌','Joal':'🏝️',
+  'Touba':'🕌','Mbacké':'🕌','Darou':'🕌',
+  'Kaolack':'🐟','Nioro':'🌾','Guinguinéo':'🌾',
+  'Kaffrine':'🌻','Koungheul':'🌻','Birkelane':'🌻',
+  'Saint-Louis':'🏰','Podor':'🌊','Richard Toll':'🌊','Dagana':'🌊',
+  'Tambacounda':'🦁','Bakel':'🌍','Goudiry':'🌍','Koumpentoum':'🌍',
+  'Ziguinchor':'🌴','Bignona':'🌿','Oussouye':'🌿',
+  'Sédhiou':'🌊','Bounkiling':'🌿','Goudomp':'🌿',
+  'Kolda':'🌍','Vélingara':'🌍',
+  'Louga':'🐪','Kébémer':'🐪','Linguère':'🐪','Dahra':'🐪',
+  'Fatick':'🦅','Foundiougne':'🌊','Gossas':'🌾',
+  'Matam':'🌾','Kanel':'🌾','Ourossogui':'🌾',
+  'Kédougou':'⛏️','Saraya':'⛏️',
+  'Diourbel':'🕍','Bambey':'🌾'
+};
+
+function getMktEmojiSearch(name) {
+  const short = name.replace(/^Marché\s+/i, '');
+  for (const [key, emoji] of Object.entries(SEARCH_MKT_EMOJIS)) {
+    if (short.toLowerCase().includes(key.toLowerCase())) return emoji;
+  }
+  return '🏪';
+}
+
+let _allMarketsPills = [];
+
+function _renderMarketPills(markets) {
+  const container = document.getElementById('market-pills');
+  if (!container) return;
+  if (!markets.length) {
+    container.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:8px;text-align:center">Aucun marché trouvé</div>';
+    return;
+  }
+  container.innerHTML = markets.map(m => {
+    const shortName = m.name.replace(/^Marché\s+/i, '');
+    const emoji = getMktEmojiSearch(m.name);
+    return `<div class="mp-item" data-market-id="${m.id}" onclick="toggleMarket(this)">
+      <span class="mp-emoji">${emoji}</span>
+      <span class="mp-name">${escapeHtml(shortName)}</span>
+      <span class="mp-count">${m._count?.shops ?? 0}</span>
+    </div>`;
+  }).join('');
+}
+
+async function loadMarketPills() {
+  const result = await getMarkets();
+  if (!result.success || !result.data?.length) return;
+  _allMarketsPills = result.data;
+  _renderMarketPills(result.data);
+}
+
+function filterMarketPills(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { _renderMarketPills(_allMarketsPills); return; }
+  _renderMarketPills(_allMarketsPills.filter(m =>
+    m.name.toLowerCase().includes(q) ||
+    (m.city || '').toLowerCase().includes(q) ||
+    (m.region || '').toLowerCase().includes(q)
+  ));
+}
+
 // ── Marché toggle ──
 function toggleMarket(el) {
   el.classList.toggle('sel');
@@ -548,19 +613,6 @@ function getQueryFromURL() {
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
 
-  // Charger les IDs réels des marchés depuis l'API
-  const marketsResult = await getMarkets();
-  if (marketsResult.success) {
-    marketsResult.data.forEach(market => {
-      document.querySelectorAll('.mp-item').forEach(pill => {
-        if (pill.querySelector('.mp-name')?.textContent.trim() === market.name) {
-          pill.dataset.marketId = market.id;
-        }
-      });
-    });
-  }
-
-  // Récupérer le terme depuis l'URL si présent
   const urlQuery = getQueryFromURL();
   if (urlQuery) {
     const input = document.getElementById('hero-search') ||
@@ -571,8 +623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentFilters.q = urlQuery;
   }
 
-  // Charger les produits
-  await loadResults();
+  await Promise.all([loadMarketPills(), loadResults()]);
 });
 </script>
 </body>
