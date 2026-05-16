@@ -427,16 +427,9 @@ a{text-decoration:none;color:inherit}
 </section>
 <!-- MARKETS BAR -->
 <div class="markets-bar">
-  <span class="mb-label">Autres marchés :</span>
-  <div class="mb-chips">
-    <button class="mb-chip active">🏛️ Sandaga</button>
-    <button class="mb-chip" onclick="changeMarket('Tilène')">🧵 Tilène</button>
-    <button class="mb-chip" onclick="changeMarket('HLM')">🛍️ HLM</button>
-    <button class="mb-chip" onclick="changeMarket('Colobane')">🔧 Colobane</button>
-    <button class="mb-chip" onclick="changeMarket('Kermel')">🥩 Kermel</button>
-    <button class="mb-chip" onclick="changeMarket('Pikine')">🏙️ Pikine</button>
-    <button class="mb-chip" onclick="changeMarket('Thiès')">🏭 Thiès</button>
-    <button class="mb-chip" onclick="changeMarket('Touba')">🕌 Touba</button>
+  <span class="mb-label">Marchés :</span>
+  <div class="mb-chips" id="markets-chips">
+    <span style="font-size:.78rem;color:var(--muted);padding:4px 0">Chargement…</span>
   </div>
 </div>
 <!-- MAIN -->
@@ -773,9 +766,55 @@ async function wish(event, productId) {
   }
 }
 
-// ── Changer de marché ──
-function changeMarket(name) {
-  showToast('🗺️ Marché ' + name + ' sélectionné');
+// ── Emojis des marchés ──
+const MARCHE_EMOJIS = {
+  'Sandaga':'🏛️','Tilène':'🧵','HLM':'🛍️','Kermel':'🥩','Colobane':'🔧',
+  'Castor':'🌾','Liberté':'🏙️','Thiaroye':'🏘️','Pikine':'🏙️','Guédiawaye':'🏙️',
+  'Grand Yoff':'🏘️','Parcelles':'🏘️','Rufisque':'⚓','Bargny':'⚓',
+  'Thiès':'🏭','Mbour':'🏖️','Saly':'🌴','Tivaouane':'🕌','Joal':'🏝️',
+  'Touba':'🕌','Mbacké':'🕌','Darou':'🕌',
+  'Kaolack':'🐟','Nioro':'🌾','Guinguinéo':'🌾',
+  'Kaffrine':'🌻','Koungheul':'🌻','Birkelane':'🌻',
+  'Saint-Louis':'🏰','Podor':'🌊','Richard Toll':'🌊','Dagana':'🌊',
+  'Tambacounda':'🦁','Bakel':'🌍','Goudiry':'🌍','Koumpentoum':'🌍',
+  'Ziguinchor':'🌴','Bignona':'🌿','Oussouye':'🌿',
+  'Sédhiou':'🌊','Bounkiling':'🌿','Goudomp':'🌿',
+  'Kolda':'🌍','Vélingara':'🌍',
+  'Louga':'🐪','Kébémer':'🐪','Linguère':'🐪','Dahra':'🐪',
+  'Fatick':'🦅','Foundiougne':'🌊','Gossas':'🌾',
+  'Matam':'🌾','Kanel':'🌾','Ourossogui':'🌾',
+  'Kédougou':'⛏️','Saraya':'⛏️',
+  'Diourbel':'🕍','Bambey':'🌾'
+};
+
+function getMktEmoji(name) {
+  const short = name.replace(/^Marché\s+/i, '');
+  for (const [key, emoji] of Object.entries(MARCHE_EMOJIS)) {
+    if (short.toLowerCase().includes(key.toLowerCase())) return emoji;
+  }
+  return '🏪';
+}
+
+// ── Charger la barre des marchés ──
+async function loadMarketsBar() {
+  const result = await getMarkets();
+  if (!result.success || !result.data?.length) return;
+
+  const chipsEl = document.getElementById('markets-chips');
+  if (!chipsEl) return;
+
+  chipsEl.innerHTML = result.data.map(m => {
+    const shortName = m.name.replace(/^Marché\s+/i, '');
+    const emoji = getMktEmoji(m.name);
+    const isActive = m.id === currentMarketId;
+    return `<button class="mb-chip${isActive ? ' active' : ''}"
+      onclick="navigateMarket('${m.id}')">${emoji} ${shortName}</button>`;
+  }).join('');
+}
+
+// ── Naviguer vers un marché ──
+function navigateMarket(marketId) {
+  window.location.href = 'marche-senegal-marche.html?id=' + marketId;
 }
 
 // ── Copier le code promo ──
@@ -826,11 +865,9 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
 
-  // Récupérer l'ID du marché depuis l'URL
   currentMarketId = getMarketIdFromURL();
 
   if (!currentMarketId) {
-    // Si pas d'ID dans l'URL — charger le premier marché
     const marketsResult = await getMarkets();
     if (marketsResult.success && marketsResult.data.length > 0) {
       currentMarketId = marketsResult.data[0].id;
@@ -838,8 +875,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (currentMarketId) {
-    await loadMarket(currentMarketId);
-    await loadShops(currentMarketId);
+    await Promise.all([
+      loadMarketsBar(),
+      loadMarket(currentMarketId),
+      loadShops(currentMarketId)
+    ]);
+  } else {
+    loadMarketsBar();
   }
 });
 </script>
