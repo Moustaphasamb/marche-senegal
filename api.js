@@ -227,6 +227,47 @@ async function updateOrderStatus(id, status) {
 }
 
 // ────────────────────────────────
+// PROFIL
+// ────────────────────────────────
+
+async function updateProfile(data) {
+  return await apiCall('/api/auth/me', {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  });
+}
+
+// ────────────────────────────────
+// ADRESSES
+// ────────────────────────────────
+
+async function getAddresses() {
+  return await apiCall('/api/addresses');
+}
+
+async function createAddress(data) {
+  return await apiCall('/api/addresses', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+async function updateAddress(id, data) {
+  return await apiCall('/api/addresses/' + id, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+async function deleteAddress(id) {
+  return await apiCall('/api/addresses/' + id, { method: 'DELETE' });
+}
+
+async function setDefaultAddress(id) {
+  return await apiCall('/api/addresses/' + id + '/default', { method: 'PATCH' });
+}
+
+// ────────────────────────────────
 // FAVORIS
 // ────────────────────────────────
 
