@@ -185,10 +185,11 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
       <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'">🛍️ Explorer les produits</button>
       <button class="btn btn-outline-white" onclick="document.getElementById('markets-grid').scrollIntoView({behavior:'smooth'})">🗺️ Choisir un marché</button>
     </div>
+    <!-- Chiffres remplis par loadMarkets() depuis l'API — on n'affiche rien tant
+         qu'on ne sait pas, plutôt que d'afficher une valeur qui serait fausse. -->
     <div class="hero-stats">
-      <div><div class="hstat-num">2 400+</div><div class="hstat-label">Boutiques actives</div></div>
-      <div><div class="hstat-num">48K</div><div class="hstat-label">Produits listés</div></div>
-      <div><div class="hstat-num">14</div><div class="hstat-label">Régions couvertes</div></div>
+      <div><div class="hstat-num" id="hstat-markets">—</div><div class="hstat-label">Marchés référencés</div></div>
+      <div><div class="hstat-num" id="hstat-regions">—</div><div class="hstat-label">Régions couvertes</div></div>
     </div>
   </div>
   <div class="hero-right">
@@ -259,14 +260,14 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <section class="section-wrap white-bg">
   <div class="section-top"><div><div class="section-label">📦 Explorer</div><div class="section-title">Toutes les catégories</div></div></div>
   <div class="cats-grid">
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji">🌾</div><div class="cat-name">Alimentation</div><div class="cat-count">12 400 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji">👗</div><div class="cat-name">Mode</div><div class="cat-count">8 900 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisan'"><div class="cat-emoji">🎨</div><div class="cat-name">Artisanat</div><div class="cat-count">4 200 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=beaute'"><div class="cat-emoji">💄</div><div class="cat-name">Beauté</div><div class="cat-count">3 100 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=maison'"><div class="cat-emoji">🏠</div><div class="cat-name">Maison</div><div class="cat-count">5 600 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=electronique'"><div class="cat-emoji">📱</div><div class="cat-name">Électronique</div><div class="cat-count">2 800 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=sport'"><div class="cat-emoji">⚽</div><div class="cat-name">Sport</div><div class="cat-count">1 900 produits</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="cat-emoji">🌿</div><div class="cat-name">Agriculture</div><div class="cat-count">6 700 produits</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji">🌾</div><div class="cat-name">Alimentation</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji">👗</div><div class="cat-name">Mode</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisan'"><div class="cat-emoji">🎨</div><div class="cat-name">Artisanat</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=beaute'"><div class="cat-emoji">💄</div><div class="cat-name">Beauté</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=maison'"><div class="cat-emoji">🏠</div><div class="cat-name">Maison</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=electronique'"><div class="cat-emoji">📱</div><div class="cat-name">Électronique</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=sport'"><div class="cat-emoji">⚽</div><div class="cat-name">Sport</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="cat-emoji">🌿</div><div class="cat-name">Agriculture</div></div>
   </div>
 </section>
 <!-- HIW -->
@@ -432,6 +433,12 @@ async function loadMarkets() {
   const byRegion = {};
   markets.forEach(m => { (byRegion[m.region || 'Autre'] = byRegion[m.region || 'Autre'] || []).push(m); });
   const regions = Object.keys(byRegion).sort((a, b) => a.localeCompare(b, 'fr'));
+
+  // Chiffres du hero — les vrais, ceux que l'API vient de renvoyer
+  const statMarkets = document.getElementById('hstat-markets');
+  const statRegions = document.getElementById('hstat-regions');
+  if (statMarkets) statMarkets.textContent = markets.length;
+  if (statRegions) statRegions.textContent = regions.length;
 
   // Générer les onglets par région
   if (tabsBar) {
