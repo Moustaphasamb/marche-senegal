@@ -700,11 +700,20 @@ function updateHeroGreeting() {
   }
 }
 
+// ── Bannière du hero ──
+// Aucune table ne porte ce visuel : il est piloté par cette constante.
+// Pour poser la vraie image, remplace null par son chemin, ex. :
+//   const HERO_BANNER = 'assets/hero-accueil.jpg';
+// (dans assets/ — files/ est exclu par le .gitignore et n'est pas déployé)
+const HERO_BANNER = null;
+
 // ── Initialisation au chargement de la page ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
   updateAuthButton();
   updateHeroGreeting();
+  // focus 'left' : le texte du hero est à gauche, on l'y protège davantage.
+  applyBanner(document.querySelector('.hero'), HERO_BANNER, { focus: 'left' });
   await loadMarkets();
   await Promise.all([loadProducts(), loadFeaturedShops()]);
 });

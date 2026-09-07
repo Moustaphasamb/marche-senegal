@@ -367,6 +367,52 @@ async function getShopStats(period) {
 }
 
 // ────────────────────────────────
+// BANNIÈRES
+// ────────────────────────────────
+
+// Visuel de repli tant que les vraies bannières ne sont pas produites.
+// Il porte la mention « VISUEL TEMPORAIRE » : si tu le vois en ligne,
+// c'est qu'une image manque encore.
+// Rangé dans assets/ et non dans files/, qui est exclu par le .gitignore
+// et ne serait donc jamais déployé.
+const BANNER_PLACEHOLDER = 'assets/banner-placeholder.svg';
+
+// Applique une image de fond à une section sombre (hero, en-tête de marché).
+// Le voile foncé fait partie du background-image plutôt que d'un ::before,
+// pour ne pas entrer en conflit avec les pseudo-éléments décoratifs déjà
+// présents sur .hero et .market-hero.
+//
+//   el      : l'élément à habiller
+//   url     : l'image réelle (market.imageUrl, shop.bannerUrl…) ou null
+//   options : { focus: 'left' | 'center' } — 'left' assombrit davantage la
+//             gauche pour garder le titre lisible par-dessus la photo.
+function applyBanner(el, url, options = {}) {
+  if (!el) return;
+
+  const { focus = 'center' } = options;
+  const image = url || BANNER_PLACEHOLDER;
+  const isPlaceholder = !url;
+
+  const veil = focus === 'left'
+    ? 'linear-gradient(100deg, rgba(13,31,23,.94) 0%, rgba(13,31,23,.82) 42%, rgba(13,31,23,.58) 100%)'
+    : 'linear-gradient(rgba(13,31,23,.78), rgba(13,31,23,.86))';
+
+  // Les guillemets encadrent l'URL : un nom de fichier avec espaces ou
+  // parenthèses casserait sinon la propriété CSS.
+  el.style.backgroundImage = `${veil}, url("${String(image).replace(/"/g, '%22')}")`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  el.style.backgroundRepeat = 'no-repeat';
+
+  // Repère lisible dans l'inspecteur et exploitable en CSS si besoin.
+  el.dataset.banner = isPlaceholder ? 'placeholder' : 'real';
+
+  if (isPlaceholder) {
+    console.info('[bannière] visuel temporaire utilisé —', el.className || el.tagName);
+  }
+}
+
+// ────────────────────────────────
 // UTILITAIRES
 // ────────────────────────────────
 

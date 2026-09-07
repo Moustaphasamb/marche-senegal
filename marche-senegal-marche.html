@@ -537,6 +537,9 @@ async function loadMarket(marketId) {
 
   const market = result.data;
 
+  // Bannière du marché — market.imageUrl si renseignée, visuel temporaire sinon
+  applyBanner(document.querySelector('.market-hero'), market.imageUrl);
+
   // Mettre à jour le hero
   document.querySelector('.mh-title').innerHTML =
     `Marché <em>${market.name.replace('Marché ', '')}</em>`;
@@ -862,6 +865,10 @@ document.addEventListener('click', function(e) {
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
+
+  // Habillage immédiat : le hero n'est jamais nu, même si l'API tarde ou échoue.
+  // loadMarket() remplacera par la vraie image dès qu'elle est connue.
+  applyBanner(document.querySelector('.market-hero'), null);
 
   currentMarketId = getMarketIdFromURL();
 
