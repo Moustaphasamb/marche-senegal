@@ -544,42 +544,34 @@
         </div>
 
         <div class="pay-title">Choisir le mode de paiement</div>
-        <div class="pay-methods">
-          <div class="pay-method selected" onclick="selectPay(this)">
+        <div class="pay-methods" id="pay-methods">
+          <div class="pay-method selected" data-method="WAVE" onclick="selectPay(this)">
             <div class="pm-icon" style="background:#E8F5E9;color:#1B5E20;font-size:1rem">W</div>
             <div>
               <div class="pm-name">Wave</div>
               <div class="pm-sub">Paiement instantané</div>
-              <div class="pm-balance">Solde : 45 000 FCFA</div>
             </div>
             <div class="pm-radio"></div>
           </div>
-          <div class="pay-method" onclick="selectPay(this)">
+          <div class="pay-method" data-method="ORANGE_MONEY" onclick="selectPay(this)">
             <div class="pm-icon" style="background:#FFF3E0;color:#E65100;font-weight:700;font-size:.75rem">OM</div>
             <div>
               <div class="pm-name">Orange Money</div>
               <div class="pm-sub">Paiement mobile</div>
-              <div class="pm-balance">Solde : 12 500 FCFA</div>
             </div>
             <div class="pm-radio"></div>
           </div>
-          <div class="pay-method" onclick="selectPay(this)">
+          <div class="pay-method" data-method="FREE_MONEY" onclick="selectPay(this)">
             <div class="pm-icon" style="background:#E8EAF6;color:#3949AB;font-weight:700;font-size:.7rem">FM</div>
             <div>
               <div class="pm-name">Free Money</div>
               <div class="pm-sub">Paiement mobile</div>
-              <div class="pm-balance">Solde : 8 200 FCFA</div>
             </div>
             <div class="pm-radio"></div>
           </div>
-          <div class="pay-method" onclick="selectPay(this)">
-            <div class="pm-icon" style="background:#E3F2FD;color:#1565C0;font-weight:700;font-size:.7rem">CB</div>
-            <div>
-              <div class="pm-name">Carte bancaire</div>
-              <div class="pm-sub">Visa / Mastercard</div>
-            </div>
-            <div class="pm-radio"></div>
-          </div>
+        </div>
+        <div id="pay-methods-empty" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.82rem;color:#8A6100;line-height:1.5">
+          ⏳ Le paiement en ligne est momentanément indisponible. Réessayez dans quelques minutes.
         </div>
 
         <div id="auth-wall" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:16px;margin-bottom:12px">
@@ -805,8 +797,43 @@ function selectAddr(card) {
 function selectPay(method) {
   document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
   method.classList.add('selected');
-  selectedPayment = method.querySelector('.pm-name').textContent.toUpperCase().replace(' ', '_');
+  selectedPayment = method.dataset.method;
   showToast('💳 ' + method.querySelector('.pm-name').textContent + ' sélectionné');
+}
+
+// ── Charger les moyens de paiement réellement disponibles ──
+// Le serveur est seul juge : on n'affiche jamais un moyen qui n'encaisse pas.
+async function loadPaymentMethods() {
+  let disponibles = ['WAVE'];
+  try {
+    const res = await fetch(API_URL + '/api/payments/methods');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data?.methods)) disponibles = data.data.methods;
+  } catch (e) {
+    console.error('Moyens de paiement indisponibles:', e);
+  }
+
+  const cartes = [...document.querySelectorAll('.pay-method')];
+  cartes.forEach(c => {
+    c.style.display = disponibles.includes(c.dataset.method) ? '' : 'none';
+  });
+
+  const visibles = cartes.filter(c => c.style.display !== 'none');
+  const payBtn = document.getElementById('pay-btn');
+
+  if (visibles.length === 0) {
+    document.getElementById('pay-methods').style.display = 'none';
+    document.getElementById('pay-methods-empty').style.display = 'block';
+    if (payBtn) payBtn.disabled = true;
+    return;
+  }
+
+  // Garder une sélection cohérente si le moyen coché a disparu.
+  if (!visibles.some(c => c.classList.contains('selected'))) {
+    cartes.forEach(c => c.classList.remove('selected'));
+    visibles[0].classList.add('selected');
+  }
+  selectedPayment = visibles.find(c => c.classList.contains('selected')).dataset.method;
 }
 
 // ── Appliquer un code promo ──
@@ -1001,9 +1028,15 @@ async function payNow() {
       return;
     }
 
-    // Simulation (pas de WAVE_API_KEY)
-    currentPaymentId = initData.paymentId;
-    openWaveModal(initData.amount, selectedPayment);
+    // Simulation — développement uniquement. En production le serveur ne renvoie
+    // jamais ce cas : seul le webhook Wave signé peut valider un paiement.
+    if (initData.simulation && initData.paymentId) {
+      currentPaymentId = initData.paymentId;
+      openWaveModal(initData.amount, selectedPayment);
+      return;
+    }
+
+    showToast('❌ Paiement indisponible pour le moment');
 
   } catch (error) {
     showToast('❌ Erreur lors de la commande');
@@ -1201,6 +1234,7 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   loadCart();
   loadSuggestedProducts();
+  loadPaymentMethods();
 
   // Retour d'erreur Wave
   if (new URLSearchParams(location.search).get('wave_error') === '1') {
