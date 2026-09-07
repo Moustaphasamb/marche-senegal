@@ -137,19 +137,16 @@
     <div class="sh-sug" onclick="setSug('kaftan bazin homme')">👒 kaftan bazin homme</div>
   </div>
   <div class="sh-stats">
-    <div><div class="sh-stat-n">241</div><div class="sh-stat-l">Produits trouvés</div></div>
-    <div><div class="sh-stat-n">38</div><div class="sh-stat-l">Boutiques</div></div>
-    <div><div class="sh-stat-n">5</div><div class="sh-stat-l">Marchés</div></div>
-    <div><div class="sh-stat-n">43</div><div class="sh-stat-l">En promotion</div></div>
+    <div><div class="sh-stat-n" id="hero-total">—</div><div class="sh-stat-l">Produits trouvés</div></div>
   </div>
 </div>
 <div class="filter-tabs">
-  <div class="ft-tab active" onclick="setTab(this)">Tout <span class="ft-count">284</span></div>
-  <div class="ft-tab" onclick="setTab(this)">Produits <span class="ft-count">241</span></div>
-  <div class="ft-tab" onclick="setTab(this)">Boutiques <span class="ft-count">38</span></div>
-  <div class="ft-tab" onclick="setTab(this)">Marchés <span class="ft-count">5</span></div>
-  <div class="ft-tab" onclick="setTab(this)">En promo <span class="ft-count">43</span></div>
-  <div class="ft-tab" onclick="setTab(this)">Nouveautés <span class="ft-count">28</span></div>
+  <div class="ft-tab active" onclick="setTab(this)">Tout</div>
+  <div class="ft-tab" onclick="setTab(this)">Produits</div>
+  <div class="ft-tab" onclick="setTab(this)">Boutiques</div>
+  <div class="ft-tab" onclick="setTab(this)">Marchés</div>
+  <div class="ft-tab" onclick="setTab(this)">En promo</div>
+  <div class="ft-tab" onclick="setTab(this)">Nouveautés</div>
 </div>
 <div class="search-layout">
   <aside class="filters-sidebar" id="filters-sidebar">
@@ -162,10 +159,10 @@
     <div class="fs-section">
       <div class="fs-title">Catégorie</div>
       <div class="cb-list">
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mode & Vêtements</span><span class="cb-count">142</span></div>
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Tissu & Wax</span><span class="cb-count">86</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Artisanat</span><span class="cb-count">24</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Beauté & Soins</span><span class="cb-count">18</span></div>
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mode & Vêtements</span></div>
+        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Tissu & Wax</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Artisanat</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Beauté & Soins</span></div>
       </div>
     </div>
     <div class="fs-section">
@@ -198,23 +195,14 @@
   </aside>
   <div class="results-area">
     <div class="results-topbar">
-      <div class="rt-count"><strong>241</strong> résultats pour "<span id="result-query">boubou wax</span>"</div>
+      <div class="rt-count"><strong id="result-count">—</strong> résultats pour "<span id="result-query">boubou wax</span>"</div>
       <div class="rt-right">
         <select class="rt-sort" onchange="updateSort(this.value)"><option value="">Pertinence</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option><option value="rating">Mieux notés</option><option value="newest">Nouveautés</option></select>
         <div class="rt-views"><button class="rv-btn active">⊞</button><button class="rv-btn">☰</button></div>
       </div>
     </div>
     <div class="active-chips" id="active-chips"></div>
-    <div class="results-grid">
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-badge">-15%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Boubou wax tissé main</div><div class="rc-shop">Mode Fatou Ndoye · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (89)</div><div class="rc-footer"><div><span class="rc-price">15 300 FCFA</span><span class="rc-old">18 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF8E7">🧵<div class="rc-badge new">Nouveau</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🧵 Tilène</div><div class="rc-name">Bazin brodé cérémonie</div><div class="rc-shop">Tissus Aminata · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (176)</div><div class="rc-footer"><div><span class="rc-price">25 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FDE8E6">👘<div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Robe wax africaine brodée</div><div class="rc-shop">Mode Fatou · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.8 (67)</div><div class="rc-footer"><div><span class="rc-price">9 500 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#E8F5EC">🎨<div class="rc-badge">-10%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🧵 Tilène</div><div class="rc-name">Tissu wax hollandais 6 yards</div><div class="rc-shop">Tissus Aminata · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★☆</span> 4.7 (112)</div><div class="rc-footer"><div><span class="rc-price">4 050 FCFA</span><span class="rc-old">4 500</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">🥻<div class="rc-badge">-20%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏛️ Sandaga</div><div class="rc-name">Ensemble 3 pièces femme cérémonie</div><div class="rc-shop">Mode Fatou · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.9 (33)</div><div class="rc-footer"><div><span class="rc-price">28 000 FCFA</span><span class="rc-old">35 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FDF3DC">👒<div class="rc-badge new">Nouveau</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🕌 Touba</div><div class="rc-name">Kaftan bazin riche homme</div><div class="rc-shop">Boutique Touba · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.8 (28)</div><div class="rc-footer"><div><span class="rc-price">22 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#FFF3E0">🧣<div class="rc-badge">-10%</div><div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🏭 Thiès</div><div class="rc-name">Foulard wax femme élégant</div><div class="rc-shop">Mode Thiès · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★☆</span> 4.5 (54)</div><div class="rc-footer"><div><span class="rc-price">3 600 FCFA</span><span class="rc-old">4 000</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-      <div class="rc" onclick="window.location.href='marche-senegal-produit.html'"><div class="rc-img" style="background:#F0EAF8">👗<div class="rc-wish" onclick="wish(event)">🤍</div></div><div class="rc-body"><div class="rc-market">🛍️ HLM</div><div class="rc-name">Boubou wax grande taille femme</div><div class="rc-shop">Boutique HLM · Vérifié ✓</div><div class="rc-rating"><span class="rc-stars">★★★★★</span> 4.6 (41)</div><div class="rc-footer"><div><span class="rc-price">14 000 FCFA</span></div><button class="rc-add" onclick="addCart(event)">+</button></div></div></div>
-    </div>
+    <div class="results-grid" id="results-grid"></div>
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
@@ -271,10 +259,11 @@ async function loadResults() {
   }
 
   // Mettre à jour le compteur
+  const total = result.pagination?.total ?? 0;
   const resultCount = document.getElementById('result-count');
-  if (resultCount) {
-    resultCount.textContent = result.pagination.total;
-  }
+  if (resultCount) resultCount.textContent = total;
+  const heroTotal = document.getElementById('hero-total');
+  if (heroTotal) heroTotal.textContent = total;
 
   if (result.data.length === 0) {
     grid.innerHTML = `
@@ -607,6 +596,44 @@ function getQueryFromURL() {
   return params.get('q');
 }
 
+// ── Filtre par catégorie depuis l'URL ──
+// Les cartes de l'accueil pointent vers ?category=<slug>, mais l'API filtre par
+// categoryId : on résout donc le slug via /api/categories, qui porte aussi la
+// bannière de la catégorie.
+async function applyCategoryFromURL() {
+  const slug = new URLSearchParams(window.location.search).get('category');
+  if (!slug) return;
+
+  let category = null;
+  try {
+    const res = await fetch(API_URL + '/api/categories');
+    const json = await res.json();
+    if (json.success) category = json.data.find(c => c.slug === slug) || null;
+  } catch (e) {
+    console.warn('[catégorie] chargement impossible —', e.message);
+  }
+
+  // Slug inconnu ou API muette : on laisse la recherche générique s'afficher.
+  if (!category) return;
+
+  currentFilters.categoryId = category.id;
+
+  // textContent plutôt qu'innerHTML : le libellé vient de la base.
+  const title = document.querySelector('.sh-title');
+  if (title) {
+    title.textContent = `${category.emoji} Catégorie `;
+    const span = document.createElement('span');
+    span.id = 'search-query';
+    span.textContent = category.name;
+    title.appendChild(span);
+  }
+
+  const resultQuery = document.getElementById('result-query');
+  if (resultQuery) resultQuery.textContent = category.name;
+
+  applyBanner(document.querySelector('.search-hero'), category.imageUrl);
+}
+
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
@@ -620,6 +647,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('result-query').textContent = urlQuery;
     currentFilters.q = urlQuery;
   }
+
+  // Avant loadResults : il doit voir le filtre catégorie déjà posé.
+  await applyCategoryFromURL();
 
   await Promise.all([loadMarketPills(), loadResults()]);
 });
