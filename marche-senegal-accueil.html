@@ -702,10 +702,10 @@ function updateHeroGreeting() {
 
 // ── Bannière du hero ──
 // Aucune table ne porte ce visuel : il est piloté par cette constante.
-// Pour poser la vraie image, remplace null par son chemin, ex. :
-//   const HERO_BANNER = 'assets/hero-accueil.jpg';
+// Le tiers gauche de l'image est volontairement dégagé (ciel et rue vide)
+// pour que le texte du hero reste lisible par-dessus.
 // (dans assets/ — files/ est exclu par le .gitignore et n'est pas déployé)
-const HERO_BANNER = null;
+const HERO_BANNER = 'assets/banner-hero.jpg';
 
 // ── Initialisation au chargement de la page ──
 document.addEventListener('DOMContentLoaded', async () => {
