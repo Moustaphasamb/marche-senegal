@@ -377,20 +377,36 @@ async function getShopStats(period) {
 // et ne serait donc jamais déployé.
 const BANNER_PLACEHOLDER = 'assets/banner-placeholder.svg';
 
-// Crédits des photos sous licence Creative Commons. L'attribution n'est pas
-// optionnelle : c'est la contrepartie de la réutilisation libre. La clé est le
-// chemin exact stocké dans Market.imageUrl. Une image absente de cette table
-// n'affiche aucun crédit — c'est le cas des visuels dont nous sommes l'auteur.
-const CREDITS_PHOTOS = {
-  'assets/marche-sandaga.jpg':  { auteur: 'Balou46',              licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-sandaga-1.jpg' },
-  'assets/marche-kermel.jpg':   { auteur: 'Balou46',              licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-marche-kermel-1.jpg' },
-  'assets/marche-thies.jpg':    { auteur: 'GastelEtzwane',        licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Thiès.jpg' },
-  'assets/marche-mbour.jpg':    { auteur: 'Le troisième oeil',    licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Mbour.jpg' },
-  'assets/marche-rufisque.jpg': { auteur: 'Habobe2020',           licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Image_représentant_des_étalages_au_marché_central_de_Rufisque_Dakar,_Sénégal.jpg' },
-  'assets/marche-touba.jpg':    { auteur: 'ho visto nina volare', licence: 'CC BY-SA 2.0', page: 'https://commons.wikimedia.org/wiki/File:ToubaMarché.jpg' }
+// Crédits des bannières. Deux régimes coexistent :
+//
+//  · les PHOTOS des marchés qui en ont une, sous licence Creative Commons —
+//    l'attribution n'est pas optionnelle, c'est la contrepartie de la
+//    réutilisation libre ;
+//  · les ILLUSTRATIONS par type de marché, que nous avons produites. Elles
+//    portent la mention « Illustration » afin que personne ne les prenne pour
+//    une photographie du marché consulté.
+//
+// La clé est le chemin exact stocké dans Market.imageUrl. Une image absente de
+// cette table n'affiche aucune mention.
+const CREDITS_BANNIERES = {
+  'assets/marche-sandaga.jpg':  { texte: 'Photo : Balou46 · CC BY-SA 4.0',              page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-sandaga-1.jpg' },
+  'assets/marche-kermel.jpg':   { texte: 'Photo : Balou46 · CC BY-SA 4.0',              page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-marche-kermel-1.jpg' },
+  'assets/marche-thies.jpg':    { texte: 'Photo : GastelEtzwane · CC BY-SA 4.0',        page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Thiès.jpg' },
+  'assets/marche-mbour.jpg':    { texte: 'Photo : Le troisième oeil · CC BY-SA 4.0',    page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Mbour.jpg' },
+  'assets/marche-rufisque.jpg': { texte: 'Photo : Habobe2020 · CC BY-SA 4.0',           page: 'https://commons.wikimedia.org/wiki/File:Image_représentant_des_étalages_au_marché_central_de_Rufisque_Dakar,_Sénégal.jpg' },
+  'assets/marche-touba.jpg':    { texte: 'Photo : ho visto nina volare · CC BY-SA 2.0', page: 'https://commons.wikimedia.org/wiki/File:ToubaMarché.jpg' },
+
+  'assets/type-urbain.jpg':       { texte: 'Illustration · marché urbain' },
+  'assets/type-poisson.jpg':      { texte: 'Illustration · marché de pêche' },
+  'assets/type-betail.jpg':       { texte: 'Illustration · marché sahélien' },
+  'assets/type-ville-sainte.jpg': { texte: 'Illustration · marché de ville sainte' },
+  'assets/type-fleuve.jpg':       { texte: 'Illustration · marché du fleuve' },
+  'assets/type-casamance.jpg':    { texte: 'Illustration · marché de Casamance' },
+  'assets/type-arachide.jpg':     { texte: 'Illustration · marché du bassin arachidier' },
+  'assets/type-oriental.jpg':     { texte: 'Illustration · marché du Sénégal oriental' }
 };
 
-// Le style du crédit est injecté une seule fois, ici plutôt que dans chaque
+// Le style de la mention est injecté une seule fois, ici plutôt que dans chaque
 // page : api.js est partagé, les feuilles de style des pages ne le sont pas.
 function injecterStyleCredit() {
   if (document.getElementById('style-credit-banniere')) return;
@@ -399,10 +415,9 @@ function injecterStyleCredit() {
   s.textContent =
     '.banner-credit{position:absolute;right:10px;bottom:8px;z-index:3;font-size:.64rem;line-height:1.3;' +
     'color:rgba(255,255,255,.66);text-decoration:none;background:rgba(0,0,0,.32);padding:3px 9px;border-radius:99px}' +
-    '.banner-credit:hover,.banner-credit:focus-visible{color:#fff;text-decoration:underline}';
+    'a.banner-credit:hover,a.banner-credit:focus-visible{color:#fff;text-decoration:underline}';
   document.head.appendChild(s);
 }
-
 
 // Applique une image de fond à une section sombre (hero, en-tête de marché).
 // Le voile foncé fait partie du background-image plutôt que d'un ::before,
@@ -434,22 +449,26 @@ function applyBanner(el, url, options = {}) {
   // Repère lisible dans l'inspecteur et exploitable en CSS si besoin.
   el.dataset.banner = isPlaceholder ? 'placeholder' : 'real';
 
-  // Attribution des photos Creative Commons : obligation de licence, pas un
-  // ornement. On retire l'ancien crédit avant d'en poser un nouveau, sans quoi
-  // un second appel sur le même élément les empilerait.
+
+  // Mention de la bannière : attribution obligatoire pour les photos sous
+  // licence, mention « Illustration » pour nos propres visuels afin qu'ils ne
+  // soient pas pris pour une photographie du lieu. On retire l'ancienne avant
+  // d'en poser une nouvelle, sans quoi deux appels les empileraient.
   el.querySelector(':scope > .banner-credit')?.remove();
-  const credit = CREDITS_PHOTOS[url];
+  const credit = CREDITS_BANNIERES[url];
   if (credit) {
     injecterStyleCredit();
-    const lien = document.createElement('a');
-    lien.className = 'banner-credit';
-    lien.href = credit.page;
-    lien.target = '_blank';
-    lien.rel = 'noopener noreferrer license';
-    lien.textContent = `Photo : ${credit.auteur} · ${credit.licence}`;
-    el.appendChild(lien);
+    // Un lien lorsqu'il y a une source à citer, un simple texte sinon.
+    const mention = document.createElement(credit.page ? 'a' : 'span');
+    mention.className = 'banner-credit';
+    if (credit.page) {
+      mention.href = credit.page;
+      mention.target = '_blank';
+      mention.rel = 'noopener noreferrer license';
+    }
+    mention.textContent = credit.texte;
+    el.appendChild(mention);
   }
-
 
   if (isPlaceholder) {
     console.info('[bannière] visuel temporaire utilisé —', el.className || el.tagName);
