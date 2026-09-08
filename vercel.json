@@ -1,1 +1,8 @@
-{"rewrites":[{"source":"/","destination":"/marche-senegal-accueil.html"}]}
+{
+  "rewrites": [
+    { "source": "/", "destination": "/marche-senegal-accueil.html" }
+  ],
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true }
+  ]
+}

@@ -58,6 +58,27 @@
 .market-emoji{font-size:1.6rem;margin-bottom:7px}.market-name{font-size:.84rem;font-weight:600;color:var(--dark)}.market-city{font-size:.7rem;color:var(--muted);margin-top:2px}
 .market-count{display:inline-block;margin-top:5px;font-size:.66rem;font-weight:600;background:var(--gp);color:var(--green);padding:2px 8px;border-radius:99px}
 .market-card.featured .market-count{background:var(--green);color:#fff}
+/* Marchés ouverts — mis en avant, seuls affichés au chargement */
+.mk-live{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-bottom:2rem}
+.mk-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s}
+.mk-card:hover{border-color:var(--green);box-shadow:var(--shadow);transform:translateY(-2px)}
+.mk-card:focus-visible{outline:2.5px solid var(--green);outline-offset:2px}
+.mk-emoji{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--gp);display:grid;place-items:center;font-size:1.5rem}
+.mk-body{display:block}
+.mk-name{display:block;font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--dark);line-height:1.15}
+.mk-city{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+.mk-count{display:inline-block;margin-top:6px;font-size:.68rem;font-weight:600;background:var(--green);color:#fff;padding:2px 9px;border-radius:99px}
+/* Passerelle vers l'annuaire complet */
+.mk-more{display:flex;align-items:center;gap:16px;margin-bottom:1.2rem}
+.mk-more::before,.mk-more::after{content:"";flex:1;height:1px;background:var(--border)}
+.mk-more-txt{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.mk-toggle{display:block;margin:0 auto 1.6rem;padding:10px 22px;border-radius:99px;border:1.5px solid var(--green);background:#fff;color:var(--green);font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s,color .2s}
+.mk-toggle:hover{background:var(--green);color:#fff}
+.mk-toggle:focus-visible{outline:2.5px solid var(--green);outline-offset:2px}
+.mk-search{width:100%;max-width:340px;height:40px;padding:0 16px;margin-bottom:1rem;border:1.5px solid var(--border);border-radius:99px;font-size:.85rem;font-family:inherit;color:var(--dark)}
+.mk-search:focus{outline:none;border-color:var(--green)}
+.mk-empty{grid-column:1/-1;text-align:center;padding:28px;color:var(--muted);font-size:.86rem}
+@media (prefers-reduced-motion:reduce){.mk-card,.mk-toggle{transition:none}.mk-card:hover{transform:none}}
 /* PROMO BAND */
 .promos-band{background:linear-gradient(135deg,var(--dark),#1a4a2e);padding:36px 5vw;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .pb-label{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
@@ -183,7 +204,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <p class="hero-desc">Sandaga, Tilène, HLM, Kermel — tous les marchés du Sénégal en ligne. Achetez et commandez depuis chez vous.</p>
     <div class="hero-btns">
       <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'">🛍️ Explorer les produits</button>
-      <button class="btn btn-outline-white" onclick="document.getElementById('markets-grid').scrollIntoView({behavior:'smooth'})">🗺️ Choisir un marché</button>
+      <button class="btn btn-outline-white" onclick="document.getElementById('marches').scrollIntoView({behavior:'smooth'})">🗺️ Choisir un marché</button>
     </div>
     <!-- Chiffres remplis par loadMarkets() depuis l'API — on n'affiche rien tant
          qu'on ne sait pas, plutôt que d'afficher une valeur qui serait fausse. -->
@@ -215,13 +236,27 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   </div>
 </section>
 <!-- MARCHÉS -->
-<section class="section-wrap white-bg">
-  <div class="section-top"><div><div class="section-label">🗺️ Filtre par marché</div><div class="section-title">Choisissez votre marché</div></div><a href="marche-senegal-marche.html" class="section-link">Voir tous →</a></div>
-  <div class="markets-tabs" id="markets-tabs-bar">
-    <button class="mtab active" onclick="filterMarketsByRegion('all',this)">Tous</button>
+<section class="section-wrap white-bg" id="marches">
+  <div class="section-top">
+    <div>
+      <div class="section-label">🗺️ Marchés</div>
+      <div class="section-title">Les marchés déjà ouverts</div>
+    </div>
   </div>
-  <div class="markets-grid" id="markets-grid">
-    <div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--muted);font-size:.9rem">Chargement des marchés…</div>
+  <!-- Seuls les marchés qui ont au moins une boutique s'affichent d'emblée.
+       Les autres restent accessibles via l'annuaire, replié par défaut. -->
+  <div class="mk-live" id="markets-live">
+    <div class="mk-empty">Chargement des marchés…</div>
+  </div>
+
+  <div class="mk-more"><span class="mk-more-txt" id="markets-scale"></span></div>
+  <button class="mk-toggle" id="markets-toggle" aria-expanded="false" aria-controls="markets-directory" onclick="toggleMarketDirectory()">Explorer tous les marchés</button>
+
+  <div id="markets-directory" hidden>
+    <input class="mk-search" id="markets-search" type="search" aria-label="Rechercher un marché" placeholder="Rechercher un marché, une ville…" oninput="filterMarketsBySearch(this.value)">
+    <div class="markets-tabs" id="markets-tabs-bar"></div>
+    <div class="markets-grid" id="markets-grid"></div>
+    <div class="mk-empty" id="markets-none" hidden>Aucun marché ne correspond à cette recherche.</div>
   </div>
 </section>
 <!-- PROMO BAND -->
@@ -421,9 +456,25 @@ function getMktEmojiAcc(name) {
 }
 
 // ── Charger les marchés depuis l'API ──
+// Les utilisateurs tapent « thies » pour « Thiès » : on compare sans accents.
+const sansAccents = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+// « Marché de Bakel » doit s'afficher « Bakel », pas « de Bakel » : on retire le
+// mot Marché ET la preposition qui suit, sans toucher aux noms composes tels
+// que « Marché Central de Diourbel ».
+const nomCourtMarche = n => (n || '').replace(/^Marché\s+(?:de\s+la\s+|de\s+|du\s+|des\s+|d')?/i, '');
+
+// « Bakel / Bakel » n'apprend rien : quand la ville repete le nom du marche,
+// on affiche la region a la place.
+const sousTitreMarche = (nom, m) => sansAccents(m.city || '') === sansAccents(nom) ? (m.region || '') : (m.city || '');
+
 async function loadMarkets() {
+  const live = document.getElementById('markets-live');
   const result = await getMarkets();
-  if (!result.success || !result.data?.length) return;
+  if (!result.success || !result.data?.length) {
+    if (live) live.innerHTML = '<div class="mk-empty">Les marchés n\'ont pas pu être chargés. Rechargez la page.</div>';
+    return;
+  }
 
   const markets = result.data;
   const grid = document.getElementById('markets-grid');
@@ -440,30 +491,83 @@ async function loadMarkets() {
   if (statMarkets) statMarkets.textContent = markets.length;
   if (statRegions) statRegions.textContent = regions.length;
 
-  // Générer les onglets par région
+  // Marchés ouverts : au moins une boutique. Eux seuls sont affiches au
+  // chargement — aligner 72 marches dont 69 vides dessert la marketplace.
+  const ouverts = markets
+    .filter(m => (m._count?.shops ?? 0) > 0)
+    .sort((a, b) => (b._count?.shops ?? 0) - (a._count?.shops ?? 0));
+
+  if (live) {
+    live.innerHTML = ouverts.length
+      ? ouverts.map(m => {
+          const n = m._count?.shops ?? 0;
+          return `
+    <button class="mk-card" onclick="goMarket('${m.id}')">
+      <span class="mk-emoji" aria-hidden="true">${getMktEmojiAcc(m.name)}</span>
+      <span class="mk-body">
+        <span class="mk-name">${escapeHtml(nomCourtMarche(m.name))}</span>
+        <span class="mk-city">${escapeHtml(sousTitreMarche(nomCourtMarche(m.name), m))}</span>
+        <span class="mk-count">${n} boutique${n > 1 ? 's' : ''}</span>
+      </span>
+    </button>`;
+        }).join('')
+      : '<div class="mk-empty">Aucune boutique n\'est encore ouverte. Parcourez les marchés référencés ci-dessous.</div>';
+  }
+
+  const echelle = document.getElementById('markets-scale');
+  if (echelle) echelle.textContent = `${markets.length} marchés cartographiés dans ${regions.length} régions`;
+
+  // Onglets par région
   if (tabsBar) {
     tabsBar.innerHTML =
       `<button class="mtab active" onclick="filterMarketsByRegion('all',this)">Tous (${markets.length})</button>` +
       regions.map(r =>
-        `<button class="mtab" onclick="filterMarketsByRegion('${r.replace(/'/g,"\\'")}',this)">${r} (${byRegion[r].length})</button>`
+        `<button class="mtab" onclick="filterMarketsByRegion('${r.replace(/'/g,"\'")}',this)">${escapeHtml(r)} (${byRegion[r].length})</button>`
       ).join('');
   }
 
-  // Rendre les cartes marchés
+  // Annuaire complet — le compteur de boutiques n'apparait que s'il y en a.
   grid.innerHTML = markets.map(market => {
-    const shortName = market.name.replace(/^Marché\s+/i, '');
-    const emoji = getMktEmojiAcc(market.name);
-    const isFeatured = shortName.toLowerCase().includes('sandaga');
+    const shortName = nomCourtMarche(market.name);
+    const n = market._count?.shops ?? 0;
+    const recherche = sansAccents(`${shortName} ${market.city || ''} ${market.region || ''}`);
     return `
-    <div class="market-card ${isFeatured ? 'featured' : ''}"
+    <div class="market-card${n > 0 ? ' featured' : ''}"
          data-region="${escapeHtml(market.region || 'Autre')}"
+         data-search="${escapeHtml(recherche)}"
          onclick="goMarket('${market.id}')">
-      <div class="market-emoji">${emoji}</div>
+      <div class="market-emoji">${getMktEmojiAcc(market.name)}</div>
       <div class="market-name">${escapeHtml(shortName)}</div>
-      <div class="market-city">${escapeHtml(market.city)}</div>
-      <div class="market-count">${market._count?.shops ?? 0} boutiques</div>
+      <div class="market-city">${escapeHtml(sousTitreMarche(shortName, market))}</div>
+      ${n > 0 ? `<div class="market-count">${n} boutique${n > 1 ? 's' : ''}</div>` : ''}
     </div>`;
   }).join('');
+}
+
+// ── Ouvrir / replier l'annuaire des 72 marchés ──
+function toggleMarketDirectory() {
+  const dir = document.getElementById('markets-directory');
+  const btn = document.getElementById('markets-toggle');
+  const etaitOuvert = !dir.hidden;
+  dir.hidden = etaitOuvert;
+  btn.setAttribute('aria-expanded', String(!etaitOuvert));
+  btn.textContent = etaitOuvert ? 'Explorer tous les marchés' : 'Réduire la liste';
+  if (!etaitOuvert) document.getElementById('markets-search').focus();
+}
+
+// ── Rechercher un marché par nom, ville ou région ──
+function filterMarketsBySearch(q) {
+  const terme = sansAccents(q.trim());
+  let visibles = 0;
+  document.querySelectorAll('#markets-grid .market-card').forEach(card => {
+    const ok = !terme || card.dataset.search.includes(terme);
+    card.style.display = ok ? '' : 'none';
+    if (ok) visibles++;
+  });
+  // La recherche prime sur le filtre régional : on remet l'onglet « Tous ».
+  document.querySelectorAll('#markets-tabs-bar .mtab').forEach((b, i) => b.classList.toggle('active', i === 0));
+  const vide = document.getElementById('markets-none');
+  if (vide) vide.hidden = visibles > 0;
 }
 
 // ── Charger les boutiques vedettes depuis l'API ──
@@ -616,11 +720,18 @@ async function filterProds(cat, el) {
 
 // ── Filtrer les marchés par région ──
 function filterMarketsByRegion(region, el) {
+  const search = document.getElementById('markets-search');
+  if (search) search.value = '';
   document.querySelectorAll('#markets-tabs-bar .mtab').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
+  let visibles = 0;
   document.querySelectorAll('#markets-grid .market-card').forEach(card => {
-    card.style.display = (region === 'all' || card.dataset.region === region) ? '' : 'none';
+    const ok = (region === 'all' || card.dataset.region === region);
+    card.style.display = ok ? '' : 'none';
+    if (ok) visibles++;
   });
+  const vide = document.getElementById('markets-none');
+  if (vide) vide.hidden = visibles > 0;
 }
 
 // ── Hamburger menu ──
