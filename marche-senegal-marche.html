@@ -406,10 +406,8 @@ a{text-decoration:none;color:inherit}
       <div class="mh-title">Marché <em>Sandaga</em></div>
       <div class="mh-location">📍 Rue Mohamed V, Dakar Centre, Sénégal</div>
       <div class="mh-stats">
-        <div><div class="mhstat-n">142</div><div class="mhstat-l">Boutiques en ligne</div></div>
-        <div><div class="mhstat-n">3 840</div><div class="mhstat-l">Produits disponibles</div></div>
-        <div><div class="mhstat-n">4.7 ⭐</div><div class="mhstat-l">Note moyenne</div></div>
-        <div><div class="mhstat-n">12K+</div><div class="mhstat-l">Ventes ce mois</div></div>
+        <div><div class="mhstat-n">—</div><div class="mhstat-l">Boutiques en ligne</div></div>
+        <div><div class="mhstat-n">—</div><div class="mhstat-l">Produits disponibles</div></div>
       </div>
     </div>
     <div class="mh-right">
@@ -445,24 +443,20 @@ a{text-decoration:none;color:inherit}
   <!-- CONTENT -->
   <div class="content">
     <div class="content-topbar">
-      <div class="ct-result"><strong>3 840</strong> produits dans <strong>Sandaga</strong></div>
+      <div class="ct-result"><strong id="ct-total">—</strong> produits dans <strong id="ct-market">ce marché</strong></div>
       <div class="ct-right">
         <select class="sort-select"><option>Pertinence</option><option>Prix croissant</option><option>Prix décroissant</option><option>Mieux notés</option><option>Plus récents</option></select>
         <div class="view-btns"><button class="view-btn active" title="Grille">⊞</button><button class="view-btn" title="Liste">☰</button></div>
       </div>
     </div>
     <div class="view-tabs">
-      <div class="vtab active" onclick="switchTab('shops',this)">🏪 Boutiques (142)</div>
-      <div class="vtab" onclick="switchTab('products',this)">📦 Produits (3 840)</div>
-      <div class="vtab" onclick="switchTab('promos',this)">🔥 Promotions (43)</div>
-    </div>
-    <div class="promo-strip">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;flex-wrap:wrap"><div class="ps-badge">🔥 HOT</div><div><div class="ps-text">Code promo exclusif Sandaga</div><div class="ps-sub">-15% sur toutes les boutiques Mode · Valable jusqu'à 20h</div></div></div>
-      <div class="ps-code" onclick="copyCode()">SANDAGA15</div>
+      <div class="vtab active" onclick="switchTab('shops',this)">🏪 Boutiques</div>
+      <div class="vtab" onclick="switchTab('products',this)">📦 Produits</div>
+      <div class="vtab" onclick="switchTab('promos',this)">🔥 Promotions</div>
     </div>
     <!-- BOUTIQUES TAB -->
     <div id="shops-view">
-      <div class="sec-hd"><div class="sec-hd-title">Boutiques du marché Sandaga</div><div class="sec-hd-count">142 boutiques</div></div>
+      <div class="sec-hd"><div class="sec-hd-title">Boutiques du marché</div></div>
       <div class="shops-grid">
         <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#F0EAF8">👗<div class="shop-live-badge">🔴 LIVE</div><div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-loc">Allée 3 · Mode & Vêtements</div><div class="shop-tags"><span class="shop-tag">🎥 Visite virtuelle</span><span class="shop-tag">-15% promo</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.8⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
         <div class="shop-card"><div class="shop-banner" style="background:#FFF8E7">🧵<div class="shop-avatar" style="background:var(--gold);color:var(--dark)">TA</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Tissus Aminata Fall</div><div class="shop-loc">Allée 1 · Tissu & Wax</div><div class="shop-tags"><span class="shop-tag">🎥 Visite virtuelle</span><span class="shop-tag">Livraison express</span></div><div class="shop-stats-row"><div class="ss-item"><div class="ss-val">4.9⭐</div><div class="ss-lbl">Note</div></div><div class="ss-item"><div class="ss-val">412</div><div class="ss-lbl">Avis</div></div><div class="ss-item"><div class="ss-val">2 800</div><div class="ss-lbl">Ventes</div></div></div><button class="shop-cta">Visiter la boutique →</button></div></div>
@@ -482,7 +476,7 @@ a{text-decoration:none;color:inherit}
     </div>
     <!-- PRODUCTS TAB -->
     <div id="products-view" style="display:none">
-      <div class="sec-hd"><div class="sec-hd-title">Tous les produits — Sandaga</div><div class="sec-hd-count">3 840 produits</div></div>
+      <div class="sec-hd"><div class="sec-hd-title">Tous les produits</div></div>
       <div class="prods-grid">
         <div class="prod-card"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.8 (234)</div><div class="prod-footer"><div><span class="prod-price">15 300 FCFA</span><span class="prod-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
         <div class="prod-card"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🏛️ Sandaga</div><div class="prod-name">Beurre de karité 500g</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.7 (312)</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
@@ -492,11 +486,10 @@ a{text-decoration:none;color:inherit}
     </div>
     <!-- PROMOS TAB -->
     <div id="promos-view" style="display:none">
-      <div class="sec-hd"><div class="sec-hd-title">Promotions actives — Sandaga</div><div class="sec-hd-count">43 offres aujourd'hui</div></div>
-      <div class="prods-grid">
-        <div class="prod-card"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Promo active</div><div class="prod-name">Boubou wax — Code SANDAGA15</div><div class="prod-shop">Mode Fatou · Valable jusqu'à 20h</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.8 (234)</div><div class="prod-footer"><div><span class="prod-price">15 300 FCFA</span><span class="prod-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="prod-img" style="background:#E8F5EC">📱<div class="prod-badge hot">-20%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Promo active</div><div class="prod-name">Écouteurs — Solde du jour</div><div class="prod-shop">IT Store · Aujourd'hui seulement</div><div class="prod-rating"><span class="stars">★★★★☆</span> 4.5 (67)</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span><span class="prod-old">15 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
-        <div class="prod-card"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-badge">2+1 gratuit</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market-tag">🔥 Offre spéciale</div><div class="prod-name">Karité — Achetez 2, 1 gratuit</div><div class="prod-shop">Beauté Naturelle · 3 jours restants</div><div class="prod-rating"><span class="stars">★★★★★</span> 4.7 (312)</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div></div>
+      <div class="sec-hd"><div class="sec-hd-title">Promotions actives</div></div>
+      <div style="text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:14px">🔥</div>
+        <div>Aucune promotion en cours sur ce marché</div>
       </div>
     </div>
   </div>
@@ -546,6 +539,9 @@ async function loadMarket(marketId) {
 
   document.querySelector('.mh-location').textContent =
     `📍 ${market.address || market.city + ', ' + market.region}`;
+
+  const ctMarket = document.getElementById('ct-market');
+  if (ctMarket) ctMarket.textContent = market.name.replace('Marché ', '');
 
   // Mettre à jour les stats
   const stats = document.querySelectorAll('.mhstat-n');
@@ -644,6 +640,13 @@ async function loadMarketProducts(marketId) {
     showError('products-view', 'Impossible de charger les produits');
     return;
   }
+
+  // Avant le retour anticipe ci-dessous : le total vaut aussi pour 0 produit.
+  const total = result.pagination?.total ?? 0;
+  const stats = document.querySelectorAll('.mhstat-n');
+  if (stats[1]) stats[1].textContent = total;
+  const ctTotal = document.getElementById('ct-total');
+  if (ctTotal) ctTotal.textContent = total;
 
   const container = document.getElementById('products-view');
 
@@ -818,12 +821,6 @@ function navigateMarket(marketId) {
   window.location.href = 'marche-senegal-marche.html?id=' + marketId;
 }
 
-// ── Copier le code promo ──
-function copyCode() {
-  navigator.clipboard?.writeText('SANDAGA15').catch(() => {});
-  showToast('✓ Code copié !');
-}
-
 // ── Ouvrir/fermer sidebar filtres ──
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
@@ -885,6 +882,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadMarket(currentMarketId),
       loadShops(currentMarketId)
     ]);
+
+    await loadMarketProducts(currentMarketId);
   } else {
     loadMarketsBar();
   }
