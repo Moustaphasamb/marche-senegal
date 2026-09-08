@@ -177,6 +177,8 @@
 }
 .pay-btn:hover{background:var(--gl);transform:translateY(-1px);box-shadow:0 6px 28px rgba(27,107,58,.4)}
 .pay-btn:active{transform:translateY(0)}
+.pay-btn:disabled{background:var(--muted);cursor:not-allowed;opacity:.55;box-shadow:none}
+.pay-btn:disabled:hover{background:var(--muted);transform:none;box-shadow:none}
 
 /* Security badges */
 .security-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap}
@@ -588,15 +590,15 @@
 
         <div class="security-row">
           <div class="sec-badge">🔒 Paiement sécurisé</div>
-          <div class="sec-badge">🛡️ Argent protégé</div>
-          <div class="sec-badge">↩️ Retour garanti</div>
+          <div class="sec-badge">✓ Vendeurs vérifiés</div>
+          <div class="sec-badge">🇸🇳 Marchés du Sénégal</div>
         </div>
       </div>
 
       <!-- Trust badges -->
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px">
-        <div style="font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:10px">🔐 Vos achats sont protégés</div>
-        <div style="font-size:.76rem;color:var(--muted);line-height:1.65">Votre argent est retenu par Marché Sénégal et libéré au vendeur <strong style="color:var(--text)">uniquement après réception</strong> de votre commande.</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:10px">🔐 Paiement et suivi</div>
+        <div style="font-size:.76rem;color:var(--muted);line-height:1.65">Le paiement est traité par <strong style="color:var(--text)">Wave</strong>. Votre commande est confirmée dès l'encaissement, et vous suivez son avancement depuis votre profil jusqu'à la livraison.</div>
       </div>
 
     </div>
@@ -804,7 +806,8 @@ function selectPay(method) {
 // ── Charger les moyens de paiement réellement disponibles ──
 // Le serveur est seul juge : on n'affiche jamais un moyen qui n'encaisse pas.
 async function loadPaymentMethods() {
-  let disponibles = ['WAVE'];
+  // Fail closed : une API injoignable ne vaut pas une autorisation de payer.
+  let disponibles = [];
   try {
     const res = await fetch(API_URL + '/api/payments/methods');
     const data = await res.json();
