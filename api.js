@@ -377,6 +377,33 @@ async function getShopStats(period) {
 // et ne serait donc jamais déployé.
 const BANNER_PLACEHOLDER = 'assets/banner-placeholder.svg';
 
+// Crédits des photos sous licence Creative Commons. L'attribution n'est pas
+// optionnelle : c'est la contrepartie de la réutilisation libre. La clé est le
+// chemin exact stocké dans Market.imageUrl. Une image absente de cette table
+// n'affiche aucun crédit — c'est le cas des visuels dont nous sommes l'auteur.
+const CREDITS_PHOTOS = {
+  'assets/marche-sandaga.jpg':  { auteur: 'Balou46',              licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-sandaga-1.jpg' },
+  'assets/marche-kermel.jpg':   { auteur: 'Balou46',              licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:SN-dakar-marche-kermel-1.jpg' },
+  'assets/marche-thies.jpg':    { auteur: 'GastelEtzwane',        licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Thiès.jpg' },
+  'assets/marche-mbour.jpg':    { auteur: 'Le troisième oeil',    licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Marché_de_Mbour.jpg' },
+  'assets/marche-rufisque.jpg': { auteur: 'Habobe2020',           licence: 'CC BY-SA 4.0', page: 'https://commons.wikimedia.org/wiki/File:Image_représentant_des_étalages_au_marché_central_de_Rufisque_Dakar,_Sénégal.jpg' },
+  'assets/marche-touba.jpg':    { auteur: 'ho visto nina volare', licence: 'CC BY-SA 2.0', page: 'https://commons.wikimedia.org/wiki/File:ToubaMarché.jpg' }
+};
+
+// Le style du crédit est injecté une seule fois, ici plutôt que dans chaque
+// page : api.js est partagé, les feuilles de style des pages ne le sont pas.
+function injecterStyleCredit() {
+  if (document.getElementById('style-credit-banniere')) return;
+  const s = document.createElement('style');
+  s.id = 'style-credit-banniere';
+  s.textContent =
+    '.banner-credit{position:absolute;right:10px;bottom:8px;z-index:3;font-size:.64rem;line-height:1.3;' +
+    'color:rgba(255,255,255,.66);text-decoration:none;background:rgba(0,0,0,.32);padding:3px 9px;border-radius:99px}' +
+    '.banner-credit:hover,.banner-credit:focus-visible{color:#fff;text-decoration:underline}';
+  document.head.appendChild(s);
+}
+
+
 // Applique une image de fond à une section sombre (hero, en-tête de marché).
 // Le voile foncé fait partie du background-image plutôt que d'un ::before,
 // pour ne pas entrer en conflit avec les pseudo-éléments décoratifs déjà
@@ -406,6 +433,23 @@ function applyBanner(el, url, options = {}) {
 
   // Repère lisible dans l'inspecteur et exploitable en CSS si besoin.
   el.dataset.banner = isPlaceholder ? 'placeholder' : 'real';
+
+  // Attribution des photos Creative Commons : obligation de licence, pas un
+  // ornement. On retire l'ancien crédit avant d'en poser un nouveau, sans quoi
+  // un second appel sur le même élément les empilerait.
+  el.querySelector(':scope > .banner-credit')?.remove();
+  const credit = CREDITS_PHOTOS[url];
+  if (credit) {
+    injecterStyleCredit();
+    const lien = document.createElement('a');
+    lien.className = 'banner-credit';
+    lien.href = credit.page;
+    lien.target = '_blank';
+    lien.rel = 'noopener noreferrer license';
+    lien.textContent = `Photo : ${credit.auteur} · ${credit.licence}`;
+    el.appendChild(lien);
+  }
+
 
   if (isPlaceholder) {
     console.info('[bannière] visuel temporaire utilisé —', el.className || el.tagName);
