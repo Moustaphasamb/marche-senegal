@@ -402,7 +402,7 @@ a{text-decoration:none;color:inherit}
 <section class="market-hero">
   <div class="mh-inner">
     <div>
-      <div class="mh-badge"><span class="mh-badge-dot"></span>Marché ouvert · Ferme à 20h00</div>
+      <div class="mh-badge"><span class="mh-badge-dot"></span><span id="mh-status">Marché référencé</span></div>
       <div class="mh-title">Marché <em>Sandaga</em></div>
       <div class="mh-location">📍 Rue Mohamed V, Dakar Centre, Sénégal</div>
       <div class="mh-stats">
@@ -412,11 +412,9 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="mh-right">
       <div class="mh-info-card">
-        <div class="mic-title">Horaires du marché</div>
-        <div class="mic-row"><div class="mic-dot dot-open"></div>Lun – Sam : 7h00 – 20h00</div>
-        <div class="mic-row"><div class="mic-dot dot-open"></div>Dimanche : 8h00 – 14h00</div>
-        <div class="mic-row" style="margin-top:5px"><div class="mic-dot dot-open"></div>Livraison disponible</div>
-        <div class="mic-row"><div class="mic-dot dot-open"></div>Paiement Wave & OM</div>
+        <div class="mic-title">Localisation</div>
+        <div class="mic-row"><div class="mic-dot dot-open"></div><span id="mic-city">—</span></div>
+        <div class="mic-row"><div class="mic-dot dot-open"></div><span id="mic-region">—</span></div>
       </div>
     </div>
   </div>
@@ -542,6 +540,15 @@ async function loadMarket(marketId) {
 
   const ctMarket = document.getElementById('ct-market');
   if (ctMarket) ctMarket.textContent = market.name.replace('Marché ', '');
+
+  const status = document.getElementById('mh-status');
+  if (status) status.textContent = market.isActive ? 'Marché actif' : 'Marché inactif';
+
+  const micCity = document.getElementById('mic-city');
+  if (micCity) micCity.textContent = market.city;
+
+  const micRegion = document.getElementById('mic-region');
+  if (micRegion) micRegion.textContent = `Région de ${market.region}`;
 
   // Mettre à jour les stats
   const stats = document.querySelectorAll('.mhstat-n');
