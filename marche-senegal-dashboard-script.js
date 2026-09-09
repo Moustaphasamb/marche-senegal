@@ -67,6 +67,15 @@ function makeImg(images, size) {
   return div;
 }
 
+// Affiche un compteur, ou efface le badge s'il n'y a rien à signaler.
+function setBadge(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const n = Number(count) || 0;
+  el.textContent = n;
+  el.style.display = n > 0 ? '' : 'none';
+}
+
 // ── Charger le dashboard principal ──
 async function loadDashboard() {
   const result = await getDashboard();
@@ -109,7 +118,20 @@ async function loadDashboard() {
   if (wbMarket && shop.market) {
     const badge = wbMarket.querySelector('.wb-open');
     wbMarket.textContent = '🏛️ ' + shop.market.name;
-    if (badge) wbMarket.appendChild(badge);
+    if (badge) {
+      // L'état réel de la boutique, et non « ouverte » quoi qu'il arrive :
+      // une boutique en attente de validation CNI n'est pas visible des acheteurs.
+      const etats = {
+        ACTIVE:    { texte: '● Boutique ouverte',            classe: 'wb-open' },
+        PENDING:   { texte: '● En attente de validation',    classe: 'wb-open wb-pending' },
+        SUSPENDED: { texte: '● Boutique suspendue',          classe: 'wb-open wb-closed' },
+        REJECTED:  { texte: '● Inscription refusée',         classe: 'wb-open wb-closed' }
+      };
+      const etat = etats[shop.status] || etats.PENDING;
+      badge.textContent = etat.texte;
+      badge.className = etat.classe;
+      wbMarket.appendChild(badge);
+    }
   }
 
   // KPIs
@@ -125,11 +147,12 @@ async function loadDashboard() {
   const kpi2sub = document.getElementById('kpi2-sub');
   if (kpi2sub) kpi2sub.textContent = stats.totalProducts > 0 ? 'dans votre boutique' : 'Ajoutez votre premier produit';
 
-  // Badges sidebar
-  const sbBadgeProducts = document.getElementById('sb-badge-products');
-  if (sbBadgeProducts) sbBadgeProducts.textContent = stats.totalProducts;
-  const sbBadgeOrders = document.getElementById('sb-badge-orders');
-  if (sbBadgeOrders) sbBadgeOrders.textContent = stats.pendingOrders || 0;
+  // Badges sidebar — un badge qui ment est pire que pas de badge :
+  // on masque ceux dont le compteur est à zéro.
+  setBadge('sb-badge-products', stats.totalProducts);
+  setBadge('sb-badge-orders', stats.pendingOrders);
+  setBadge('sb-badge-messages', stats.unreadMessages);
+  setBadge('sb-badge-promotions', stats.activePromotions);
 
   // Lien boutique
   const sbSeeShop = document.getElementById('sb-see-shop');
@@ -234,165 +257,6 @@ async function loadDashboard() {
     });
     actList.replaceChildren(frag);
   }
-}
-
-// ── Section "Mes produits" (onglet interne) ──
-async function loadMyProducts() {
-  const result = await getMyProducts();
-  if (!result.success) return;
-  const products = result.data;
-
-  const filterBtns = document.querySelectorAll('#page-produits .filter-btn');
-  if (filterBtns[0]) filterBtns[0].textContent = 'Tous (' + products.length + ')';
-  if (filterBtns[1]) filterBtns[1].textContent = 'Actifs (' + products.filter(p => p.status === 'ACTIVE').length + ')';
-  if (filterBtns[2]) filterBtns[2].textContent = 'En pause (' + products.filter(p => p.status === 'PAUSED').length + ')';
-  if (filterBtns[3]) filterBtns[3].textContent = 'Rupture (' + products.filter(p => p.stock === 0).length + ')';
-
-  const tbody = document.querySelector('#page-produits .prod-table tbody');
-  if (!tbody) return;
-
-  if (!products.length) {
-    const tr = mk('tr');
-    const td = mk('td', '', 'Aucun produit — ');
-    td.colSpan = 6;
-    td.style.cssText = 'text-align:center;padding:32px;color:var(--muted)';
-    const link = mk('a', '', 'Ajouter votre premier produit →');
-    link.href = 'marche-senegal-ajout-produit.html';
-    link.style.cssText = 'color:var(--green);font-weight:600';
-    td.appendChild(link);
-    tr.appendChild(td);
-    tbody.replaceChildren(tr);
-    return;
-  }
-
-  const frag = document.createDocumentFragment();
-  products.forEach(prod => {
-    const tr = mk('tr');
-
-    // Colonne image + nom
-    const td1 = mk('td');
-    const wrap = mk('div'); wrap.style.cssText = 'display:flex;align-items:center;gap:10px';
-    const imgDiv = makeImg(prod.images, '44px'); imgDiv.className = 'pt-img';
-    const nameWrap = mk('div');
-    nameWrap.appendChild(mk('div', 'pt-name', prod.name));
-    nameWrap.appendChild(mk('div', 'pt-cat', prod.category ? prod.category.name : '—'));
-    wrap.appendChild(imgDiv); wrap.appendChild(nameWrap);
-    td1.appendChild(wrap);
-
-    // Prix
-    const td2 = mk('td', '', formatPrice(prod.price)); td2.style.fontWeight = '600';
-
-    // Stock
-    const stockClass = prod.stock === 0 ? 'pt-stock-out' : prod.stock <= 5 ? 'pt-stock-low' : 'pt-stock-ok';
-    const td3 = mk('td', stockClass, prod.stock === 0 ? '0 — Rupture' : prod.stock + ' restant(s)');
-
-    // Ventes
-    const td4 = mk('td', '', prod.totalSales + ' ventes');
-
-    // Statut
-    const td5 = mk('td');
-    td5.appendChild(mk('span', 'pt-status ' + (prod.status === 'ACTIVE' ? 'pts-active' : 'pts-paused'), prod.status === 'ACTIVE' ? 'Actif' : 'En pause'));
-
-    // Actions
-    const td6 = mk('td');
-    const actDiv = mk('div', 'pt-actions');
-    const editBtn = mk('button', 'pta-btn', '✏️');
-    editBtn.onclick = () => window.location.href = 'marche-senegal-modifier-produit.html?id=' + prod.id;
-    const delBtn = mk('button', 'pta-btn del', '🗑️');
-    delBtn.onclick = () => deleteProd(prod.id);
-    actDiv.appendChild(editBtn); actDiv.appendChild(delBtn);
-    td6.appendChild(actDiv);
-
-    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
-    tr.appendChild(td4); tr.appendChild(td5); tr.appendChild(td6);
-    frag.appendChild(tr);
-  });
-  tbody.replaceChildren(frag);
-}
-
-async function deleteProd(id) {
-  if (!confirm('Supprimer ce produit ?')) return;
-  const result = await apiCall('/api/products/' + id, { method: 'DELETE' });
-  if (result.success) { showToast('Produit supprimé'); loadMyProducts(); }
-  else showToast('Erreur lors de la suppression', 'error');
-}
-
-// ── Section "Commandes" (onglet interne) ──
-async function loadMyOrders() {
-  const result = await getShopOrders();
-  if (!result.success) return;
-  const orders = result.data;
-
-  const filterBtns = document.querySelectorAll('#page-commandes .of-btn');
-  if (filterBtns[0]) filterBtns[0].textContent = 'Toutes (' + orders.length + ')';
-  if (filterBtns[1]) filterBtns[1].textContent = 'En attente (' + orders.filter(o => o.status === 'PENDING').length + ')';
-  if (filterBtns[2]) filterBtns[2].textContent = 'En livraison (' + orders.filter(o => o.status === 'DELIVERING').length + ')';
-  if (filterBtns[3]) filterBtns[3].textContent = 'Livrées (' + orders.filter(o => o.status === 'DELIVERED').length + ')';
-  if (filterBtns[4]) filterBtns[4].textContent = 'Annulées (' + orders.filter(o => o.status === 'CANCELLED').length + ')';
-
-  const phSub = document.querySelector('#page-commandes .page-header div:last-child');
-  if (phSub) phSub.textContent = orders.filter(o => o.status === 'PENDING').length + ' commande(s) en attente';
-
-  const container = document.querySelector('.order-cards');
-  if (!container) return;
-
-  if (!orders.length) {
-    setEmpty(container, 'Aucune commande pour le moment');
-    return;
-  }
-
-  const frag = document.createDocumentFragment();
-  orders.slice(0, 30).forEach(order => {
-    const card = mk('div', 'order-card');
-
-    // Header
-    const header = mk('div', 'oc-header');
-    header.appendChild(mk('div', 'oc-num', '#' + order.id.substring(0,8).toUpperCase()));
-    header.appendChild(mk('div', 'oc-date', formatDate(order.createdAt)));
-    header.appendChild(mk('div', 'oc-status ' + getStatusClass(order.status), getStatusLabel(order.status)));
-
-    // Body
-    const body = mk('div', 'oc-body');
-    const items = mk('div', 'oc-items');
-    items.appendChild(mk('div', 'oc-item-img', '👗'));
-    const info = mk('div', 'oc-info');
-    const client = mk('div', 'oc-client', (order.buyer ? order.buyer.firstName : 'Client') + ' · 📱 ' + (order.buyer ? order.buyer.phone : '—'));
-    const detail = mk('div', 'oc-detail', (order.items ? order.items.length : 1) + ' article(s)');
-    info.appendChild(client); info.appendChild(detail);
-    const amount = mk('div', 'oc-amount', formatPrice(order.total));
-    body.appendChild(items); body.appendChild(info); body.appendChild(amount);
-
-    // Actions
-    const actions = mk('div', 'oc-actions');
-    if (order.status === 'PENDING') {
-      const btn = mk('button', 'oca-btn oca-btn-primary', '✓ Confirmer');
-      btn.onclick = () => changeOrderStatus(order.id, 'CONFIRMED');
-      actions.appendChild(btn);
-    }
-    if (order.status === 'CONFIRMED') {
-      const btn = mk('button', 'oca-btn oca-btn-primary', '📦 En préparation');
-      btn.onclick = () => changeOrderStatus(order.id, 'PREPARING');
-      actions.appendChild(btn);
-    }
-    if (order.status === 'PREPARING') {
-      const btn = mk('button', 'oca-btn oca-btn-primary', '🚚 Envoyer');
-      btn.onclick = () => changeOrderStatus(order.id, 'DELIVERING');
-      actions.appendChild(btn);
-    }
-    const detailBtn = mk('button', 'oca-btn', 'Détails →');
-    detailBtn.onclick = () => window.location.href = 'marche-senegal-mes-commandes.html';
-    actions.appendChild(detailBtn);
-
-    card.appendChild(header); card.appendChild(body); card.appendChild(actions);
-    frag.appendChild(card);
-  });
-  container.replaceChildren(frag);
-}
-
-async function changeOrderStatus(orderId, status) {
-  const result = await updateOrderStatus(orderId, status);
-  if (result.success) { showToast('✓ Statut mis à jour'); loadMyOrders(); loadDashboard(); }
-  else showToast('Erreur', 'error');
 }
 
 // ════════════════════════════════════════
@@ -553,23 +417,25 @@ function showPage(pageId, navItem) {
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     navItem.classList.add('active');
   }
-  const titles = { dashboard:'Tableau de bord', produits:'Mes produits', commandes:'Mes commandes', promotions:'Mes promotions' };
+  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
-  if (pageId === 'produits')    loadMyProducts();
-  if (pageId === 'commandes')   loadMyOrders();
   if (pageId === 'promotions')  loadPromotions();
 }
 
 function goToMessages() {
-  const user = getCurrentUser();
-  if (!user?.shopId) {
-    getDashboard().then(r => {
-      const shopId = r?.data?.shop?.id;
-      if (shopId) window.location.href = 'marche-senegal-chat.html?shopId=' + shopId;
-    });
-  } else {
-    window.location.href = 'marche-senegal-chat.html?shopId=' + user.shopId;
+  // loadDashboard() range la boutique complète sous user.shop : c'est là qu'on
+  // lit l'identifiant, sans refaire un appel réseau à chaque clic.
+  const shopId = getCurrentUser()?.shop?.id;
+  if (shopId) {
+    window.location.href = 'marche-senegal-chat.html?shopId=' + shopId;
+    return;
   }
+
+  getDashboard().then(r => {
+    const id = r?.data?.shop?.id;
+    if (id) window.location.href = 'marche-senegal-chat.html?shopId=' + id;
+    else showToast('Boutique introuvable — rechargez la page', 'error');
+  });
 }
 
 function logoutVendeur() {
@@ -584,14 +450,6 @@ function toggleSidebar() {
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sb-overlay').classList.remove('show');
-}
-function filterTgl(btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function filterOf(btn) {
-  document.querySelectorAll('.of-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
 }
 function selPromoType(btn) {
   document.querySelectorAll('.ptg-btn').forEach(b => b.classList.remove('selected'));

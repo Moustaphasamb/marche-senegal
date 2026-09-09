@@ -385,14 +385,10 @@ const MARKET_EMOJIS = {
   'Kédougou':'⛏️','Saraya':'⛏️','Salémata':'⛏️'
 };
 
-const FALLBACK_MARKETS = [
-  { id:'sandaga', name:'Marché Sandaga' },
-  { id:'tilene',  name:'Marché Tilène'  },
-  { id:'hlm',     name:'Marché HLM'     },
-  { id:'touba',   name:'Marché Touba'   },
-  { id:'thies',   name:'Marché Thiès'   },
-  { id:'ziguinchor', name:'Marché Ziguinchor' }
-];
+// Pas de liste de secours : ces marchés avaient des identifiants inventés
+// ('sandaga', 'tilene'…) que la base ne connaît pas. Le vendeur choisissait
+// son marché, puis l'inscription échouait sans qu'il comprenne pourquoi.
+// Mieux vaut dire franchement que la liste n'a pas pu être chargée.
 
 // ── Vérifier si déjà connecté ──
 document.addEventListener('DOMContentLoaded', async () => {
@@ -407,12 +403,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // ── Charger les marchés ──
 async function loadMarkets() {
-  let markets = FALLBACK_MARKETS;
   try {
     const result = await getMarkets();
-    if (result.success && result.data && result.data.length > 0) markets = result.data;
+    if (result.success && result.data && result.data.length > 0) {
+      renderMarkets(result.data);
+      return;
+    }
   } catch (_) {}
-  renderMarkets(markets);
+  showMarketsError();
+}
+
+// La liste des marchés vient de la base : sans elle, impossible de créer
+// une boutique valide. On le dit, avec un moyen de réessayer.
+function showMarketsError() {
+  _allMarketsVendeur = [];
+  const grid = document.getElementById('market-grid');
+  const noResult = document.getElementById('market-no-result');
+  if (noResult) noResult.style.display = 'none';
+  if (!grid) return;
+
+  grid.replaceChildren();
+
+  const msg = document.createElement('div');
+  msg.style.cssText = 'grid-column:1/-1;text-align:center;padding:18px;font-size:.85rem;color:var(--muted)';
+  msg.textContent = 'Impossible de charger la liste des marchés. Vérifiez votre connexion.';
+
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'market-btn';
+  retry.style.cssText = 'margin-top:10px;justify-content:center';
+  retry.textContent = '↻ Réessayer';
+  retry.onclick = loadMarkets;
+
+  msg.appendChild(document.createElement('br'));
+  msg.appendChild(retry);
+  grid.appendChild(msg);
 }
 
 let _allMarketsVendeur = [];

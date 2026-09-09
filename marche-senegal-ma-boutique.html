@@ -55,6 +55,11 @@ a{text-decoration:none;color:inherit;}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.08);}
 .field textarea{resize:vertical;min-height:90px;}
 .field-hint{font-size:.75rem;color:var(--muted);margin-top:4px;}
+.upload-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.upload-btn{padding:9px 16px;border-radius:10px;border:1.5px solid var(--green);background:var(--white);color:var(--green);font-size:.84rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;}
+.upload-btn:hover{background:var(--green);color:#fff;}
+.upload-btn:disabled{opacity:.6;cursor:default;}
+.upload-state{font-size:.78rem;color:var(--muted);}
 /* badge marché */
 .market-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gp);border:1px solid var(--g2);border-radius:20px;padding:8px 16px;font-size:.85rem;color:var(--muted);}
 .market-badge strong{color:var(--dark);}
@@ -122,6 +127,12 @@ a{text-decoration:none;color:inherit;}
   <p>Chargement de votre boutique…</p>
 </div>
 
+<div class="loading-state" id="errorState" style="display:none">
+  <p style="font-size:2rem;margin-bottom:8px">⚠️</p>
+  <p id="errorMessage">Impossible de charger votre boutique.</p>
+  <button type="button" class="upload-btn" style="margin-top:14px" onclick="loadShop()">Réessayer</button>
+</div>
+
 <div class="page-wrap" id="pageWrap">
   <div class="page-header">
     <h1>Ma boutique</h1>
@@ -157,17 +168,26 @@ a{text-decoration:none;color:inherit;}
 
       <!-- Médias -->
       <div class="card">
-        <h2>Photos (URL)</h2>
+        <h2>Photos</h2>
         <div class="field">
-          <label>URL du logo / avatar</label>
-          <input type="url" id="shopAvatar" placeholder="https://exemple.com/logo.jpg" oninput="updatePreview()">
+          <label>Logo / avatar</label>
+          <div class="upload-row">
+            <button type="button" class="upload-btn" id="avatarBtn" onclick="triggerUpload('shopAvatar')">📷 Choisir une photo</button>
+            <span class="upload-state" id="avatarState"></span>
+          </div>
+          <input type="url" id="shopAvatar" placeholder="ou collez une adresse d'image" oninput="updatePreview()">
           <p class="field-hint">Image carrée recommandée (ex : photo du vendeur ou logo).</p>
         </div>
         <div class="field">
-          <label>URL de la bannière</label>
-          <input type="url" id="shopBanner" placeholder="https://exemple.com/banniere.jpg" oninput="updatePreview()">
+          <label>Bannière</label>
+          <div class="upload-row">
+            <button type="button" class="upload-btn" id="bannerBtn" onclick="triggerUpload('shopBanner')">📷 Choisir une photo</button>
+            <span class="upload-state" id="bannerState"></span>
+          </div>
+          <input type="url" id="shopBanner" placeholder="ou collez une adresse d'image" oninput="updatePreview()">
           <p class="field-hint">Image large recommandée (ex : photo de votre étalage).</p>
         </div>
+        <input type="file" id="shopFileInput" accept="image/*" style="display:none">
       </div>
 
       <!-- Infos pratiques -->
@@ -241,8 +261,64 @@ function showToastLocal(msg, type) {
 }
 
 function logoutVendeur() {
-  logout();
-  window.location.href = 'marche-senegal-connexion-vendeur.html';
+  logout(); // logout() redirige déjà vers l'accueil
+}
+
+/* ── Envoi des photos ──
+   Un vendeur de marché n'a pas d'adresse web à coller : il a une photo dans
+   son téléphone. Le champ URL reste disponible pour ceux qui en ont une. */
+let _uploadTarget = null;
+
+const UPLOAD_UI = {
+  shopAvatar: { bouton: 'avatarBtn', etat: 'avatarState' },
+  shopBanner: { bouton: 'bannerBtn', etat: 'bannerState' }
+};
+
+function triggerUpload(champId) {
+  _uploadTarget = champId;
+  document.getElementById('shopFileInput').click();
+}
+
+function setUploadState(champId, texte, occupe) {
+  const ui = UPLOAD_UI[champId];
+  if (!ui) return;
+  const etat = document.getElementById(ui.etat);
+  const bouton = document.getElementById(ui.bouton);
+  if (etat) etat.textContent = texte;
+  if (bouton) bouton.disabled = Boolean(occupe);
+}
+
+async function uploadShopImage(file) {
+  if (!file || !_uploadTarget) return;
+  const champId = _uploadTarget;
+
+  const token = localStorage.getItem('token');
+  if (!token) { showToastLocal('Connectez-vous pour envoyer une photo', 'error'); return; }
+
+  setUploadState(champId, '⏳ Envoi en cours…', true);
+
+  try {
+    const fd = new FormData();
+    fd.append('image', file);
+    const res = await fetch(API_URL + '/api/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById(champId).value = data.url;
+      setUploadState(champId, '✓ Photo prête — enregistrez pour la publier', false);
+      updatePreview();
+    } else {
+      setUploadState(champId, '', false);
+      showToastLocal(data.message || 'Erreur lors de l\'envoi', 'error');
+    }
+  } catch (e) {
+    setUploadState(champId, '', false);
+    showToastLocal('Erreur de connexion au serveur', 'error');
+  }
 }
 
 function updatePreview() {
@@ -401,14 +477,29 @@ function fillForm(shop, stats) {
   updatePreview();
 }
 
+// Un échec doit se voir et se rattraper : sans cela la page restait
+// indéfiniment sur « Chargement… », sans explication ni issue.
+function showLoadError(message) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('pageWrap').style.display = 'none';
+  document.getElementById('errorMessage').textContent = message;
+  document.getElementById('errorState').style.display = 'block';
+}
+
 async function loadShop() {
+  document.getElementById('errorState').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+
   try {
     const res = await getDashboard();
     const shop = res.data?.shop;
     const stats = res.data?.stats;
     const seller = res.data?.seller;
 
-    if (!shop) { showToastLocal('Boutique introuvable', 'error'); return; }
+    if (!shop) {
+      showLoadError(res.message || 'Boutique introuvable. Vérifiez que votre compte vendeur est bien validé.');
+      return;
+    }
 
     const nameEl = document.getElementById('sellerName');
     if (nameEl && seller) nameEl.textContent = seller.firstName || '';
@@ -419,7 +510,7 @@ async function loadShop() {
     fillForm(shop, stats);
     loadMarkets(shop.marketId);
   } catch (e) {
-    showToastLocal('Erreur de chargement', 'error');
+    showLoadError('Impossible de joindre le serveur. Vérifiez votre connexion.');
   }
 }
 
@@ -458,6 +549,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!isLoggedIn()) { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   const user = getCurrentUser();
   if (user && user.role !== 'SELLER') { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
+
+  document.getElementById('shopFileInput').addEventListener('change', function() {
+    uploadShopImage(this.files[0]);
+    this.value = '';
+  });
+
   loadShop();
 });
 </script>

@@ -37,6 +37,8 @@
 .wb-name{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:#fff}
 .wb-market{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .wb-open{background:rgba(76,175,80,.2);border:1px solid rgba(76,175,80,.3);color:#4CAF50;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.wb-open.wb-pending{background:rgba(230,168,23,.2);border-color:rgba(230,168,23,.35);color:#E6A817}
+.wb-open.wb-closed{background:rgba(192,57,43,.2);border-color:rgba(192,57,43,.35);color:#E57368}
 .wb-right{display:flex;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
 .wb-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:99px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
 .wb-btn-primary{background:var(--green);color:#fff}
@@ -314,13 +316,13 @@
   <nav class="sb-nav">
     <div class="sb-section-label">Principal</div>
     <div class="sb-item active" onclick="showPage('dashboard',this)"><span class="sb-icon">📊</span>Tableau de bord</div>
-    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-produits.html'"><span class="sb-icon">📦</span>Mes produits<span class="sb-badge gold" id="sb-badge-products">—</span></div>
-    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-commandes.html'"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge" id="sb-badge-orders">—</span></div>
-    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions<span class="sb-badge gold">3</span></div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-produits.html'"><span class="sb-icon">📦</span>Mes produits<span class="sb-badge gold" id="sb-badge-products" style="display:none">0</span></div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-mes-commandes.html'"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge" id="sb-badge-orders" style="display:none">0</span></div>
+    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions<span class="sb-badge gold" id="sb-badge-promotions" style="display:none">0</span></div>
     <div class="sb-section-label">Boutique</div>
     <div class="sb-item" onclick="window.location.href='marche-senegal-ma-boutique.html'"><span class="sb-icon">🏪</span>Ma boutique</div>
     <div class="sb-item" onclick="toast('Visite virtuelle...')"><span class="sb-icon">🎥</span>Visite virtuelle</div>
-    <div class="sb-item" id="sb-messages" onclick="goToMessages()"><span class="sb-icon">💬</span>Messages<span class="sb-badge" id="sb-badge-messages">—</span></div>
+    <div class="sb-item" id="sb-messages" onclick="goToMessages()"><span class="sb-icon">💬</span>Messages<span class="sb-badge" id="sb-badge-messages" style="display:none">0</span></div>
     <div class="sb-item" onclick="toast('Avis clients...')"><span class="sb-icon">⭐</span>Avis clients</div>
     <div class="sb-section-label">Finance</div>
     <div class="sb-item" onclick="toast('Mes revenus...')"><span class="sb-icon">💰</span>Mes revenus</div>
@@ -552,7 +554,7 @@
       <div class="table-card">
         <div class="tc-header">
           <div class="tc-title">⚠️ Alertes stock</div>
-          <div class="tc-link" onclick="showPage('produits',null)">Gérer →</div>
+          <div class="tc-link" onclick="window.location.href='marche-senegal-mes-produits.html'">Gérer →</div>
         </div>
         <div class="stock-list">
           <div class="stock-item"><div class="st-img">👗</div><div class="st-info"><div class="st-name">Boubou wax tissé main — Taille L</div><div class="st-stock">4 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
@@ -565,114 +567,9 @@
     </div>
   </div>
 
-  <!-- ══ PRODUITS ══ -->
-  <div class="page-section" id="page-produits">
-    <div class="page-header">
-      <div class="ph-title">📦 Mes produits</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="ph-btn ph-btn-outline" onclick="toast('Importer des produits...')">↑ Importer</button>
-        <button class="ph-btn ph-btn-primary" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Nouveau produit</button>
-      </div>
-    </div>
-    <div class="filter-bar">
-      <input class="filter-input" type="text" placeholder="🔍 Rechercher un produit..."/>
-      <select class="filter-select"><option>Toutes catégories</option><option>Boubou</option><option>Bazin</option><option>Tissu wax</option><option>Robe</option></select>
-      <button class="filter-btn active" onclick="filterTgl(this)">Tous (48)</button>
-      <button class="filter-btn" onclick="filterTgl(this)">Actifs (44)</button>
-      <button class="filter-btn" onclick="filterTgl(this)">En pause (4)</button>
-      <button class="filter-btn" onclick="filterTgl(this)">Rupture (2)</button>
-    </div>
-    <div class="prod-table-card">
-      <table class="prod-table">
-        <thead><tr><th>Produit</th><th>Prix</th><th>Stock</th><th>Ventes</th><th>Statut</th><th>Actions</th></tr></thead>
-        <tbody>
-          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chargement des produits...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ══ COMMANDES ══ -->
-  <div class="page-section" id="page-commandes">
-    <div class="page-header">
-      <div class="ph-title">🛒 Mes commandes</div>
-      <div style="font-size:.86rem;color:var(--muted)">5 commandes en attente</div>
-    </div>
-    <div class="orders-filters">
-      <button class="of-btn active" onclick="filterOf(this)">Toutes (28)</button>
-      <button class="of-btn" onclick="filterOf(this)">En attente (5)</button>
-      <button class="of-btn" onclick="filterOf(this)">En livraison (3)</button>
-      <button class="of-btn" onclick="filterOf(this)">Livrées (18)</button>
-      <button class="of-btn" onclick="filterOf(this)">Annulées (2)</button>
-    </div>
-    <div class="order-cards">
-      <div class="order-card">
-        <div class="oc-header">
-          <div class="oc-num">#MS-2025-00847</div>
-          <div class="oc-date">Aujourd'hui à 14h23</div>
-          <div class="oc-status os-wait">En attente</div>
-        </div>
-        <div class="oc-body">
-          <div class="oc-items"><div class="oc-item-img">👗</div></div>
-          <div class="oc-info">
-            <div class="oc-client">Moussa Sow · 📱 +221 77 XXX XX XX</div>
-            <div class="oc-detail">Boubou wax L · Taille L · Bleu/Or · Wave</div>
-            <div class="oc-detail" style="margin-top:3px">📍 Cité Keur Gorgui, Villa 12 · Dakar</div>
-          </div>
-          <div class="oc-amount">15 300 FCFA</div>
-        </div>
-        <div class="oc-actions">
-          <button class="oca-btn oca-btn-primary" onclick="toast('✓ Commande confirmée !')">✓ Confirmer</button>
-          <button class="oca-btn" onclick="toast('Contacter le client...')">💬 Contacter</button>
-          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
-          <button class="oca-btn" style="color:var(--red);border-color:var(--red)" onclick="toast('Commande annulée')">✕ Annuler</button>
-        </div>
-      </div>
-
-      <div class="order-card">
-        <div class="oc-header">
-          <div class="oc-num">#MS-2025-00841</div>
-          <div class="oc-date">Hier à 09h15</div>
-          <div class="oc-status os-go">En livraison</div>
-        </div>
-        <div class="oc-body">
-          <div class="oc-items"><div class="oc-item-img">🧵</div></div>
-          <div class="oc-info">
-            <div class="oc-client">Aissatou Ba · 📱 +221 78 XXX XX XX</div>
-            <div class="oc-detail">Bazin brodé cérémonie · Taille XL · Orange Money</div>
-            <div class="oc-detail" style="margin-top:3px">📍 Médina, Rue 12 · Dakar</div>
-          </div>
-          <div class="oc-amount">25 000 FCFA</div>
-        </div>
-        <div class="oc-actions">
-          <button class="oca-btn" onclick="toast('Suivre le livreur...')">📍 Suivre livreur</button>
-          <button class="oca-btn" onclick="toast('Contacter le client...')">💬 Contacter</button>
-          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
-        </div>
-      </div>
-
-      <div class="order-card">
-        <div class="oc-header">
-          <div class="oc-num">#MS-2025-00835</div>
-          <div class="oc-date">Il y a 3 jours</div>
-          <div class="oc-status os-done">Livré ✓</div>
-        </div>
-        <div class="oc-body">
-          <div class="oc-items"><div class="oc-item-img">🎨</div><div class="oc-item-img">👘</div></div>
-          <div class="oc-info">
-            <div class="oc-client">Ibrahima Fall · 📱 +221 76 XXX XX XX</div>
-            <div class="oc-detail">2 articles · Tissu wax + Robe wax · Wave</div>
-            <div class="oc-detail" style="margin-top:3px">📍 Thiès centre · Livré le 28 Avril</div>
-          </div>
-          <div class="oc-amount">14 000 FCFA</div>
-        </div>
-        <div class="oc-actions">
-          <button class="oca-btn" onclick="toast('Voir les détails...')">Détails →</button>
-          <button class="oca-btn" onclick="toast('Télécharger la facture...')">📄 Facture</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Les produits et les commandes ont leurs propres pages, complètes
+       (recherche, tri, détail, changement de statut) : mes-produits.html
+       et mes-commandes.html. La barre latérale y mène directement. -->
 
   <!-- ══ PROMOTIONS ══ -->
   <div class="page-section" id="page-promotions">
