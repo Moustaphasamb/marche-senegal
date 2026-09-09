@@ -99,6 +99,8 @@ a{text-decoration:none;color:inherit}
 .oa-btn.confirm{background:var(--green);border-color:var(--green);color:#fff}
 .oa-btn.confirm:hover{background:var(--gl)}
 .oa-btn.deliver{background:var(--blue);border-color:var(--blue);color:#fff}
+.oa-btn.cancel{color:var(--red);border-color:var(--red)}
+.oa-btn.cancel:hover{background:var(--red);border-color:var(--red);color:#fff}
 
 /* ORDER DETAIL PANEL */
 .detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px}
@@ -365,7 +367,7 @@ function renderOrders(orders) {
         ${orders.map(order => `
           <tr onclick="openDetail('${order.id}')">
             <td>
-              <div class="order-num">${order.orderNumber}</div>
+              <div class="order-num">${escapeHtml(order.orderNumber)}</div>
               <div class="order-date">
                 ${new Date(order.createdAt).toLocaleDateString('fr-FR', {
                   day:'numeric', month:'short', year:'numeric'
@@ -456,6 +458,17 @@ function getOrderActions(order) {
     `);
   }
 
+  // Le vendeur peut refuser tant que la commande n'est ni livrée ni déjà annulée
+  // (l'API applique la même règle : voir src/lib/access.js côté backend).
+  if (!['DELIVERED', 'CANCELLED'].includes(order.status)) {
+    actions.push(`
+      <button class="oa-btn cancel"
+        onclick="cancelOrder('${order.id}')">
+        ✕ Refuser
+      </button>
+    `);
+  }
+
   actions.push(`
     <button class="oa-btn"
       onclick="openDetail('${order.id}')">
@@ -464,6 +477,12 @@ function getOrderActions(order) {
   `);
 
   return actions.join('');
+}
+
+// ── Refuser une commande ──
+async function cancelOrder(orderId) {
+  if (!confirm('Refuser cette commande ? Le client en sera averti par SMS.')) return;
+  await updateStatus(orderId, 'CANCELLED');
 }
 
 // ── Mettre à jour le statut ──
@@ -475,12 +494,13 @@ async function updateStatus(orderId, newStatus) {
       'CONFIRMED': '✓ Commande confirmée !',
       'PREPARING': '📦 Préparation commencée',
       'DELIVERING': '🛵 Livraison lancée',
-      'DELIVERED': '✅ Livraison confirmée'
+      'DELIVERED': '✅ Livraison confirmée',
+      'CANCELLED': '✕ Commande refusée'
     };
     showToast(labels[newStatus] || 'Statut mis à jour');
     await loadOrders();
   } else {
-    showToast('❌ Erreur lors de la mise à jour');
+    showToast(result.message || '❌ Erreur lors de la mise à jour');
   }
 }
 
@@ -504,14 +524,14 @@ async function openDetail(orderId) {
         <div class="dp-item-row">
           <div class="dp-item-img">
             ${item.imageUrl
-              ? `<img src="${item.imageUrl}" alt="${item.name}"/>`
+              ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}"/>`
               : '👗'
             }
           </div>
           <div class="dp-item-name">
-            ${item.name}
-            ${item.size ? `<span style="color:var(--muted);font-size:.76rem"> · ${item.size}</span>` : ''}
-            ${item.color ? `<span style="color:var(--muted);font-size:.76rem"> · ${item.color}</span>` : ''}
+            ${escapeHtml(item.name)}
+            ${item.size ? `<span style="color:var(--muted);font-size:.76rem"> · ${escapeHtml(item.size)}</span>` : ''}
+            ${item.color ? `<span style="color:var(--muted);font-size:.76rem"> · ${escapeHtml(item.color)}</span>` : ''}
             <div style="font-size:.74rem;color:var(--muted)">Qté : ${item.quantity}</div>
           </div>
           <div class="dp-item-price">${formatPrice(item.price * item.quantity)}</div>
@@ -545,11 +565,11 @@ async function openDetail(orderId) {
       <div class="dp-section-title">Informations client</div>
       <div class="dp-info-row">
         <span class="dp-info-label">Client</span>
-        <span class="dp-info-val">${order.buyer?.firstName || '—'}</span>
+        <span class="dp-info-val">${escapeHtml(order.buyer?.firstName || '—')}</span>
       </div>
       <div class="dp-info-row">
         <span class="dp-info-label">Téléphone</span>
-        <span class="dp-info-val">${order.buyer?.phone || '—'}</span>
+        <span class="dp-info-val">${escapeHtml(order.buyer?.phone || '—')}</span>
       </div>
       <div class="dp-info-row">
         <span class="dp-info-label">Livraison</span>
@@ -560,13 +580,13 @@ async function openDetail(orderId) {
       ${order.address ? `
         <div class="dp-info-row">
           <span class="dp-info-label">Adresse</span>
-          <span class="dp-info-val">${order.address.address}, ${order.address.city}</span>
+          <span class="dp-info-val">${escapeHtml(order.address.address)}, ${escapeHtml(order.address.city)}</span>
         </div>
       ` : ''}
       ${order.notes ? `
         <div class="dp-info-row">
           <span class="dp-info-label">Notes</span>
-          <span class="dp-info-val">${order.notes}</span>
+          <span class="dp-info-val">${escapeHtml(order.notes)}</span>
         </div>
       ` : ''}
     </div>
@@ -680,7 +700,7 @@ function showToast(msg) {
 // ── Initialisation ──
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
-function logoutVendeur(){logout();window.location.href='marche-senegal-accueil.html';}
+function logoutVendeur(){logout();} // logout() redirige déjà vers l'accueil
 function initSidebar(){
   const user=getCurrentUser();if(!user)return;
   const shop=user.shop||{};const nm=shop.name||'Ma boutique';

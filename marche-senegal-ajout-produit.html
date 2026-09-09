@@ -706,7 +706,7 @@ function viewMyShop() {
 // ── Init ──
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
-function logoutVendeur(){logout();window.location.href='marche-senegal-accueil.html';}
+function logoutVendeur(){logout();} // logout() redirige déjà vers l'accueil
 function initSidebar(){
   const user=getCurrentUser();if(!user)return;
   const shop=user.shop||{};const nm=shop.name||'Ma boutique';
@@ -723,7 +723,6 @@ document.addEventListener('DOMContentLoaded', function(){
     window.location.href = 'marche-senegal-connexion-vendeur.html';
     return;
   }
-  initSidebar();
   initSidebar();
 
   document.getElementById('file-input').addEventListener('change', function(){

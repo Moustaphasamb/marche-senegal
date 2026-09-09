@@ -311,6 +311,7 @@ a{text-decoration:none;color:inherit}
 
 let allProducts = [];
 let currentFilter = 'all';
+let currentSort = 'recent';
 let productToDelete = null;
 let productToStock = null;
 let newStock = 0;
@@ -335,7 +336,9 @@ async function loadProducts() {
 
   allProducts = result.data;
   updateStats();
-  renderProducts(allProducts);
+  // Après une action (stock, pause, suppression) on recharge : le filtre,
+  // la recherche et le tri en cours doivent survivre au rechargement.
+  filterProducts();
 }
 
 // ── Mettre à jour les stats ──
@@ -385,7 +388,7 @@ function renderProducts(products) {
         <div class="prod-card">
           <div class="pc-img">
             ${prod.images?.length > 0
-              ? `<img src="${prod.images[0]}" alt="${prod.name}"/>`
+              ? `<img src="${escapeHtml(prod.images[0])}" alt="${escapeHtml(prod.name)}"/>`
               : '👗'
             }
             <div class="pc-status ${getStatusClass(prod.status)}">
@@ -433,15 +436,15 @@ function renderProducts(products) {
                 ✏️ Modifier
               </button>
               <button class="pca-btn"
-                onclick="openStockModal('${prod.id}','${prod.name}',${prod.price},${prod.stock})">
+                onclick="openStockModal('${prod.id}')">
                 📦 Stock
               </button>
               <button class="pca-btn"
-                onclick="toggleStatus('${prod.id}','${prod.status}')">
+                onclick="toggleStatus('${prod.id}')">
                 ${prod.status === 'ACTIVE' ? '⏸️' : '▶️'}
               </button>
               <button class="pca-btn danger"
-                onclick="openDeleteModal('${prod.id}','${prod.name}',${prod.price})">
+                onclick="openDeleteModal('${prod.id}')">
                 🗑️
               </button>
             </div>
@@ -473,7 +476,19 @@ function filterProducts() {
     );
   }
 
-  renderProducts(filtered);
+  renderProducts(applySort(filtered));
+}
+
+// Le tri s'applique à ce qui est affiché, pas à la liste complète :
+// sinon choisir un tri faisait réapparaître les produits filtrés.
+function applySort(products) {
+  const sorted = [...products];
+  if (currentSort === 'sales')           sorted.sort((a,b) => b.totalSales - a.totalSales);
+  else if (currentSort === 'price_asc')  sorted.sort((a,b) => a.price - b.price);
+  else if (currentSort === 'price_desc') sorted.sort((a,b) => b.price - a.price);
+  else if (currentSort === 'stock')      sorted.sort((a,b) => a.stock - b.stock);
+  else sorted.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return sorted;
 }
 
 function setFilter(filter, btn) {
@@ -484,13 +499,8 @@ function setFilter(filter, btn) {
 }
 
 function sortProducts(sortBy) {
-  let sorted = [...allProducts];
-  if (sortBy === 'sales') sorted.sort((a,b) => b.totalSales - a.totalSales);
-  else if (sortBy === 'price_asc') sorted.sort((a,b) => a.price - b.price);
-  else if (sortBy === 'price_desc') sorted.sort((a,b) => b.price - a.price);
-  else if (sortBy === 'stock') sorted.sort((a,b) => a.stock - b.stock);
-  else sorted.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-  renderProducts(sorted);
+  currentSort = sortBy;
+  filterProducts();
 }
 
 // ── Modifier un produit ──
@@ -498,9 +508,18 @@ function editProduct(productId) {
   window.location.href = 'marche-senegal-modifier-produit.html?id=' + productId;
 }
 
+// Les boutons ne transmettent que l'identifiant : le reste vient d'ici.
+// Interpoler un nom de produit dans un attribut onclick casse sur une
+// apostrophe (« Boubou d'apparat ») et laisse passer du script.
+function findProduct(productId) {
+  return allProducts.find(p => p.id === productId);
+}
+
 // ── Toggle statut ──
-async function toggleStatus(productId, currentStatus) {
-  const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+async function toggleStatus(productId) {
+  const prod = findProduct(productId);
+  if (!prod) return;
+  const newStatus = prod.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
   const result = await apiCall(`/api/products/${productId}`, {
     method: 'PUT',
     body: JSON.stringify({ status: newStatus })
@@ -515,10 +534,12 @@ async function toggleStatus(productId, currentStatus) {
 }
 
 // ── Modal suppression ──
-function openDeleteModal(productId, name, price) {
+function openDeleteModal(productId) {
+  const prod = findProduct(productId);
+  if (!prod) return;
   productToDelete = productId;
-  document.getElementById('del-name').textContent = name;
-  document.getElementById('del-price').textContent = formatPrice(price);
+  document.getElementById('del-name').textContent = prod.name;
+  document.getElementById('del-price').textContent = formatPrice(prod.price);
   document.getElementById('delete-modal').classList.add('show');
 }
 
@@ -545,12 +566,14 @@ async function confirmDelete() {
 }
 
 // ── Modal stock ──
-function openStockModal(productId, name, price, stock) {
+function openStockModal(productId) {
+  const prod = findProduct(productId);
+  if (!prod) return;
   productToStock = productId;
-  newStock = stock;
-  document.getElementById('stock-prod-name').textContent = name;
-  document.getElementById('stock-prod-price').textContent = formatPrice(price);
-  document.getElementById('stock-num').textContent = stock;
+  newStock = prod.stock;
+  document.getElementById('stock-prod-name').textContent = prod.name;
+  document.getElementById('stock-prod-price').textContent = formatPrice(prod.price);
+  document.getElementById('stock-num').textContent = prod.stock;
   document.getElementById('stock-modal').classList.add('show');
 }
 
@@ -613,7 +636,7 @@ function showToast(msg) {
 // ── Initialisation ──
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
-function logoutVendeur(){logout();window.location.href='marche-senegal-accueil.html';}
+function logoutVendeur(){logout();} // logout() redirige déjà vers l'accueil
 function initSidebar(){
   const user=getCurrentUser();if(!user)return;
   const shop=user.shop||{};const nm=shop.name||'Ma boutique';
