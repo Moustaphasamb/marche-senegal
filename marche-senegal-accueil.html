@@ -459,11 +459,6 @@ function getMktEmojiAcc(name) {
 // Les utilisateurs tapent « thies » pour « Thiès » : on compare sans accents.
 const sansAccents = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-// « Marché de Bakel » doit s'afficher « Bakel », pas « de Bakel » : on retire le
-// mot Marché ET la preposition qui suit, sans toucher aux noms composes tels
-// que « Marché Central de Diourbel ».
-const nomCourtMarche = n => (n || '').replace(/^Marché\s+(?:de\s+la\s+|de\s+|du\s+|des\s+|d')?/i, '');
-
 // « Bakel / Bakel » n'apprend rien : quand la ville repete le nom du marche,
 // on affiche la region a la place.
 const sousTitreMarche = (nom, m) => sansAccents(m.city || '') === sansAccents(nom) ? (m.region || '') : (m.city || '');
