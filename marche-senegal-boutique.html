@@ -342,10 +342,11 @@
 
 <!-- ═══════ SHOP HERO ═══════ -->
 <div class="shop-hero">
-  <div class="sh-banner">
-    👗
-    <div class="sh-promo-badge">🔥 -15% Code FATOU15</div>
-  </div>
+  <!-- La bannière du vendeur est posée par loadShop() à partir de shop.bannerUrl.
+       L'emoji 👗 et le badge « -15% Code FATOU15 » qui se trouvaient ici étaient
+       écrits en dur : toutes les boutiques affichaient la robe et le code promo
+       d'une autre vendeuse, code qu'aucun acheteur ne pouvait utiliser. -->
+  <div class="sh-banner"></div>
   <div class="sh-info">
     <div class="sh-avatar-row">
       <div class="sh-avatar">MF</div>
@@ -547,28 +548,33 @@
     <div id="tab-infos" style="display:none">
       <div class="info-tab">
         <p class="it-desc">Mode Fatou Ndoye est une boutique spécialisée dans les tissus wax, bazin et boubous de qualité supérieure depuis 2015. Située à l'Allée 3 du marché Sandaga, Fatou propose une sélection soigneuse de vêtements et tissus africains authentiques.</p>
-        <div class="it-row"><div class="it-icon">🕐</div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub">Lundi – Samedi : 8h00 – 20h00<br/>Dimanche : 9h00 – 15h00</div><span class="it-open">Ouverte maintenant</span></div></div>
-        <div class="it-row"><div class="it-icon">📍</div><div><div class="it-label">Adresse physique</div><div class="it-sub">Allée 3, Stand 12 · Marché Sandaga<br/>Rue Mohamed V, Dakar Centre</div></div></div>
-        <div class="it-row"><div class="it-icon">📞</div><div><div class="it-label">Contact</div><div class="it-sub">+221 77 XXX XX XX · WhatsApp disponible</div></div></div>
-        <div class="it-row"><div class="it-icon">🚚</div><div><div class="it-label">Livraison</div><div class="it-sub">Dakar & banlieue : 1 000 FCFA · 24h<br/>Régions : 2 500 – 5 000 FCFA · 48–72h</div></div></div>
-        <div class="it-row"><div class="it-icon">💳</div><div><div class="it-label">Paiements acceptés</div><div class="it-sub">Wave · Orange Money · Free Money · Espèces</div></div></div>
-        <div class="it-row" style="margin-bottom:0"><div class="it-icon">🔄</div><div><div class="it-label">Retours</div><div class="it-sub">7 jours pour signaler un problème · Échange ou remboursement garanti</div></div></div>
+        <!-- Ce bloc était entièrement écrit en dur : horaires, adresse « Allée 3,
+             Stand 12 · Marché Sandaga », numéro factice, tarifs de livraison et
+             garantie de retour. Autant d'engagements commerciaux affichés au nom
+             d'un vendeur qui ne les avait jamais choisis. Chaque ligne n'apparaît
+             plus que si la donnée existe (voir remplirInfosBoutique). -->
+        <div class="it-row" id="it-horaires" style="display:none"><div class="it-icon">🕐</div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub"></div><span class="it-open"></span></div></div>
+        <div class="it-row" id="it-adresse" style="display:none"><div class="it-icon">📍</div><div><div class="it-label">Adresse physique</div><div class="it-sub"></div></div></div>
       </div>
     </div>
   </div>
 
   <!-- RIGHT -->
   <div class="right-col">
-    <div class="promo-card">
-      <div class="pc-label">🔥 Promotion active aujourd'hui</div>
-      <div class="pc-code">FATOU15</div>
-      <div class="pc-detail">-15% sur toute la boutique<br/>Valable jusqu'à 20h00 · Max 50 utilisations</div>
-      <button class="pc-copy" onclick="copyCode('FATOU15')">Copier le code promo</button>
-      <div class="pc-timer"><span class="pt-dot"></span><span id="promo-countdown">Calcul en cours…</span></div>
+    <!-- Cette carte annonçait « FATOU15 · -15% sur toute la boutique » sur
+         TOUTES les boutiques, avec un bouton pour copier le code. Aucune route
+         publique n'expose les promotions d'une boutique : l'acheteur copiait un
+         code qui ne pouvait pas fonctionner. Masquée tant que les promotions
+         créées par le vendeur ne sont pas réellement exposées. -->
+    <div class="promo-card" id="promo-card" style="display:none">
+      <div class="pc-label">🔥 Promotion active</div>
+      <div class="pc-code" id="pc-code">—</div>
+      <div class="pc-detail" id="pc-detail"></div>
+      <button class="pc-copy" id="pc-copy">Copier le code promo</button>
     </div>
 
     <div class="contact-card">
-      <div class="cc-title">Contacter Fatou Ndoye</div>
+      <div class="cc-title" id="cc-title">Contacter la boutique</div>
       <div class="cc-btns">
         <button class="cc-btn cc-primary" onclick="openChat()">
           <div class="cc-icon" style="background:rgba(255,255,255,.2)">💬</div>
@@ -605,7 +611,7 @@
       <div class="chat-header">
         <div class="chat-av">MF</div>
         <div class="chat-info">
-          <div class="chat-name-txt">Mode Fatou Ndoye</div>
+          <div class="chat-name-txt" id="chat-name-txt">Boutique</div>
           <div class="chat-status">● En ligne · Répond en moins de 5 min</div>
         </div>
         <button class="chat-close" onclick="closeChat()">✕</button>
@@ -677,6 +683,30 @@ async function loadShop(shopId) {
   const shName = document.querySelector('.sh-name');
   if (shName) shName.textContent = shop.name;
 
+  // Bannière de la boutique. Le champ existait en base et « Ma boutique »
+  // permettait de l'enregistrer, mais cette page ne l'a jamais lu : la
+  // bannière posée par le vendeur ne s'affichait nulle part.
+  const shBanner = document.querySelector('.sh-banner');
+  if (shBanner && shop.bannerUrl) {
+    shBanner.style.backgroundImage =
+      `url("${String(shop.bannerUrl).replace(/"/g, '%22')}")`;
+    shBanner.style.backgroundSize = 'cover';
+    shBanner.style.backgroundPosition = 'center';
+    shBanner.style.backgroundRepeat = 'no-repeat';
+  }
+
+  // « Vendeur Vérifié · CNI validée » était affiché à tous, y compris aux
+  // boutiques en attente de validation : l'acheteur était induit en erreur.
+  const shVerified = document.querySelector('.sh-verified');
+  if (shVerified) {
+    if (shop.isVerified) {
+      shVerified.textContent = '✓ Vendeur Vérifié · CNI validée';
+      shVerified.style.display = '';
+    } else {
+      shVerified.style.display = 'none';
+    }
+  }
+
   // Mettre à jour la localisation
   const shLocation = document.querySelector('.sh-location');
   if (shLocation) {
@@ -721,11 +751,43 @@ async function loadShop(shopId) {
     champ.placeholder = `Rechercher dans ${shop.name}...`;
   });
 
-  // Mettre à jour le numéro de téléphone dans Infos
-  const itPhone = document.querySelector('.it-row .it-sub');
-  if (itPhone && shop.phone) {
-    itPhone.textContent = shop.phone + ' · WhatsApp disponible';
+  // « Contacter Fatou Ndoye » était écrit en dur : chaque boutique affichait
+  // le nom d'une autre vendeuse.
+  const ccTitle = document.getElementById('cc-title');
+  if (ccTitle) ccTitle.textContent = 'Contacter ' + shop.name;
+
+  // Le bandeau du chat affichait lui aussi « Mode Fatou Ndoye »
+  const chatName = document.getElementById('chat-name-txt');
+  if (chatName) chatName.textContent = shop.name;
+
+  // L'onglet annonçait « Avis (234) » alors que le hero affichait 0 juste
+  // au-dessus : le nombre était écrit en dur.
+  const avisTab = document.querySelectorAll('.tab')[2];
+  if (avisTab) avisTab.textContent = '⭐ Avis (' + (shop.totalReviews || 0) + ')';
+
+  // Visite virtuelle : la section montrait une vidéo de 2:34 inexistante et des
+  // produits cliquables écrits en dur, qu'un acheteur pouvait mettre au panier
+  // alors qu'ils n'appartenaient pas à cette boutique.
+  const sectionVisite = document.querySelector('.visit-section');
+  if (sectionVisite && !shop.virtualTourUrl) sectionVisite.style.display = 'none';
+
+  // La description rédigée par le vendeur dans « Ma boutique » n'était jamais
+  // lue : toutes les boutiques affichaient le texte de Mode Fatou Ndoye.
+  const itDesc = document.querySelector('.it-desc');
+  if (itDesc) {
+    if (shop.description) itDesc.textContent = shop.description;
+    else itDesc.style.display = 'none';
   }
+
+  // Adresse sous la carte : « Marché Sandaga — Allée 3, Stand 12 » était figé.
+  const mapAddress = document.querySelector('.map-address');
+  if (mapAddress) {
+    const lieu = [shop.market?.name, shop.market?.address].filter(Boolean).join(' — ');
+    if (lieu) mapAddress.textContent = lieu;
+    else mapAddress.style.display = 'none';
+  }
+
+  remplirInfosBoutique(shop);
 
   if (shop.market) {
     const bcLinks = document.querySelectorAll('.bc-link');
@@ -823,6 +885,38 @@ function buildProdCard(prod) {
   return card;
 }
 
+// Les boutons de filtre étaient figés sur « Tissu wax / Boubou / Bazin / Promo »,
+// les rayons d'une boutique de mode. Ils sont maintenant construits à partir des
+// catégories réellement présentes dans la boutique, et disparaissent s'il n'y a
+// rien à filtrer.
+function construireFiltresCategories(produits) {
+  const categories = [...new Set(
+    produits.map(p => p.category?.name).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, 'fr'));
+
+  document.querySelectorAll('.pf-row').forEach(barre => {
+    const dansOngletProduits = barre.closest('#tab-produits');
+    const filtrer = dansOngletProduits ? 'filterAllProds' : 'filterP';
+
+    // Moins de deux catégories : un filtre n'apporte rien
+    if (categories.length < 2) { barre.style.display = 'none'; return; }
+
+    barre.style.display = '';
+    barre.replaceChildren();
+
+    const ajouter = (libelle, valeur, actif) => {
+      const b = document.createElement('button');
+      b.className = 'pf' + (actif ? ' active' : '');
+      b.textContent = libelle;
+      b.onclick = () => window[filtrer](valeur, b);
+      barre.appendChild(b);
+    };
+
+    ajouter('Tout', 'all', true);
+    categories.forEach(c => ajouter(c, c.toLowerCase(), false));
+  });
+}
+
 // ── Charger les produits de la boutique ──
 function loadShopProducts(shop) {
   const featuredGrid = document.querySelector('#tab-boutique .prods-grid');
@@ -835,6 +929,8 @@ function loadShopProducts(shop) {
   const prodTab = document.querySelectorAll('.tab')[1];
   if (prodTab) prodTab.textContent = '📦 Produits (' + count + ')';
   if (allTitle) allTitle.textContent = 'Tous les produits (' + count + ')';
+
+  construireFiltresCategories(shop.products || []);
 
   const emptyNode = () => {
     const w = document.createElement('div');
@@ -1093,6 +1189,32 @@ function openMap() {
   const shop = currentShop;
   const query = shop?.address || shop?.market?.name || 'Marché Sandaga Dakar';
   window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query), '_blank');
+}
+
+// Remplit le bloc « Infos boutique » avec les seules données réellement
+// connues. Une ligne sans donnée reste masquée plutôt que d'afficher un
+// engagement que le vendeur n'a jamais pris.
+function remplirInfosBoutique(shop) {
+  // Horaires : champ openingHours, saisi par le vendeur dans « Ma boutique »
+  const horaires = shop.openingHours;
+  const texteHoraires = typeof horaires === 'string' ? horaires : (horaires?.text || '');
+  const ligneHoraires = document.getElementById('it-horaires');
+  if (ligneHoraires && texteHoraires.trim()) {
+    ligneHoraires.querySelector('.it-sub').textContent = texteHoraires;
+    const badge = ligneHoraires.querySelector('.it-open');
+    if (badge) badge.textContent = shop.isOpen ? 'Ouverte maintenant' : 'Fermée';
+    ligneHoraires.style.display = '';
+  }
+
+  // Adresse : celle du marché, seule adresse dont on dispose réellement
+  const ligneAdresse = document.getElementById('it-adresse');
+  if (ligneAdresse && shop.market) {
+    const parts = [shop.market.name, shop.market.address, shop.market.city].filter(Boolean);
+    if (parts.length) {
+      ligneAdresse.querySelector('.it-sub').textContent = parts.join(' · ');
+      ligneAdresse.style.display = '';
+    }
+  }
 }
 
 // ── Compte à rebours promo (expire à 20h00 du jour) ──
