@@ -288,6 +288,60 @@
   </div>
 </div>
 
+<!-- MODAL ARBITRAGE D'UN LITIGE -->
+<div class="mkt-overlay" id="disp-overlay" onclick="closeDisputeModal(event)">
+  <div class="mkt-box" onclick="event.stopPropagation()">
+    <h3>
+      <span>⚖️ Arbitrer le litige</span>
+      <button style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted)" onclick="closeDisputeModal()">✕</button>
+    </h3>
+
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.82rem;line-height:1.7">
+      <div>Commande <strong id="disp-order">—</strong> · <span id="disp-parties">—</span></div>
+      <div>Montant payé : <strong id="disp-total">—</strong> · Motif : <span id="disp-reason">—</span></div>
+      <div id="disp-escrow" style="margin-top:6px"></div>
+    </div>
+
+    <div class="mkt-form-row full">
+      <div class="mkt-field">
+        <label>Ce que dit l'acheteur</label>
+        <div id="disp-description" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.84rem;background:#fff;white-space:pre-wrap"></div>
+      </div>
+    </div>
+
+    <div class="mkt-form-row full">
+      <div class="mkt-field">
+        <label>Décision *</label>
+        <select id="disp-outcome" onchange="toggleDisputeAmount()">
+          <option value="">— Choisir —</option>
+          <option value="REFUND_BUYER">Rembourser l'acheteur</option>
+          <option value="FAVOR_SELLER">Donner raison au vendeur</option>
+          <option value="REJECTED">Rejeter la réclamation</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mkt-form-row full" id="disp-amount-row">
+      <div class="mkt-field">
+        <label>Montant à rembourser (FCFA) *</label>
+        <input type="number" id="disp-amount" min="1" step="1" placeholder="Total ou partiel"/>
+      </div>
+    </div>
+
+    <div class="mkt-form-row full">
+      <div class="mkt-field">
+        <label>Motivation de la décision * (conservée au journal)</label>
+        <textarea id="disp-resolution" placeholder="Pourquoi cette décision ? Ce texte est archivé et engage la plateforme…"></textarea>
+      </div>
+    </div>
+
+    <div class="mkt-actions">
+      <button class="mkt-btn-cancel" onclick="closeDisputeModal()">Annuler</button>
+      <button class="mkt-btn-save" onclick="submitDisputeResolution()">⚖️ Trancher</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
@@ -487,11 +541,18 @@
 
   <!-- ── DISPUTES ── -->
   <div class="ps" id="ps-disputes">
-    <div class="sec-header"><div class="sec-title" id="disputes-title">⚖️ Litiges & annulations</div></div>
+    <div class="sec-header">
+      <div class="sec-title" id="disputes-title">⚖️ Litiges</div>
+      <select id="disputes-filter" onchange="loadDisputes()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
+        <option value="open">Ouverts</option>
+        <option value="resolved">Tranchés</option>
+        <option value="all">Tous</option>
+      </select>
+    </div>
     <div class="card">
       <table class="t">
-        <thead><tr><th>Commande</th><th>Acheteur</th><th>Vendeur</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
-        <tbody id="disputes-tbody"><tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+        <thead><tr><th>Commande</th><th>Acheteur</th><th>Vendeur</th><th>Motif</th><th>Montant</th><th>Séquestre</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody id="disputes-tbody"><tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -743,7 +804,7 @@ const pageTitles = {
   users:      'Gestion des utilisateurs',
   vendors:    'Gestion des vendeurs',
   orders:     'Toutes les commandes',
-  disputes:   'Litiges & annulations',
+  disputes:   'Litiges',
   markets:    'Gestion des marchés',
   products:   'Modération des produits',
   promotions: 'Promotions',
@@ -1377,45 +1438,204 @@ async function loadOrders() {
 //   GESTION DES LITIGES
 // ══════════════════════════════════════
 
+// ── Libellés des litiges ──
+const DISPUTE_REASONS = {
+  NOT_RECEIVED:     'Jamais reçu',
+  DAMAGED:          'Produit abîmé',
+  WRONG_ITEM:       'Mauvais article',
+  INCOMPLETE:       'Commande incomplète',
+  NOT_AS_DESCRIBED: 'Non conforme',
+  NOT_REFUNDED:     'Pas remboursé',
+  OTHER:            'Autre'
+};
+
+const DISPUTE_STATUS_LABELS = {
+  OPEN:          { label: 'Ouvert',      cls: 'b-pend' },
+  INVESTIGATING: { label: 'En examen',   cls: 'b-pend' },
+  RESOLVED:      { label: 'Tranché',     cls: 'b-ok'   }
+};
+
+const DISPUTE_OUTCOMES = {
+  REFUND_BUYER: 'Acheteur remboursé',
+  FAVOR_SELLER: 'Vendeur confirmé',
+  REJECTED:     'Réclamation rejetée'
+};
+
+let _disputes = [];
+
 async function loadDisputes() {
   disputesLoaded = true;
   const tbody = document.getElementById('disputes-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+  const filtre = document.getElementById('disputes-filter')?.value || 'open';
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
 
   try {
-    const res    = await apiCall('/api/admin/disputes');
-    const orders = res.data || [];
+    const res = await apiCall('/api/admin/disputes?status=' + filtre);
+    _disputes = res.data || [];
 
     const titleEl = document.getElementById('disputes-title');
-    if (titleEl) titleEl.textContent = '⚖️ Litiges & annulations (' + orders.length + ')';
+    if (titleEl) titleEl.textContent = '⚖️ Litiges (' + _disputes.length + ')';
+
+    const sbDisp = document.getElementById('sb-disputes-count');
+    if (sbDisp && res.meta) sbDisp.textContent = res.meta.ouverts;
 
     tbody.innerHTML = '';
-    if (!orders.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Aucun litige ou annulation</td></tr>';
+    if (!_disputes.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Aucun litige</td></tr>';
       return;
     }
 
-    orders.forEach(o => {
+    _disputes.forEach((d, i) => {
+      const o          = d.order || {};
       const buyerName  = [o.buyer?.firstName, o.buyer?.lastName].filter(Boolean).join(' ') || '—';
       const shopName   = o.shop?.name || '—';
-      const statusInfo = ORDER_STATUS_LABELS[o.status] || { label: o.status, cls: 'b-rej' };
-      const date = new Date(o.updatedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+      const statutInfo = DISPUTE_STATUS_LABELS[d.status] || { label: d.status, cls: 'b-rej' };
+      const date       = new Date(d.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+      // L'état du séquestre décide de ce que l'admin peut encore récupérer.
+      const escrowParti = o.payment?.escrowReleased;
+      const escrowTxt = o.payment
+        ? (escrowParti
+            ? '<span style="color:var(--red);font-weight:600">Versé au vendeur</span>'
+            : '<span style="color:var(--green);font-weight:600">Retenu</span>')
+        : '<span style="color:var(--muted)">Espèces</span>';
+
+      let actionHtml;
+      if (d.status === 'RESOLVED') {
+        const issue = DISPUTE_OUTCOMES[d.outcome] || d.outcome || '—';
+        // Un remboursement décidé mais non viré reste un travail à faire.
+        actionHtml = (d.outcome === 'REFUND_BUYER' && !d.refundedAt)
+          ? '<button class="sec-btn sec-btn-green" style="padding:6px 10px;font-size:.72rem" onclick="askRefundReference(\'' + d.id + '\')">💸 Virement fait</button>'
+          : '<span style="font-size:.72rem;color:var(--muted)">' + escapeHtml(issue) + '</span>';
+      } else {
+        actionHtml = '<button class="sec-btn sec-btn-green" style="padding:6px 10px;font-size:.72rem" onclick="openDisputeModal(' + i + ')">⚖️ Arbitrer</button>';
+      }
 
       const tr = document.createElement('tr');
       tr.innerHTML =
-        '<td style="font-weight:600;color:var(--dark)">' + escapeHtml(o.orderNumber) + '</td>' +
+        '<td style="font-weight:600;color:var(--dark)">' + escapeHtml(o.orderNumber || '—') +
+          '<div style="font-size:.7rem;color:var(--muted);font-weight:400">' + date + '</div></td>' +
         '<td>' + escapeHtml(buyerName) + (o.buyer?.phone ? '<div style="font-size:.7rem;color:var(--muted)">' + escapeHtml(o.buyer.phone) + '</div>' : '') + '</td>' +
         '<td>' + escapeHtml(shopName) + '</td>' +
-        '<td style="color:var(--red);font-weight:600">' + formatPrice(o.total) + '</td>' +
-        '<td><span class="badge ' + statusInfo.cls + '">' + statusInfo.label + '</span></td>' +
-        '<td style="font-size:.76rem;color:var(--muted)">' + date + '</td>';
+        '<td style="font-size:.76rem">' + escapeHtml(DISPUTE_REASONS[d.reason] || d.reason) + '</td>' +
+        '<td style="font-weight:600">' + formatPrice(o.total || 0) + '</td>' +
+        '<td style="font-size:.74rem">' + escrowTxt + '</td>' +
+        '<td><span class="badge ' + statutInfo.cls + '">' + statutInfo.label + '</span></td>' +
+        '<td>' + actionHtml + '</td>';
       tbody.appendChild(tr);
     });
   } catch (e) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
   }
+}
+
+// ── Modal d'arbitrage ──
+let _disputeCourant = null;
+
+function openDisputeModal(index) {
+  const d = _disputes[index];
+  if (!d) return;
+  _disputeCourant = d;
+
+  const o = d.order || {};
+  const buyerName = [o.buyer?.firstName, o.buyer?.lastName].filter(Boolean).join(' ') || '—';
+
+  document.getElementById('disp-order').textContent = o.orderNumber || '—';
+  document.getElementById('disp-parties').textContent = buyerName + ' contre ' + (o.shop?.name || '—');
+  document.getElementById('disp-reason').textContent = DISPUTE_REASONS[d.reason] || d.reason;
+  document.getElementById('disp-description').textContent = d.description || '';
+  document.getElementById('disp-total').textContent = formatPrice(o.total || 0);
+
+  // L'admin doit voir où est l'argent avant de décider, pas après.
+  const escrowEl = document.getElementById('disp-escrow');
+  if (!o.payment) {
+    escrowEl.innerHTML = '<strong style="color:var(--muted)">Paiement en espèces</strong> — la plateforme n\'a jamais tenu cet argent, tout remboursement se règle de la main à la main.';
+  } else if (o.payment.escrowReleased) {
+    escrowEl.innerHTML = '<strong style="color:var(--red)">Argent déjà versé au vendeur</strong> — un remboursement devra lui être réclamé.';
+  } else {
+    escrowEl.innerHTML = '<strong style="color:var(--green)">Argent retenu par la plateforme</strong> — le vendeur n\'a pas encore été payé.';
+  }
+
+  document.getElementById('disp-outcome').value = '';
+  document.getElementById('disp-amount').value = o.total || 0;
+  document.getElementById('disp-resolution').value = '';
+  toggleDisputeAmount();
+
+  document.getElementById('disp-overlay').classList.add('open');
+}
+
+function closeDisputeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('disp-overlay').classList.remove('open');
+  _disputeCourant = null;
+}
+
+// Le montant n'a de sens que pour un remboursement.
+function toggleDisputeAmount() {
+  const outcome = document.getElementById('disp-outcome').value;
+  const bloc = document.getElementById('disp-amount-row');
+  if (bloc) bloc.style.display = outcome === 'REFUND_BUYER' ? '' : 'none';
+}
+
+async function submitDisputeResolution() {
+  if (!_disputeCourant) return;
+
+  const outcome    = document.getElementById('disp-outcome').value;
+  const resolution = document.getElementById('disp-resolution').value.trim();
+
+  if (!outcome) { toast('❌ Choisissez une décision'); return; }
+  if (resolution.length < 10) { toast('❌ Motivez la décision (10 caractères minimum)'); return; }
+
+  const corps = { outcome, resolution };
+
+  if (outcome === 'REFUND_BUYER') {
+    const montant = parseInt(document.getElementById('disp-amount').value, 10);
+    const total   = _disputeCourant.order?.total || 0;
+    if (!Number.isInteger(montant) || montant <= 0 || montant > total) {
+      toast('❌ Montant entre 1 et ' + formatPrice(total));
+      return;
+    }
+    corps.refundAmount = montant;
+  }
+
+  const res = await apiCall('/api/admin/disputes/' + _disputeCourant.id + '/resolve', {
+    method: 'POST',
+    body: JSON.stringify(corps)
+  });
+
+  if (!res.success) { toast('❌ ' + (res.message || 'Erreur')); return; }
+
+  closeDisputeModal();
+
+  // Le virement Wave n'est pas automatique : on le rappelle plutôt que de
+  // laisser croire que l'acheteur a déjà reçu son argent.
+  if (res.data?.actionRequise) {
+    toast('✅ Litige tranché — ' + res.data.actionRequise);
+  } else {
+    toast('✅ Litige tranché');
+  }
+  if (res.data?.recoverFromSeller) {
+    setTimeout(() => toast('⚠️ Argent déjà versé : à récupérer auprès du vendeur'), 2600);
+  }
+
+  loadDisputes();
+  loadAdminStats();
+}
+
+async function askRefundReference(disputeId) {
+  const reference = prompt('Référence de la transaction Wave / Orange Money :');
+  if (reference === null) return;
+
+  const res = await apiCall('/api/admin/disputes/' + disputeId + '/refund-reference', {
+    method: 'PATCH',
+    body: JSON.stringify({ reference: reference.trim() })
+  });
+
+  if (!res.success) { toast('❌ ' + (res.message || 'Erreur')); return; }
+  toast('✅ Remboursement enregistré');
+  loadDisputes();
 }
 
 // ══════════════════════════════════════
@@ -2252,23 +2472,26 @@ async function loadOverviewDisputes() {
   const title = document.getElementById('overview-disputes-title');
   if (!list) return;
   try {
-    const res = await apiCall('/api/admin/disputes');
-    const disputes = (res.data || []).slice(0, 3);
-    if (title) title.textContent = '⚖️ Litiges ouverts (' + (res.data || []).length + ')';
+    const res = await apiCall('/api/admin/disputes?status=open');
+    const tous = res.data || [];
+    const disputes = tous.slice(0, 3);
+    if (title) title.textContent = '⚖️ Litiges ouverts (' + tous.length + ')';
     if (!disputes.length) {
-      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucun litige</div>';
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucun litige ouvert</div>';
       return;
     }
-    list.innerHTML = disputes.map(o => {
+    list.innerHTML = disputes.map(d => {
+      const o = d.order || {};
       const buyer = escapeHtml((o.buyer?.firstName || '') + ' ' + (o.buyer?.lastName || '').slice(0, 1) + '.');
       const shop = escapeHtml(o.shop?.name || '—');
       const amt = (o.total || 0).toLocaleString('fr-FR');
-      const label = o.status === 'CANCELLED' ? 'Annulée' : 'Remboursée';
-      const cls = o.status === 'CANCELLED' ? 'ds-open' : 'ds-resolved';
-      const icon = o.status === 'CANCELLED' ? 'var(--rp)' : 'var(--gp)';
-      return '<div class="disp"><div class="disp-icon" style="background:' + icon + '">⚖️</div>' +
-        '<div class="disp-info"><div class="disp-title">Commande ' + escapeHtml(o.orderNumber || '') + '</div>' +
-        '<div class="disp-sub">' + buyer + ' vs ' + shop + ' · ' + formatTimeAgo(new Date(o.updatedAt)) + '</div></div>' +
+      const motif = escapeHtml(DISPUTE_REASONS[d.reason] || d.reason || '');
+      const enExamen = d.status === 'INVESTIGATING';
+      const label = enExamen ? 'En examen' : 'Ouvert';
+      const cls = enExamen ? 'ds-resolved' : 'ds-open';
+      return '<div class="disp"><div class="disp-icon" style="background:var(--rp)">⚖️</div>' +
+        '<div class="disp-info"><div class="disp-title">Commande ' + escapeHtml(o.orderNumber || '') + ' · ' + motif + '</div>' +
+        '<div class="disp-sub">' + buyer + ' vs ' + shop + ' · ' + formatTimeAgo(new Date(d.createdAt)) + '</div></div>' +
         '<div class="disp-amount">' + amt + ' FCFA</div>' +
         '<div class="disp-status ' + cls + '">' + label + '</div></div>';
     }).join('');

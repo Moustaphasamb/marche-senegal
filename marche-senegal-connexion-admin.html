@@ -223,6 +223,16 @@ async function loginAdmin() {
     body: JSON.stringify({ email, password })
   });
 
+  // Une API injoignable n'est pas un mot de passe faux. Afficher « identifiants
+  // incorrects » envoyait sur une fausse piste, et la tentative était comptée :
+  // trois pannes réseau suffisaient à bloquer l'accès pendant cinq minutes.
+  if (!result.success && result.message === 'Erreur de connexion au serveur') {
+    showToast('⚠️ Serveur injoignable — le backend tourne-t-il sur le port 3000 ?');
+    btn.disabled = false;
+    btn.innerHTML = '🔐 Accéder au panel admin';
+    return;
+  }
+
   if (result.success) {
     // Sauvegarder le token
     localStorage.setItem('token', result.token);
