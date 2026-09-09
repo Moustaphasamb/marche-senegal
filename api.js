@@ -419,6 +419,11 @@ function injecterStyleCredit() {
   document.head.appendChild(s);
 }
 
+// « Marché de Bakel » doit s'afficher « Bakel », pas « de Bakel » : on retire le
+// mot Marché ET la preposition qui suit, sans toucher aux noms composes tels
+// que « Marché Central de Diourbel ».
+const nomCourtMarche = n => (n || '').replace(/^Marché\s+(?:de\s+la\s+|de\s+|du\s+|des\s+|d')?/i, '');
+
 // Applique une image de fond à une section sombre (hero, en-tête de marché).
 // Le voile foncé fait partie du background-image plutôt que d'un ::before,
 // pour ne pas entrer en conflit avec les pseudo-éléments décoratifs déjà

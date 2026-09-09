@@ -715,6 +715,12 @@ async function loadShop(shopId) {
   const bcCurrent = document.querySelector('.bc-current');
   if (bcCurrent) bcCurrent.textContent = shop.name;
 
+  // « Rechercher dans Mode Fatou… » était écrit en dur : toutes les boutiques
+  // affichaient le nom de la même.
+  document.querySelectorAll('.nav-search input').forEach(champ => {
+    champ.placeholder = `Rechercher dans ${shop.name}...`;
+  });
+
   // Mettre à jour le numéro de téléphone dans Infos
   const itPhone = document.querySelector('.it-row .it-sub');
   if (itPhone && shop.phone) {

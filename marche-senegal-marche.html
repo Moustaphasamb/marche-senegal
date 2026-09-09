@@ -533,13 +533,13 @@ async function loadMarket(marketId) {
 
   // Mettre à jour le hero
   document.querySelector('.mh-title').innerHTML =
-    `Marché <em>${market.name.replace('Marché ', '')}</em>`;
+    `Marché <em>${escapeHtml(nomCourtMarche(market.name))}</em>`;
 
   document.querySelector('.mh-location').textContent =
     `📍 ${market.address || market.city + ', ' + market.region}`;
 
   const ctMarket = document.getElementById('ct-market');
-  if (ctMarket) ctMarket.textContent = market.name.replace('Marché ', '');
+  if (ctMarket) ctMarket.textContent = nomCourtMarche(market.name);
 
   const status = document.getElementById('mh-status');
   if (status) status.textContent = market.isActive ? 'Marché actif' : 'Marché inactif';
@@ -556,6 +556,15 @@ async function loadMarket(marketId) {
 
   // Mettre à jour le titre de la page
   document.title = `${market.name} — Marché Sénégal`;
+
+  // « Rechercher dans Sandaga… » et le fil d'Ariane étaient écrits en dur :
+  // les 72 pages affichaient le nom du même marché.
+  const nomCourt = nomCourtMarche(market.name);
+  document.querySelectorAll('.nav-search input').forEach(champ => {
+    champ.placeholder = `Rechercher dans ${nomCourt}...`;
+  });
+  const fil = document.querySelector('.breadcrumb .bc-current');
+  if (fil) fil.textContent = market.name;
 }
 
 // ── Charger les boutiques du marché ──
