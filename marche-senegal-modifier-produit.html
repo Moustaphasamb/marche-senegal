@@ -115,6 +115,9 @@
         <div class="photo-slot" id="slot-1" onclick="triggerUpload(1)"><span class="photo-slot-icon">+</span><span class="photo-slot-text">Photo 2</span><button class="photo-del" onclick="event.stopPropagation();removePhoto(1)">✕</button></div>
         <div class="photo-slot" id="slot-2" onclick="triggerUpload(2)"><span class="photo-slot-icon">+</span><span class="photo-slot-text">Photo 3</span><button class="photo-del" onclick="event.stopPropagation();removePhoto(2)">✕</button></div>
         <div class="photo-slot" id="slot-3" onclick="triggerUpload(3)"><span class="photo-slot-icon">+</span><span class="photo-slot-text">Photo 4</span><button class="photo-del" onclick="event.stopPropagation();removePhoto(3)">✕</button></div>
+        <!-- 5e emplacement : l'ajout en propose 5, la modification n'en avait que
+             4 et supprimait donc silencieusement la dernière photo du produit. -->
+        <div class="photo-slot" id="slot-4" onclick="triggerUpload(4)"><span class="photo-slot-icon">+</span><span class="photo-slot-text">Photo 5</span><button class="photo-del" onclick="event.stopPropagation();removePhoto(4)">✕</button></div>
       </div>
       <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none"/>
       <p class="photo-hint">📌 Cliquez sur un emplacement pour modifier la photo · JPG, PNG · Max 5 MB</p>
@@ -227,7 +230,7 @@
 
 <script src="api.js"></script>
 <script>
-const uploadedImages = [null, null, null, null];
+const uploadedImages = [null, null, null, null, null];
 let activeSlot = 0;
 let productId = null;
 
@@ -286,7 +289,7 @@ function renderFilledSlot(i, url) {
 }
 
 function renderEmptySlot(i) {
-  const labels = ['Photo principale', 'Photo 2', 'Photo 3', 'Photo 4'];
+  const labels = ['Photo principale', 'Photo 2', 'Photo 3', 'Photo 4', 'Photo 5'];
   const s = document.getElementById('slot-' + i);
   s.className = 'photo-slot'; s.replaceChildren();
   const ic = document.createElement('span'); ic.className = 'photo-slot-icon'; ic.textContent = i === 0 ? '📷' : '+';
@@ -318,19 +321,14 @@ function updatePreview() {
       pv.src = main;
     } else { emoji.style.display = ''; if (pv) pv.remove(); }
   }
-  const commission = Math.round(price * 0.08), net = price - commission;
+  // Aucune commission n'est prélevée par le serveur : le vendeur perçoit le
+  // prix de vente entier. La ligne « Commission (8%) » a donc été retirée.
   const calc = document.getElementById('price-calc');
   if (calc) {
     calc.replaceChildren();
-    [['Prix de vente', price.toLocaleString() + ' FCFA'], ['Commission (8%)', '- ' + commission.toLocaleString() + ' FCFA']].forEach(pair => {
-      const row = document.createElement('div'); row.className = 'pc-row';
-      const l = document.createElement('span'); l.textContent = pair[0];
-      const r = document.createElement('span'); r.textContent = pair[1];
-      row.appendChild(l); row.appendChild(r); calc.appendChild(row);
-    });
     const tot = document.createElement('div'); tot.className = 'pc-row pc-total';
     const tl = document.createElement('span'); tl.textContent = 'Vous recevrez';
-    const tv = document.createElement('span'); tv.textContent = net.toLocaleString() + ' FCFA';
+    const tv = document.createElement('span'); tv.textContent = price.toLocaleString() + ' FCFA';
     tot.appendChild(tl); tot.appendChild(tv); calc.appendChild(tot);
   }
 }
@@ -363,7 +361,7 @@ function fillForm(prod) {
   document.getElementById('prod-stock').value = prod.stock ?? 0;
   document.getElementById('prod-status').value = prod.status || 'ACTIVE';
 
-  (prod.images || []).slice(0, 4).forEach((url, i) => { if (url) { uploadedImages[i] = url; renderFilledSlot(i, url); } });
+  (prod.images || []).slice(0, 5).forEach((url, i) => { if (url) { uploadedImages[i] = url; renderFilledSlot(i, url); } });
 
   const sizes = prod.sizes || [];
   document.querySelectorAll('#sizes-container .vtag').forEach(t => { if (sizes.includes(t.getAttribute('data-size'))) t.classList.add('sel'); });
@@ -432,6 +430,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!result.success || !result.data) {
     showToastLocal('Produit introuvable', 'error');
     setTimeout(() => location.href = 'marche-senegal-mes-produits.html', 1500);
+    return;
+  }
+
+  // GET /api/products/:id est public : la page affichait donc le produit d'un
+  // autre vendeur dans un formulaire éditable, dont l'enregistrement échouait.
+  const maBoutique = user.shop?.id || (await getDashboard())?.data?.shop?.id;
+  const boutiqueDuProduit = result.data.shopId || result.data.shop?.id;
+  if (maBoutique && boutiqueDuProduit && maBoutique !== boutiqueDuProduit) {
+    showToastLocal('Ce produit appartient à une autre boutique', 'error');
+    setTimeout(() => location.href = 'marche-senegal-mes-produits.html', 1800);
     return;
   }
 

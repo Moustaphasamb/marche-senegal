@@ -308,7 +308,7 @@
       <div class="sb-avatar">MF</div>
       <div>
         <div class="sb-shop-name">Mode Fatou Ndoye</div>
-        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+        <div class="sb-shop-status" id="sb-shop-status"><div class="sb-status-dot"></div><span>—</span></div>
         <div class="sb-plan">⭐ Plan Pro</div>
       </div>
     </div>
@@ -321,15 +321,15 @@
     <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions<span class="sb-badge gold" id="sb-badge-promotions" style="display:none">0</span></div>
     <div class="sb-section-label">Boutique</div>
     <div class="sb-item" onclick="window.location.href='marche-senegal-ma-boutique.html'"><span class="sb-icon">🏪</span>Ma boutique</div>
-    <div class="sb-item" onclick="toast('Visite virtuelle...')"><span class="sb-icon">🎥</span>Visite virtuelle</div>
+    <!-- Masquée tant qu'aucune visite virtuelle n'est renseignée (Shop.virtualTourUrl) -->
+    <div class="sb-item" id="sb-tour" style="display:none" onclick="ouvrirVisiteVirtuelle()"><span class="sb-icon">🎥</span>Visite virtuelle</div>
     <div class="sb-item" id="sb-messages" onclick="goToMessages()"><span class="sb-icon">💬</span>Messages<span class="sb-badge" id="sb-badge-messages" style="display:none">0</span></div>
-    <div class="sb-item" onclick="toast('Avis clients...')"><span class="sb-icon">⭐</span>Avis clients</div>
-    <div class="sb-section-label">Finance</div>
-    <div class="sb-item" onclick="toast('Mes revenus...')"><span class="sb-icon">💰</span>Mes revenus</div>
-    <div class="sb-item" onclick="toast('Factures...')"><span class="sb-icon">📄</span>Factures</div>
+    <div class="sb-item" onclick="showPage('avis',this)"><span class="sb-icon">⭐</span>Avis clients</div>
+    <!-- « Mes revenus », « Factures » et « Paramètres boutique » n'affichaient
+         qu'un message : rien ne les alimentait. Les revenus figurent déjà sur
+         le tableau de bord, les réglages dans « Ma boutique ». -->
     <div class="sb-section-label">Compte</div>
-    <div class="sb-item" onclick="toast('Paramètres boutique...')"><span class="sb-icon">⚙️</span>Paramètres boutique</div>
-    <div class="sb-item" onclick="toast('Mon profil...')"><span class="sb-icon">👤</span>Mon profil</div>
+    <div class="sb-item" onclick="window.location.href='marche-senegal-profil.html'"><span class="sb-icon">👤</span>Mon profil</div>
     <div class="sb-item" id="sb-see-shop" onclick="window.location.href='marche-senegal-accueil.html'"><span class="sb-icon">🌐</span>Voir ma boutique</div>
   </nav>
   <div class="sb-bottom">
@@ -354,11 +354,9 @@
     <button class="tb-search-btn">🔍</button>
   </div>
   <div class="tb-actions">
-    <button class="tb-btn" onclick="toast('Notifications...')">
-      🔔<div class="tb-notif-badge">8</div>
-    </button>
-    <button class="tb-btn" onclick="toast('Aide...')">❓</button>
-    <div class="tb-profile" onclick="toast('Profil...')">
+    <!-- La cloche affichait « 8 » notifications et le bouton d'aide un simple
+         message : aucun des deux n'était relié à quoi que ce soit. Retirés. -->
+    <div class="tb-profile" onclick="window.location.href='marche-senegal-profil.html'">
       <div class="tb-profile-av">MF</div>
       <span class="tb-profile-name">Fatou Ndoye</span>
     </div>
@@ -422,7 +420,7 @@
         </div>
         <div class="kpi-val">4.8</div>
         <div class="kpi-label">Note moyenne</div>
-        <div class="kpi-sub">234 avis clients</div>
+        <div class="kpi-sub" id="kpi3-sub">—</div>
       </div>
     </div>
 
@@ -607,6 +605,19 @@
         <div><div class="fp-label">Durée</div><div class="fp-val" id="preview-duration">7 jours</div></div>
       </div>
       <button class="promo-submit" id="promo-submit-btn" onclick="submitPromo()">🎯 Activer la promotion</button>
+    </div>
+  </div>
+
+  <!-- ══ AVIS CLIENTS ══ -->
+  <div class="page-section" id="page-avis">
+    <div class="page-header">
+      <div class="ph-title">⭐ Avis clients</div>
+      <div style="font-size:.86rem;color:var(--muted)" id="avis-resume">—</div>
+    </div>
+    <div class="table-card">
+      <div class="prod-list" id="avis-liste">
+        <div style="text-align:center;padding:24px;color:var(--muted)">Chargement des avis…</div>
+      </div>
     </div>
   </div>
 

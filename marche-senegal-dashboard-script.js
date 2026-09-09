@@ -108,6 +108,7 @@ async function loadDashboard() {
   if (sbAv) sbAv.textContent = initials || shop.name.substring(0,2).toUpperCase();
   const sbShopName = document.querySelector('.sb-shop-name');
   if (sbShopName) sbShopName.textContent = shop.name;
+  majStatutSidebar(shop);
   const sbPlan = document.querySelector('.sb-plan');
   if (sbPlan) sbPlan.textContent = shop.plan === 'PRO' ? '⭐ Plan Pro' : shop.plan === 'BUSINESS' ? '🚀 Plan Business' : '🆓 Plan Gratuit';
 
@@ -140,6 +141,13 @@ async function loadDashboard() {
   if (kpiVals[1]) kpiVals[1].textContent = stats.totalOrders;
   if (kpiVals[2]) kpiVals[2].textContent = stats.totalProducts;
   if (kpiVals[3]) kpiVals[3].textContent = shop.rating > 0 ? shop.rating.toFixed(1) : 'Nouveau';
+  // « 234 avis clients » restait écrit en dur sous la note, même à zéro avis.
+  const kpi3sub = document.getElementById('kpi3-sub');
+  if (kpi3sub) {
+    const n = shop.totalReviews || 0;
+    kpi3sub.textContent = n === 0 ? 'Aucun avis pour le moment'
+                                  : n + (n === 1 ? ' avis client' : ' avis clients');
+  }
   const kpi0sub = document.getElementById('kpi0-sub');
   if (kpi0sub) kpi0sub.textContent = stats.totalOrders + ' commandes au total';
   const kpi1sub = document.getElementById('kpi1-sub');
@@ -153,6 +161,10 @@ async function loadDashboard() {
   setBadge('sb-badge-orders', stats.pendingOrders);
   setBadge('sb-badge-messages', stats.unreadMessages);
   setBadge('sb-badge-promotions', stats.activePromotions);
+
+  // Visite virtuelle : l'entrée n'apparaît que si le vendeur en a renseigné une
+  const sbTour = document.getElementById('sb-tour');
+  if (sbTour) sbTour.style.display = shop.virtualTourUrl ? '' : 'none';
 
   // Lien boutique
   const sbSeeShop = document.getElementById('sb-see-shop');
@@ -242,6 +254,11 @@ async function loadDashboard() {
 
   // ── Activité récente ──
   const actList = document.querySelector('.activity-list');
+  // Sans ce cas, la liste gardait l'activité de démonstration écrite dans le
+  // HTML — « Nouvelle commande de Moussa Sow » sur une boutique sans commande.
+  if (actList && recentOrders.length === 0) {
+    setEmpty(actList, 'Aucune activité pour le moment');
+  }
   if (actList && recentOrders.length > 0) {
     const frag = document.createDocumentFragment();
     recentOrders.slice(0, 5).forEach(order => {
@@ -417,9 +434,62 @@ function showPage(pageId, navItem) {
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     navItem.classList.add('active');
   }
-  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions' };
+  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
   if (pageId === 'promotions')  loadPromotions();
+  if (pageId === 'avis')        loadAvis();
+}
+
+// ── Avis clients ──
+// L'entrée de menu n'affichait qu'un message alors que GET /api/reviews/shop/:id
+// existe depuis le début.
+async function loadAvis() {
+  const liste = document.getElementById('avis-liste');
+  const resume = document.getElementById('avis-resume');
+  if (!liste) return;
+
+  const shopId = getCurrentUser()?.shop?.id || (await getDashboard())?.data?.shop?.id;
+  if (!shopId) { setEmpty(liste, 'Boutique introuvable'); return; }
+
+  const result = await getShopReviews(shopId);
+  if (!result.success) { setEmpty(liste, 'Impossible de charger les avis'); return; }
+
+  const avis = result.data || [];
+  if (resume) {
+    resume.textContent = avis.length === 0
+      ? 'Aucun avis pour le moment'
+      : avis.length + (avis.length === 1 ? ' avis reçu' : ' avis reçus');
+  }
+
+  if (!avis.length) {
+    setEmpty(liste, 'Aucun avis pour le moment — ils apparaîtront après vos premières livraisons');
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  avis.forEach(a => {
+    const ligne = mk('div', 'prod-row');
+
+    const note = mk('div', 'pr-rank gold', String(a.rating ?? '—'));
+    const info = mk('div', 'pr-info');
+    info.appendChild(mk('div', 'pr-name', a.buyer?.firstName || 'Client'));
+    info.appendChild(mk('div', 'pr-cat', a.comment || 'Sans commentaire'));
+
+    const droite = mk('div', 'pr-right');
+    droite.appendChild(mk('div', 'pr-sold', '★'.repeat(Math.max(0, Math.min(5, a.rating || 0)))));
+    droite.appendChild(mk('div', 'pr-rev', formatDate(a.createdAt)));
+
+    ligne.appendChild(note); ligne.appendChild(info); ligne.appendChild(droite);
+    frag.appendChild(ligne);
+  });
+  liste.replaceChildren(frag);
+}
+
+// Ouvre la visite virtuelle si le vendeur en a renseigné une dans « Ma boutique ».
+function ouvrirVisiteVirtuelle() {
+  const url = getCurrentUser()?.shop?.virtualTourUrl;
+  if (url) window.open(url, '_blank', 'noopener');
+  else showToast('Ajoutez le lien de votre visite virtuelle dans « Ma boutique »', 'error');
 }
 
 function goToMessages() {

@@ -124,7 +124,7 @@
       <div class="sb-avatar" id="sb-avatar">MF</div>
       <div>
         <div class="sb-shop-name" id="sb-shop-name">Ma boutique</div>
-        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+        <div class="sb-shop-status" id="sb-shop-status"><div class="sb-status-dot"></div><span>—</span></div>
       </div>
     </div>
   </div>
@@ -156,7 +156,9 @@
   </button>
   <div class="tb-title">➕ Ajouter un produit</div>
   <div class="tb-actions">
-    <button onclick="toast('💾 Brouillon sauvegardé !')" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:#fff;color:var(--dark);border:1.5px solid var(--border);display:flex;align-items:center;gap:5px">💾 Brouillon</button>
+    <!-- Le bouton « Brouillon » annonçait un enregistrement qui n'existait pas :
+         aucune route ne stocke de brouillon. Retiré plutôt que de mentir. -->
+    <button onclick="pauseProduct()" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:#fff;color:var(--dark);border:1.5px solid var(--border);display:flex;align-items:center;gap:5px">⏸️ Publier en pause</button>
     <button onclick="publishProduct()" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px">🚀 Publier</button>
     <div class="tb-profile">
       <div class="tb-profile-av" id="tb-av">MF</div>
@@ -212,16 +214,16 @@
       <div class="fgrid">
         <div class="fgrid-full field">
           <label class="fl">Nom du produit <span class="fl-req">*</span></label>
-          <input class="fi" type="text" id="prod-name" value="Boubou wax tissé main" oninput="updatePreview()" placeholder="Nom clair et descriptif du produit"/>
+          <input class="fi" type="text" id="prod-name" oninput="updatePreview()" placeholder="Nom clair et descriptif du produit"/>
           <span class="fi-hint">Un bon nom = plus de visibilité dans la recherche</span>
         </div>
         <div class="fgrid-full field">
           <label class="fl">Description <span class="fl-req">*</span></label>
-          <textarea class="fi fi-ta" placeholder="Décrivez votre produit : matière, dimensions, utilisation, conseils d'entretien...">Boubou wax tissé main de qualité supérieure. Tissu wax hollandais 100% coton. Couture et broderie entièrement faites à la main par les artisans sénégalais. Idéal pour les cérémonies, Tabaski, Korité. Disponible en plusieurs tailles et couleurs.</textarea>
+          <textarea class="fi fi-ta" oninput="updatePreview()" placeholder="Décrivez votre produit : matière, dimensions, utilisation, conseils d'entretien..."></textarea>
         </div>
         <div class="field">
           <label class="fl">Prix de vente (FCFA) <span class="fl-req">*</span></label>
-          <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-price" value="18000" oninput="updatePreview()" placeholder="0"/></div>
+          <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-price" oninput="updatePreview()" placeholder="0"/></div>
         </div>
         <div class="field">
           <label class="fl">Ancien prix (optionnel)</label>
@@ -255,9 +257,9 @@
         <div class="vtags">
           <div class="vtag" onclick="this.classList.toggle('sel')">S</div>
           <div class="vtag" onclick="this.classList.toggle('sel')">M</div>
-          <div class="vtag sel" onclick="this.classList.toggle('sel')">L</div>
-          <div class="vtag sel" onclick="this.classList.toggle('sel')">XL</div>
-          <div class="vtag sel" onclick="this.classList.toggle('sel')">XXL</div>
+          <div class="vtag" onclick="this.classList.toggle('sel')">L</div>
+          <div class="vtag" onclick="this.classList.toggle('sel')">XL</div>
+          <div class="vtag" onclick="this.classList.toggle('sel')">XXL</div>
           <div class="vtag" onclick="this.classList.toggle('sel')">XXXL</div>
           <div class="vtag" onclick="toast('Ajouter une taille personnalisée...')">+ Sur mesure</div>
         </div>
@@ -265,8 +267,8 @@
       <div class="vrow">
         <div class="vrow-label" style="margin-top:4px">Couleurs</div>
         <div class="color-swatches">
-          <div class="cs sel" style="background:linear-gradient(135deg,#1565C0,#F9A825)" title="Bleu/Or" onclick="this.classList.toggle('sel')"></div>
-          <div class="cs sel" style="background:linear-gradient(135deg,#C62828,#212121)" title="Rouge/Noir" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:linear-gradient(135deg,#1565C0,#F9A825)" title="Bleu/Or" onclick="this.classList.toggle('sel')"></div>
+          <div class="cs" style="background:linear-gradient(135deg,#C62828,#212121)" title="Rouge/Noir" onclick="this.classList.toggle('sel')"></div>
           <div class="cs" style="background:linear-gradient(135deg,#2E7D32,#FAFAFA)" title="Vert/Blanc" onclick="this.classList.toggle('sel')"></div>
           <div class="cs" style="background:linear-gradient(135deg,#6A1B9A,#F57F17)" title="Violet/Or" onclick="this.classList.toggle('sel')"></div>
           <div class="cs" style="background:linear-gradient(135deg,#880E4F,#F3E5F5)" title="Rose/Blanc" onclick="this.classList.toggle('sel')"></div>
@@ -337,34 +339,36 @@
             <div class="pp-badge" id="prev-badge" style="display:none">-15%</div>
           </div>
           <div class="pp-body">
-            <div class="pp-market">🏛️ Sandaga · Mode Fatou Ndoye</div>
-            <div class="pp-name" id="prev-name">Boubou wax tissé main</div>
+            <div class="pp-market" id="prev-market">—</div>
+            <div class="pp-name" id="prev-name">Nom du produit</div>
             <div style="display:flex;align-items:baseline;gap:4px">
-              <span class="pp-price" id="prev-price">18 000 FCFA</span>
+              <span class="pp-price" id="prev-price">0 FCFA</span>
               <span class="pp-old" id="prev-old" style="display:none"></span>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- La commission de 8 % annoncée ici n'existe nulle part côté serveur :
+           le vendeur perçoit le prix de vente entier. Le detail est retire tant
+           qu'aucun prelevement n'est reellement applique. -->
       <div class="price-calc" id="price-calc">
-        <div class="pc-row"><span>Prix de vente</span><span>18 000 FCFA</span></div>
-        <div class="pc-row"><span>Commission Marché SN (8%)</span><span>- 1 440 FCFA</span></div>
-        <div class="pc-row pc-total"><span>Vous recevrez</span><span id="net-price">16 560 FCFA</span></div>
+        <div class="pc-row pc-total"><span>Vous recevrez</span><span id="net-price">0 FCFA</span></div>
       </div>
 
+      <!-- Chaque ligne est pilotée par updateChecklist() / updatePreview().
+           Les mentions « options de livraison » et « +40% de vues » ont été
+           retirées : rien sur cette page ne permettait de les vérifier. -->
       <div class="checklist">
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Photos ajoutées (3/5)</span></div>
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Nom du produit renseigné</span></div>
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Prix défini</span></div>
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Description rédigée</span></div>
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Catégorie sélectionnée</span></div>
-        <div class="cl-item"><div class="cl-dot cl-warn"></div><span class="cl-text warn">⚠ Ajoutez 2 photos de plus pour +40% de vues</span></div>
-        <div class="cl-item"><div class="cl-dot cl-ok"></div><span class="cl-text">✓ Options de livraison configurées</span></div>
+        <div class="cl-item"><div class="cl-dot cl-err"></div><span class="cl-text err">Aucune photo — ajoutez au moins 1 photo</span></div>
+        <div class="cl-item"><div class="cl-dot cl-err"></div><span class="cl-text err">✗ Nom du produit manquant</span></div>
+        <div class="cl-item"><div class="cl-dot cl-err"></div><span class="cl-text err">✗ Prix manquant</span></div>
+        <div class="cl-item"><div class="cl-dot cl-err"></div><span class="cl-text err">✗ Description manquante</span></div>
+        <div class="cl-item"><div class="cl-dot cl-err"></div><span class="cl-text err">✗ Catégorie non choisie</span></div>
       </div>
 
       <button class="publish-btn" onclick="publishProduct()">🚀 Publier le produit</button>
-      <button class="draft-btn" onclick="toast('💾 Brouillon enregistré !')">💾 Sauvegarder en brouillon</button>
+      <button class="draft-btn" onclick="pauseProduct()">⏸️ Publier en pause</button>
 
       <div style="margin-top:14px;font-size:.74rem;color:var(--muted);text-align:center;line-height:1.6">
         🔒 Votre produit sera visible dès la publication par les acheteurs de toute la plateforme
@@ -536,7 +540,10 @@ function updateChecklist(){
 
 // ── Apercu en temps reel ──
 function updatePreview(){
-  const name = document.getElementById('prod-name')?.value || 'Nom du produit';
+  // nomSaisi = ce que le vendeur a réellement tapé ; name = ce qu'on affiche
+  // dans l'aperçu, avec un texte de remplacement quand le champ est vide.
+  const nomSaisi = (document.getElementById('prod-name')?.value || '').trim();
+  const name = nomSaisi || 'Nom du produit';
   const price = parseInt(document.getElementById('prod-price')?.value) || 0;
   const oldPrice = parseInt(document.getElementById('prod-old-price')?.value) || 0;
   const discount = parseInt(document.getElementById('prod-discount')?.value) || 0;
@@ -580,65 +587,48 @@ function updatePreview(){
     }
   }
 
-  // Checklist nom et prix
-  const clItems = document.querySelectorAll('.cl-item');
-  if (clItems[1]) {
-    const dot = clItems[1].querySelector('.cl-dot');
-    const txt = clItems[1].querySelector('.cl-text');
-    if (!name || name === 'Nom du produit') {
-      if (dot) dot.className = 'cl-dot cl-err';
-      if (txt) { txt.className = 'cl-text err'; txt.textContent = '✗ Nom du produit manquant'; }
-    } else {
-      if (dot) dot.className = 'cl-dot cl-ok';
-      if (txt) { txt.className = 'cl-text'; txt.textContent = '✓ Nom du produit renseigné'; }
-    }
-  }
-  if (clItems[2]) {
-    const dot = clItems[2].querySelector('.cl-dot');
-    const txt = clItems[2].querySelector('.cl-text');
-    if (!price) {
-      if (dot) dot.className = 'cl-dot cl-err';
-      if (txt) { txt.className = 'cl-text err'; txt.textContent = '✗ Prix manquant'; }
-    } else {
-      if (dot) dot.className = 'cl-dot cl-ok';
-      if (txt) { txt.className = 'cl-text'; txt.textContent = '✓ Prix défini — ' + price.toLocaleString() + ' FCFA'; }
-    }
-  }
+  // Checklist — chaque ligne reflète l'état réel du formulaire
+  const description = (document.querySelector('textarea.fi-ta')?.value || '').trim();
+  const categorie = document.querySelector('.cg-btn.sel');
 
-  // Calcul commission
-  const commission = Math.round(price * 0.08);
-  const net = price - commission;
-  const calc = document.querySelector('.price-calc');
-  if(calc){
-    calc.replaceChildren();
-    [['Prix de vente', price.toLocaleString() + ' FCFA'],
-     ['Commission Marché SN (8%)', '- ' + commission.toLocaleString() + ' FCFA']
-    ].forEach(function(pair){
-      const row = document.createElement('div');
-      row.className = 'pc-row';
-      const s1 = document.createElement('span'); s1.textContent = pair[0];
-      const s2 = document.createElement('span'); s2.textContent = pair[1];
-      row.appendChild(s1); row.appendChild(s2);
-      calc.appendChild(row);
-    });
-    const totalRow = document.createElement('div');
-    totalRow.className = 'pc-row pc-total';
-    const tl = document.createElement('span'); tl.textContent = 'Vous recevrez';
-    const tv = document.createElement('span'); tv.textContent = net.toLocaleString() + ' FCFA';
-    totalRow.appendChild(tl); totalRow.appendChild(tv);
-    calc.appendChild(totalRow);
+  setChecklistItem(1, Boolean(nomSaisi), '✓ Nom du produit renseigné', '✗ Nom du produit manquant');
+  setChecklistItem(2, Boolean(price),
+    price ? '✓ Prix défini — ' + price.toLocaleString() + ' FCFA' : '', '✗ Prix manquant');
+  setChecklistItem(3, Boolean(description), '✓ Description rédigée', '✗ Description manquante');
+  setChecklistItem(4, Boolean(categorie),
+    categorie ? '✓ Catégorie : ' + categorie.textContent.trim() : '', '✗ Catégorie non choisie');
+
+  // Ce que le vendeur perçoit. Aucun prélèvement n'est appliqué par le serveur :
+  // il reçoit donc le prix de vente entier.
+  const net = document.getElementById('net-price');
+  if (net) net.textContent = price.toLocaleString() + ' FCFA';
+}
+
+// Bascule une ligne de la checklist entre son état satisfait et son état manquant.
+function setChecklistItem(index, ok, texteOk, texteManquant){
+  const item = document.querySelectorAll('.cl-item')[index];
+  if (!item) return;
+  const dot = item.querySelector('.cl-dot');
+  const txt = item.querySelector('.cl-text');
+  if (dot) dot.className = 'cl-dot ' + (ok ? 'cl-ok' : 'cl-err');
+  if (txt) {
+    txt.className = 'cl-text' + (ok ? '' : ' err');
+    txt.textContent = ok ? texteOk : texteManquant;
   }
 }
 
 function selCat(btn){
   document.querySelectorAll('.cg-btn').forEach(b => b.classList.remove('sel'));
   btn.classList.add('sel');
+  updatePreview(); // la checklist suit le choix de catégorie
 }
 
 function toggleCb(row){ row.classList.toggle('checked'); }
 
 // ── Publier le produit ──
-async function publishProduct(){
+// statut : 'ACTIVE' (visible immédiatement) ou 'PAUSED' (enregistré, invisible)
+async function publishProduct(statut){
+  const enPause = statut === 'PAUSED';
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if(!user){
     toast('Connectez-vous pour publier');
@@ -655,8 +645,19 @@ async function publishProduct(){
   const descEl = document.querySelector('textarea.fi-ta');
   const description = descEl ? descEl.value.trim() : '';
 
+  const selectedCatCheck = document.querySelector('.cg-btn.sel');
   if(!name || !price){
     toast('Remplissez le nom et le prix du produit');
+    return;
+  }
+  // Le formulaire marque description et catégorie d'une étoile : on les exige
+  // vraiment, au lieu de publier un produit sans description ni rayon.
+  if(!description){
+    toast('Ajoutez une description de votre produit');
+    return;
+  }
+  if(!selectedCatCheck){
+    toast('Choisissez une catégorie pour votre produit');
     return;
   }
 
@@ -679,15 +680,18 @@ async function publishProduct(){
     categoryId: selectedCat ? selectedCat.getAttribute('data-id') : null,
     images,
     sizes,
-    colors
+    colors,
+    status: enPause ? 'PAUSED' : 'ACTIVE'
   };
 
   const result = await createProduct(productData);
 
   if(result.success){
-    if(btn){ btn.textContent = 'Produit publié !'; btn.style.background = 'var(--gl)'; }
-    toast('Produit publié avec succès !');
-    setTimeout(() => window.location.href = 'marche-senegal-dashboard.html', 2000);
+    if(btn){ btn.textContent = enPause ? 'Produit enregistré !' : 'Produit publié !'; btn.style.background = 'var(--gl)'; }
+    toast(enPause
+      ? 'Produit enregistré en pause — activez-le quand vous voulez'
+      : 'Produit publié avec succès !');
+    setTimeout(() => window.location.href = 'marche-senegal-mes-produits.html', 2000);
   } else {
     if(btn){ btn.textContent = 'Publier le produit'; btn.style.background = ''; btn.disabled = false; }
     if(topBtn){ topBtn.textContent = 'Publier'; topBtn.disabled = false; }
@@ -716,6 +720,7 @@ function initSidebar(){
   const tbAv=document.getElementById('tb-av');const tbNm=document.getElementById('tb-name');
   if(avEl)avEl.textContent=av;if(nmEl)nmEl.textContent=nm;
   if(tbAv)tbAv.textContent=av;if(tbNm)tbNm.textContent=user.firstName||'Vendeur';
+  majStatutSidebar(shop);
 }
 document.addEventListener('DOMContentLoaded', function(){
   const user = getCurrentUser();
@@ -724,6 +729,7 @@ document.addEventListener('DOMContentLoaded', function(){
     return;
   }
   initSidebar();
+  afficherBoutiqueDansApercu();
 
   document.getElementById('file-input').addEventListener('change', function(){
     handleFileChange(this.files[0]);
@@ -735,6 +741,57 @@ document.addEventListener('DOMContentLoaded', function(){
   updateChecklist();
 });
 
+// L'aperçu annonçait « Sandaga · Mode Fatou Ndoye » à tous les vendeurs.
+// Il montre maintenant la boutique et le marché de celui qui publie.
+async function afficherBoutiqueDansApercu(){
+  const el = document.getElementById('prev-market');
+
+  let boutique = getCurrentUser()?.shop;
+  if (!boutique?.name) {
+    const res = await getDashboard();
+    boutique = res?.data?.shop;
+  }
+
+  if (el) {
+    el.textContent = boutique
+      ? '🏛️ ' + (boutique.market?.name ? boutique.market.name + ' · ' : '') + boutique.name
+      : '🏛️ Votre boutique';
+  }
+
+  // Le serveur refuse toute création tant que la boutique n'est pas validée.
+  // Autant le dire avant que le vendeur remplisse tout le formulaire.
+  if (boutique && boutique.status !== 'ACTIVE') avertirBoutiqueNonValidee(boutique.status);
+}
+
+function avertirBoutiqueNonValidee(statut){
+  const messages = {
+    PENDING:   'Votre boutique attend sa validation : vous pourrez publier dès qu’elle sera approuvée.',
+    SUSPENDED: 'Votre boutique est suspendue : la publication de produits est bloquée.',
+    REJECTED:  'Votre inscription a été refusée : contactez le support pour publier des produits.'
+  };
+
+  const banniere = document.createElement('div');
+  banniere.style.cssText = 'background:#FDF3DC;border:1.5px solid #E6A817;color:#8A6100;' +
+    'border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;font-weight:500';
+  banniere.textContent = '⏳ ' + (messages[statut] || messages.PENDING);
+
+  const contenu = document.querySelector('.main') || document.body;
+  contenu.insertBefore(banniere, contenu.firstChild);
+
+  document.querySelectorAll('.publish-btn, .draft-btn').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '.55';
+    b.style.cursor = 'not-allowed';
+  });
+}
+
+// Publier directement en pause : le produit est enregistré mais reste invisible
+// des acheteurs tant que le vendeur ne l'active pas depuis « Mes produits ».
+// Remplace l'ancien bouton « Brouillon », qui n'enregistrait rien.
+function pauseProduct(){
+  publishProduct('PAUSED');
+}
+
 async function loadCategories(){
   try {
     const res = await fetch(API_URL + '/api/categories');
@@ -743,8 +800,10 @@ async function loadCategories(){
     const grid = document.getElementById('cat-grid');
     grid.replaceChildren();
     data.data.forEach(function(cat, i){
+      // Aucune catégorie pré-sélectionnée : « Alimentation » se retrouvait
+      // choisie d'office, quel que soit le produit publié.
       const btn = document.createElement('div');
-      btn.className = 'cg-btn' + (i === 0 ? ' sel' : '');
+      btn.className = 'cg-btn';
       btn.setAttribute('data-id', cat.id);
       btn.onclick = function(){ selCat(btn); };
       const icon = document.createElement('span');

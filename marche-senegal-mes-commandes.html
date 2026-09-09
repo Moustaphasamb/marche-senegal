@@ -187,7 +187,7 @@ a{text-decoration:none;color:inherit}
       <div class="sb-avatar" id="sb-avatar">MF</div>
       <div>
         <div class="sb-shop-name" id="sb-shop-name">Ma boutique</div>
-        <div class="sb-shop-status"><div class="sb-status-dot"></div>Ouverte maintenant</div>
+        <div class="sb-shop-status" id="sb-shop-status"><div class="sb-status-dot"></div><span>—</span></div>
       </div>
     </div>
   </div>
@@ -710,6 +710,7 @@ function initSidebar(){
   const tbAv=document.getElementById('tb-av');const tbNm=document.getElementById('tb-name');
   if(avEl)avEl.textContent=av;if(nmEl)nmEl.textContent=nm;
   if(tbAv)tbAv.textContent=av;if(tbNm)tbNm.textContent=user.firstName||'Vendeur';
+  majStatutSidebar(shop);
 }
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
