@@ -481,6 +481,34 @@ function applyBanner(el, url, options = {}) {
 }
 
 // ────────────────────────────────
+// STATUT DE LA BOUTIQUE (espace vendeur)
+// ────────────────────────────────
+
+// Les pages vendeur affichaient « Ouverte maintenant » en dur dans leur barre
+// latérale, y compris pour une boutique en attente de validation ou suspendue.
+// Cette fonction est partagée par les quatre pages qui portent cette barre.
+const STATUTS_BOUTIQUE = {
+  ACTIVE:    { texte: 'Ouverte maintenant',      couleur: '#4CAF50' },
+  PENDING:   { texte: 'En attente de validation', couleur: '#E6A817' },
+  SUSPENDED: { texte: 'Boutique suspendue',       couleur: '#C0392B' },
+  REJECTED:  { texte: 'Inscription refusée',      couleur: '#C0392B' }
+};
+
+function majStatutSidebar(shop) {
+  const el = document.getElementById('sb-shop-status');
+  if (!el) return;
+
+  const etat = STATUTS_BOUTIQUE[shop?.status] || STATUTS_BOUTIQUE.PENDING;
+
+  const point = el.querySelector('.sb-status-dot');
+  if (point) point.style.background = etat.couleur;
+
+  const texte = el.querySelector('span');
+  if (texte) texte.textContent = etat.texte;
+  else el.appendChild(document.createTextNode(etat.texte));
+}
+
+// ────────────────────────────────
 // UTILITAIRES
 // ────────────────────────────────
 
