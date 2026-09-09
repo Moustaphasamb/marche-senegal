@@ -327,6 +327,10 @@ a{text-decoration:none;color:inherit}
   body{padding-bottom:130px}
   .toast{bottom:140px}
   .main{grid-template-columns:1fr}
+  /* Les elements d'une grille gardent min-width:auto : la colonne s'elargit
+     alors a la largeur minimale de son contenu — ici la rangee d'onglets en
+     white-space:nowrap — et la page deborde de la largeur de l'ecran. */
+  .main > *{min-width:0}
   .product-gallery{position:static;top:auto}
   .main-img{aspect-ratio:4/3;font-size:6rem}
   .similar-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
