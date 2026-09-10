@@ -403,8 +403,10 @@
         <div class="vs-header">
           <div class="vs-title">🏪 Visitez la boutique</div>
         </div>
-        <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg)">
-          <img id="vitrine-img" alt="Photo de la boutique" style="width:100%;display:block">
+        <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
+          <div id="vitrine-scene" style="position:relative;will-change:transform">
+            <img id="vitrine-img" alt="Photo de la boutique" style="width:100%;display:block">
+          </div>
         </div>
         <div class="vp-hint" id="vitrine-hint">📌 Appuyez sur un point pour voir le produit</div>
       </div>
@@ -939,7 +941,7 @@ function afficherVitrine(shop) {
 
     boite.appendChild(echec);
   };
-  image.onload = () => dessinerPastilles();
+  image.onload = () => { dessinerPastilles(); activerZoomVitrine(); };
   image.src = shop.showcaseUrl;
 
   // Sans point, la photo vaut déjà comme vitrine : on la montre sans consigne.
@@ -947,7 +949,7 @@ function afficherVitrine(shop) {
 }
 
 function dessinerPastilles() {
-  const boite = document.getElementById('vitrine-box');
+  const boite = document.getElementById('vitrine-scene');
   boite.querySelectorAll('.vitrine-pastille').forEach(e => e.remove());
 
   _vitrinePoints.forEach((point, i) => {
@@ -959,6 +961,8 @@ function dessinerPastilles() {
     pastille.onclick = (e) => { e.stopPropagation(); ouvrirFicheVitrine(point); };
     boite.appendChild(pastille);
   });
+
+  appliquerTransformationVitrine();
 }
 
 function ouvrirFicheVitrine(point) {
@@ -1035,6 +1039,108 @@ function fermerFicheSurEchap(e) {
 function fermerFicheVitrine() {
   document.getElementById('vitrine-fiche')?.remove();
   document.removeEventListener('keydown', fermerFicheSurEchap);
+}
+
+/* ── Zoom de la vitrine ──
+   Une transformation CSS sur un conteneur intérieur : l'image et les
+   pastilles bougent ensemble, les positions en pourcentage restent valables.
+   Les pastilles compensent l'échelle pour garder une taille constante et
+   rester cliquables au zoom maximal. */
+const VITRINE_ZOOM_MIN = 1;
+const VITRINE_ZOOM_MAX = 4;
+let _vitrineEchelle = 1;
+let _vitrineX = 0;
+let _vitrineY = 0;
+
+function appliquerTransformationVitrine() {
+  const scene = document.getElementById('vitrine-scene');
+  if (!scene) return;
+
+  const boite = document.getElementById('vitrine-box');
+  const largeur = boite.clientWidth;
+  const hauteur = boite.clientHeight;
+
+  // On empêche de sortir de l'image : au-delà du cadre, on recolle au bord.
+  const debordementX = Math.max(0, (largeur * _vitrineEchelle - largeur) / 2);
+  const debordementY = Math.max(0, (hauteur * _vitrineEchelle - hauteur) / 2);
+  _vitrineX = Math.min(debordementX, Math.max(-debordementX, _vitrineX));
+  _vitrineY = Math.min(debordementY, Math.max(-debordementY, _vitrineY));
+
+  scene.style.transform =
+    'translate(' + _vitrineX + 'px,' + _vitrineY + 'px) scale(' + _vitrineEchelle + ')';
+
+  scene.querySelectorAll('.vitrine-pastille').forEach(p => {
+    p.style.transform = 'translate(-50%,-50%) scale(' + (1 / _vitrineEchelle) + ')';
+  });
+}
+
+function reglerZoomVitrine(nouvelleEchelle) {
+  _vitrineEchelle = Math.min(VITRINE_ZOOM_MAX, Math.max(VITRINE_ZOOM_MIN, nouvelleEchelle));
+  if (_vitrineEchelle === 1) { _vitrineX = 0; _vitrineY = 0; }
+  appliquerTransformationVitrine();
+}
+
+function activerZoomVitrine() {
+  const boite = document.getElementById('vitrine-box');
+  const scene = document.getElementById('vitrine-scene');
+  if (!boite || !scene) return;
+
+  scene.style.transformOrigin = 'center center';
+  scene.style.transition = 'transform .08s linear';
+
+  boite.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    reglerZoomVitrine(_vitrineEchelle * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+  }, { passive: false });
+
+  boite.addEventListener('dblclick', () => reglerZoomVitrine(1));
+
+  let depart = null;
+  let distanceDepart = null;
+  let echelleDepart = 1;
+
+  const distanceEntre = (touches) => Math.hypot(
+    touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY
+  );
+
+  boite.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      distanceDepart = distanceEntre(e.touches);
+      echelleDepart = _vitrineEchelle;
+    } else if (e.touches.length === 1 && _vitrineEchelle > 1) {
+      depart = { x: e.touches[0].clientX - _vitrineX, y: e.touches[0].clientY - _vitrineY };
+    }
+  }, { passive: true });
+
+  boite.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && distanceDepart) {
+      e.preventDefault();
+      reglerZoomVitrine(echelleDepart * (distanceEntre(e.touches) / distanceDepart));
+    } else if (e.touches.length === 1 && depart) {
+      e.preventDefault();
+      _vitrineX = e.touches[0].clientX - depart.x;
+      _vitrineY = e.touches[0].clientY - depart.y;
+      appliquerTransformationVitrine();
+    }
+  }, { passive: false });
+
+  boite.addEventListener('touchend', () => { depart = null; distanceDepart = null; });
+
+  // À la souris : glisser pour se déplacer une fois zoomé.
+  let souris = null;
+  boite.addEventListener('mousedown', (e) => {
+    if (_vitrineEchelle > 1) { souris = { x: e.clientX - _vitrineX, y: e.clientY - _vitrineY }; e.preventDefault(); }
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!souris) return;
+    _vitrineX = e.clientX - souris.x;
+    _vitrineY = e.clientY - souris.y;
+    appliquerTransformationVitrine();
+  });
+  window.addEventListener('mouseup', () => { souris = null; });
+
+  window.addEventListener('resize', appliquerTransformationVitrine);
 }
 
 // ── Charger les produits de la boutique ──
