@@ -1051,6 +1051,9 @@ const VITRINE_ZOOM_MAX = 4;
 let _vitrineEchelle = 1;
 let _vitrineX = 0;
 let _vitrineY = 0;
+// Empêche de reposer wheel/dblclick/touch/souris/resize à chaque rechargement
+// réussi de la photo (ex. après un échec puis « Réessayer »).
+let _vitrineZoomActive = false;
 
 function appliquerTransformationVitrine() {
   const scene = document.getElementById('vitrine-scene');
@@ -1084,6 +1087,16 @@ function activerZoomVitrine() {
   const boite = document.getElementById('vitrine-box');
   const scene = document.getElementById('vitrine-scene');
   if (!boite || !scene) return;
+
+  // Une photo (re)chargée repart toujours de la vue d'ensemble, même si les
+  // écouteurs eux sont déjà posés depuis un appel précédent.
+  _vitrineEchelle = 1;
+  _vitrineX = 0;
+  _vitrineY = 0;
+  appliquerTransformationVitrine();
+
+  if (_vitrineZoomActive) return;
+  _vitrineZoomActive = true;
 
   scene.style.transformOrigin = 'center center';
   scene.style.transition = 'transform .08s linear';
