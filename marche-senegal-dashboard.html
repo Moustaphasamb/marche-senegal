@@ -47,7 +47,7 @@
 .wb-btn-gold:hover{filter:brightness(1.08)}
 
 /* KPI Cards */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
 .kpi-card{
   background:#fff;border:1.5px solid var(--border);
   border-radius:var(--radius);padding:18px;
@@ -400,7 +400,7 @@
           <div class="kpi-change up">↑ +18%</div>
         </div>
         <div class="kpi-val">342 500</div>
-        <div class="kpi-label">Revenus totaux (FCFA)</div>
+        <div class="kpi-label">Revenus encaissés (FCFA)</div>
         <div class="kpi-sub" id="kpi0-sub">commandes livrées</div>
       </div>
       <div class="kpi-card">
@@ -429,6 +429,17 @@
         <div class="kpi-val">4.8</div>
         <div class="kpi-label">Note moyenne</div>
         <div class="kpi-sub" id="kpi3-sub">—</div>
+      </div>
+      <!-- Encaissé par la plateforme, pas encore chez le vendeur : c'est la
+           question qu'il se pose en premier. -->
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon ki-gold">🔒</div>
+          <div class="kpi-change flat" id="kpi4-change">→ séquestre</div>
+        </div>
+        <div class="kpi-val" id="kpi4-val">—</div>
+        <div class="kpi-label">En attente de versement</div>
+        <div class="kpi-sub" id="kpi4-sub">versé à la confirmation de l'acheteur</div>
       </div>
     </div>
 
