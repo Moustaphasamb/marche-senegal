@@ -81,6 +81,15 @@
 .back-btn{width:100%;height:40px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:10px;font-size:.84rem;font-weight:500;cursor:pointer;margin-top:8px;transition:all .2s}
 .back-btn:hover{border-color:var(--green);color:var(--green)}
 
+.cni-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.cni-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:16px 10px;background:var(--bg);border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;transition:all .2s}
+.cni-slot:hover{border-color:var(--green)}
+.cni-slot.rempli{border-style:solid;border-color:var(--green);background:var(--gp)}
+.cni-slot.occupe{opacity:.6;cursor:wait}
+.cni-slot-icon{font-size:1.5rem}
+.cni-slot-label{font-size:.84rem;font-weight:600;color:var(--dark)}
+.cni-slot-state{font-size:.7rem;color:var(--muted);line-height:1.3}
+.cni-slot.rempli .cni-slot-state{color:var(--green);font-weight:600}
 .pending-box{background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:16px;margin-bottom:16px}
 .pb-title{font-size:.88rem;font-weight:600;color:#8A6100;margin-bottom:5px}
 .pb-text{font-size:.78rem;color:#8A6100;line-height:1.6}
@@ -321,7 +330,8 @@
         <div class="pending-box" style="margin-top:12px">
           <div class="pb-title">⏳ Validation en 24-48h</div>
           <div class="pb-text">
-            Votre boutique sera visible après validation par notre équipe. Vous pouvez déjà ajouter vos produits !
+            Votre boutique devient visible des acheteurs après validation par notre équipe.
+            En attendant, préparez vos produits : ils seront publiés dès la validation.
           </div>
         </div>
 
@@ -331,13 +341,66 @@
         <button class="back-btn" onclick="showStep('step-register-1')">← Retour</button>
       </div>
 
+      <!-- ── INSCRIPTION ÉTAPE 3 — Pièce d'identité ──
+           Après la création du compte : l'envoi des photos réclame un jeton,
+           et le vendeur qui n'a pas sa carte sous la main passe son tour. -->
+      <div class="step" id="step-register-3">
+
+        <div class="progress">
+          <div class="prog-step">
+            <div class="prog-dot done">✓</div>
+            <span class="prog-label done">Compte</span>
+          </div>
+          <div class="prog-line done"></div>
+          <div class="prog-step">
+            <div class="prog-dot done">✓</div>
+            <span class="prog-label done">Boutique</span>
+          </div>
+          <div class="prog-line done"></div>
+          <div class="prog-step">
+            <div class="prog-dot active">3</div>
+            <span class="prog-label active">Identité</span>
+          </div>
+        </div>
+
+        <div class="form-title">Votre pièce d'identité 🪪</div>
+        <div class="form-sub">
+          Notre équipe en a besoin pour valider votre boutique. Envoyez-la maintenant,
+          ou plus tard depuis « Ma boutique ».
+        </div>
+
+        <div class="field">
+          <label class="fl" for="cni-number">Numéro de CNI</label>
+          <input class="fi" type="text" id="cni-number" placeholder="Ex : 1234567890123" maxlength="20"/>
+        </div>
+
+        <div class="cni-slots">
+          <button type="button" class="cni-slot" id="cni-slot-front" onclick="choisirCni('front')">
+            <span class="cni-slot-icon">🪪</span>
+            <span class="cni-slot-label">Recto</span>
+            <span class="cni-slot-state" id="cni-state-front">Appuyez pour photographier</span>
+          </button>
+          <button type="button" class="cni-slot" id="cni-slot-back" onclick="choisirCni('back')">
+            <span class="cni-slot-icon">🪪</span>
+            <span class="cni-slot-label">Verso</span>
+            <span class="cni-slot-state" id="cni-state-back">Appuyez pour photographier</span>
+          </button>
+        </div>
+        <input type="file" id="cni-file-input" accept="image/*" style="display:none"/>
+
+        <button class="submit-btn" id="cni-submit-btn" onclick="envoyerCni()">
+          ✓ Envoyer mes pièces
+        </button>
+        <button class="back-btn" onclick="terminerInscription()">Je l'envoie plus tard</button>
+      </div>
+
       <!-- ── SUCCÈS ── -->
       <div class="step" id="step-success">
         <div class="success-box">
           <span class="sb-icon">🏪</span>
           <div class="sb-title">Boutique créée !</div>
           <div class="sb-sub">
-            Votre boutique est créée. Notre équipe va valider votre compte dans les 24-48h. En attendant, vous pouvez déjà ajouter vos produits !
+            Votre boutique est créée. Notre équipe valide votre dossier sous 24 à 48h. En attendant, préparez vos produits : ils partiront en ligne dès la validation.
           </div>
           <div class="sb-shop">
             <div class="sb-shop-label">Votre boutique</div>
@@ -398,6 +461,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (user.role === 'ADMIN')  { window.location.href = 'marche-senegal-admin.html'; return; }
     if (user.role === 'BUYER')  { window.location.href = 'marche-senegal-accueil.html'; return; }
   }
+
+  const champCni = document.getElementById('cni-file-input');
+  if (champCni) {
+    champCni.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';          // pour pouvoir reprendre la même photo
+      envoyerPhotoCni(file);
+    });
+  }
+
   await loadMarkets();
 });
 
@@ -636,6 +709,99 @@ function selMarket(btn, marketId, marketName) {
 }
 
 // ── Créer le compte vendeur + boutique ──
+/* ── Pièce d'identité ──
+   Le vendeur photographie sa carte ; chaque photo part vers Cloudinary et
+   l'adresse revient ici. Rien n'est obligatoire : « Je l'envoie plus tard »
+   mène au tableau de bord, qui rappellera ce qui manque. */
+let _cniUrls = { front: null, back: null };
+let _cniFace = null;
+
+const CNI_LIBELLES = { front: 'Recto', back: 'Verso' };
+
+function choisirCni(face) {
+  _cniFace = face;
+  document.getElementById('cni-file-input').click();
+}
+
+function majEtatCni(face, texte, etat) {
+  const slot = document.getElementById('cni-slot-' + face);
+  const état = document.getElementById('cni-state-' + face);
+  if (état) état.textContent = texte;
+  if (slot) {
+    slot.classList.toggle('rempli', etat === 'ok');
+    slot.classList.toggle('occupe', etat === 'envoi');
+    slot.disabled = etat === 'envoi';
+  }
+}
+
+async function envoyerPhotoCni(file) {
+  if (!file || !_cniFace) return;
+  const face = _cniFace;
+  const token = localStorage.getItem('token');
+  if (!token) { showToast('Session expirée — reconnectez-vous'); return; }
+
+  majEtatCni(face, '⏳ Envoi en cours…', 'envoi');
+
+  try {
+    const fd = new FormData();
+    fd.append('image', file);
+    const res = await fetch(API_URL + '/api/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      _cniUrls[face] = data.url;
+      majEtatCni(face, '✓ Photo prête', 'ok');
+    } else {
+      majEtatCni(face, 'Appuyez pour réessayer', null);
+      showToast(data.message || 'Envoi impossible');
+    }
+  } catch (e) {
+    majEtatCni(face, 'Appuyez pour réessayer', null);
+    showToast('Connexion au serveur impossible');
+  }
+}
+
+async function envoyerCni() {
+  const numero = document.getElementById('cni-number').value.trim();
+
+  if (!numero && !_cniUrls.front && !_cniUrls.back) {
+    showToast('Ajoutez au moins une pièce, ou choisissez « Je l\'envoie plus tard »');
+    return;
+  }
+
+  const btn = document.getElementById('cni-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+
+  const result = await apiCall('/api/shops/me/cni', {
+    method: 'PUT',
+    body: JSON.stringify({
+      cniNumber: numero || null,
+      cniFrontUrl: _cniUrls.front,
+      cniBackUrl: _cniUrls.back
+    })
+  });
+
+  btn.disabled = false;
+  btn.textContent = '✓ Envoyer mes pièces';
+
+  if (result.success) {
+    showToast(result.message || 'Pièces enregistrées');
+    terminerInscription();
+  } else {
+    showToast(result.message || 'Enregistrement impossible');
+  }
+}
+
+function terminerInscription() {
+  showStep('step-success');
+  setTimeout(() => { window.location.href = 'marche-senegal-dashboard.html'; }, 2500);
+}
+
 async function doRegister() {
   const shopName    = document.getElementById('reg-shop-name').value.trim();
   const description = document.getElementById('reg-shop-desc').value.trim();
@@ -679,8 +845,8 @@ async function doRegister() {
     document.getElementById('success-shop-name').textContent = shopName;
     document.getElementById('success-market').textContent = '📍 ' + selectedMarketName;
 
-    showStep('step-success');
-    setTimeout(() => { window.location.href = 'marche-senegal-dashboard.html'; }, 3000);
+    // Le compte existe : l'envoi des photos est possible à partir d'ici.
+    showStep('step-register-3');
   } else {
     showToast(result.message || 'Erreur lors de la création du compte');
     btn.disabled = false;
