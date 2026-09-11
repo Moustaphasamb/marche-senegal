@@ -87,6 +87,17 @@
 
 /* ═══════ VIDEO ═══════ */
 .visit-section{margin-bottom:26px}
+.vitrine-pastille{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-size:.74rem;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;transition:transform .15s}
+.vitrine-pastille:hover{transform:translate(-50%,-50%) scale(1.15)}
+.vitrine-fiche{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:16px 16px 0 0;padding:18px;box-shadow:0 -4px 24px rgba(0,0,0,.2);z-index:320;max-width:520px;margin:0 auto}
+.vitrine-fiche-haut{display:flex;gap:12px;align-items:center}
+.vitrine-fiche img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.vitrine-fiche-nom{font-weight:600;color:var(--dark)}
+.vitrine-fiche-prix{color:var(--green);font-weight:700;font-size:1.05rem}
+.vitrine-fiche-actions{display:flex;gap:8px;margin-top:14px}
+.vitrine-fiche-actions button{flex:1;padding:10px;border-radius:99px;font-size:.86rem;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid var(--border);background:#fff}
+.vitrine-fiche-actions .principal{background:var(--green);border-color:var(--green);color:#fff}
+.vitrine-indispo{color:var(--red);font-size:.8rem;margin-top:6px}
 .vs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .vs-title{font-size:.96rem;font-weight:600;color:var(--dark)}
 .vs-badge{display:inline-flex;align-items:center;gap:5px;background:var(--rp);color:var(--red);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px}
@@ -390,38 +401,14 @@
     <div id="tab-boutique">
       <div class="visit-section">
         <div class="vs-header">
-          <div class="vs-title">🎥 Visite virtuelle de la boutique</div>
-          <div class="vs-badge"><span class="vs-badge-dot"></span>Nouvelle vidéo</div>
+          <div class="vs-title">🏪 Visitez la boutique</div>
         </div>
-        <div class="video-player" onclick="playVideo()">
-          <div class="vp-thumb">
-            <div class="vp-label">🎥 Visite virtuelle</div>
-            <div class="vp-emoji">🏪</div>
-            <div class="vp-overlay" id="vp-overlay">
-              <div class="vp-play"><div class="vp-tri"></div></div>
-            </div>
-            <div class="vp-duration" id="vp-dur">2:34</div>
+        <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
+          <div id="vitrine-scene" style="position:relative;will-change:transform">
+            <img id="vitrine-img" alt="Photo de la boutique" style="width:100%;display:block">
           </div>
         </div>
-        <div class="vp-hint">📌 Produits vus dans cette vidéo — cliquez pour commander</div>
-        <div class="vp-tags">
-          <div class="vp-tag" onclick="addToCart2('Boubou wax L',18000)">
-            <div class="vt-icon">👗</div>
-            <div><div class="vt-name">Boubou wax — Taille L</div><div class="vt-price">18 000 FCFA</div><div class="vt-time">à 0:18 dans la vidéo</div></div>
-          </div>
-          <div class="vp-tag" onclick="addToCart2('Robe wax brodée',9500)">
-            <div class="vt-icon">👘</div>
-            <div><div class="vt-name">Robe wax brodée</div><div class="vt-price">9 500 FCFA</div><div class="vt-time">à 0:45 dans la vidéo</div></div>
-          </div>
-          <div class="vp-tag" onclick="addToCart2('Bazin brodé cérémonie',25000)">
-            <div class="vt-icon">🧵</div>
-            <div><div class="vt-name">Bazin brodé cérémonie</div><div class="vt-price">25 000 FCFA</div><div class="vt-time">à 1:12 dans la vidéo</div></div>
-          </div>
-          <div class="vp-tag" onclick="addToCart2('Tissu wax 6 yards',4500)">
-            <div class="vt-icon">🎨</div>
-            <div><div class="vt-name">Tissu wax 6 yards</div><div class="vt-price">4 500 FCFA</div><div class="vt-time">à 1:55 dans la vidéo</div></div>
-          </div>
-        </div>
+        <div class="vp-hint" id="vitrine-hint">📌 Appuyez sur un point pour voir le produit</div>
       </div>
 
       <div class="prod-section">
@@ -764,8 +751,7 @@ async function loadShop(shopId) {
   // Visite virtuelle : la section montrait une vidéo de 2:34 inexistante et des
   // produits cliquables écrits en dur, qu'un acheteur pouvait mettre au panier
   // alors qu'ils n'appartenaient pas à cette boutique.
-  const sectionVisite = document.querySelector('.visit-section');
-  if (sectionVisite && !shop.virtualTourUrl) sectionVisite.style.display = 'none';
+  afficherVitrine(shop);
 
   // La description rédigée par le vendeur dans « Ma boutique » n'était jamais
   // lue : toutes les boutiques affichaient le texte de Mode Fatou Ndoye.
@@ -911,6 +897,263 @@ function construireFiltresCategories(produits) {
     ajouter('Tout', 'all', true);
     categories.forEach(c => ajouter(c, c.toLowerCase(), false));
   });
+}
+
+// ── La vitrine cliquable ──
+// La photo de la boutique et les points que le vendeur y a posés.
+let _vitrinePoints = [];
+
+function afficherVitrine(shop) {
+  const section = document.querySelector('.visit-section');
+  const boite = document.getElementById('vitrine-box');
+  const image = document.getElementById('vitrine-img');
+  const conseil = document.getElementById('vitrine-hint');
+  if (!section || !boite || !image) return;
+
+  if (!shop.showcaseUrl) { section.style.display = 'none'; return; }
+
+  section.style.display = '';
+  _vitrinePoints = shop.showcaseHotspots || [];
+
+  // On ne vide jamais la boîte : l'image et, à la tâche 7, la scène de zoom
+  // doivent survivre pour qu'un nouvel essai ait quelque chose à recharger.
+  document.getElementById('vitrine-echec')?.remove();
+
+  image.onerror = () => {
+    image.style.display = 'none';
+    if (conseil) conseil.style.display = 'none';
+
+    const echec = document.createElement('div');
+    echec.id = 'vitrine-echec';
+    echec.style.cssText = 'padding:30px;text-align:center;color:var(--muted)';
+    echec.textContent = 'La photo de la boutique n\'a pas pu être chargée.';
+
+    const reessayer = document.createElement('button');
+    reessayer.textContent = '↻ Réessayer';
+    reessayer.style.cssText = 'display:block;margin:12px auto 0;padding:8px 18px;border-radius:99px;' +
+      'border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:600;cursor:pointer;font-family:inherit';
+    reessayer.onclick = () => {
+      echec.remove();
+      image.style.display = '';
+      afficherVitrine(shop);
+    };
+    echec.appendChild(reessayer);
+
+    boite.appendChild(echec);
+  };
+  image.onload = () => { dessinerPastilles(); activerZoomVitrine(); };
+  image.src = shop.showcaseUrl;
+
+  // Sans point, la photo vaut déjà comme vitrine : on la montre sans consigne.
+  if (conseil) conseil.style.display = _vitrinePoints.length ? '' : 'none';
+}
+
+function dessinerPastilles() {
+  const boite = document.getElementById('vitrine-scene');
+  boite.querySelectorAll('.vitrine-pastille').forEach(e => e.remove());
+
+  _vitrinePoints.forEach((point, i) => {
+    const pastille = document.createElement('div');
+    pastille.className = 'vitrine-pastille';
+    pastille.style.left = point.x + '%';
+    pastille.style.top = point.y + '%';
+    pastille.textContent = String(i + 1);
+    pastille.onclick = (e) => { e.stopPropagation(); ouvrirFicheVitrine(point); };
+    boite.appendChild(pastille);
+  });
+
+  appliquerTransformationVitrine();
+}
+
+function ouvrirFicheVitrine(point) {
+  fermerFicheVitrine();
+  const produit = point.product;
+  if (!produit) return;
+
+  const disponible = produit.status === 'ACTIVE' && produit.stock > 0;
+
+  const fiche = document.createElement('div');
+  fiche.className = 'vitrine-fiche';
+  fiche.id = 'vitrine-fiche';
+
+  const haut = document.createElement('div');
+  haut.className = 'vitrine-fiche-haut';
+
+  if (produit.images && produit.images.length) {
+    const img = document.createElement('img');
+    img.src = produit.images[0];
+    img.alt = '';
+    haut.appendChild(img);
+  }
+
+  const infos = document.createElement('div');
+  const nom = document.createElement('div');
+  nom.className = 'vitrine-fiche-nom';
+  nom.textContent = produit.name;
+  const prix = document.createElement('div');
+  prix.className = 'vitrine-fiche-prix';
+  prix.textContent = formatPrice(produit.price);
+  infos.append(nom, prix);
+
+  if (!disponible) {
+    const alerte = document.createElement('div');
+    alerte.className = 'vitrine-indispo';
+    alerte.textContent = produit.stock === 0 ? 'Rupture de stock' : 'Produit indisponible';
+    infos.appendChild(alerte);
+  }
+
+  haut.appendChild(infos);
+  fiche.appendChild(haut);
+
+  const actions = document.createElement('div');
+  actions.className = 'vitrine-fiche-actions';
+
+  const voir = document.createElement('button');
+  voir.textContent = 'Voir le produit';
+  voir.onclick = () => { window.location.href = 'marche-senegal-produit.html?id=' + produit.id; };
+  actions.appendChild(voir);
+
+  if (disponible) {
+    const ajouter = document.createElement('button');
+    ajouter.className = 'principal';
+    ajouter.textContent = 'Ajouter au panier';
+    ajouter.onclick = () => { window.location.href = 'marche-senegal-produit.html?id=' + produit.id; };
+    actions.appendChild(ajouter);
+  }
+
+  const fermer = document.createElement('button');
+  fermer.textContent = 'Fermer';
+  fermer.onclick = fermerFicheVitrine;
+  actions.appendChild(fermer);
+
+  fiche.appendChild(actions);
+  document.body.appendChild(fiche);
+
+  document.addEventListener('keydown', fermerFicheSurEchap);
+}
+
+function fermerFicheSurEchap(e) {
+  if (e.key === 'Escape') fermerFicheVitrine();
+}
+
+function fermerFicheVitrine() {
+  document.getElementById('vitrine-fiche')?.remove();
+  document.removeEventListener('keydown', fermerFicheSurEchap);
+}
+
+/* ── Zoom de la vitrine ──
+   Une transformation CSS sur un conteneur intérieur : l'image et les
+   pastilles bougent ensemble, les positions en pourcentage restent valables.
+   Les pastilles compensent l'échelle pour garder une taille constante et
+   rester cliquables au zoom maximal. */
+const VITRINE_ZOOM_MIN = 1;
+const VITRINE_ZOOM_MAX = 4;
+let _vitrineEchelle = 1;
+let _vitrineX = 0;
+let _vitrineY = 0;
+// Empêche de reposer wheel/dblclick/touch/souris/resize à chaque rechargement
+// réussi de la photo (ex. après un échec puis « Réessayer »).
+let _vitrineZoomActive = false;
+
+function appliquerTransformationVitrine() {
+  const scene = document.getElementById('vitrine-scene');
+  if (!scene) return;
+
+  const boite = document.getElementById('vitrine-box');
+  const largeur = boite.clientWidth;
+  const hauteur = boite.clientHeight;
+
+  // On empêche de sortir de l'image : au-delà du cadre, on recolle au bord.
+  const debordementX = Math.max(0, (largeur * _vitrineEchelle - largeur) / 2);
+  const debordementY = Math.max(0, (hauteur * _vitrineEchelle - hauteur) / 2);
+  _vitrineX = Math.min(debordementX, Math.max(-debordementX, _vitrineX));
+  _vitrineY = Math.min(debordementY, Math.max(-debordementY, _vitrineY));
+
+  scene.style.transform =
+    'translate(' + _vitrineX + 'px,' + _vitrineY + 'px) scale(' + _vitrineEchelle + ')';
+
+  scene.querySelectorAll('.vitrine-pastille').forEach(p => {
+    p.style.transform = 'translate(-50%,-50%) scale(' + (1 / _vitrineEchelle) + ')';
+  });
+}
+
+function reglerZoomVitrine(nouvelleEchelle) {
+  _vitrineEchelle = Math.min(VITRINE_ZOOM_MAX, Math.max(VITRINE_ZOOM_MIN, nouvelleEchelle));
+  if (_vitrineEchelle === 1) { _vitrineX = 0; _vitrineY = 0; }
+  appliquerTransformationVitrine();
+}
+
+function activerZoomVitrine() {
+  const boite = document.getElementById('vitrine-box');
+  const scene = document.getElementById('vitrine-scene');
+  if (!boite || !scene) return;
+
+  // Une photo (re)chargée repart toujours de la vue d'ensemble, même si les
+  // écouteurs eux sont déjà posés depuis un appel précédent.
+  _vitrineEchelle = 1;
+  _vitrineX = 0;
+  _vitrineY = 0;
+  appliquerTransformationVitrine();
+
+  if (_vitrineZoomActive) return;
+  _vitrineZoomActive = true;
+
+  scene.style.transformOrigin = 'center center';
+  scene.style.transition = 'transform .08s linear';
+
+  boite.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    reglerZoomVitrine(_vitrineEchelle * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+  }, { passive: false });
+
+  boite.addEventListener('dblclick', () => reglerZoomVitrine(1));
+
+  let depart = null;
+  let distanceDepart = null;
+  let echelleDepart = 1;
+
+  const distanceEntre = (touches) => Math.hypot(
+    touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY
+  );
+
+  boite.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      distanceDepart = distanceEntre(e.touches);
+      echelleDepart = _vitrineEchelle;
+    } else if (e.touches.length === 1 && _vitrineEchelle > 1) {
+      depart = { x: e.touches[0].clientX - _vitrineX, y: e.touches[0].clientY - _vitrineY };
+    }
+  }, { passive: true });
+
+  boite.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && distanceDepart) {
+      e.preventDefault();
+      reglerZoomVitrine(echelleDepart * (distanceEntre(e.touches) / distanceDepart));
+    } else if (e.touches.length === 1 && depart) {
+      e.preventDefault();
+      _vitrineX = e.touches[0].clientX - depart.x;
+      _vitrineY = e.touches[0].clientY - depart.y;
+      appliquerTransformationVitrine();
+    }
+  }, { passive: false });
+
+  boite.addEventListener('touchend', () => { depart = null; distanceDepart = null; });
+
+  // À la souris : glisser pour se déplacer une fois zoomé.
+  let souris = null;
+  boite.addEventListener('mousedown', (e) => {
+    if (_vitrineEchelle > 1) { souris = { x: e.clientX - _vitrineX, y: e.clientY - _vitrineY }; e.preventDefault(); }
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!souris) return;
+    _vitrineX = e.clientX - souris.x;
+    _vitrineY = e.clientY - souris.y;
+    appliquerTransformationVitrine();
+  });
+  window.addEventListener('mouseup', () => { souris = null; });
+
+  window.addEventListener('resize', appliquerTransformationVitrine);
 }
 
 // ── Charger les produits de la boutique ──

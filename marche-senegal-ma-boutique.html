@@ -60,6 +60,13 @@ a{text-decoration:none;color:inherit;}
 .upload-btn:hover{background:var(--green);color:#fff;}
 .upload-btn:disabled{opacity:.6;cursor:default;}
 .upload-state{font-size:.78rem;color:var(--muted);}
+.vitrine-point{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.vitrine-ligne{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.vitrine-ligne:last-child{border-bottom:none}
+.vitrine-num{width:22px;height:22px;border-radius:50%;background:var(--gp);color:var(--green);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vitrine-suppr{margin-left:auto;background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem}
+.vitrine-produit{display:block;width:100%;text-align:left;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--white);margin-bottom:6px;cursor:pointer;font-size:.86rem;font-family:inherit}
+.vitrine-produit:hover{border-color:var(--green);background:var(--gp)}
 /* badge marché */
 .market-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gp);border:1px solid var(--g2);border-radius:20px;padding:8px 16px;font-size:.85rem;color:var(--muted);}
 .market-badge strong{color:var(--dark);}
@@ -188,6 +195,44 @@ a{text-decoration:none;color:inherit;}
           <p class="field-hint">Image large recommandée (ex : photo de votre étalage).</p>
         </div>
         <input type="file" id="shopFileInput" accept="image/*" style="display:none">
+      </div>
+
+      <!-- Ma vitrine : une photo de la boutique, des points vers les produits -->
+      <div class="card">
+        <h2>Ma vitrine</h2>
+        <p class="field-hint" style="margin-bottom:12px">
+          Prenez votre boutique en mode panoramique, puis reliez vos produits à la photo.
+          Vos clients pourront cliquer dessus.
+        </p>
+
+        <div id="vitrineIndispo" style="display:none"></div>
+
+        <div id="vitrineZone">
+          <div class="upload-row">
+            <button type="button" class="upload-btn" id="vitrineBtn" onclick="choisirPhotoVitrine()">📷 Choisir la photo</button>
+            <span class="upload-state" id="vitrineState"></span>
+          </div>
+
+          <div id="vitrineEditeur" style="display:none">
+            <div id="vitrinePhotoBox" style="position:relative;display:inline-block;max-width:100%;margin-top:10px;cursor:crosshair">
+              <img id="vitrinePhoto" alt="Photo de la boutique" style="max-width:100%;display:block;border-radius:10px">
+            </div>
+            <p class="field-hint">Appuyez sur un produit dans la photo pour le relier à votre catalogue.</p>
+            <div id="vitrineListe"></div>
+          </div>
+        </div>
+
+        <input type="file" id="vitrineFileInput" accept="image/*" style="display:none">
+      </div>
+
+      <!-- Choix du produit, ouvert au clic sur la photo -->
+      <div id="vitrineModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--white);border-radius:14px;max-width:420px;width:100%;max-height:80vh;overflow:auto;padding:18px">
+          <h2 style="margin-bottom:12px">Quel produit se trouve ici ?</h2>
+          <input type="text" id="vitrineRecherche" placeholder="Rechercher un produit…" oninput="filtrerProduitsVitrine()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;margin-bottom:10px">
+          <div id="vitrineProduits"></div>
+          <button type="button" class="upload-btn" style="margin-top:12px;width:100%" onclick="fermerModalVitrine()">Annuler</button>
+        </div>
       </div>
 
       <!-- Infos pratiques -->
@@ -508,6 +553,7 @@ async function loadShop() {
     document.getElementById('pageWrap').style.display = 'block';
 
     fillForm(shop, stats);
+    initVitrine(shop);
     loadMarkets(shop.marketId);
   } catch (e) {
     showLoadError('Impossible de joindre le serveur. Vérifiez votre connexion.');
@@ -542,7 +588,252 @@ async function saveShop() {
   } else {
     showToastLocal(result.message || 'Erreur lors de la mise à jour', 'error');
   }
+  await enregistrerVitrine();
   if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
+}
+
+/* ── Ma vitrine ──
+   Une photo, des points. Chaque point retient une position en pourcentage
+   et l'identifiant d'un produit : la photo s'affiche à des tailles
+   différentes selon l'écran, des pixels décaleraient tout. */
+let _vitrinePhotoUrl = null;
+let _vitrinePoints = [];      // [{ productId, x, y, nom }]
+let _vitrineProduits = [];    // catalogue du vendeur
+let _vitrinePositionEnCours = null;
+
+// Passe à true seulement quand initVitrine() a pu charger la vitrine.
+// Sans ce garde-fou, un vendeur dont la boutique n'est pas encore validée
+// ou dont le catalogue est vide effacerait sa vitrine en enregistrant
+// simplement les informations de sa boutique.
+let _vitrineEditable = false;
+
+function choisirPhotoVitrine() {
+  // Remplacer la photo garde les points, mais ils ne tomberont plus au bon
+  // endroit : on prévient, et on propose de repartir de zéro.
+  if (_vitrinePhotoUrl && _vitrinePoints.length) {
+    const garder = confirm(
+      'Vous allez remplacer la photo. Vos ' + _vitrinePoints.length + ' point(s) ' +
+      'risquent de ne plus tomber au bon endroit.\n\n' +
+      'OK : garder les points et les repositionner ensuite.\n' +
+      'Annuler : effacer les points et recommencer.'
+    );
+    if (!garder) {
+      _vitrinePoints = [];
+      dessinerPointsVitrine();
+    }
+  }
+  document.getElementById('vitrineFileInput').click();
+}
+
+async function envoyerPhotoVitrine(file) {
+  if (!file) return;
+  const token = localStorage.getItem('token');
+  if (!token) { showToastLocal('Connectez-vous pour envoyer une photo', 'error'); return; }
+
+  const etat = document.getElementById('vitrineState');
+  const bouton = document.getElementById('vitrineBtn');
+  etat.textContent = '⏳ Envoi en cours…';
+  bouton.disabled = true;
+
+  try {
+    const fd = new FormData();
+    fd.append('image', file);
+    const res = await fetch(API_URL + '/api/upload/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      _vitrinePhotoUrl = data.url;
+      etat.textContent = '✓ Photo prête';
+      afficherEditeurVitrine();
+    } else {
+      etat.textContent = '';
+      showToastLocal(data.message || 'Erreur lors de l\'envoi', 'error');
+    }
+  } catch (e) {
+    etat.textContent = '';
+    showToastLocal('Erreur de connexion au serveur', 'error');
+  }
+  bouton.disabled = false;
+}
+
+function afficherEditeurVitrine() {
+  const editeur = document.getElementById('vitrineEditeur');
+  const photo = document.getElementById('vitrinePhoto');
+  if (!_vitrinePhotoUrl) { editeur.style.display = 'none'; return; }
+  photo.src = _vitrinePhotoUrl;
+  editeur.style.display = 'block';
+  document.getElementById('vitrineBtn').textContent = '📷 Remplacer la photo';
+  dessinerPointsVitrine();
+}
+
+// Le clic est converti en pourcentage de la taille affichée.
+function surClicPhotoVitrine(evenement) {
+  const photo = document.getElementById('vitrinePhoto');
+  const rect = photo.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+
+  _vitrinePositionEnCours = {
+    x: Math.min(100, Math.max(0, ((evenement.clientX - rect.left) / rect.width) * 100)),
+    y: Math.min(100, Math.max(0, ((evenement.clientY - rect.top) / rect.height) * 100))
+  };
+  ouvrirModalVitrine();
+}
+
+function ouvrirModalVitrine() {
+  document.getElementById('vitrineRecherche').value = '';
+  filtrerProduitsVitrine();
+  document.getElementById('vitrineModal').style.display = 'flex';
+}
+
+function fermerModalVitrine() {
+  document.getElementById('vitrineModal').style.display = 'none';
+  _vitrinePositionEnCours = null;
+}
+
+function filtrerProduitsVitrine() {
+  const recherche = (document.getElementById('vitrineRecherche').value || '').toLowerCase();
+  const liste = document.getElementById('vitrineProduits');
+  liste.replaceChildren();
+
+  const visibles = _vitrineProduits.filter(p => p.name.toLowerCase().includes(recherche));
+
+  if (!visibles.length) {
+    const vide = document.createElement('p');
+    vide.className = 'field-hint';
+    vide.textContent = 'Aucun produit trouvé.';
+    liste.appendChild(vide);
+    return;
+  }
+
+  visibles.forEach(p => {
+    const bouton = document.createElement('button');
+    bouton.type = 'button';
+    bouton.className = 'vitrine-produit';
+    bouton.textContent = p.name + ' — ' + formatPrice(p.price);
+    bouton.onclick = () => poserPointVitrine(p);
+    liste.appendChild(bouton);
+  });
+}
+
+function poserPointVitrine(produit) {
+  if (!_vitrinePositionEnCours) return;
+  _vitrinePoints.push({
+    productId: produit.id,
+    x: _vitrinePositionEnCours.x,
+    y: _vitrinePositionEnCours.y,
+    nom: produit.name
+  });
+  fermerModalVitrine();
+  dessinerPointsVitrine();
+}
+
+function retirerPointVitrine(index) {
+  _vitrinePoints.splice(index, 1);
+  dessinerPointsVitrine();
+}
+
+function dessinerPointsVitrine() {
+  const boite = document.getElementById('vitrinePhotoBox');
+  boite.querySelectorAll('.vitrine-point').forEach(e => e.remove());
+
+  _vitrinePoints.forEach((point, i) => {
+    const pastille = document.createElement('div');
+    pastille.className = 'vitrine-point';
+    pastille.style.left = point.x + '%';
+    pastille.style.top = point.y + '%';
+    pastille.textContent = String(i + 1);
+    boite.appendChild(pastille);
+  });
+
+  const liste = document.getElementById('vitrineListe');
+  liste.replaceChildren();
+
+  if (!_vitrinePoints.length) {
+    const vide = document.createElement('p');
+    vide.className = 'field-hint';
+    vide.textContent = 'Aucun produit relié pour le moment.';
+    liste.appendChild(vide);
+    return;
+  }
+
+  _vitrinePoints.forEach((point, i) => {
+    const ligne = document.createElement('div');
+    ligne.className = 'vitrine-ligne';
+
+    const numero = document.createElement('span');
+    numero.className = 'vitrine-num';
+    numero.textContent = String(i + 1);
+
+    const nom = document.createElement('span');
+    nom.textContent = point.nom;
+
+    const suppr = document.createElement('button');
+    suppr.type = 'button';
+    suppr.className = 'vitrine-suppr';
+    suppr.textContent = '✕';
+    suppr.onclick = () => retirerPointVitrine(i);
+
+    ligne.append(numero, nom, suppr);
+    liste.appendChild(ligne);
+  });
+}
+
+async function enregistrerVitrine() {
+  // Rien à enregistrer si l'éditeur n'a jamais été ouvert : voir _vitrineEditable.
+  if (!_vitrineEditable) return;
+
+  const resultat = await apiCall('/api/shops/me/showcase', {
+    method: 'PUT',
+    body: JSON.stringify({
+      showcaseUrl: _vitrinePhotoUrl,
+      hotspots: _vitrinePoints.map(p => ({ productId: p.productId, x: p.x, y: p.y }))
+    })
+  });
+
+  if (resultat.success) showToastLocal('Vitrine enregistrée !');
+  else showToastLocal(resultat.message || 'Erreur lors de l\'enregistrement', 'error');
+}
+
+// La vitrine n'a de sens qu'avec une boutique validée et des produits à relier.
+async function initVitrine(shop) {
+  const indispo = document.getElementById('vitrineIndispo');
+  const zone = document.getElementById('vitrineZone');
+
+  if (shop.status !== 'ACTIVE') {
+    indispo.textContent = '⏳ Votre boutique doit être validée avant de créer votre vitrine.';
+    indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
+    zone.style.display = 'none';
+    return;
+  }
+
+  const res = await getMyProducts();
+  _vitrineProduits = (res.success ? res.data : []).filter(p => p.status !== 'DELETED');
+
+  if (!_vitrineProduits.length) {
+    indispo.innerHTML = 'Ajoutez d\'abord un produit à votre catalogue : ' +
+      '<a href="marche-senegal-ajout-produit.html" style="color:var(--green);font-weight:600">Ajouter un produit</a>';
+    indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
+    zone.style.display = 'none';
+    return;
+  }
+
+  _vitrinePhotoUrl = shop.showcaseUrl || null;
+  _vitrinePoints = (shop.showcaseHotspots || []).map(h => ({
+    productId: h.productId,
+    x: h.x,
+    y: h.y,
+    nom: _vitrineProduits.find(p => p.id === h.productId)?.name || 'Produit'
+  }));
+
+  // À partir d'ici seulement, un enregistrement reflète l'état réel de la vitrine.
+  _vitrineEditable = true;
+
+  if (_vitrinePhotoUrl) afficherEditeurVitrine();
+  else dessinerPointsVitrine();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -554,6 +845,13 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadShopImage(this.files[0]);
     this.value = '';
   });
+
+  document.getElementById('vitrineFileInput').addEventListener('change', function() {
+    envoyerPhotoVitrine(this.files[0]);
+    this.value = '';
+  });
+
+  document.getElementById('vitrinePhotoBox').addEventListener('click', surClicPhotoVitrine);
 
   loadShop();
 });
