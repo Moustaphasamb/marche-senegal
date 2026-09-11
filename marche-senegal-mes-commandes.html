@@ -42,7 +42,7 @@ a{text-decoration:none;color:inherit}
 
 
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
 .stat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
 .sc-val{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--dark);margin-bottom:3px}
 .sc-label{font-size:.74rem;color:var(--muted)}
@@ -81,6 +81,12 @@ a{text-decoration:none;color:inherit}
 .items-more{font-size:.72rem;color:var(--muted)}
 
 /* STATUS */
+.pay-badge{display:inline-block;font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;border:1px solid}
+.pay-vert{background:var(--gp);color:var(--green);border-color:rgba(27,107,58,.25)}
+.pay-or{background:var(--gdl);color:#8A6100;border-color:rgba(230,168,23,.35)}
+.pay-rouge{background:var(--rp);color:var(--red);border-color:rgba(192,57,43,.25)}
+.pay-neutre{background:var(--bg);color:var(--muted);border-color:var(--border)}
+.pay-detail{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .order-status{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .os-pending{background:var(--gdl);color:#8A6100}
 .os-confirmed{background:var(--bluep);color:var(--blue)}
@@ -245,7 +251,11 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="stat-card">
       <div class="sc-val" id="stat-revenue">—</div>
-      <div class="sc-label">Revenus totaux</div>
+      <div class="sc-label">Revenus versés</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-val" id="stat-a-verser">—</div>
+      <div class="sc-label">En attente de versement</div>
     </div>
   </div>
 
@@ -324,6 +334,14 @@ function updateStats(stats) {
       ? (stats.revenue / 1000).toFixed(0) + 'K FCFA'
       : '0 FCFA';
 
+  // Encaissé par la plateforme, pas encore chez le vendeur.
+  const aVerser = document.getElementById('stat-a-verser');
+  if (aVerser) {
+    aVerser.textContent = stats.aVerser > 0
+      ? (stats.aVerser / 1000).toFixed(0) + 'K FCFA'
+      : '0 FCFA';
+  }
+
   // Badge en attente
   const pendingCount = stats.pending || 0;
   const badge = document.getElementById('pending-badge');
@@ -359,6 +377,7 @@ function renderOrders(orders) {
           <th>Client</th>
           <th>Articles</th>
           <th>Montant</th>
+          <th>Paiement</th>
           <th>Statut</th>
           <th>Actions</th>
         </tr>
@@ -402,6 +421,9 @@ function renderOrders(orders) {
               <div class="order-amount">${formatPrice(order.total)}</div>
             </td>
             <td>
+              ${renderEtatPaiement(order)}
+            </td>
+            <td>
               <span class="order-status ${getStatusClass(order.status)}">
                 ${getStatusLabel(order.status)}
               </span>
@@ -416,6 +438,37 @@ function renderOrders(orders) {
       </tbody>
     </table>
   `;
+}
+
+// ── État du paiement ──
+// Le serveur envoie l'état déjà calculé (statut, séquestre, litige). Ici on
+// ne fait que l'afficher — et on prévoit le cas d'une réponse plus ancienne.
+const PAIEMENT_SECOURS = { cle: 'attente_paiement', libelle: 'En attente de paiement', ton: 'neutre' };
+
+const LIBELLES_MOYEN = {
+  WAVE: 'Wave', ORANGE_MONEY: 'Orange Money', FREE_MONEY: 'Free Money',
+  CARD: 'Carte bancaire', CASH: 'Espèces'
+};
+
+// Ce que le vendeur doit comprendre, en une phrase, pour chaque situation.
+const EXPLICATIONS_PAIEMENT = {
+  attente_paiement:  'L\'acheteur n\'a pas encore réglé sa commande.',
+  paiement_en_cours: 'Le paiement a été lancé et n\'est pas encore confirmé par l\'opérateur.',
+  paiement_echoue:   'Le paiement n\'a pas abouti. L\'acheteur doit recommencer.',
+  rembourse:         'La somme a été rendue à l\'acheteur.',
+  sequestre:         'Nous avons encaissé la somme. Elle vous est versée dès que l\'acheteur confirme avoir reçu sa commande.',
+  verse:             'La somme vous a été versée.',
+  gele_litige:       'Un litige est ouvert sur cette commande : la somme reste bloquée jusqu\'à la décision de notre équipe.'
+};
+
+function renderEtatPaiement(order) {
+  const etat = order.etatPaiement || PAIEMENT_SECOURS;
+  return `<span class="pay-badge pay-${escapeHtml(etat.ton)}">${escapeHtml(etat.libelle)}</span>`;
+}
+
+function explicationPaiement(order) {
+  const etat = order.etatPaiement || PAIEMENT_SECOURS;
+  return escapeHtml(EXPLICATIONS_PAIEMENT[etat.cle] || '');
 }
 
 // ── Actions selon statut ──
@@ -589,6 +642,25 @@ async function openDetail(orderId) {
           <span class="dp-info-val">${escapeHtml(order.notes)}</span>
         </div>
       ` : ''}
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-section-title">Paiement</div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">État</span>
+        <span class="dp-info-val">${renderEtatPaiement(order)}</span>
+      </div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Moyen</span>
+        <span class="dp-info-val">${order.payment ? escapeHtml(LIBELLES_MOYEN[order.payment.method] || order.payment.method) : '—'}</span>
+      </div>
+      <div class="dp-info-row">
+        <span class="dp-info-label">Montant encaissé</span>
+        <span class="dp-info-val">${order.payment ? formatPrice(order.payment.amount) : '—'}</span>
+      </div>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:8px;line-height:1.45">
+        ${explicationPaiement(order)}
+      </div>
     </div>
 
     <div class="dp-section">

@@ -192,7 +192,8 @@ async function loadDashboard() {
   // KPIs
   const kpiVals = document.querySelectorAll('.kpi-val');
   if (kpiVals[0]) kpiVals[0].textContent = stats.totalRevenue > 0 ? stats.totalRevenue.toLocaleString('fr-FR') : '0';
-  if (kpiVals[1]) kpiVals[1].textContent = stats.totalOrders;
+  // « Commandes ce mois » affichait le total depuis la création de la boutique.
+  if (kpiVals[1]) kpiVals[1].textContent = stats.ordersThisMonth ?? stats.totalOrders;
   if (kpiVals[2]) kpiVals[2].textContent = stats.totalProducts;
   if (kpiVals[3]) kpiVals[3].textContent = shop.rating > 0 ? shop.rating.toFixed(1) : 'Nouveau';
   // « 234 avis clients » restait écrit en dur sous la note, même à zéro avis.
@@ -203,7 +204,17 @@ async function loadDashboard() {
                                   : n + (n === 1 ? ' avis client' : ' avis clients');
   }
   const kpi0sub = document.getElementById('kpi0-sub');
-  if (kpi0sub) kpi0sub.textContent = stats.totalOrders + ' commandes au total';
+  if (kpi0sub) kpi0sub.textContent = 'sur ' + stats.totalOrders + ' commandes livrées';
+
+  // Ce que la plateforme détient encore pour le compte du vendeur.
+  const kpi4val = document.getElementById('kpi4-val');
+  if (kpi4val) kpi4val.textContent = (stats.aVerser || 0).toLocaleString('fr-FR');
+  const kpi4sub = document.getElementById('kpi4-sub');
+  if (kpi4sub) {
+    kpi4sub.textContent = stats.aVerser > 0
+      ? 'versé à la confirmation de l\'acheteur'
+      : 'rien en attente';
+  }
   const kpi1sub = document.getElementById('kpi1-sub');
   if (kpi1sub) kpi1sub.textContent = stats.pendingOrders + ' en attente';
   const kpi2sub = document.getElementById('kpi2-sub');
@@ -250,7 +261,9 @@ async function loadDashboard() {
         td4.appendChild(statusSpan);
         const td5 = mk('td');
         const actionSpan = mk('span', 'order-action', 'Voir →');
-        actionSpan.onclick = () => showPage('commandes', null);
+        // showPage('commandes') visait une section retirée du HTML : le clic
+        // levait une erreur et ne faisait rien. Les commandes ont leur page.
+        actionSpan.onclick = () => { window.location.href = 'marche-senegal-mes-commandes.html'; };
         td5.appendChild(actionSpan);
         tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
         frag.appendChild(tr);
