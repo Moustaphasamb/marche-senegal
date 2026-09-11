@@ -60,6 +60,14 @@
 .ki-gold{background:var(--gdl)}
 .ki-blue{background:var(--bluep)}
 .ki-red{background:var(--rp)}
+.bandeau-validation{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-radius:12px;padding:14px 18px;margin-bottom:18px;border:1.5px solid}
+.bandeau-validation.rouge{background:#FDECEA;border-color:#E9B4AE;color:#8E2C22}
+.bandeau-validation.or{background:#FDF4DC;border-color:rgba(230,168,23,.45);color:#7A5A08}
+.bv-corps{flex:1;min-width:min(100%,16rem)}
+.bv-titre{font-size:.92rem;font-weight:700;margin-bottom:2px}
+.bv-texte{font-size:.82rem;line-height:1.45;opacity:.92}
+.bv-action{flex-shrink:0;display:inline-flex;align-items:center;padding:9px 16px;border-radius:99px;background:var(--green);color:#fff;font-size:.82rem;font-weight:600;text-decoration:none;transition:background .2s}
+.bv-action:hover{background:var(--gl)}
 .kpi-change{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:99px}
 .kpi-change.up{background:var(--gp);color:var(--green)}
 .kpi-change.down{background:var(--rp);color:var(--red)}

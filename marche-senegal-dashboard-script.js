@@ -77,6 +77,60 @@ function setBadge(id, count) {
 }
 
 // ── Charger le dashboard principal ──
+// ── Bandeau d'état de la boutique ──
+// Affiché tant que la boutique n'est pas visible des acheteurs, avec le geste
+// exact qui débloque la situation.
+const LIBELLES_PIECES = { numero: 'le numéro de votre CNI', recto: 'la photo recto', verso: 'la photo verso' };
+
+function afficherBandeauValidation(shop, cni) {
+  const existant = document.getElementById('bandeau-validation');
+  if (existant) existant.remove();
+
+  if (!shop || shop.status === 'ACTIVE') return;
+
+  const manquant = (cni && cni.manquant) || [];
+  let ton, titre, texte, action = null;
+
+  if (shop.status === 'SUSPENDED') {
+    ton = 'rouge';
+    titre = 'Boutique suspendue';
+    texte = 'Vos produits ne sont plus visibles. Contactez le support pour régulariser.';
+  } else if (shop.status === 'REJECTED') {
+    ton = 'rouge';
+    titre = 'Inscription refusée';
+    texte = 'Votre dossier n\'a pas été validé. Contactez le support pour en connaître la raison.';
+  } else if (manquant.length > 0) {
+    ton = 'rouge';
+    titre = 'Votre boutique n\'est pas encore visible';
+    texte = 'Il manque ' + manquant.map(m => LIBELLES_PIECES[m] || m).join(', ') +
+            '. Vos produits restent en pause jusqu\'à la validation de votre pièce d\'identité.';
+    action = { texte: 'Envoyer ma pièce d\'identité', href: 'marche-senegal-ma-boutique.html' };
+  } else {
+    ton = 'or';
+    titre = 'Dossier en cours de vérification';
+    texte = 'Notre équipe examine votre pièce d\'identité sous 24 à 48h. Préparez vos produits : ils seront publiés dès la validation.';
+  }
+
+  const bandeau = mk('div', 'bandeau-validation ' + ton);
+  bandeau.id = 'bandeau-validation';
+
+  const corps = mk('div', 'bv-corps');
+  corps.appendChild(mk('div', 'bv-titre', titre));
+  corps.appendChild(mk('div', 'bv-texte', texte));
+  bandeau.appendChild(corps);
+
+  if (action) {
+    const lien = mk('a', 'bv-action', action.texte);
+    lien.href = action.href;
+    bandeau.appendChild(lien);
+  }
+
+  const main = document.querySelector('.main');
+  const premier = document.getElementById('page-dashboard');
+  if (premier) premier.insertBefore(bandeau, premier.firstChild);
+  else if (main) main.insertBefore(bandeau, main.firstChild);
+}
+
 async function loadDashboard() {
   const result = await getDashboard();
   if (!result.success) {
@@ -171,7 +225,9 @@ async function loadDashboard() {
   if (sbSeeShop && shop.id) sbSeeShop.onclick = () => window.location.href = 'marche-senegal-boutique.html?id=' + shop.id;
 
   // Boutique non validée
-  if (shop.status === 'PENDING') showToast('⚠️ Boutique en attente de validation CNI', 'error');
+  // Un toast disparaît en deux secondes, alors que le vendeur a besoin de
+  // savoir en permanence ce qui bloque la mise en ligne de sa boutique.
+  afficherBandeauValidation(shop, result.data.cni);
 
   // ── Commandes récentes (tableau) ──
   const ordersTable = document.querySelector('.orders-table tbody');
