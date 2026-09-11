@@ -154,6 +154,32 @@
             <option value="OUT_OF_STOCK">❌ Rupture de stock</option>
           </select>
         </div>
+        <div class="field">
+          <label class="fl">Référence interne</label>
+          <input class="fi" type="text" id="prod-sku" placeholder="Votre code interne (facultatif)"/>
+        </div>
+        <div class="field">
+          <label class="fl">Poids estimé (grammes)</label>
+          <input class="fi" type="number" id="prod-weight" min="0" placeholder="Poids en grammes"/>
+        </div>
+        <div class="field">
+          <label class="fl">Délai de préparation</label>
+          <select class="fi" id="prod-preparation">
+            <option value="">Non précisé</option>
+            <option value="MEME_JOUR">Même jour</option>
+            <option value="1_JOUR">1 jour ouvré</option>
+            <option value="2_3_JOURS">2 à 3 jours</option>
+            <option value="5_7_JOURS">5 à 7 jours</option>
+            <option value="SUR_COMMANDE">Sur commande</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="fl">Mise en avant</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;cursor:pointer;padding-top:8px">
+            <input type="checkbox" id="prod-featured" style="width:18px;height:18px;accent-color:var(--green);cursor:pointer"/>
+            Produit vedette de ma boutique
+          </label>
+        </div>
       </div>
     </div>
 
@@ -360,6 +386,10 @@ function fillForm(prod) {
   document.getElementById('prod-old-price').value = prod.originalPrice || '';
   document.getElementById('prod-stock').value = prod.stock ?? 0;
   document.getElementById('prod-status').value = prod.status || 'ACTIVE';
+  document.getElementById('prod-sku').value = prod.sku || '';
+  document.getElementById('prod-weight').value = prod.weight ?? '';
+  document.getElementById('prod-preparation').value = prod.preparationTime || '';
+  document.getElementById('prod-featured').checked = Boolean(prod.isFeatured);
 
   (prod.images || []).slice(0, 5).forEach((url, i) => { if (url) { uploadedImages[i] = url; renderFilledSlot(i, url); } });
 
@@ -394,6 +424,10 @@ async function saveProduct() {
     originalPrice: parseInt(document.getElementById('prod-old-price').value) || null,
     stock: parseInt(document.getElementById('prod-stock').value) || 0,
     status: document.getElementById('prod-status').value,
+    sku: document.getElementById('prod-sku').value.trim() || null,
+    weight: document.getElementById('prod-weight').value || null,
+    preparationTime: document.getElementById('prod-preparation').value || null,
+    isFeatured: document.getElementById('prod-featured').checked,
     categoryId: selectedCat ? selectedCat.getAttribute('data-id') : undefined,
     images: uploadedImages.filter(Boolean),
     sizes: Array.from(document.querySelectorAll('#sizes-container .vtag.sel')).map(t => t.getAttribute('data-size')),

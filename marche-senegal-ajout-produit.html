@@ -139,10 +139,6 @@
     <div class="sb-item" onclick="viewMyShop()"><span class="sb-icon">🌐</span>Voir ma boutique</div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-help" onclick="toast('Aide & Support...')">
-      <span style="font-size:1rem">❓</span>
-      <span class="sb-help-text">Aide & Support</span>
-    </div>
     <div class="sb-logout" onclick="logoutVendeur()">
       <span>🚪</span> Se déconnecter
     </div>
@@ -236,7 +232,7 @@
         </div>
         <div class="field">
           <label class="fl">Référence produit</label>
-          <input class="fi" type="text" value="MFN-BWX-001" placeholder="Code de référence interne"/>
+          <input class="fi" type="text" id="prod-sku" placeholder="Votre code interne (facultatif)"/>
         </div>
       </div>
     </div>
@@ -261,7 +257,7 @@
           <div class="vtag" onclick="this.classList.toggle('sel')">XL</div>
           <div class="vtag" onclick="this.classList.toggle('sel')">XXL</div>
           <div class="vtag" onclick="this.classList.toggle('sel')">XXXL</div>
-          <div class="vtag" onclick="toast('Ajouter une taille personnalisée...')">+ Sur mesure</div>
+          <div class="vtag" onclick="ajouterTaille()">+ Sur mesure</div>
         </div>
       </div>
       <div class="vrow">
@@ -272,7 +268,7 @@
           <div class="cs" style="background:linear-gradient(135deg,#2E7D32,#FAFAFA)" title="Vert/Blanc" onclick="this.classList.toggle('sel')"></div>
           <div class="cs" style="background:linear-gradient(135deg,#6A1B9A,#F57F17)" title="Violet/Or" onclick="this.classList.toggle('sel')"></div>
           <div class="cs" style="background:linear-gradient(135deg,#880E4F,#F3E5F5)" title="Rose/Blanc" onclick="this.classList.toggle('sel')"></div>
-          <div class="cs" style="background:#eee;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted)" onclick="toast('Ajouter une couleur...')">+</div>
+          <div class="cs" style="background:#eee;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--muted)" onclick="ajouterCouleur()">+</div>
         </div>
       </div>
     </div>
@@ -283,46 +279,26 @@
       <div class="fgrid">
         <div class="field">
           <label class="fl">Délai de préparation</label>
-          <select class="fi"><option>Même jour</option><option>1 jour ouvré</option><option selected>2–3 jours</option><option>5–7 jours</option><option>Sur commande</option></select>
+          <select class="fi" id="prod-preparation"><option value="">Non précisé</option><option value="MEME_JOUR">Même jour</option><option value="1_JOUR">1 jour ouvré</option><option value="2_3_JOURS" selected>2 à 3 jours</option><option value="5_7_JOURS">5 à 7 jours</option><option value="SUR_COMMANDE">Sur commande</option></select>
         </div>
         <div class="field">
           <label class="fl">Poids estimé (grammes)</label>
-          <input class="fi" type="number" value="350" min="0" placeholder="Poids en grammes"/>
+          <input class="fi" type="number" id="prod-weight" min="0" placeholder="Poids en grammes"/>
         </div>
-      </div>
-      <div class="cb-list">
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison à domicile disponible — Tout le Sénégal</span></div>
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Retrait gratuit en boutique — Marché Sandaga, Allée 3</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express disponible (+500 FCFA)</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Expédition internationale — Diaspora sénégalaise</span></div>
       </div>
     </div>
 
     <!-- PROMOTION -->
     <div class="form-card">
-      <div class="fc-title"><span class="fc-icon">🎯</span>Promotion <span style="font-size:.76rem;font-weight:400;color:var(--muted)">— Optionnel</span></div>
+      <div class="fc-title"><span class="fc-icon">🎯</span>Remise et mise en avant <span style="font-size:.76rem;font-weight:400;color:var(--muted)">— Optionnel</span></div>
       <div class="fgrid">
         <div class="field">
           <label class="fl">Réduction (%)</label>
-          <div class="fi-prefix"><div class="fi-pre-label">%</div><input type="number" id="prod-discount" placeholder="Ex: 15" min="0" max="80" oninput="updatePreview()"/></div>
-        </div>
-        <div class="field">
-          <label class="fl">Code promo</label>
-          <input class="fi" type="text" placeholder="Ex: FATOU15" style="text-transform:uppercase"/>
-        </div>
-        <div class="field">
-          <label class="fl">Date de fin de promo</label>
-          <input class="fi" type="date"/>
-        </div>
-        <div class="field">
-          <label class="fl">Utilisations max.</label>
-          <input class="fi" type="number" placeholder="Ex: 50 (illimité si vide)"/>
+          <div class="fi-prefix"><div class="fi-pre-label">%</div><input type="number" id="prod-discount" placeholder="Ex: 15" min="0" max="80" oninput="appliquerRemise()"/></div>
         </div>
       </div>
       <div class="cb-list" style="margin-top:10px">
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Marquer comme "Produit vedette" de la boutique</span></div>
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Activer la promotion immédiatement après publication</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Partager automatiquement sur WhatsApp et l'application</span></div>
+        <div class="cb-row" id="cb-vedette" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mettre en avant comme produit vedette de ma boutique</span></div>
       </div>
     </div>
 
@@ -539,6 +515,20 @@ function updateChecklist(){
 }
 
 // ── Apercu en temps reel ──
+/* La remise saisie par le vendeur remplit le prix barré : c est ainsi que la
+   réduction existe vraiment pour l acheteur. */
+function appliquerRemise(){
+  const prix = parseInt(document.getElementById("prod-price")?.value) || 0;
+  const remise = parseInt(document.getElementById("prod-discount")?.value) || 0;
+  const champAncien = document.getElementById("prod-old-price");
+  if (champAncien && prix > 0 && remise > 0 && remise < 100) {
+    champAncien.value = Math.round(prix / (1 - remise / 100));
+  } else if (champAncien && remise === 0) {
+    champAncien.value = "";
+  }
+  updatePreview();
+}
+
 function updatePreview(){
   // nomSaisi = ce que le vendeur a réellement tapé ; name = ce qu'on affiche
   // dans l'aperçu, avec un texte de remplacement quand le champ est vide.
@@ -627,6 +617,33 @@ function toggleCb(row){ row.classList.toggle('checked'); }
 
 // ── Publier le produit ──
 // statut : 'ACTIVE' (visible immédiatement) ou 'PAUSED' (enregistré, invisible)
+/* Les six tailles et cinq couleurs proposées ne couvrent pas un marché
+   sénégalais : les colonnes sizes et colors acceptent n importe quelle valeur. */
+function ajouterTaille(){
+  const valeur = (prompt("Quelle taille ajouter ?") || "").trim();
+  if (!valeur) return;
+  const conteneur = document.querySelector(".vtags");
+  if (!conteneur) return;
+  const tag = document.createElement("div");
+  tag.className = "vtag sel";
+  tag.textContent = valeur;
+  tag.onclick = function(){ this.classList.toggle("sel"); };
+  conteneur.insertBefore(tag, conteneur.lastElementChild);
+}
+
+function ajouterCouleur(){
+  const valeur = (prompt("Quelle couleur ajouter ?") || "").trim();
+  if (!valeur) return;
+  const conteneur = document.querySelector(".color-swatches");
+  if (!conteneur) return;
+  const pastille = document.createElement("div");
+  pastille.className = "cs sel";
+  pastille.title = valeur;
+  pastille.style.background = "linear-gradient(135deg,#888,#ccc)";
+  pastille.onclick = function(){ this.classList.toggle("sel"); };
+  conteneur.insertBefore(pastille, conteneur.lastElementChild);
+}
+
 async function publishProduct(statut){
   const enPause = statut === 'PAUSED';
   const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -681,7 +698,11 @@ async function publishProduct(statut){
     images,
     sizes,
     colors,
-    status: enPause ? 'PAUSED' : 'ACTIVE'
+    status: enPause ? 'PAUSED' : 'ACTIVE',
+    sku: document.getElementById('prod-sku')?.value.trim() || null,
+    weight: document.getElementById('prod-weight')?.value || null,
+    preparationTime: document.getElementById('prod-preparation')?.value || null,
+    isFeatured: document.getElementById('cb-vedette')?.classList.contains('checked') || false
   };
 
   const result = await createProduct(productData);

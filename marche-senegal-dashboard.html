@@ -341,10 +341,6 @@
     <div class="sb-item" id="sb-see-shop" onclick="window.location.href='marche-senegal-accueil.html'"><span class="sb-icon">🌐</span>Voir ma boutique</div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-help" onclick="toast('Aide & Support...')">
-      <span style="font-size:1rem">❓</span>
-      <span class="sb-help-text">Aide & Support</span>
-    </div>
     <div class="sb-logout" onclick="logoutVendeur()">
       <span>🚪</span> Se déconnecter
     </div>
@@ -358,8 +354,8 @@
   </button>
   <div class="tb-title" id="tb-title">Tableau de bord</div>
   <div class="tb-search">
-    <input type="text" placeholder="Rechercher commande, produit..."/>
-    <button class="tb-search-btn">🔍</button>
+    <input type="text" id="tb-search-input" placeholder="Rechercher un produit..." onkeydown="if(event.key==='Enter')lancerRecherche()"/>
+    <button class="tb-search-btn" onclick="lancerRecherche()">🔍</button>
   </div>
   <div class="tb-actions">
     <!-- La cloche affichait « 8 » notifications et le bouton d'aide un simple
@@ -388,7 +384,7 @@
       </div>
       <div class="wb-right">
         <button class="wb-btn wb-btn-primary" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</button>
-        <button class="wb-btn wb-btn-gold" onclick="showPage('promotions',null);toast('Créer une promotion...')">🎯 Créer une promo</button>
+        <button class="wb-btn wb-btn-gold" onclick="showPage('promotions',null);allerAuFormulairePromo()">🎯 Créer une promo</button>
       </div>
     </div>
 
@@ -415,7 +411,7 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <div class="kpi-icon ki-blue">📦</div>
-          <div class="kpi-change flat">→ actifs</div>
+          
         </div>
         <div class="kpi-val" id="kpi2-val">—</div>
         <div class="kpi-label">Produits actifs</div>
@@ -424,7 +420,7 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <div class="kpi-icon ki-red">⭐</div>
-          <div class="kpi-change flat">→ stable</div>
+          
         </div>
         <div class="kpi-val">4.8</div>
         <div class="kpi-label">Note moyenne</div>
@@ -592,7 +588,7 @@
   <div class="page-section" id="page-promotions">
     <div class="page-header">
       <div class="ph-title">🎯 Mes promotions</div>
-      <button class="ph-btn ph-btn-primary" onclick="toast('Créer une promotion...')">+ Nouvelle promotion</button>
+      <button class="ph-btn ph-btn-primary" onclick="allerAuFormulairePromo()">+ Nouvelle promotion</button>
     </div>
 
     <!-- Active promos -->
