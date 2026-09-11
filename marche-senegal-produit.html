@@ -790,6 +790,8 @@ async function loadProduct(productId) {
     if (prod.shop?.market) addTag('tag-market', '🏛️ ' + prod.shop.market.name);
     if (prod.category)     addTag('tag-cat',    '👗 ' + prod.category.name);
     if (prod.isNew)        addTag('tag-new',    'Nouveau');
+    // Le délai annoncé par le vendeur : l acheteur le demande avant de commander.
+    if (prod.preparationLabel) addTag('tag-cat', '⏱️ ' + prod.preparationLabel);
     if (prod.originalPrice) {
       const pct = Math.round((1 - prod.price / prod.originalPrice) * 100);
       addTag('tag-promo', '-' + pct + '%');

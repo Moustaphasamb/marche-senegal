@@ -223,10 +223,6 @@ a{text-decoration:none;color:inherit}
     <div class="sb-item" onclick="window.location.href='marche-senegal-accueil.html'"><span class="sb-icon">🌐</span>Voir ma boutique</div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-help" onclick="toast('Aide &amp; Support...')">
-      <span style="font-size:1rem">❓</span>
-      <span class="sb-help-text">Aide &amp; Support</span>
-    </div>
     <div class="sb-logout" onclick="logoutVendeur()">
       <span>🚪</span> Se déconnecter
     </div>
@@ -255,7 +251,6 @@ a{text-decoration:none;color:inherit}
     <div class="stat-card">
       <div class="sc-val" id="stat-total">—</div>
       <div class="sc-label">Produits actifs</div>
-      <div class="sc-change sc-up" id="stat-total-change"></div>
     </div>
     <div class="stat-card">
       <div class="sc-val" id="stat-sales">—</div>
@@ -276,7 +271,7 @@ a{text-decoration:none;color:inherit}
   <div class="toolbar">
     <div class="tb-search">
       <input type="text" id="search-input" placeholder="Rechercher un produit..." oninput="filterProducts()"/>
-      <button class="tb-search-btn">🔍</button>
+      <span class="tb-search-btn" aria-hidden="true">🔍</span>
     </div>
     <div class="filter-tabs">
       <button class="ft active" onclick="setFilter('all',this)">Tous</button>
@@ -655,6 +650,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   initSidebar();
+  // Terme transmis par la recherche du tableau de bord.
+  const terme = new URLSearchParams(location.search).get("q");
+  if (terme) {
+    const champ = document.getElementById("search-input");
+    if (champ) champ.value = terme;
+  }
   await loadProducts();
 });
 </script>

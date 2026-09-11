@@ -495,6 +495,24 @@ async function deletePromo(id) {
   else showToast('Erreur', 'error');
 }
 
+// Le champ de recherche du haut ne menait nulle part : il renvoie désormais vers
+// le catalogue du vendeur, déjà équipé d une recherche.
+function lancerRecherche() {
+  const champ = document.getElementById("tb-search-input");
+  const terme = (champ?.value || "").trim();
+  if (!terme) { showToast("Entrez un mot à rechercher", "error"); return; }
+  window.location.href = "marche-senegal-mes-produits.html?q=" + encodeURIComponent(terme);
+}
+
+// Le formulaire de création est en bas de la section : on y conduit le vendeur.
+function allerAuFormulairePromo() {
+  showPage("promotions", null);
+  const champ = document.getElementById("promo-code-input");
+  const carte = document.querySelector(".new-promo-card");
+  if (carte) carte.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (champ) setTimeout(() => champ.focus(), 350);
+}
+
 // ── Navigation entre pages ──
 function showPage(pageId, navItem) {
   document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
@@ -623,12 +641,12 @@ async function loadCharts(period) {
   if (kpiChanges[0]) {
     const up = revenueChange >= 0;
     kpiChanges[0].className = 'kpi-change ' + (up ? 'up' : 'down');
-    kpiChanges[0].textContent = (up ? '↑ +' : '↓ ') + revenueChange + '%';
+    kpiChanges[0].textContent = (up ? '↑ +' : '↓ −') + Math.abs(revenueChange) + '%';
   }
   if (kpiChanges[1]) {
     const up = orderChange >= 0;
     kpiChanges[1].className = 'kpi-change ' + (up ? 'up' : 'down');
-    kpiChanges[1].textContent = (up ? '↑ +' : '↓ ') + orderChange + '%';
+    kpiChanges[1].textContent = (up ? '↑ +' : '↓ −') + Math.abs(orderChange) + '%';
   }
 
   renderBarChart(revenueByDay, currentRevenue, days);
