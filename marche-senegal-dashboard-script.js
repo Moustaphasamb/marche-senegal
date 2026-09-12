@@ -546,11 +546,13 @@ async function loadAvis() {
 
   const frag = document.createDocumentFragment();
   avis.forEach(a => {
+    const bloc = mk('div', 'avis-bloc');
     const ligne = mk('div', 'prod-row');
 
     const note = mk('div', 'pr-rank gold', String(a.rating ?? '—'));
     const info = mk('div', 'pr-info');
-    info.appendChild(mk('div', 'pr-name', a.buyer?.firstName || 'Client'));
+    // La route renvoie « user » : lire « buyer » affichait « Client » pour tout le monde.
+    info.appendChild(mk('div', 'pr-name', a.user?.firstName || 'Client'));
     info.appendChild(mk('div', 'pr-cat', a.comment || 'Sans commentaire'));
 
     const droite = mk('div', 'pr-right');
@@ -558,9 +560,84 @@ async function loadAvis() {
     droite.appendChild(mk('div', 'pr-rev', formatDate(a.createdAt)));
 
     ligne.appendChild(note); ligne.appendChild(info); ligne.appendChild(droite);
-    frag.appendChild(ligne);
+    bloc.appendChild(ligne);
+    bloc.appendChild(zoneDeReponse(a));
+    frag.appendChild(bloc);
   });
   liste.replaceChildren(frag);
+}
+
+// La réponse déjà publiée, ou le bouton pour en écrire une. Un avis sans
+// droit de réponse laisse le commerçant sans voix devant un malentendu.
+function zoneDeReponse(avis) {
+  const zone = mk('div', 'avis-reponse');
+  zone.id = 'avis-reponse-' + avis.id;
+
+  if (avis.sellerReply) {
+    const titre = mk('div', 'ar-titre', 'Votre réponse · ' + formatDate(avis.repliedAt || avis.createdAt));
+    const texte = mk('div', 'ar-texte', avis.sellerReply);
+    const modifier = mk('button', 'ar-lien', 'Modifier');
+    modifier.onclick = () => ouvrirSaisieReponse(avis);
+    zone.appendChild(titre);
+    zone.appendChild(texte);
+    zone.appendChild(modifier);
+    return zone;
+  }
+
+  const repondre = mk('button', 'ar-lien', 'Répondre');
+  repondre.onclick = () => ouvrirSaisieReponse(avis);
+  zone.appendChild(repondre);
+  return zone;
+}
+
+function ouvrirSaisieReponse(avis) {
+  const zone = document.getElementById('avis-reponse-' + avis.id);
+  if (!zone) return;
+
+  const champ = mk('textarea', 'ar-champ');
+  champ.placeholder = 'Votre réponse, visible par tous vos clients…';
+  champ.maxLength = 1000;
+  champ.value = avis.sellerReply || '';
+
+  const publier = mk('button', 'ar-btn', avis.sellerReply ? 'Enregistrer' : 'Publier');
+  publier.onclick = () => envoyerReponse(avis, champ.value, publier);
+
+  const annuler = mk('button', 'ar-lien', 'Annuler');
+  annuler.onclick = () => zone.replaceWith(zoneDeReponse(avis));
+
+  const actions = mk('div', 'ar-actions');
+  actions.appendChild(publier);
+  actions.appendChild(annuler);
+
+  // Vider le champ efface la réponse : le geste attendu pour se rétracter.
+  if (avis.sellerReply) {
+    const effacer = mk('button', 'ar-lien ar-lien-rouge', 'Supprimer ma réponse');
+    effacer.onclick = () => envoyerReponse(avis, '', effacer);
+    actions.appendChild(effacer);
+  }
+
+  zone.replaceChildren(champ, actions);
+  champ.focus();
+}
+
+async function envoyerReponse(avis, texte, bouton) {
+  const libelle = bouton.textContent;
+  bouton.textContent = '⏳…';
+  bouton.disabled = true;
+
+  const resultat = await repondreAAvis(avis.id, texte);
+
+  bouton.textContent = libelle;
+  bouton.disabled = false;
+
+  if (!resultat.success) {
+    showToast(resultat.message || 'Impossible d\'enregistrer la réponse', 'error');
+    return;
+  }
+
+  showToast(resultat.message || 'Réponse enregistrée');
+  // On recharge la liste : la réponse doit apparaître telle que le client la verra.
+  loadAvis();
 }
 
 
