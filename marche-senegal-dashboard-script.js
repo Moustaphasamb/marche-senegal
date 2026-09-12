@@ -373,7 +373,11 @@ async function loadPromotions() {
 
     card.appendChild(mk('div', 'pci-code', promo.code || promo.title));
 
-    let descText = '-' + promo.discount + '% de réduction';
+    // Une annonce ou une livraison gratuite ne porte aucune remise : afficher
+    // « -0% de réduction » ferait douter le vendeur de ce qu'il a créé.
+    let descText = promo.discount > 0
+      ? '-' + promo.discount + '% de réduction'
+      : 'Message affiché sur votre boutique';
     if (promo.maxUses) descText += ' · Max ' + promo.maxUses + ' utilisations';
     if (daysLeft !== null) descText += daysLeft > 0 ? ' · ' + daysLeft + ' jour(s) restant(s)' : ' · Expiré';
     card.appendChild(mk('div', 'pci-desc', descText));
@@ -422,7 +426,9 @@ async function submitPromo() {
 
   const type = typeBtn?.getAttribute('data-type') || 'CODE';
 
-  if (!discount || parseInt(discount) < 1 || parseInt(discount) > 80) {
+  const sansReduction = typePromoSansReduction(type);
+
+  if (!sansReduction && (!discount || parseInt(discount) < 1 || parseInt(discount) > 80)) {
     showToast('Entrez une réduction entre 1 et 80%', 'error');
     return;
   }
@@ -432,7 +438,10 @@ async function submitPromo() {
   }
 
   const info = PROMO_TYPE_INFO[type] || PROMO_TYPE_INFO.CODE;
-  const title = type === 'CODE' ? code : info.label + ' -' + discount + '%';
+  // Sans réduction, le titre ne colle pas un « -0% » qui ne veut rien dire.
+  const title = type === 'CODE'
+    ? code
+    : (sansReduction ? info.label : info.label + ' -' + discount + '%');
 
   const btn = document.getElementById('promo-submit-btn');
   if (btn) { btn.textContent = '⏳ Création...'; btn.disabled = true; }
@@ -441,7 +450,7 @@ async function submitPromo() {
     title,
     type,
     code: code || null,
-    discount: parseInt(discount),
+    discount: sansReduction ? 0 : parseInt(discount),
     durationDays,
     maxUses: maxUses ? parseInt(maxUses) : null
   });
@@ -555,9 +564,52 @@ async function loadAvis() {
 }
 
 
+// « Livraison gratuite » et « Annonce » ne touchent pas au prix : ce sont des
+// messages affichés sur la boutique. Exiger une réduction obligeait le vendeur
+// à inventer un chiffre que le panier n'appliquait jamais.
+const TYPES_PROMO_SANS_REDUCTION = ['FREE_DELIVERY', 'ANNOUNCEMENT'];
+
+const NOTES_PROMO_ANNONCE = {
+  FREE_DELIVERY: 'Cette promotion affiche « Livraison gratuite » sur votre boutique. Elle ne modifie pas encore le prix ni les frais de livraison au moment du paiement.',
+  ANNOUNCEMENT: 'Une annonce est un message affiché sur votre boutique, par exemple « Arrivage de tissus vendredi ». Elle ne modifie aucun prix.'
+};
+
+function typePromoSansReduction(type) {
+  return TYPES_PROMO_SANS_REDUCTION.includes(type);
+}
+
 function selPromoType(btn) {
   document.querySelectorAll('.ptg-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+  majFormulairePromo(btn.getAttribute('data-type'));
+}
+
+// Grise la réduction pour les types qui n'en ont pas, et dit pourquoi : un
+// champ désactivé sans explication laisse croire à une panne.
+function majFormulairePromo(type) {
+  const sansReduction = typePromoSansReduction(type);
+
+  const champ = document.getElementById('promo-pct-field');
+  const saisie = document.getElementById('promo-pct-input');
+  if (champ) champ.style.opacity = sansReduction ? '.45' : '';
+  if (saisie) {
+    saisie.disabled = sansReduction;
+    if (sansReduction) saisie.value = '';
+  }
+
+  const champCode = document.getElementById('promo-code-input');
+  if (champCode) champCode.disabled = type !== 'CODE';
+
+  const note = document.getElementById('promo-annonce-note');
+  if (note) {
+    note.textContent = NOTES_PROMO_ANNONCE[type] || '';
+    note.style.display = sansReduction ? '' : 'none';
+  }
+
+  const apercu = document.getElementById('promo-preview');
+  if (apercu) apercu.style.display = sansReduction ? 'none' : '';
+
+  updatePreview();
 }
 function updatePreview() {
   const code = document.getElementById('promo-code-input')?.value.toUpperCase() || 'SANDAGA20';

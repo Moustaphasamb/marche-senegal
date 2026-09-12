@@ -560,10 +560,11 @@
       </div>
       <div class="form-grid">
         <div class="form-field"><div class="form-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex: SANDAGA20" id="promo-code-input" oninput="updatePreview()" style="text-transform:uppercase"/></div>
-        <div class="form-field"><div class="form-label">Réduction (%)</div><input class="form-input" type="number" placeholder="Ex: 20" id="promo-pct-input" min="1" max="80" oninput="updatePreview()"/></div>
+        <div class="form-field" id="promo-pct-field"><div class="form-label">Réduction (%)</div><input class="form-input" type="number" placeholder="Ex: 20" id="promo-pct-input" min="1" max="80" oninput="updatePreview()"/></div>
         <div class="form-field"><div class="form-label">Durée</div><select class="form-input" id="promo-duration-select"><option value="1">1 jour</option><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
         <div class="form-field"><div class="form-label">Utilisations max.</div><input class="form-input" type="number" id="promo-maxuses-input" placeholder="Illimité si vide"/></div>
       </div>
+      <div id="promo-annonce-note" style="display:none;font-size:.8rem;color:#8A6100;background:var(--gdl);border:1px solid rgba(230,168,23,.35);border-radius:10px;padding:10px 14px;margin-bottom:14px"></div>
       <div class="form-preview" id="promo-preview">
         <div><div class="fp-label">Aperçu du code</div><div class="fp-val" id="preview-code">SANDAGA20</div></div>
         <div><div class="fp-label">Réduction</div><div class="fp-val" id="preview-pct">-20%</div></div>
