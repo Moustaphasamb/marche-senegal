@@ -48,6 +48,11 @@ a{text-decoration:none;color:inherit}
 
 /* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+/* Ce que le plan autorise encore, annoncé avant la publication */
+.plan-bandeau{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:7px 16px;margin-bottom:14px}
+.plan-bandeau strong{color:var(--text);font-weight:600}
+.plan-bandeau.plan-plein{border-color:var(--gold);background:var(--gdl,#FDF3DC)}
+.plan-bandeau.plan-plein strong{color:#8A6100}
 .tb-search{display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 14px;height:38px;flex:1;min-width:200px;transition:border-color .2s}
 .tb-search:focus-within{border-color:var(--green)}
 .tb-search input{flex:1;border:none;outline:none;font-size:.84rem;color:var(--text);background:transparent}
@@ -199,7 +204,7 @@ a{text-decoration:none;color:inherit}
   </button>
   <div class="tb-title">📦 Mes produits</div>
   <div class="tb-actions">
-    <button onclick="window.location.href='marche-senegal-ajout-produit.html'" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px">➕ Ajouter</button>
+    <button id="btn-ajouter" onclick="window.location.href='marche-senegal-ajout-produit.html'" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px">➕ Ajouter</button>
     <div class="tb-profile">
       <div class="tb-profile-av" id="tb-av">MF</div>
       <span class="tb-profile-name" id="tb-name">Vendeur</span>
@@ -231,6 +236,8 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <!-- TOOLBAR -->
+  <div class="plan-bandeau" id="plan-bandeau" style="display:none"></div>
+
   <div class="toolbar">
     <div class="tb-search">
       <input type="text" id="search-input" placeholder="Rechercher un produit..." oninput="filterProducts()"/>
@@ -263,6 +270,7 @@ a{text-decoration:none;color:inherit}
 
 <script src="api.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
+<script src="marche-senegal-plan-vendeur.js"></script>
 <script>
 // ════════════════════════════════════════
 //   MES PRODUITS — Données dynamiques
@@ -294,6 +302,10 @@ async function loadProducts() {
   }
 
   allProducts = result.data;
+  // Ce que le plan autorise encore, annoncé ici plutôt que dans un message
+  // d'erreur au moment de publier.
+  afficherPlanVendeur('plan-bandeau', result.meta);
+  majBoutonAjout('btn-ajouter', result.meta);
   updateStats();
   // Après une action (stock, pause, suppression) on recharge : le filtre,
   // la recherche et le tri en cours doivent survivre au rechargement.
