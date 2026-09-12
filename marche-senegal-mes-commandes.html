@@ -88,6 +88,13 @@ a{text-decoration:none;color:inherit}
 .os-pending{background:var(--gdl);color:#8A6100}
 .os-confirmed{background:var(--bluep);color:var(--blue)}
 .os-preparing{background:var(--bluep);color:var(--blue)}
+.os-ready{background:var(--gdl);color:#8A6100}
+/* Joindre l'acheteur depuis le détail d'une commande */
+.dp-contact{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap}
+.dp-contact-btn{flex:1;min-width:120px;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;color:var(--text);background:#fff;transition:all .18s}
+.dp-contact-btn:hover{border-color:var(--green);background:var(--gp);color:var(--green)}
+.dp-contact-wa:hover{border-color:#25D366;background:#E8F8EE;color:#128C4A}
+.buyer-phone a,.dp-info-val a{color:var(--green);font-weight:600}
 .os-delivering{background:#E8F4FD;color:#0277BD}
 .os-delivered{background:var(--gp);color:var(--green)}
 .os-cancelled{background:var(--rp);color:var(--red)}
@@ -234,6 +241,8 @@ a{text-decoration:none;color:inherit}
         <span class="ft-badge" id="pending-badge" style="display:none">0</span>
       </button>
       <button class="ft" onclick="setFilter('CONFIRMED',this)">Confirmées</button>
+      <button class="ft" onclick="setFilter('PREPARING',this)">En préparation</button>
+      <button class="ft" onclick="setFilter('READY',this)">Prêtes</button>
       <button class="ft" onclick="setFilter('DELIVERING',this)">En livraison</button>
       <button class="ft" onclick="setFilter('DELIVERED',this)">Livrées</button>
       <button class="ft" onclick="setFilter('CANCELLED',this)">Annulées</button>
@@ -367,7 +376,9 @@ function renderOrders(orders) {
                     ${escapeHtml(order.buyer?.firstName || 'Client')}
                   </div>
                   <div class="buyer-phone">
-                    ${escapeHtml(order.buyer?.phone || '')}
+                    ${lienAppel(order.buyer?.phone)
+                      ? `<a href="${lienAppel(order.buyer.phone)}" onclick="event.stopPropagation()">${escapeHtml(order.buyer.phone)}</a>`
+                      : escapeHtml(order.buyer?.phone || '')}
                   </div>
                 </div>
               </div>
@@ -457,8 +468,27 @@ function getOrderActions(order) {
     `);
   }
 
+  // « Prêt » existait côté serveur depuis le début, sans aucun bouton pour le
+  // poser : le vendeur sautait de la préparation à la livraison.
   if (order.status === 'PREPARING') {
     actions.push(`
+      <button class="oa-btn"
+        onclick="updateStatus('${order.id}','READY')">
+        ${estRetrait(order) ? '🔔 Prêt à retirer' : '🔔 Prêt à partir'}
+      </button>
+    `);
+  }
+
+  // Un retrait en boutique ne part jamais « en livraison » : le client vient.
+  if (order.status === 'READY') {
+    actions.push(estRetrait(order)
+      ? `
+      <button class="oa-btn confirm"
+        onclick="updateStatus('${order.id}','DELIVERED')">
+        ✅ Remis au client
+      </button>
+    `
+      : `
       <button class="oa-btn deliver"
         onclick="updateStatus('${order.id}','DELIVERING')">
         🛵 Livrer
@@ -586,8 +616,16 @@ async function openDetail(orderId) {
       </div>
       <div class="dp-info-row">
         <span class="dp-info-label">Téléphone</span>
-        <span class="dp-info-val">${escapeHtml(order.buyer?.phone || '—')}</span>
+        <span class="dp-info-val">${lienAppel(order.buyer?.phone)
+          ? `<a href="${lienAppel(order.buyer.phone)}">${escapeHtml(order.buyer.phone)}</a>`
+          : escapeHtml(order.buyer?.phone || '—')}</span>
       </div>
+      ${numeroJoignable(order.buyer?.phone) ? `
+        <div class="dp-contact">
+          <a class="dp-contact-btn" href="${lienAppel(order.buyer.phone)}">📞 Appeler</a>
+          <a class="dp-contact-btn dp-contact-wa" href="${lienWhatsApp(order.buyer.phone, messageAuClient(order))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        </div>
+      ` : ''}
       <div class="dp-info-row">
         <span class="dp-info-label">Livraison</span>
         <span class="dp-info-val">
@@ -654,10 +692,21 @@ async function openDetail(orderId) {
       ` : ''}
       ${order.status === 'PREPARING' ? `
         <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','READY');closeDetail()">
+          ${estRetrait(order) ? '🔔 Marquer prête à retirer' : '🔔 Marquer prête à partir'}
+        </button>
+      ` : ''}
+      ${order.status === 'READY' ? (estRetrait(order) ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="updateStatus('${order.id}','DELIVERED');closeDetail()">
+          ✅ Remise au client
+        </button>
+      ` : `
+        <button class="dp-action-btn dp-btn-green"
           onclick="updateStatus('${order.id}','DELIVERING');closeDetail()">
           🛵 Envoyer en livraison
         </button>
-      ` : ''}
+      `) : ''}
       ${order.status === 'DELIVERING' ? `
         <button class="dp-action-btn dp-btn-green"
           onclick="updateStatus('${order.id}','DELIVERED');closeDetail()">
@@ -706,11 +755,48 @@ function setFilter(filter, btn) {
   filterOrders();
 }
 
+// ── Joindre l'acheteur ──
+// Le numéro s'affichait en texte mort. Un vendeur de marché appelle son client
+// ou lui écrit sur WhatsApp : ce sont les deux gestes qu'il fait vraiment.
+
+// Un retrait en boutique ne passe jamais « en livraison » : le client vient.
+function estRetrait(order) {
+  return order?.deliveryType === 'PICKUP';
+}
+
+// Ne garde que les chiffres et le plus initial. Un numéro absent ou trop court
+// ne doit pas produire un lien mort que le vendeur croira cassé.
+function numeroJoignable(telephone) {
+  const propre = String(telephone || '').replace(/[^0-9+]/g, '');
+  return propre.replace(/[^0-9]/g, '').length >= 9 ? propre : null;
+}
+
+function lienAppel(telephone) {
+  const numero = numeroJoignable(telephone);
+  return numero ? 'tel:' + numero : null;
+}
+
+// wa.me n'accepte pas le « + » et ouvre la conversation sans rien envoyer :
+// le vendeur relit son message et appuie lui-même sur Envoyer.
+function lienWhatsApp(telephone, message) {
+  const numero = numeroJoignable(telephone);
+  if (!numero) return null;
+  const chiffres = numero.replace(/[^0-9]/g, '');
+  return 'https://wa.me/' + chiffres + '?text=' + encodeURIComponent(message || '');
+}
+
+function messageAuClient(order) {
+  const prenom = order?.buyer?.firstName || 'bonjour';
+  const boutique = getCurrentUser()?.shop?.name || 'votre boutique';
+  const numero = (order?.id || '').slice(0, 8).toUpperCase();
+  return `Bonjour ${prenom}, c'est ${boutique} au sujet de votre commande #${numero}.`;
+}
+
 // ── Helpers ──
 function getStatusClass(status) {
   const classes = {
     'PENDING':'os-pending','CONFIRMED':'os-confirmed',
-    'PREPARING':'os-preparing','DELIVERING':'os-delivering',
+    'PREPARING':'os-preparing','READY':'os-ready','DELIVERING':'os-delivering',
     'DELIVERED':'os-delivered','CANCELLED':'os-cancelled'
   };
   return classes[status]||'os-pending';
@@ -719,7 +805,7 @@ function getStatusClass(status) {
 function getStatusLabel(status) {
   const labels = {
     'PENDING':'⏳ En attente','CONFIRMED':'✓ Confirmée',
-    'PREPARING':'📦 En préparation','DELIVERING':'🛵 En livraison',
+    'PREPARING':'📦 En préparation','READY':'🔔 Prête','DELIVERING':'🛵 En livraison',
     'DELIVERED':'✅ Livrée','CANCELLED':'❌ Annulée'
   };
   return labels[status]||status;
