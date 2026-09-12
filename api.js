@@ -331,6 +331,12 @@ async function createReview(data) {
   });
 }
 
+// L argent du vendeur : verse, en attente de versement, gele par un litige.
+// Les totaux sont calcules par le serveur pour rester alignes avec le tableau de bord.
+async function getRevenus(periode = 'tout') {
+  return await apiCall(`/api/shops/revenus?periode=${encodeURIComponent(periode)}`);
+}
+
 async function getShopReviews(shopId, page = 1) {
   return await apiCall(`/api/reviews/shop/${shopId}?page=${page}`);
 }
