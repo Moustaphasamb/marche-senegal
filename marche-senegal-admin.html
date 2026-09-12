@@ -1157,7 +1157,15 @@ function openCNI(vendor, shop, badge, actDiv) {
   } else {
     const info = document.createElement('div');
     info.style.cssText = 'font-size:.82rem;color:var(--muted);padding:8px 0;text-align:center;width:100%';
-    info.textContent = shop?.isVerified ? '✅ CNI validée — boutique active' : '📋 Dossier consulté';
+    // Les boutiques validees avant que la collecte existe n ont aucune piece :
+    // le dire ici evite de croire que le dossier a ete examine.
+    const dossier = vendor?.dossierCni;
+    if (shop?.isVerified && dossier && !dossier.complet) {
+      info.style.color = '#8A6100';
+      info.textContent = '⚠️ Boutique active, dossier incomplet — il manque : ' + dossier.manquant.join(', ');
+    } else {
+      info.textContent = shop?.isVerified ? '✅ CNI validée — boutique active' : '📋 Dossier consulté';
+    }
     actionsEl.appendChild(info);
   }
 
@@ -1195,28 +1203,50 @@ async function suspendShop(shopId, shopName, action, badge, actDiv, vendor) {
   }
 }
 
+// apiCall ne leve jamais : il rend { success: false }. Sans lire ce drapeau,
+// l'ecran affichait « Validé » alors que le serveur venait de refuser.
+async function envoyerValidation(userId, action, forcer, motif) {
+  return await apiCall('/api/admin/vendors/' + userId + '/verify', {
+    method: 'PATCH',
+    body: JSON.stringify({ action, forcer, motif })
+  });
+}
+
+function appliquerResultatValidation(action, shopName, badge, actDiv, vendor) {
+  if (action === 'approve') {
+    badge.className = 'badge b-ok';
+    badge.textContent = 'Validé';
+    toast('✓ ' + shopName + ' approuvé !');
+  } else {
+    badge.className = 'badge b-rej';
+    badge.textContent = 'Refusé';
+    toast('✗ ' + shopName + ' refusé');
+  }
+  buildVendorActions(actDiv, vendor, { id: vendor.shop?.id, name: shopName, status: action === 'approve' ? 'ACTIVE' : 'REJECTED', isVerified: action === 'approve' }, badge);
+}
+
 async function verifyVendor(userId, shopName, action, badge, actDiv, vendor) {
   if (action === 'reject') {
-    if (!confirm((action === 'reject' ? 'Refuser' : 'Valider') + ' "' + shopName + '" ?')) return;
+    if (!confirm('Refuser "' + shopName + '" ?')) return;
   }
-  try {
-    await apiCall('/api/admin/vendors/' + userId + '/verify', {
-      method: 'PATCH',
-      body: JSON.stringify({ action })
-    });
-    if (action === 'approve') {
-      badge.className = 'badge b-ok';
-      badge.textContent = 'Validé';
-      toast('✓ ' + shopName + ' approuvé !');
-    } else {
-      badge.className = 'badge b-rej';
-      badge.textContent = 'Refusé';
-      toast('✗ ' + shopName + ' refusé');
-    }
-    buildVendorActions(actDiv, vendor, { id: vendor.shop?.id, name: shopName, status: action === 'approve' ? 'ACTIVE' : 'REJECTED', isVerified: action === 'approve' }, badge);
-  } catch (e) {
-    toast('Erreur lors de l\'action');
+
+  let resultat = await envoyerValidation(userId, action, false, null);
+
+  // Dossier incomplet : le serveur dit ce qui manque. L'admin peut trancher
+  // quand la piece lui a ete presentee autrement, mais il doit le motiver,
+  // et sa decision part au journal.
+  if (!resultat.success && Array.isArray(resultat.manquant) && resultat.manquant.length) {
+    const motif = prompt(resultat.message + '\n\nPour valider malgre tout, indiquez le motif (10 caracteres minimum) :', '');
+    if (motif === null) return;
+    resultat = await envoyerValidation(userId, action, true, motif);
   }
+
+  if (!resultat.success) {
+    toast(resultat.message || 'Action impossible');
+    return;
+  }
+
+  appliquerResultatValidation(action, shopName, badge, actDiv, vendor);
 }
 
 // ══════════════════════════════════════
