@@ -27,6 +27,7 @@ const ENTREES_MENU_VENDEUR = [
   { cle: 'visite',    icone: '🎥', texte: 'Visite virtuelle', action: ouvrirVisiteVirtuelle, id: 'sb-tour', masquee: true },
   { cle: 'messages',  icone: '💬', texte: 'Messages',         action: allerVersMessages, badge: 'sb-badge-messages' },
   { cle: 'avis',      icone: '⭐', texte: 'Avis clients',      href: 'marche-senegal-dashboard.html#avis' },
+  { cle: 'revenus',   icone: '💰', texte: 'Mes revenus',       href: 'marche-senegal-mes-revenus.html' },
 
   { section: 'Compte' },
   // « Mon profil » menait à la page de l'acheteur (Favoris, Adresses, ses
@@ -43,6 +44,7 @@ const PAGE_VERS_ENTREE = {
   'marche-senegal-mes-commandes.html':    'commandes',
   'marche-senegal-ajout-produit.html':    'ajout',
   'marche-senegal-ma-boutique.html':      'boutique',
+  'marche-senegal-mes-revenus.html':     'revenus',
 };
 
 // ── Construction ──────────────────────────────────────────────────
