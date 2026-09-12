@@ -357,19 +357,31 @@ async function repondreAAvis(reviewId, reponse) {
 // CHAT / MESSAGES
 // ────────────────────────────────
 
-async function getChatMessages(shopId) {
-  return await apiCall(`/api/messages/${shopId}`);
+// Une conversation est le couple (boutique, acheteur). L'acheteur n'envoie
+// jamais son identifiant : le serveur le déduit de son jeton.
+function cheminConversation(shopId, buyerId, suffixe = '') {
+  const base = `/api/messages/${shopId}`;
+  return buyerId ? `${base}/${buyerId}${suffixe}` : `${base}${suffixe}`;
 }
 
-async function sendChatMessage(shopId, content) {
-  return await apiCall(`/api/messages/${shopId}`, {
+async function getChatMessages(shopId, buyerId = null) {
+  return await apiCall(cheminConversation(shopId, buyerId));
+}
+
+async function sendChatMessage(shopId, content, buyerId = null) {
+  return await apiCall(cheminConversation(shopId, buyerId), {
     method: 'POST',
     body: JSON.stringify({ content })
   });
 }
 
-async function markMessagesRead(shopId) {
-  return await apiCall(`/api/messages/${shopId}/read`, { method: 'PATCH' });
+async function markMessagesRead(shopId, buyerId = null) {
+  return await apiCall(cheminConversation(shopId, buyerId, '/read'), { method: 'PATCH' });
+}
+
+// Les fils d'un vendeur, un par acheteur.
+async function getConversations() {
+  return await apiCall('/api/messages/conversations');
 }
 
 // ────────────────────────────────
