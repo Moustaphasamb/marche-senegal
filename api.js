@@ -339,6 +339,14 @@ async function getProductReviews(productId) {
   return await apiCall(`/api/reviews/product/${productId}`);
 }
 
+// Réponse publique du vendeur à un avis reçu. Un texte vide efface la réponse.
+async function repondreAAvis(reviewId, reponse) {
+  return await apiCall(`/api/reviews/${reviewId}/reply`, {
+    method: 'PATCH',
+    body: JSON.stringify({ reply: reponse })
+  });
+}
+
 // ────────────────────────────────
 // CHAT / MESSAGES
 // ────────────────────────────────
