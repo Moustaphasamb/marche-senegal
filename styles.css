@@ -136,3 +136,20 @@ a{text-decoration:none;color:inherit}
   .topbar{left:0}
   .hamburger-btn{display:flex}
 }
+
+/* ══════════════════════════════════════
+   ESPACE VENDEUR — barre latérale commune
+   Construite par marche-senegal-menu-vendeur.js, qui pose aussi la
+   classe « espace-vendeur » sur le body. Le préfixe protège les pages
+   acheteur (marché, admin), qui ont leur propre barre du même nom.
+   ══════════════════════════════════════ */
+body.espace-vendeur .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:95}
+body.espace-vendeur .sidebar-overlay.show{display:block}
+body.espace-vendeur .sb-item{text-decoration:none}
+
+@media(max-width:960px){
+  body.espace-vendeur .sidebar{transform:translateX(-100%)}
+  body.espace-vendeur .sidebar.open{transform:translateX(0)}
+  body.espace-vendeur .topbar{left:0}
+  body.espace-vendeur .hamburger-btn{display:flex}
+}

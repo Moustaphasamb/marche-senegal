@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Ma boutique — Marché Sénégal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
   --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;
@@ -22,18 +23,10 @@ button,input,select,textarea{font-family:inherit;}
 a{text-decoration:none;color:inherit;}
 .flag{display:flex;width:26px;height:17px;border-radius:3px;overflow:hidden;flex-shrink:0}
 .flag span{flex:1}.fg{background:#00853F}.fy{background:#FDEF42}.fr{background:#E31B23}
-/* topbar */
-.topbar{background:var(--dark);height:var(--nav-h);display:flex;align-items:center;padding:0 4vw;gap:14px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.08);}
-.logo{display:flex;align-items:center;gap:8px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green);flex-shrink:0;}
-.nav{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;flex:1;}
-.nav::-webkit-scrollbar{display:none;}
-.nav a{padding:0 16px;height:var(--nav-h);display:flex;align-items:center;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.45);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
-.nav a:hover{color:rgba(255,255,255,.8);}
-.nav a.active{color:#fff;border-bottom-color:var(--green);}
-.topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0;margin-left:auto;}
-.tb-name{font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7);}
-.tb-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:99px;cursor:pointer;font-size:.8rem;color:rgba(255,255,255,.7);transition:.2s;}
-.tb-logout:hover{background:rgba(255,255,255,.18);color:#fff;}
+/* La barre laterale et la barre du haut viennent de styles.css : le
+   contenu se decale du meme coup, sans toucher a la mise en page interne. */
+body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
+@media(max-width:960px){body{padding-left:0;}}
 /* loading */
 .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
 .spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;}
@@ -123,24 +116,18 @@ a{text-decoration:none;color:inherit;}
 .mkt-btn.selected{background:var(--gp);border-color:var(--green);color:var(--green);font-weight:600;}
 /* responsive */
 @media(max-width:860px){.two-col{grid-template-columns:1fr;}.preview-card{position:static;}}
-@media(max-width:600px){.page-wrap{padding:16px 4vw 40px;}.nav a{display:none;}.nav a.active{display:flex;}}
+@media(max-width:600px){.page-wrap{padding:16px 4vw 40px;}}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a class="logo" href="marche-senegal-dashboard.html">🇸🇳 Marché Sénégal</a>
-  <nav class="nav">
-    <a href="marche-senegal-dashboard.html">Dashboard</a>
-    <a href="marche-senegal-mes-produits.html">Mes produits</a>
-    <a href="marche-senegal-ma-boutique.html" class="active">Ma boutique</a>
-    <a href="marche-senegal-mes-commandes.html">Commandes</a>
-  </nav>
-  <div class="topbar-right">
-    <span class="tb-name" id="sellerName">—</span>
-    <button class="tb-logout" onclick="logoutVendeur()">Déconnexion</button>
-  </div>
-</div>
+<!-- La barre laterale est construite par marche-senegal-menu-vendeur.js -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="tb-title">Ma boutique</div>
+</header>
 
 <div class="loading-state" id="loadingState">
   <div class="spinner"></div>
@@ -320,6 +307,7 @@ a{text-decoration:none;color:inherit;}
 <div class="toast" id="toast"></div>
 
 <script src="api.js"></script>
+<script src="marche-senegal-menu-vendeur.js"></script>
 <script>
 let shopId = null;
 let _selectedMarketId = null;
@@ -347,10 +335,6 @@ function showToastLocal(msg, type) {
   t.textContent = msg;
   t.className = 'toast show' + (type === 'error' ? ' error' : '');
   setTimeout(() => t.className = 'toast', 2800);
-}
-
-function logoutVendeur() {
-  logout(); // logout() redirige déjà vers l'accueil
 }
 
 /* ── Envoi des photos ──
@@ -717,11 +701,12 @@ async function loadShop() {
       return;
     }
 
-    const nameEl = document.getElementById('sellerName');
-    if (nameEl && seller) nameEl.textContent = seller.firstName || '';
-
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('pageWrap').style.display = 'block';
+
+    // La barre laterale prend le nom, le statut et le lien de visite
+    // qui viennent d arriver, sans attendre le prochain chargement.
+    remplirIdentiteMenu(shop);
 
     fillForm(shop, stats);
     afficherEtatCni(shop);
