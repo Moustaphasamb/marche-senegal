@@ -67,15 +67,6 @@ function makeImg(images, size) {
   return div;
 }
 
-// Affiche un compteur, ou efface le badge s'il n'y a rien à signaler.
-function setBadge(id, count) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const n = Number(count) || 0;
-  el.textContent = n;
-  el.style.display = n > 0 ? '' : 'none';
-}
-
 // ── Charger le dashboard principal ──
 // ── Bandeau d'état de la boutique ──
 // Affiché tant que la boutique n'est pas visible des acheteurs, avec le geste
@@ -157,14 +148,9 @@ async function loadDashboard() {
   const tbAv = document.querySelector('.tb-profile-av');
   if (tbAv) tbAv.textContent = initials || shop.name.substring(0,2).toUpperCase();
 
-  // Sidebar
-  const sbAv = document.querySelector('.sb-avatar');
-  if (sbAv) sbAv.textContent = initials || shop.name.substring(0,2).toUpperCase();
-  const sbShopName = document.querySelector('.sb-shop-name');
-  if (sbShopName) sbShopName.textContent = shop.name;
-  majStatutSidebar(shop);
-  const sbPlan = document.querySelector('.sb-plan');
-  if (sbPlan) sbPlan.textContent = shop.plan === 'PRO' ? '⭐ Plan Pro' : shop.plan === 'BUSINESS' ? '🚀 Plan Business' : '🆓 Plan Gratuit';
+  // Barre laterale : nom, initiales, statut et plan, avec les donnees
+  // qui viennent d arriver plutot que celles de la session.
+  remplirIdentiteMenu(shop);
 
   // Welcome bar
   const wbName = document.querySelector('.wb-name');
@@ -222,18 +208,10 @@ async function loadDashboard() {
 
   // Badges sidebar — un badge qui ment est pire que pas de badge :
   // on masque ceux dont le compteur est à zéro.
-  setBadge('sb-badge-products', stats.totalProducts);
-  setBadge('sb-badge-orders', stats.pendingOrders);
-  setBadge('sb-badge-messages', stats.unreadMessages);
-  setBadge('sb-badge-promotions', stats.activePromotions);
-
-  // Visite virtuelle : l'entrée n'apparaît que si le vendeur en a renseigné une
-  const sbTour = document.getElementById('sb-tour');
-  if (sbTour) sbTour.style.display = shop.virtualTourUrl ? '' : 'none';
-
-  // Lien boutique
-  const sbSeeShop = document.getElementById('sb-see-shop');
-  if (sbSeeShop && shop.id) sbSeeShop.onclick = () => window.location.href = 'marche-senegal-boutique.html?id=' + shop.id;
+  majBadgeMenu('sb-badge-products', stats.totalProducts);
+  majBadgeMenu('sb-badge-orders', stats.pendingOrders);
+  majBadgeMenu('sb-badge-messages', stats.unreadMessages);
+  majBadgeMenu('sb-badge-promotions', stats.activePromotions);
 
   // Boutique non validée
   // Un toast disparaît en deux secondes, alors que le vendeur a besoin de
@@ -517,9 +495,13 @@ function allerAuFormulairePromo() {
 function showPage(pageId, navItem) {
   document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
+  // L entree du menu suit la section ouverte, que le clic vienne de la
+  // barre laterale ou d un lien « dashboard.html#promotions » d une autre page.
   if (navItem) {
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     navItem.classList.add('active');
+  } else if (typeof activerEntreeMenu === 'function') {
+    activerEntreeMenu(pageId);
   }
   const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
@@ -572,42 +554,7 @@ async function loadAvis() {
   liste.replaceChildren(frag);
 }
 
-// Ouvre la visite virtuelle si le vendeur en a renseigné une dans « Ma boutique ».
-function ouvrirVisiteVirtuelle() {
-  const url = getCurrentUser()?.shop?.virtualTourUrl;
-  if (url) window.open(url, '_blank', 'noopener');
-  else showToast('Ajoutez le lien de votre visite virtuelle dans « Ma boutique »', 'error');
-}
 
-function goToMessages() {
-  // loadDashboard() range la boutique complète sous user.shop : c'est là qu'on
-  // lit l'identifiant, sans refaire un appel réseau à chaque clic.
-  const shopId = getCurrentUser()?.shop?.id;
-  if (shopId) {
-    window.location.href = 'marche-senegal-chat.html?shopId=' + shopId;
-    return;
-  }
-
-  getDashboard().then(r => {
-    const id = r?.data?.shop?.id;
-    if (id) window.location.href = 'marche-senegal-chat.html?shopId=' + id;
-    else showToast('Boutique introuvable — rechargez la page', 'error');
-  });
-}
-
-function logoutVendeur() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = 'marche-senegal-accueil.html';
-}
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sb-overlay').classList.toggle('show');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sb-overlay').classList.remove('show');
-}
 function selPromoType(btn) {
   document.querySelectorAll('.ptg-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -783,4 +730,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user || user.role !== 'SELLER') { window.location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   await loadDashboard();
   await loadCharts('7d');
+
+  // « Promotions » et « Avis clients » ne sont pas des pages : les autres
+  // pages vendeur y mènent par un fragment, qu il faut ouvrir a l arrivee.
+  const section = window.location.hash.replace('#', '');
+  if (section === 'promotions' || section === 'avis') showPage(section);
 });
