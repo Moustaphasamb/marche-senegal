@@ -258,6 +258,18 @@ function appendMessage(msg) {
 // messages sans pouvoir en identifier l'auteur.
 async function afficherConversations() {
   document.getElementById('messages-wrap').style.display = 'none';
+
+  // L'en-tête et la barre de saisie appartiennent à une conversation ouverte :
+  // sur la liste, l'un resterait sur « Chargement... » et l'autre serait un
+  // champ qui n'envoie nulle part.
+  const nomEl = document.getElementById('ch-name');
+  const avEl = document.getElementById('ch-avatar');
+  if (nomEl) nomEl.textContent = 'Mes conversations';
+  if (avEl) avEl.textContent = '💬';
+
+  const barre = document.querySelector('.input-bar');
+  if (barre) barre.style.display = 'none';
+
   const liste = document.getElementById('conv-liste');
   liste.style.display = 'flex';
   liste.replaceChildren();
@@ -324,6 +336,9 @@ async function ouvrirConversation(buyerId, prenom) {
   currentBuyerId = buyerId;
   document.getElementById('conv-liste').style.display = 'none';
   document.getElementById('messages-wrap').style.display = '';
+
+  const barre = document.querySelector('.input-bar');
+  if (barre) barre.style.display = '';
 
   // À l'arrivée directe — un rafraîchissement, un favori — le prénom n'est pas
   // connu : on le retrouve dans la liste des conversations plutôt que de laisser
