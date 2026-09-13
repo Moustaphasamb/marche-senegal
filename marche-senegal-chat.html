@@ -475,7 +475,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   currentUser = getCurrentUser();
   currentShopId = getShopIdFromURL();
-  estVendeur = currentUser?.role === 'SELLER';
+  // Vendeur de CETTE boutique seulement : ailleurs, il est un client.
+  estVendeur = currentUser?.role === 'SELLER' && currentUser?.shop?.id === currentShopId;
 
   if (!currentShopId) {
     window.location.href = 'marche-senegal-accueil.html';
