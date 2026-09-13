@@ -104,7 +104,7 @@ a{text-decoration:none;color:inherit}
 
 <!-- NAV -->
 <nav class="nav">
-  <button class="nav-back" onclick="history.back()">← Retour</button>
+  <button class="nav-back" onclick="quitterOuRevenir()">← Retour</button>
   <div class="chat-header" id="chat-header">
     <div class="ch-avatar" id="ch-avatar">?</div>
     <div class="ch-info">
@@ -325,8 +325,20 @@ async function ouvrirConversation(buyerId, prenom) {
   document.getElementById('conv-liste').style.display = 'none';
   document.getElementById('messages-wrap').style.display = '';
 
+  // À l'arrivée directe — un rafraîchissement, un favori — le prénom n'est pas
+  // connu : on le retrouve dans la liste des conversations plutôt que de laisser
+  // l'en-tête figé sur « Chargement... ».
+  let nom = prenom;
+  if (!nom) {
+    const fils = await getConversations();
+    const fil = (fils.data || []).find(f => f.buyerId === buyerId);
+    nom = fil?.acheteur?.firstName || 'Client';
+  }
+
   const nomEl = document.getElementById('ch-name');
-  if (nomEl && prenom) nomEl.textContent = prenom;
+  const avEl = document.getElementById('ch-avatar');
+  if (nomEl) nomEl.textContent = nom;
+  if (avEl) avEl.textContent = nom.charAt(0).toUpperCase();
 
   const url = new URL(window.location.href);
   url.searchParams.set('buyerId', buyerId);
@@ -334,6 +346,31 @@ async function ouvrirConversation(buyerId, prenom) {
 
   await loadChat(currentShopId, buyerId);
   connectSocket(currentShopId, buyerId, currentUser?.id);
+}
+
+// Le vendeur doit pouvoir changer d'interlocuteur : sans ce retour, il reste
+// enfermé dans le premier fil qu'il a ouvert.
+function retourALaListe() {
+  currentBuyerId = null;
+  if (socket) { socket.disconnect(); socket = null; }
+
+  const url = new URL(window.location.href);
+  url.searchParams.delete('buyerId');
+  window.history.replaceState({}, '', url);
+
+  const nomEl = document.getElementById('ch-name');
+  const avEl = document.getElementById('ch-avatar');
+  if (nomEl) nomEl.textContent = 'Mes conversations';
+  if (avEl) avEl.textContent = '💬';
+
+  afficherConversations();
+}
+
+// Pour un vendeur dans un fil, « Retour » ramène à sa liste ; partout ailleurs
+// il quitte la page comme avant.
+function quitterOuRevenir() {
+  if (estVendeur && currentBuyerId) retourALaListe();
+  else history.back();
 }
 
 async function loadChat(shopId, buyerId) {
@@ -445,7 +482,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   currentBuyerId = null;
   await loadChat(currentShopId, null);
-  connectSocket(currentShopId, currentUser.id, currentUser.id);
+  connectSocket(currentShopId, currentUser?.id, currentUser?.id);
 });
 </script>
 </body>
