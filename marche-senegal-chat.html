@@ -79,6 +79,20 @@ a{text-decoration:none;color:inherit}
 .ls:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
+/* Liste des conversations, côté vendeur */
+.conv-liste{display:flex;flex-direction:column;background:#fff}
+.conv-ligne{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s}
+.conv-ligne:hover{background:var(--gp)}
+.conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.conv-corps{flex:1;min-width:0}
+.conv-nom{font-size:.9rem;font-weight:600;color:var(--dark)}
+.conv-extrait{font-size:.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conv-droite{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.conv-date{font-size:.7rem;color:var(--muted)}
+.conv-nonlus{background:var(--red);color:#fff;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:99px;min-width:20px;text-align:center}
+.conv-vide{padding:40px 20px;text-align:center;color:var(--muted);font-size:.88rem}
+.retour-liste{background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;padding:4px 8px;margin-right:4px}
+
 @media(max-width:480px){
   .msg-row{max-width:88%}
   .nav{padding:0 12px}
@@ -100,6 +114,9 @@ a{text-decoration:none;color:inherit}
   </div>
 </nav>
 
+<!-- CONVERSATIONS LIST -->
+<div class="conv-liste" id="conv-liste" style="display:none"></div>
+
 <!-- MESSAGES -->
 <div class="messages-wrap" id="messages-wrap">
   <div class="loading-chat">
@@ -118,13 +135,18 @@ const API_URL_WS = (window.location.hostname === 'localhost' || window.location.
   ? 'http://localhost:3000'
   : 'https://marche-senegal-backend-production.up.railway.app';
 let currentShopId = null;
+let currentBuyerId = null;   // l'acheteur de la conversation ouverte
+let estVendeur = false;
 let currentUser = null;
 let socket = null;
 let lastDate = null;
 
-// ── Récupérer shopId depuis l'URL ──
 function getShopIdFromURL() {
   return new URLSearchParams(window.location.search).get('shopId');
+}
+
+function getBuyerIdFromURL() {
+  return new URLSearchParams(window.location.search).get('buyerId');
 }
 
 // ── Formater l'heure ──
@@ -232,17 +254,97 @@ function appendMessage(msg) {
   wrap.scrollTop = wrap.scrollHeight;
 }
 
-// ── Charger les messages ──
-async function loadChat(shopId) {
-  const result = await getChatMessages(shopId);
+// Le vendeur choisit à qui il répond : sans cette liste, il recevrait des
+// messages sans pouvoir en identifier l'auteur.
+async function afficherConversations() {
+  document.getElementById('messages-wrap').style.display = 'none';
+  const liste = document.getElementById('conv-liste');
+  liste.style.display = 'flex';
+  liste.replaceChildren();
+
+  const resultat = await getConversations();
+  if (!resultat.success) {
+    const erreur = document.createElement('div');
+    erreur.className = 'conv-vide';
+    erreur.textContent = 'Impossible de charger vos conversations';
+    liste.appendChild(erreur);
+    return;
+  }
+
+  const fils = resultat.data || [];
+  if (!fils.length) {
+    const vide = document.createElement('div');
+    vide.className = 'conv-vide';
+    vide.textContent = 'Aucune conversation pour le moment — vos clients peuvent vous écrire depuis votre boutique';
+    liste.appendChild(vide);
+    return;
+  }
+
+  fils.forEach(fil => {
+    const ligne = document.createElement('div');
+    ligne.className = 'conv-ligne';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'conv-avatar';
+    avatar.textContent = (fil.acheteur?.firstName || '?').charAt(0).toUpperCase();
+
+    const corps = document.createElement('div');
+    corps.className = 'conv-corps';
+    const nom = document.createElement('div');
+    nom.className = 'conv-nom';
+    nom.textContent = fil.acheteur?.firstName || 'Client';
+    const extrait = document.createElement('div');
+    extrait.className = 'conv-extrait';
+    extrait.textContent = fil.dernierMessage || '';
+    corps.appendChild(nom);
+    corps.appendChild(extrait);
+
+    const droite = document.createElement('div');
+    droite.className = 'conv-droite';
+    const date = document.createElement('div');
+    date.className = 'conv-date';
+    date.textContent = formatDate(fil.date);
+    droite.appendChild(date);
+    if (fil.nonLus > 0) {
+      const pastille = document.createElement('div');
+      pastille.className = 'conv-nonlus';
+      pastille.textContent = fil.nonLus;
+      droite.appendChild(pastille);
+    }
+
+    ligne.appendChild(avatar);
+    ligne.appendChild(corps);
+    ligne.appendChild(droite);
+    ligne.onclick = () => ouvrirConversation(fil.buyerId, fil.acheteur?.firstName);
+    liste.appendChild(ligne);
+  });
+}
+
+async function ouvrirConversation(buyerId, prenom) {
+  currentBuyerId = buyerId;
+  document.getElementById('conv-liste').style.display = 'none';
+  document.getElementById('messages-wrap').style.display = '';
+
+  const nomEl = document.getElementById('ch-name');
+  if (nomEl && prenom) nomEl.textContent = prenom;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('buyerId', buyerId);
+  window.history.replaceState({}, '', url);
+
+  await loadChat(currentShopId, buyerId);
+  connectSocket(currentShopId, buyerId, currentUser?.id);
+}
+
+async function loadChat(shopId, buyerId) {
+  const result = await getChatMessages(shopId, buyerId);
   if (!result.success) {
     showToast('❌ Impossible de charger les messages', 'error');
     return;
   }
 
-  // Header boutique
   const shop = result.shop;
-  if (shop) {
+  if (shop && !estVendeur) {
     const nameEl = document.getElementById('ch-name');
     const avEl = document.getElementById('ch-avatar');
     if (nameEl) nameEl.textContent = shop.name;
@@ -250,10 +352,9 @@ async function loadChat(shopId) {
   }
 
   renderMessages(result.data, currentUser?.id);
-  markMessagesRead(shopId);
+  markMessagesRead(shopId, buyerId);
 }
 
-// ── Envoyer un message ──
 async function sendMessage() {
   const input = document.getElementById('msg-input');
   const content = input.value.trim();
@@ -263,9 +364,9 @@ async function sendMessage() {
   btn.disabled = true;
   input.value = '';
 
-  const result = await sendChatMessage(currentShopId, content);
+  const result = await sendChatMessage(currentShopId, content, currentBuyerId);
   if (!result.success) {
-    showToast('❌ Erreur d\'envoi', 'error');
+    showToast('❌ ' + (result.message || 'Erreur d\'envoi'), 'error');
     input.value = content;
   } else {
     appendMessage(result.data);
@@ -274,18 +375,26 @@ async function sendMessage() {
   input.focus();
 }
 
-// ── Connecter Socket.io ──
-function connectSocket(shopId, userId) {
-  socket = io(API_URL_WS, { transports: ['websocket', 'polling'] });
+function connectSocket(shopId, buyerId, userId) {
+  // Une seule connexion : rouvrir sans fermer empilerait les écouteurs et
+  // afficherait le même message plusieurs fois.
+  if (socket) socket.disconnect();
+
+  socket = io(API_URL_WS, {
+    transports: ['websocket', 'polling'],
+    // Le serveur refuse les connexions anonymes : sans ce jeton, n'importe
+    // qui pourrait rejoindre la conversation de deux inconnus.
+    auth: { token: localStorage.getItem('token') }
+  });
 
   socket.on('connect', () => {
-    socket.emit('join_chat', { shopId, userId });
+    socket.emit('join_chat', { shopId, buyerId });
   });
 
   socket.on('new_message', (msg) => {
     if (msg.senderId !== userId) {
       appendMessage(msg);
-      markMessagesRead(shopId);
+      markMessagesRead(shopId, buyerId);
     }
   });
 
@@ -306,7 +415,6 @@ document.getElementById('msg-input').addEventListener('input', (e) => {
   document.getElementById('send-btn').disabled = !e.target.value.trim();
 });
 
-// ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   if (!isLoggedIn()) {
     window.location.href = 'marche-senegal-connexion-acheteur.html';
@@ -315,14 +423,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   currentUser = getCurrentUser();
   currentShopId = getShopIdFromURL();
+  estVendeur = currentUser?.role === 'SELLER';
 
   if (!currentShopId) {
     window.location.href = 'marche-senegal-accueil.html';
     return;
   }
 
-  await loadChat(currentShopId);
-  connectSocket(currentShopId, currentUser?.id);
+  const buyerDemande = getBuyerIdFromURL();
+
+  // Le vendeur arrive sur la liste de ses fils ; l'acheteur sur le sien.
+  if (estVendeur && !buyerDemande) {
+    await afficherConversations();
+    return;
+  }
+
+  if (estVendeur) {
+    await ouvrirConversation(buyerDemande, null);
+    return;
+  }
+
+  currentBuyerId = null;
+  await loadChat(currentShopId, null);
+  connectSocket(currentShopId, currentUser.id, currentUser.id);
 });
 </script>
 </body>
