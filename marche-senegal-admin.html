@@ -721,8 +721,8 @@
     </div>
     <div class="card">
       <table class="t">
-        <thead><tr><th>Promotion</th><th>Boutique</th><th>Type</th><th>Remise</th><th>Utilisations</th><th>Statut</th><th>Expire le</th></tr></thead>
-        <tbody id="promotions-tbody"><tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+        <thead><tr><th>Promotion</th><th>Boutique</th><th>Type</th><th>Remise</th><th>Utilisations</th><th>Statut</th><th>Expire le</th><th>Action</th></tr></thead>
+        <tbody id="promotions-tbody"><tr><td colspan="8" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -2051,15 +2051,36 @@ async function changeProductStatus(productId, status, badgeEl, actDiv, product) 
 
 const PROMO_TYPE = {
   CODE: 'Code promo', SALE: 'Soldes', OFFER: 'Offre',
-  FEATURED: 'Mise en avant', FREE_DELIVERY: 'Livraison offerte'
+  ANNOUNCEMENT: 'Annonce', FEATURED: 'Mise en avant', FREE_DELIVERY: 'Livraison offerte'
 };
+
+// Couper une promotion laisse une trace au journal, côté serveur : la décision
+// doit rester défendable un mois plus tard.
+async function basculerPromotion(id, actuellementActive, titre) {
+  const question = actuellementActive
+    ? 'Couper la promotion « ' + titre + ' » ? Elle disparaîtra des boutiques.'
+    : 'Remettre « ' + titre + ' » en ligne ?';
+  if (!confirm(question)) return;
+
+  try {
+    const res = await apiCall('/api/admin/promotions/' + id + '/toggle', { method: 'PATCH' });
+    if (res.success) {
+      showToast(res.message || 'Promotion mise à jour');
+      loadPromotions();
+    } else {
+      showToast(res.message || 'Action impossible');
+    }
+  } catch (e) {
+    showToast('Erreur — backend démarré ?');
+  }
+}
 
 async function loadPromotions() {
   promotionsLoaded = true;
   const tbody = document.getElementById('promotions-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
 
   try {
     const res   = await apiCall('/api/admin/promotions');
@@ -2071,14 +2092,18 @@ async function loadPromotions() {
 
     tbody.innerHTML = '';
     if (!promos.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Aucune promotion</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Aucune promotion</td></tr>';
       return;
     }
 
     promos.forEach(p => {
-      const isActive  = p.isActive && (!p.endDate || new Date(p.endDate) > new Date());
+      // « Expirée » était affiché aussi bien pour une promotion arrivée à son
+      // terme que pour une promotion coupée : deux situations différentes, dont
+      // une seule appelle une action.
+      const expiree   = !!p.endDate && new Date(p.endDate) <= new Date();
+      const isActive  = p.isActive && !expiree;
       const statusCls = isActive ? 'b-ok' : 'b-rej';
-      const statusLbl = isActive ? 'Active' : 'Expirée';
+      const statusLbl = isActive ? 'Active' : (expiree ? 'Expirée' : 'Coupée');
       const endDate   = p.endDate ? new Date(p.endDate).toLocaleDateString('fr-FR') : '—';
       const maxUses   = p.maxUses ? p.usedCount + ' / ' + p.maxUses : p.usedCount + ' / ∞';
       const remise    = p.discount + (p.type === 'FREE_DELIVERY' ? '' : ' %');
@@ -2094,10 +2119,29 @@ async function loadPromotions() {
         '<td style="font-size:.78rem">' + maxUses + '</td>' +
         '<td><span class="badge ' + statusCls + '">' + statusLbl + '</span></td>' +
         '<td style="font-size:.76rem;color:var(--muted)">' + endDate + '</td>';
+
+      // L'admin voyait les promotions de toutes les boutiques sans rien pouvoir
+      // en faire : une remise mensongère restait en ligne jusqu'à ce que le
+      // vendeur veuille bien la retirer.
+      const tdAction = document.createElement('td');
+      if (!expiree) {
+        const bouton = document.createElement('button');
+        bouton.className = 'badge ' + (p.isActive ? 'b-rej' : 'b-ok');
+        bouton.style.cursor = 'pointer';
+        bouton.style.border = 'none';
+        bouton.textContent = p.isActive ? 'Couper' : 'Remettre en ligne';
+        bouton.onclick = () => basculerPromotion(p.id, p.isActive, p.title);
+        tdAction.appendChild(bouton);
+      } else {
+        tdAction.style.color = 'var(--muted)';
+        tdAction.textContent = '—';
+      }
+      tr.appendChild(tdAction);
+
       tbody.appendChild(tr);
     });
   } catch (e) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--red)">Erreur de chargement — backend démarré ?</td></tr>';
   }
 }
 
