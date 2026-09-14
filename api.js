@@ -319,6 +319,11 @@ async function getShopPromotions(shopId) {
   return await apiCall('/api/promotions/shop/' + shopId);
 }
 
+// Les quatre offres du bandeau de l'accueil, une par boutique.
+async function getActivePromotions() {
+  return await apiCall('/api/promotions/active');
+}
+
 async function validatePromoCode(code, shopId, amount) {
   return await apiCall('/api/promotions/validate', {
     method: 'POST',

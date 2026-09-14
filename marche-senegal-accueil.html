@@ -263,12 +263,12 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <!-- PROMO BAND -->
 <div class="promos-band">
   <div><div class="pb-label"><i class="ic" data-ic="flame"></i> Offres du moment</div><div class="pb-title">Promotions actives aujourd'hui</div><div class="pb-sub">Les vendeurs partagent leurs meilleures offres</div></div>
-  <div class="promo-pills">
-    <div class="promo-pill"><div class="pp-disc">-15%</div><div class="pp-shop">Mode Fatou · Sandaga</div></div>
-    <div class="promo-pill"><div class="pp-disc">-20%</div><div class="pp-shop">Artisan Thiès</div></div>
-    <div class="promo-pill"><div class="pp-disc">-10%</div><div class="pp-shop">Ferme Diallo</div></div>
-    <div class="promo-pill"><div class="pp-disc">2+1</div><div class="pp-shop">Boutique HLM</div></div>
-  </div>
+  <!-- Ces quatre pastilles étaient écrites en dur — « -15% Mode Fatou ·
+       Sandaga », « -20% Artisan Thiès » — les mêmes pour tout le monde, et
+       fausses pour tout le monde : aucune ne correspondait à une promotion
+       réelle. Elles sont maintenant posées par loadPromosBand(), et la bande
+       entière disparaît quand aucun vendeur n'a d'offre en cours. -->
+  <div class="promo-pills" id="promo-pills"></div>
 </div>
 <!-- PRODUITS -->
 <section class="section-wrap bg">
@@ -363,6 +363,57 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 let cartCount = 0;
 
 // ── Charger les produits depuis l'API ──
+// Le bandeau « Promotions actives aujourd'hui » annonçait quatre offres
+// inventées. Il montre de vraies promotions de vrais vendeurs, ou rien.
+async function loadPromosBand() {
+  const bande = document.querySelector('.promos-band');
+  const pastilles = document.getElementById('promo-pills');
+  if (!pastilles) return;
+
+  const result = await getActivePromotions();
+  const promos = (result.success && result.data) || [];
+
+  if (!promos.length) {
+    if (bande) bande.style.display = 'none';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  promos.forEach((promo) => {
+    const pastille = document.createElement('div');
+    pastille.className = 'promo-pill';
+
+    const remise = document.createElement('div');
+    remise.className = 'pp-disc';
+    // Une livraison offerte n'a pas de pourcentage : afficher « -0% » ferait
+    // passer une vraie offre pour une erreur.
+    remise.textContent = promo.discount > 0 ? '-' + promo.discount + '%' : 'OFFERT';
+
+    const boutique = document.createElement('div');
+    boutique.className = 'pp-shop';
+    const nomMarche = promo.shop?.market?.name;
+    boutique.textContent = (promo.shop?.name || 'Boutique') + (nomMarche ? ' · ' + nomMarche : '');
+
+    pastille.appendChild(remise);
+    pastille.appendChild(boutique);
+
+    // Le code ne sert à rien s'il ne mène nulle part : la pastille ouvre la
+    // boutique qui l'offre.
+    if (promo.shopId) {
+      pastille.style.cursor = 'pointer';
+      pastille.title = promo.code ? 'Code ' + promo.code : promo.title;
+      pastille.onclick = () => {
+        window.location.href = 'marche-senegal-boutique.html?id=' + promo.shopId;
+      };
+    }
+
+    fragment.appendChild(pastille);
+  });
+
+  pastilles.replaceChildren(fragment);
+  if (bande) bande.style.display = '';
+}
+
 async function loadProducts(filters = {}) {
   showLoading('products-grid', 'Chargement des produits...');
 
@@ -822,7 +873,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // focus 'left' : le texte du hero est à gauche, on l'y protège davantage.
   applyBanner(document.querySelector('.hero'), HERO_BANNER, { focus: 'left' });
   await loadMarkets();
-  await Promise.all([loadProducts(), loadFeaturedShops()]);
+  await Promise.all([loadProducts(), loadFeaturedShops(), loadPromosBand()]);
 });
 </script>
 </body>
