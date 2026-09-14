@@ -350,6 +350,7 @@
   .sg-grid{grid-template-columns:repeat(2,1fr);gap:8px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 
@@ -372,7 +373,7 @@
         Payer maintenant
       </button>
       <button class="wave-cancel-btn" onclick="cancelPayment()">Annuler</button>
-      <div class="wave-security">🔒 Paiement sécurisé — Simulation dev</div>
+      <div class="wave-security"><i class="ic" data-ic="lock"></i> Paiement sécurisé — Simulation dev</div>
     </div>
   </div>
 </div>
@@ -380,7 +381,7 @@
 <!-- SUCCESS OVERLAY -->
 <div class="success-overlay" id="success-overlay">
   <div class="success-card">
-    <span class="sc-icon">🎉</span>
+    <span class="sc-icon"><i class="ic" data-ic="party-popper"></i></span>
     <div class="sc-title">Commande confirmée !</div>
     <div class="sc-sub">Votre paiement a bien été reçu via Wave. Votre commande est en cours de préparation.</div>
     <div class="sc-order">
@@ -396,7 +397,7 @@
       <div class="sc-step waiting"><div class="sc-step-dot"></div><span>Livré</span></div>
     </div>
     <div class="sc-btns">
-      <button class="sc-btn-primary" onclick="closeSuccess('track')">📦 Suivre ma commande</button>
+      <button class="sc-btn-primary" onclick="closeSuccess('track')"><i class="ic" data-ic="package"></i> Suivre ma commande</button>
       <button class="sc-btn-secondary" onclick="closeSuccess('home')">Retour à l'accueil</button>
     </div>
   </div>
@@ -410,12 +411,12 @@
   </a>
   <div class="nav-search">
     <input type="text" placeholder="Rechercher un produit, une boutique..."/>
-    <button class="nav-search-btn">🔍 Rechercher</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i> Rechercher</button>
   </div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
     <button class="nav-cart" onclick="toast('Panier...')">
-      🛒<div class="cart-badge" id="cart-count">3</div>
+      <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">3</div>
     </button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
       <span></span><span></span><span></span>
@@ -425,7 +426,7 @@
 <div class="nav-drawer" id="nav-drawer">
   <div class="nav-search" style="max-width:100%;width:100%">
     <input type="text" placeholder="Rechercher..."/>
-    <button class="nav-search-btn">🔍</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="nav-drawer-row">
     <button class="nav-btn" style="flex:1;justify-content:center">Se connecter</button>
@@ -470,16 +471,16 @@
     <div>
 
       <!-- CART ITEMS -->
-      <div class="sec-title">🛒 Mon panier <span class="sec-count">(3 articles)</span></div>
+      <div class="sec-title"><i class="ic" data-ic="shopping-cart"></i> Mon panier <span class="sec-count">(3 articles)</span></div>
 
       <div class="cart-section"></div>
 
       <!-- ADRESSE DE LIVRAISON -->
-      <div class="sec-title" style="margin-top:8px">📍 Adresse de livraison</div>
+      <div class="sec-title" style="margin-top:8px"><i class="ic" data-ic="map-pin"></i> Adresse de livraison</div>
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
         <div class="addr-list">
           <div class="addr-card selected" onclick="selectAddr(this)">
-            <div class="addr-icon">🏠</div>
+            <div class="addr-icon"><i class="ic" data-ic="house"></i></div>
             <div>
               <div class="addr-label">Domicile</div>
               <div class="addr-text">Cité Keur Gorgui, Villa 12<br/>Dakar, Sénégal</div>
@@ -487,7 +488,7 @@
             <div class="addr-radio"></div>
           </div>
           <div class="addr-card" onclick="selectAddr(this)">
-            <div class="addr-icon">💼</div>
+            <div class="addr-icon"><i class="ic" data-ic="briefcase"></i></div>
             <div>
               <div class="addr-label">Bureau</div>
               <div class="addr-text">Plateau, Rue Carnot<br/>Dakar Centre, Sénégal</div>
@@ -503,7 +504,7 @@
 
       <!-- CODE PROMO -->
       <div class="promo-section">
-        <div class="ps-title">🏷️ Code promo</div>
+        <div class="ps-title"><i class="ic" data-ic="tag"></i> Code promo</div>
         <div class="ps-input-row">
           <input class="ps-input" type="text" placeholder="Entrez votre code..." id="promo-input"/>
           <button class="ps-btn" onclick="applyPromo()">Appliquer</button>
@@ -519,7 +520,7 @@
 
       <!-- SUGGESTED -->
       <div class="suggested-section">
-        <div class="sg-title">💡 Vous pourriez aussi aimer</div>
+        <div class="sg-title"><i class="ic" data-ic="lightbulb"></i> Vous pourriez aussi aimer</div>
         <div class="sg-grid" id="suggested-grid">
           <div style="text-align:center;padding:20px;color:var(--muted);font-size:.84rem">Chargement...</div>
         </div>
@@ -573,11 +574,11 @@
           </div>
         </div>
         <div id="pay-methods-empty" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.82rem;color:#8A6100;line-height:1.5">
-          ⏳ Le paiement en ligne est momentanément indisponible. Réessayez dans quelques minutes.
+          <i class="ic" data-ic="hourglass"></i> Le paiement en ligne est momentanément indisponible. Réessayez dans quelques minutes.
         </div>
 
         <div id="auth-wall" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:16px;margin-bottom:12px">
-          <div style="font-size:.9rem;font-weight:700;color:#8A6100;margin-bottom:5px">🔐 Connexion requise</div>
+          <div style="font-size:.9rem;font-weight:700;color:#8A6100;margin-bottom:5px"><i class="ic" data-ic="lock-keyhole"></i> Connexion requise</div>
           <div style="font-size:.78rem;color:#8A6100;line-height:1.6;margin-bottom:12px">Pour finaliser votre commande, créez un compte ou connectez-vous. Votre panier sera conservé.</div>
           <div style="display:flex;gap:8px">
             <button onclick="window.location.href='marche-senegal-connexion-acheteur.html'" style="flex:1;height:38px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer">Se connecter</button>
@@ -585,11 +586,11 @@
           </div>
         </div>
         <button class="pay-btn" id="pay-btn" onclick="payNow()">
-          🔒 Payer <span id="pay-btn-amount">32 620 FCFA</span>
+          <i class="ic" data-ic="lock"></i> Payer <span id="pay-btn-amount">32 620 FCFA</span>
         </button>
 
         <div class="security-row">
-          <div class="sec-badge">🔒 Paiement sécurisé</div>
+          <div class="sec-badge"><i class="ic" data-ic="lock"></i> Paiement sécurisé</div>
           <div class="sec-badge">✓ Vendeurs vérifiés</div>
           <div class="sec-badge">🇸🇳 Marchés du Sénégal</div>
         </div>
@@ -597,7 +598,7 @@
 
       <!-- Trust badges -->
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px">
-        <div style="font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:10px">🔐 Paiement et suivi</div>
+        <div style="font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:10px"><i class="ic" data-ic="lock-keyhole"></i> Paiement et suivi</div>
         <div style="font-size:.76rem;color:var(--muted);line-height:1.65">Le paiement est traité par <strong style="color:var(--text)">Wave</strong>. Votre commande est confirmée dès l'encaissement, et vous suivez son avancement depuis votre profil jusqu'à la livraison.</div>
       </div>
 
@@ -608,11 +609,11 @@
 <!-- Mobile nav -->
 <nav class="mobile-nav">
   <div class="mn-items">
-    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
-    <div class="mn-item act"><div class="mn-icon act">🛒</div><div class="mn-label act">Panier</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon"><i class="ic" data-ic="map"></i></div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item act"><div class="mn-icon act"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label act">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
 
@@ -763,6 +764,7 @@ function changeQty(productId, delta) {
 
   localStorage.setItem('cart', JSON.stringify(cart));
   updateSummary();
+  revaliderPromo();
   showToast('Quantité mise à jour');
 }
 
@@ -771,6 +773,7 @@ function removeItem(productId) {
   cart = cart.filter(i => i.productId !== productId);
   localStorage.setItem('cart', JSON.stringify(cart));
   loadCart();
+  revaliderPromo();
   showToast('Article supprimé du panier');
 }
 
@@ -840,6 +843,33 @@ async function loadPaymentMethods() {
 }
 
 // ── Appliquer un code promo ──
+//
+// Un code appartient à une boutique. Il était validé sans le dire : l'écran
+// affichait « −15 % », la commande ne trouvait pas le code chez le bon vendeur
+// et l'acheteur payait le plein tarif sans un mot. On essaie maintenant le code
+// sur chaque boutique du panier, et on retient celle qui l'accepte.
+function boutiquesDuPanier() {
+  const parBoutique = {};
+  cart.forEach(item => {
+    const shopId = item.shopId || 'default';
+    parBoutique[shopId] = (parBoutique[shopId] || 0) + item.price * item.quantity;
+  });
+  return parBoutique;
+}
+
+async function validerCodeChezBoutique(code, shopId, sousTotal) {
+  const token = localStorage.getItem('token');
+  const res = await fetch(API_URL + '/api/promotions/validate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+    },
+    body: JSON.stringify({ code, shopId, amount: sousTotal })
+  });
+  return await res.json();
+}
+
 async function applyPromo() {
   const code = document.getElementById('promo-input').value.trim().toUpperCase();
   if (!code) { showToast('Entrez un code promo'); return; }
@@ -849,38 +879,78 @@ async function applyPromo() {
   btn.disabled = true;
 
   try {
-    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-    const token = localStorage.getItem('token');
-    const res = await fetch(API_URL + '/api/promotions/validate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
-      },
-      body: JSON.stringify({ code, amount: subtotal })
-    });
-    const data = await res.json();
+    const parBoutique = boutiquesDuPanier();
+    let accepte = null;
+    let dernierRefus = 'Code promo invalide ou expiré';
 
-    if (!data.success) {
-      showToast('❌ ' + data.message);
+    for (const [shopId, sousTotal] of Object.entries(parBoutique)) {
+      const data = await validerCodeChezBoutique(code, shopId, sousTotal);
+      if (data.success) { accepte = { ...data.data, shopId }; break; }
+      // « Une autre boutique » n'apprend rien à l'acheteur tant qu'il reste des
+      // boutiques à essayer : on garde plutôt la vraie raison du refus.
+      if (!/autre boutique/i.test(data.message || '')) dernierRefus = data.message;
+    }
+
+    if (!accepte) {
+      showToast('❌ ' + dernierRefus);
       document.getElementById('promo-input').style.borderColor = 'var(--red)';
       setTimeout(() => { document.getElementById('promo-input').style.borderColor = ''; }, 1500);
       return;
     }
 
-    promoApplied = { pct: data.data.discount, label: data.data.title, id: data.data.promoId };
+    promoApplied = {
+      pct: accepte.discount,
+      reduction: accepte.discountAmount,
+      livraisonOfferte: !!accepte.freeDelivery,
+      code: accepte.code,
+      shopId: accepte.shopId,
+      label: accepte.title,
+      id: accepte.promoId
+    };
     document.getElementById('promo-applied').style.display = 'flex';
-    document.getElementById('applied-code').textContent = data.data.code;
-    document.getElementById('applied-desc').textContent = data.data.description || data.data.title;
+    document.getElementById('applied-code').textContent = accepte.code;
+    document.getElementById('applied-desc').textContent = accepte.description || accepte.title;
     document.getElementById('promo-input').value = '';
     updateSummary();
-    showToast('✓ Code ' + data.data.code + ' appliqué ! −' + data.data.discount + '%');
+    showToast(accepte.freeDelivery
+      ? '✓ Code ' + accepte.code + ' appliqué ! Livraison offerte'
+      : '✓ Code ' + accepte.code + ' appliqué ! −' + formatPrice(accepte.discountAmount));
   } catch (e) {
     showToast('❌ Erreur réseau, réessayez');
   } finally {
     btn.textContent = 'Appliquer';
     btn.disabled = false;
   }
+}
+
+// Le panier a changé : la remise calculée sur l'ancien sous-total ne vaut plus.
+// On la refait confirmer par le serveur, en silence, plutôt que d'afficher un
+// montant que la commande refuserait.
+async function revaliderPromo() {
+  if (!promoApplied) return;
+  const parBoutique = boutiquesDuPanier();
+  const sousTotal = parBoutique[promoApplied.shopId];
+
+  if (!sousTotal) {
+    const codePerdu = promoApplied.code;
+    promoApplied = null;
+    document.getElementById('promo-applied').style.display = 'none';
+    updateSummary();
+    showToast('Le code ' + codePerdu + ' ne peut plus être appliqué à votre panier');
+    return;
+  }
+
+  const data = await validerCodeChezBoutique(promoApplied.code, promoApplied.shopId, sousTotal);
+  if (data.success) {
+    promoApplied.reduction = data.data.discountAmount;
+    promoApplied.livraisonOfferte = !!data.data.freeDelivery;
+  } else {
+    const codePerdu = promoApplied.code;
+    promoApplied = null;
+    document.getElementById('promo-applied').style.display = 'none';
+    showToast('Code ' + codePerdu + ' retiré : ' + data.message);
+  }
+  updateSummary();
 }
 
 // ── Retirer le code promo ──
@@ -894,8 +964,15 @@ function removePromo() {
 // ── Mettre à jour le récapitulatif ──
 function updateSummary() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = promoApplied ? Math.floor(subtotal * promoApplied.pct / 100) : 0;
-  const totalDeliveryFee = Object.values(deliveryFees).reduce((s, f) => s + f, 0);
+  // La remise vient du serveur, calculée sur la boutique du code : la calculer
+  // ici sur le panier entier annonçait plus que ce que la commande appliquait.
+  const discount = promoApplied ? promoApplied.reduction : 0;
+  // Un code « livraison gratuite » efface les frais de sa boutique — et d'elle
+  // seule : les autres vendeurs du panier livrent toujours à leurs frais.
+  const fraisOfferts = (promoApplied && promoApplied.livraisonOfferte)
+    ? (deliveryFees[promoApplied.shopId] || 0)
+    : 0;
+  const totalDeliveryFee = Object.values(deliveryFees).reduce((s, f) => s + f, 0) - fraisOfferts;
   const total = subtotal + totalDeliveryFee - discount;
 
   // Lignes produits dynamiques
@@ -986,7 +1063,7 @@ async function payNow() {
           color: item.color || null
         })),
         deliveryType: (deliveryFees[shopId] ?? 1000) === 0 ? 'PICKUP' : 'DELIVERY',
-        promoCode: promoApplied ? document.getElementById('applied-code')?.textContent : null
+        promoCode: (promoApplied && promoApplied.shopId === shopId) ? promoApplied.code : null
       };
 
       const result = await createOrder(orderData);
@@ -1002,10 +1079,9 @@ async function payNow() {
     }
 
     // Initier le paiement
+    // Le montant à payer se lit sur la commande, côté serveur : le total que
+    // cette page recalculait ne servait plus à personne.
     const token = localStorage.getItem('token');
-    const total = cart.reduce((s, i) => s + i.price * i.quantity, 0)
-      + Object.values(deliveryFees).reduce((s, f) => s + f, 0)
-      - (promoApplied ? Math.floor(cart.reduce((s, i) => s + i.price * i.quantity, 0) * promoApplied.pct / 100) : 0);
 
     const initRes = await fetch(API_URL + '/api/payments/initiate', {
       method: 'POST',

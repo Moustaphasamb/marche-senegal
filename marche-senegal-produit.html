@@ -353,6 +353,7 @@ a{text-decoration:none;color:inherit}
   .similar-section{padding:0 4vw 80px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 
@@ -366,12 +367,12 @@ a{text-decoration:none;color:inherit}
   </a>
   <div class="nav-search">
     <input type="text" placeholder="Rechercher un produit, une boutique..."/>
-    <button class="nav-search-btn">🔍 Rechercher</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i> Rechercher</button>
   </div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login">Se connecter</button>
     <button class="nav-cart" onclick="toast('Panier...')">
-      🛒<div class="cart-badge" id="cart-count">0</div>
+      <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
       <span></span><span></span><span></span>
@@ -381,7 +382,7 @@ a{text-decoration:none;color:inherit}
 <div class="nav-drawer" id="nav-drawer">
   <div class="nav-search" style="max-width:100%;width:100%">
     <input type="text" placeholder="Rechercher..."/>
-    <button class="nav-search-btn">🔍</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="nav-drawer-row">
     <button class="nav-btn" style="flex:1;justify-content:center">Se connecter</button>
@@ -405,17 +406,21 @@ a{text-decoration:none;color:inherit}
   <!-- LEFT — GALLERY -->
   <div class="product-gallery">
     <div class="main-img" id="main-img" onclick="openZoom()">
-      <div class="img-badge">-15% · Code FATOU15</div>
-      <span id="main-emoji">👗</span>
-      <div class="img-wish" id="wish-btn" onclick="toggleWish()">🤍</div>
-      <div class="img-share" onclick="shareProduct()">↗</div>
+      <!-- Ce badge annonçait « -15% · Code FATOU15 » sur TOUS les produits :
+           le code de la boutique de démonstration s'affichait sur la fiche de
+           chaque vendeur. Il porte maintenant la remise réelle du produit,
+           celle que le vendeur a saisie, et reste caché sans remise. -->
+      <div class="img-badge" id="img-badge" style="display:none"></div>
+      <span id="main-emoji"><i class="ic" data-ic="shirt"></i></span>
+      <div class="img-wish" id="wish-btn" onclick="toggleWish()"><i class="ic" data-ic="heart"></i></div>
+      <div class="img-share" onclick="shareProduct()"><i class="ic" data-ic="share-2"></i></div>
     </div>
     <div class="thumb-row">
-      <div class="thumb active" onclick="changeImg(this,'👗','#F0EAF8')">👗</div>
-      <div class="thumb" onclick="changeImg(this,'🧵','#FFF8E7')">🧵</div>
-      <div class="thumb" onclick="changeImg(this,'🎨','#E8F5EC')">🎨</div>
-      <div class="thumb" onclick="changeImg(this,'✨','#FDE8E6')">✨</div>
-      <div class="thumb" onclick="changeImg(this,'🪡','#FDF3DC')">🪡</div>
+      <div class="thumb active" onclick="changeImg(this,'👗','#F0EAF8')"><i class="ic" data-ic="shirt"></i></div>
+      <div class="thumb" onclick="changeImg(this,'🧵','#FFF8E7')"><i class="ic" data-ic="spool"></i></div>
+      <div class="thumb" onclick="changeImg(this,'🎨','#E8F5EC')"><i class="ic" data-ic="palette"></i></div>
+      <div class="thumb" onclick="changeImg(this,'✨','#FDE8E6')"><i class="ic" data-ic="sparkles"></i></div>
+      <div class="thumb" onclick="changeImg(this,'🪡','#FDF3DC')"><i class="ic" data-ic="scissors"></i></div>
     </div>
 
     <!-- TABS — visible on desktop under image -->
@@ -481,7 +486,7 @@ a{text-decoration:none;color:inherit}
           </div>
         </div>
         <div id="prod-review-form" style="display:none;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
-          <div style="font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:12px">✍️ Laisser un avis sur ce produit</div>
+          <div style="font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:12px"><i class="ic" data-ic="pen-line"></i> Laisser un avis sur ce produit</div>
           <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Votre note</div>
           <div id="prod-star-picker" style="display:flex;gap:6px;font-size:1.6rem;cursor:pointer;margin-bottom:10px">
             <span data-v="1">☆</span><span data-v="2">☆</span><span data-v="3">☆</span><span data-v="4">☆</span><span data-v="5">☆</span>
@@ -563,8 +568,8 @@ a{text-decoration:none;color:inherit}
   <!-- RIGHT — PRODUCT INFO -->
   <div class="product-info">
     <div class="pi-tags" id="pi-tags">
-      <span class="pi-tag tag-market">🏛️ Sandaga</span>
-      <span class="pi-tag tag-cat">👗 Mode</span>
+      <span class="pi-tag tag-market"><i class="ic" data-ic="landmark"></i> Sandaga</span>
+      <span class="pi-tag tag-cat"><i class="ic" data-ic="shirt"></i> Mode</span>
     </div>
 
     <h1 class="pi-title">Boubou wax tissé main — Qualité supérieure</h1>
@@ -581,13 +586,14 @@ a{text-decoration:none;color:inherit}
       <span class="pi-old">18 000 FCFA</span>
       <span class="pi-discount">-15%</span>
     </div>
-    <div class="pi-price-note">Prix avec code promo FATOU15 · Économie de 2 700 FCFA</div>
+    <div class="pi-price-note" id="pi-price-note" style="display:none"></div>
 
-    <!-- Promo box -->
-    <div class="promo-box">
-      <div class="pb-text">🔥 Promotion active jusqu'à 20h · Utilisez le code</div>
-      <div class="pb-code" onclick="copyCode()">FATOU15</div>
-    </div>
+    <!-- Cet encadré annonçait « Promotion active jusqu'à 20h » avec le code
+         FATOU15, sur toutes les fiches et à toute heure. Aucune route publique
+         n'expose les promotions d'une boutique : l'acheteur copiait un code qui
+         ne pouvait pas fonctionner chez ce vendeur. Masqué tant que les
+         promotions ne sont pas exposées publiquement — même raison que la carte
+         promo de marche-senegal-boutique.html. -->
 
     <!-- Taille -->
     <div class="opt-section">
@@ -632,33 +638,33 @@ a{text-decoration:none;color:inherit}
         <button class="qty-btn" onclick="changeQty(1)">+</button>
       </div>
       <button class="add-cart-btn" onclick="addToCart()">
-        🛒 Ajouter au panier
+        <i class="ic" data-ic="shopping-cart"></i> Ajouter au panier
       </button>
     </div>
     <button class="buy-now-btn" onclick="buyNow()">
-      ⚡ Acheter maintenant
+      <i class="ic" data-ic="zap"></i> Acheter maintenant
     </button>
 
     <!-- Delivery info -->
     <div class="delivery-info">
       <div class="di-row">
-        <div class="di-icon">🚚</div>
+        <div class="di-icon"><i class="ic" data-ic="truck"></i></div>
         <div><div class="di-label">Livraison Dakar — 1 000 FCFA</div><div class="di-sub">Demain avant 18h si commande avant 14h</div></div>
       </div>
       <div class="di-row">
-        <div class="di-icon">🗺️</div>
+        <div class="di-icon"><i class="ic" data-ic="map"></i></div>
         <div><div class="di-label">Livraison régions — 2 500 à 5 000 FCFA</div><div class="di-sub">2 à 4 jours ouvrés · Toutes les régions du Sénégal</div></div>
       </div>
       <div class="di-row">
-        <div class="di-icon">🏪</div>
+        <div class="di-icon"><i class="ic" data-ic="store"></i></div>
         <div><div class="di-label">Retrait gratuit en boutique</div><div class="di-sub">Allée 3, Stand 12 · Marché Sandaga · Disponible maintenant</div></div>
       </div>
     </div>
 
     <!-- Security -->
     <div class="sec-row">
-      <div class="sec-item">🔒 Paiement sécurisé</div>
-      <div class="sec-item">📱 Paiement par Wave</div>
+      <div class="sec-item"><i class="ic" data-ic="lock"></i> Paiement sécurisé</div>
+      <div class="sec-item"><i class="ic" data-ic="smartphone"></i> Paiement par Wave</div>
       <div class="sec-item">✓ Vendeur vérifié</div>
     </div>
 
@@ -668,9 +674,9 @@ a{text-decoration:none;color:inherit}
       <div class="sc-info">
         <div class="sc-verified">✓ Vendeur Vérifié · Sandaga</div>
         <div class="sc-name">Mode Fatou Ndoye</div>
-        <div class="sc-market">🏛️ Marché Sandaga · Allée 3 · Ouvert maintenant</div>
+        <div class="sc-market"><i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3 · Ouvert maintenant</div>
         <div class="sc-stats">
-          <div><div class="sc-stat-val">4.8⭐</div><div class="sc-stat-lbl">Note</div></div>
+          <div><div class="sc-stat-val">4.8<i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="sc-stat-lbl">Note</div></div>
           <div><div class="sc-stat-val">234</div><div class="sc-stat-lbl">Avis</div></div>
           <div><div class="sc-stat-val">1 240</div><div class="sc-stat-lbl">Ventes</div></div>
           <div><div class="sc-stat-val">48</div><div class="sc-stat-lbl">Produits</div></div>
@@ -687,7 +693,7 @@ a{text-decoration:none;color:inherit}
   <div class="similar-title">Produits similaires</div>
   <div class="similar-grid" id="similar-grid">
     <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted)">
-      <div style="font-size:1.8rem;margin-bottom:8px">⏳</div>
+      <div style="font-size:1.8rem;margin-bottom:8px"><i class="ic" data-ic="hourglass"></i></div>
       <div style="font-size:.84rem">Chargement des produits similaires…</div>
     </div>
   </div>
@@ -695,17 +701,17 @@ a{text-decoration:none;color:inherit}
 
 <!-- Mobile sticky bar -->
 <div class="mobile-sticky" id="mobile-sticky">
-  <button class="add-cart-btn" style="height:44px" onclick="addToCart()">🛒 Ajouter au panier — 15 300 FCFA</button>
+  <button class="add-cart-btn" style="height:44px" onclick="addToCart()"><i class="ic" data-ic="shopping-cart"></i> Ajouter au panier — 15 300 FCFA</button>
 </div>
 
 <!-- Mobile nav -->
 <nav class="mobile-nav">
   <div class="mn-items">
-    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon"><i class="ic" data-ic="map"></i></div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
 
@@ -717,7 +723,7 @@ a{text-decoration:none;color:inherit}
 
 <!-- État d'erreur produit introuvable -->
 <div id="error-state" style="display:none;max-width:480px;margin:80px auto;text-align:center;padding:40px 20px">
-  <div style="font-size:3.5rem;margin-bottom:16px">😕</div>
+  <div style="font-size:3.5rem;margin-bottom:16px"><i class="ic" data-ic="search-x"></i></div>
   <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:8px">Produit introuvable</div>
   <div style="font-size:.88rem;color:var(--muted);margin-bottom:24px">Ce produit n'existe pas ou a été retiré de la vente.</div>
   <a href="marche-senegal-accueil.html"
@@ -870,6 +876,27 @@ async function loadProduct(productId) {
   } else {
     if (oldPrice) oldPrice.style.display = 'none';
     if (discount) discount.style.display = 'none';
+  }
+
+  // Le badge de la photo et la note sous le prix étaient écrits en dur avec le
+  // code de la boutique de démonstration. Ils disent maintenant la remise du
+  // produit, ou ne disent rien.
+  const imgBadge = document.getElementById('img-badge');
+  const priceNote = document.getElementById('pi-price-note');
+  if (prod.originalPrice && prod.originalPrice > prod.price) {
+    const pct = Math.round((1 - prod.price / prod.originalPrice) * 100);
+    const economie = prod.originalPrice - prod.price;
+    if (imgBadge) {
+      imgBadge.textContent = '-' + pct + '%';
+      imgBadge.style.display = '';
+    }
+    if (priceNote) {
+      priceNote.textContent = 'Économie de ' + formatPrice(economie);
+      priceNote.style.display = '';
+    }
+  } else {
+    if (imgBadge) imgBadge.style.display = 'none';
+    if (priceNote) priceNote.style.display = 'none';
   }
 
   // ── Mettre à jour la description ──
@@ -1452,11 +1479,8 @@ function submitQuestion() {
   if (input) input.value = '';
 }
 
-// ── Copier le code promo ──
-function copyCode() {
-  navigator.clipboard?.writeText('FATOU15').catch(() => {});
-  showToast('✓ Code FATOU15 copié !');
-}
+// Le bouton « copier le code » copiait FATOU15 pour toutes les boutiques.
+// Il reviendra avec les promotions publiques d'une boutique.
 
 // ── Changer d'onglet ──
 function switchProdTab(tab, el) {

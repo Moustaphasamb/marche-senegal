@@ -57,6 +57,7 @@
 @media(max-width:860px){.page{grid-template-columns:1fr}.left{display:none}.right{min-height:100vh;padding:30px 20px}}
 @media(max-width:480px){.fi-row{grid-template-columns:1fr}}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -72,21 +73,21 @@
       <div class="left-sub">Achetez en toute confiance auprès des meilleurs vendeurs des marchés sénégalais.</div>
       <div class="features">
         <div class="feature">
-          <div class="feat-icon">🛡️</div>
+          <div class="feat-icon"><i class="ic" data-ic="shield-check"></i></div>
           <div class="feat-text"><div class="feat-title">Paiement sécurisé</div>Paiement traité par Wave Sénégal</div>
         </div>
         <div class="feature">
-          <div class="feat-icon">🚚</div>
+          <div class="feat-icon"><i class="ic" data-ic="truck"></i></div>
           <div class="feat-text"><div class="feat-title">Livraison partout</div>Dakar et toutes les régions du Sénégal</div>
         </div>
         <div class="feature">
-          <div class="feat-icon">📱</div>
+          <div class="feat-icon"><i class="ic" data-ic="smartphone"></i></div>
           <div class="feat-text"><div class="feat-title">Wave et Orange Money</div>Les moyens de paiement que vous utilisez déjà</div>
         </div>
       </div>
       <div class="left-switch">
         <div class="ls-text">Vous êtes vendeur ?</div>
-        <button class="ls-btn" onclick="window.location.href='marche-senegal-connexion-vendeur.html'">🏪 Espace vendeur →</button>
+        <button class="ls-btn" onclick="window.location.href='marche-senegal-connexion-vendeur.html'"><i class="ic" data-ic="store"></i> Espace vendeur →</button>
       </div>
     </div>
   </div>
@@ -111,7 +112,7 @@
           <label class="fl">Mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="login-password" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLogin()"/>
-            <button class="fi-eye" id="eye-login" onclick="toggleEye('login-password','eye-login')">👁️</button>
+            <button class="fi-eye" id="eye-login" onclick="toggleEye('login-password','eye-login')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="login-btn" onclick="submitLogin()">Se connecter</button>
@@ -121,7 +122,7 @@
 
       <!-- INSCRIPTION -->
       <div id="form-register" style="display:none">
-        <div class="form-title">Créer un compte 🛍️</div>
+        <div class="form-title">Créer un compte <i class="ic" data-ic="shopping-bag"></i></div>
         <div class="form-sub">Inscrivez-vous gratuitement pour commencer à acheter.</div>
         <div class="fi-row">
           <div class="field">
@@ -142,7 +143,7 @@
           <label class="fl">Mot de passe *</label>
           <div class="fi-password">
             <input class="fi" type="password" id="reg-password" placeholder="Minimum 6 caractères" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitRegister()"/>
-            <button class="fi-eye" id="eye-reg" onclick="toggleEye('reg-password','eye-reg')">👁️</button>
+            <button class="fi-eye" id="eye-reg" onclick="toggleEye('reg-password','eye-reg')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="register-btn" onclick="submitRegister()">Créer mon compte</button>
@@ -151,7 +152,7 @@
 
       <!-- SUCCÈS -->
       <div class="success-box" id="success-box">
-        <span class="sb-icon">🎉</span>
+        <span class="sb-icon"><i class="ic" data-ic="party-popper"></i></span>
         <div class="sb-title" id="success-title">Bienvenue !</div>
         <div class="sb-sub" id="success-sub">Redirection en cours...</div>
       </div>

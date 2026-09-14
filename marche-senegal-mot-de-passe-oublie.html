@@ -55,6 +55,7 @@
 .prog-fill{height:100%;background:var(--green);border-radius:99px;transition:width .4s ease}
 @media(max-width:860px){.page{grid-template-columns:1fr}.left{display:none}.right{min-height:100vh;padding:30px 20px}}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -117,7 +118,7 @@
       <!-- ÉTAPE 2 — Code -->
       <div id="step-2" style="display:none">
         <div class="back-link" onclick="showStep(1)">← Changer d'email</div>
-        <div class="form-title">Entrez le code 🔑</div>
+        <div class="form-title">Entrez le code <i class="ic" data-ic="key-round"></i></div>
         <div class="form-sub" id="code-sub">Un code à 6 chiffres a été envoyé à votre adresse email.</div>
         <div class="dev-notice" id="dev-notice">
           <strong>Mode développement</strong>
@@ -140,20 +141,20 @@
 
       <!-- ÉTAPE 3 — Nouveau mot de passe -->
       <div id="step-3" style="display:none">
-        <div class="form-title">Nouveau mot de passe 🔒</div>
+        <div class="form-title">Nouveau mot de passe <i class="ic" data-ic="lock"></i></div>
         <div class="form-sub">Choisissez un mot de passe sécurisé (minimum 6 caractères).</div>
         <div class="field">
           <label class="fl">Nouveau mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="new-password" placeholder="Minimum 6 caractères" autocomplete="new-password"/>
-            <button class="fi-eye" id="eye-new" onclick="toggleEye('new-password','eye-new')">👁️</button>
+            <button class="fi-eye" id="eye-new" onclick="toggleEye('new-password','eye-new')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <div class="field">
           <label class="fl">Confirmer le mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="confirm-password" placeholder="Retapez le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitReset()"/>
-            <button class="fi-eye" id="eye-confirm" onclick="toggleEye('confirm-password','eye-confirm')">👁️</button>
+            <button class="fi-eye" id="eye-confirm" onclick="toggleEye('confirm-password','eye-confirm')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="reset-btn" onclick="submitReset()">Réinitialiser le mot de passe</button>
@@ -161,7 +162,7 @@
 
       <!-- SUCCÈS -->
       <div class="success-box" id="success-box">
-        <span class="sb-icon">✅</span>
+        <span class="sb-icon"><i class="ic ic-ok" data-ic="circle-check"></i></span>
         <div class="sb-title">Mot de passe mis à jour !</div>
         <div class="sb-sub">Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.</div>
         <button class="submit-btn" onclick="goBack()">Se connecter</button>

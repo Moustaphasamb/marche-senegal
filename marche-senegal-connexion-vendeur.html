@@ -123,6 +123,7 @@
   .fi-row{grid-template-columns:1fr}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -136,7 +137,7 @@
         <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
         <span class="left-logo-text">Marché Sénégal</span>
       </div>
-      <div class="left-badge">🏪 Espace Vendeur</div>
+      <div class="left-badge"><i class="ic" data-ic="store"></i> Espace Vendeur</div>
       <div class="left-title">
         Vendez à des milliers<br/>d'acheteurs au <span>Sénégal</span>
       </div>
@@ -145,7 +146,7 @@
       </div>
       <div class="plans">
         <div class="plan">
-          <div class="plan-icon">🆓</div>
+          <div class="plan-icon"><i class="ic" data-ic="gift"></i></div>
           <div>
             <div class="plan-name">Plan Gratuit</div>
             <div class="plan-desc">Jusqu'à 10 produits · Pour débuter</div>
@@ -153,7 +154,7 @@
           <div class="plan-price">0 FCFA</div>
         </div>
         <div class="plan featured">
-          <div class="plan-icon">⭐</div>
+          <div class="plan-icon"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div>
           <div>
             <div class="plan-name">Plan Pro</div>
             <div class="plan-desc">100 produits · Produits vedettes</div>
@@ -161,7 +162,7 @@
           <div class="plan-price">9 900/mois</div>
         </div>
         <div class="plan">
-          <div class="plan-icon">🚀</div>
+          <div class="plan-icon"><i class="ic" data-ic="rocket"></i></div>
           <div>
             <div class="plan-name">Plan Business</div>
             <div class="plan-desc">Illimité · Priorité dans les résultats</div>
@@ -172,7 +173,7 @@
       <div class="left-switch">
         <div class="ls-text">Vous êtes acheteur ?</div>
         <button class="ls-btn" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">
-          🛍️ Espace acheteur →
+          <i class="ic" data-ic="shopping-bag"></i> Espace acheteur →
         </button>
       </div>
     </div>
@@ -190,7 +191,7 @@
 
       <!-- ── CONNEXION ── -->
       <div class="step active" id="step-login">
-        <div class="form-title">Connexion vendeur 🏪</div>
+        <div class="form-title">Connexion vendeur <i class="ic" data-ic="store"></i></div>
         <div class="form-sub">Accédez à votre tableau de bord avec votre email ou numéro de téléphone.</div>
 
         <div class="field">
@@ -206,7 +207,7 @@
             <input class="fi" type="password" id="login-password"
                    placeholder="••••••••"
                    onkeydown="if(event.key==='Enter')doLogin()"/>
-            <button class="pw-eye" type="button" onclick="togglePw('login-password',this)" title="Afficher/masquer">👁</button>
+            <button class="pw-eye" type="button" onclick="togglePw('login-password',this)" title="Afficher/masquer"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
 
@@ -243,7 +244,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre compte 👤</div>
+        <div class="form-title">Votre compte <i class="ic" data-ic="user"></i></div>
         <div class="form-sub">Toutes les informations sont obligatoires.</div>
 
         <div class="fi-row">
@@ -273,7 +274,7 @@
                    placeholder="Minimum 6 caractères"
                    oninput="this.classList.remove('error')"
                    onkeydown="if(event.key==='Enter')goToStep2()"/>
-            <button class="pw-eye" type="button" onclick="togglePw('reg-password',this)" title="Afficher/masquer">👁</button>
+            <button class="pw-eye" type="button" onclick="togglePw('reg-password',this)" title="Afficher/masquer"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
 
@@ -304,7 +305,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre boutique 🏪</div>
+        <div class="form-title">Votre boutique <i class="ic" data-ic="store"></i></div>
         <div class="form-sub">Donnez un nom à votre boutique et choisissez votre marché.</div>
 
         <div class="field">
@@ -328,7 +329,7 @@
         </div>
 
         <div class="pending-box" style="margin-top:12px">
-          <div class="pb-title">⏳ Validation en 24-48h</div>
+          <div class="pb-title"><i class="ic" data-ic="hourglass"></i> Validation en 24-48h</div>
           <div class="pb-text">
             Votre boutique devient visible des acheteurs après validation par notre équipe.
             En attendant, préparez vos produits : ils seront publiés dès la validation.
@@ -336,7 +337,7 @@
         </div>
 
         <button class="submit-btn" id="register-btn" onclick="doRegister()">
-          🚀 Créer ma boutique →
+          <i class="ic" data-ic="rocket"></i> Créer ma boutique →
         </button>
         <button class="back-btn" onclick="showStep('step-register-1')">← Retour</button>
       </div>
@@ -363,7 +364,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre pièce d'identité 🪪</div>
+        <div class="form-title">Votre pièce d'identité <i class="ic" data-ic="id-card"></i></div>
         <div class="form-sub">
           Notre équipe en a besoin pour valider votre boutique. Envoyez-la maintenant,
           ou plus tard depuis « Ma boutique ».
@@ -376,12 +377,12 @@
 
         <div class="cni-slots">
           <button type="button" class="cni-slot" id="cni-slot-front" onclick="choisirCni('front')">
-            <span class="cni-slot-icon">🪪</span>
+            <span class="cni-slot-icon"><i class="ic" data-ic="id-card"></i></span>
             <span class="cni-slot-label">Recto</span>
             <span class="cni-slot-state" id="cni-state-front">Appuyez pour photographier</span>
           </button>
           <button type="button" class="cni-slot" id="cni-slot-back" onclick="choisirCni('back')">
-            <span class="cni-slot-icon">🪪</span>
+            <span class="cni-slot-icon"><i class="ic" data-ic="id-card"></i></span>
             <span class="cni-slot-label">Verso</span>
             <span class="cni-slot-state" id="cni-state-back">Appuyez pour photographier</span>
           </button>
@@ -397,7 +398,7 @@
       <!-- ── SUCCÈS ── -->
       <div class="step" id="step-success">
         <div class="success-box">
-          <span class="sb-icon">🏪</span>
+          <span class="sb-icon"><i class="ic" data-ic="store"></i></span>
           <div class="sb-title">Boutique créée !</div>
           <div class="sb-sub">
             Votre boutique est créée. Notre équipe valide votre dossier sous 24 à 48h. En attendant, préparez vos produits : ils partiront en ligne dès la validation.
@@ -408,7 +409,7 @@
             <div class="sb-shop-market" id="success-market">—</div>
           </div>
           <button class="submit-btn" onclick="window.location.href='marche-senegal-dashboard.html'">
-            📊 Accéder à mon dashboard →
+            <i class="ic" data-ic="chart-column"></i> Accéder à mon dashboard →
           </button>
         </div>
       </div>

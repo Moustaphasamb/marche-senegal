@@ -208,6 +208,7 @@ a{text-decoration:none;color:inherit}
 .submit-review-btn:disabled{background:var(--muted);cursor:not-allowed}
 .review-hint{font-size:.75rem;color:var(--muted);text-align:center;margin-top:10px}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -216,7 +217,7 @@ a{text-decoration:none;color:inherit}
 <div class="modal-overlay" id="review-modal" onclick="closeReviewModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="modal-head">
-      <span class="modal-title">⭐ Laisser un avis</span>
+      <span class="modal-title"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Laisser un avis</span>
       <button class="modal-close" onclick="closeReviewModal()">✕</button>
     </div>
     <p class="modal-shop-name" id="review-shop-name"></p>
@@ -246,7 +247,7 @@ a{text-decoration:none;color:inherit}
   </button>
   <div class="nav-actions">
     <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
-      🛒<div class="cart-badge" id="cart-count">0</div>
+      <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
   </div>
 </nav>
@@ -281,7 +282,7 @@ a{text-decoration:none;color:inherit}
           <div class="oh-date" id="oh-date">Passée le 3 avril 2025</div>
         </div>
         <div class="oh-status" id="oh-status">
-          ⏳ En attente
+          <i class="ic" data-ic="hourglass"></i> En attente
         </div>
       </div>
       <div class="oh-stats">
@@ -308,12 +309,12 @@ a{text-decoration:none;color:inherit}
     <div class="live-tracker" id="live-tracker" style="display:none">
       <div class="lt-header">
         <div class="lt-pulse"></div>
-        <div class="lt-title">🚵 Livreur en route</div>
+        <div class="lt-title"><i class="ic" data-ic="bike"></i> Livreur en route</div>
         <div class="lt-sub">Suivi en temps réel</div>
       </div>
       <div class="lt-map">
-        <div class="lt-map-bg">🗺️</div>
-        <div class="lt-rider">🛵</div>
+        <div class="lt-map-bg"><i class="ic" data-ic="map"></i></div>
+        <div class="lt-rider"><i class="ic" data-ic="bike"></i></div>
       </div>
       <div class="lt-eta">
         <div>
@@ -326,14 +327,14 @@ a{text-decoration:none;color:inherit}
             <div class="lt-rider-name">Mamadou Diallo</div>
             <div class="lt-rider-phone">Livreur certifié ✓</div>
           </div>
-          <button class="lt-call" onclick="showToast('📞 Appel livreur...')">📞</button>
+          <button class="lt-call" onclick="showToast('📞 Appel livreur...')"><i class="ic" data-ic="phone"></i></button>
         </div>
       </div>
     </div>
 
     <!-- TRACKING STEPS -->
     <div class="tracking-card">
-      <div class="tc-title">📍 Suivi de la commande</div>
+      <div class="tc-title"><i class="ic" data-ic="map-pin"></i> Suivi de la commande</div>
       <div class="tracking-steps" id="tracking-steps">
         <!-- Généré dynamiquement -->
       </div>
@@ -352,7 +353,7 @@ a{text-decoration:none;color:inherit}
     <!-- ITEMS -->
     <div class="items-card">
       <div class="ic-header">
-        <div class="ic-title">📦 Articles commandés</div>
+        <div class="ic-title"><i class="ic" data-ic="package"></i> Articles commandés</div>
       </div>
       <div id="items-list">
         <!-- Généré dynamiquement -->
@@ -361,7 +362,7 @@ a{text-decoration:none;color:inherit}
 
     <!-- SUMMARY -->
     <div class="summary-card">
-      <div class="sc-title">💰 Récapitulatif</div>
+      <div class="sc-title"><i class="ic" data-ic="coins"></i> Récapitulatif</div>
       <div class="sc-row">
         <span class="sc-label">Sous-total</span>
         <span class="sc-val" id="sc-subtotal">—</span>
@@ -383,23 +384,23 @@ a{text-decoration:none;color:inherit}
 
     <!-- DELIVERY INFO -->
     <div class="delivery-card">
-      <div class="dc-title">🚚 Informations de livraison</div>
+      <div class="dc-title"><i class="ic" data-ic="truck"></i> Informations de livraison</div>
       <div class="dc-row">
-        <div class="dc-icon">📍</div>
+        <div class="dc-icon"><i class="ic" data-ic="map-pin"></i></div>
         <div class="dc-info">
           <div class="dc-label">Adresse de livraison</div>
           <div class="dc-val" id="dc-address">—</div>
         </div>
       </div>
       <div class="dc-row">
-        <div class="dc-icon">📅</div>
+        <div class="dc-icon"><i class="ic" data-ic="calendar"></i></div>
         <div class="dc-info">
           <div class="dc-label">Date estimée</div>
           <div class="dc-val" id="dc-date">—</div>
         </div>
       </div>
       <div class="dc-row">
-        <div class="dc-icon">💳</div>
+        <div class="dc-icon"><i class="ic" data-ic="credit-card"></i></div>
         <div class="dc-info">
           <div class="dc-label">Moyen de paiement</div>
           <div class="dc-val" id="dc-payment">Wave</div>
@@ -409,7 +410,7 @@ a{text-decoration:none;color:inherit}
 
     <!-- ACTIONS -->
     <div class="actions-card" id="actions-card">
-      <div class="ac-title">⚡ Actions</div>
+      <div class="ac-title"><i class="ic" data-ic="zap"></i> Actions</div>
       <div class="ac-btns" id="ac-btns">
         <!-- Généré dynamiquement selon le statut -->
       </div>
@@ -422,16 +423,16 @@ a{text-decoration:none;color:inherit}
 <nav class="mobile-nav">
   <div class="mn-items">
     <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'">
-      <div class="mn-icon">🏠</div><div class="mn-label">Accueil</div>
+      <div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'">
-      <div class="mn-icon">🔍</div><div class="mn-label">Recherche</div>
+      <div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'">
-      <div class="mn-icon">🛒</div><div class="mn-label">Panier</div>
+      <div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'">
-      <div class="mn-icon">👤</div><div class="mn-label">Profil</div>
+      <div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div>
     </div>
   </div>
 </nav>

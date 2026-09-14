@@ -146,6 +146,7 @@ a{text-decoration:none;color:inherit}
   .main{padding:16px 3vw 40px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -153,10 +154,10 @@ a{text-decoration:none;color:inherit}
 <!-- MODAL SUPPRESSION -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal">
-    <div class="modal-title">🗑️ Supprimer ce produit ?</div>
+    <div class="modal-title"><i class="ic" data-ic="trash-2"></i> Supprimer ce produit ?</div>
     <div class="modal-sub">Cette action est irréversible. Le produit sera retiré de votre boutique et ne sera plus visible par les acheteurs.</div>
     <div class="modal-prod">
-      <div class="mp-img" id="del-img">👗</div>
+      <div class="mp-img" id="del-img"><i class="ic" data-ic="shirt"></i></div>
       <div>
         <div class="mp-name" id="del-name">Nom du produit</div>
         <div class="mp-price" id="del-price">Prix</div>
@@ -164,7 +165,7 @@ a{text-decoration:none;color:inherit}
     </div>
     <div class="modal-btns">
       <button class="modal-btn" onclick="closeDeleteModal()">Annuler</button>
-      <button class="modal-btn modal-btn-red" onclick="confirmDelete()">🗑️ Supprimer</button>
+      <button class="modal-btn modal-btn-red" onclick="confirmDelete()"><i class="ic" data-ic="trash-2"></i> Supprimer</button>
     </div>
   </div>
 </div>
@@ -172,9 +173,9 @@ a{text-decoration:none;color:inherit}
 <!-- MODAL STOCK -->
 <div class="modal-overlay" id="stock-modal">
   <div class="modal">
-    <div class="modal-title">📦 Modifier le stock</div>
+    <div class="modal-title"><i class="ic" data-ic="package"></i> Modifier le stock</div>
     <div class="modal-prod">
-      <div class="mp-img">👗</div>
+      <div class="mp-img"><i class="ic" data-ic="shirt"></i></div>
       <div>
         <div class="mp-name" id="stock-prod-name">Nom du produit</div>
         <div class="mp-price" id="stock-prod-price">Prix</div>
@@ -202,9 +203,9 @@ a{text-decoration:none;color:inherit}
   <button class="hamburger-btn" onclick="toggleSidebar()">
     <span></span><span></span><span></span>
   </button>
-  <div class="tb-title">📦 Mes produits</div>
+  <div class="tb-title"><i class="ic" data-ic="package"></i> Mes produits</div>
   <div class="tb-actions">
-    <button id="btn-ajouter" onclick="window.location.href='marche-senegal-ajout-produit.html'" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px">➕ Ajouter</button>
+    <button id="btn-ajouter" onclick="window.location.href='marche-senegal-ajout-produit.html'" style="height:34px;padding:0 14px;border-radius:99px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--green);color:#fff;border:none;display:flex;align-items:center;gap:5px"><i class="ic" data-ic="plus"></i> Ajouter</button>
     <div class="tb-profile">
       <div class="tb-profile-av" id="tb-av">MF</div>
       <span class="tb-profile-name" id="tb-name">Vendeur</span>
@@ -241,7 +242,7 @@ a{text-decoration:none;color:inherit}
   <div class="toolbar">
     <div class="tb-search">
       <input type="text" id="search-input" placeholder="Rechercher un produit..." oninput="filterProducts()"/>
-      <span class="tb-search-btn" aria-hidden="true">🔍</span>
+      <span class="tb-search-btn" aria-hidden="true"><i class="ic" data-ic="search"></i></span>
     </div>
     <div class="filter-tabs">
       <button class="ft active" onclick="setFilter('all',this)">Tous</button>
