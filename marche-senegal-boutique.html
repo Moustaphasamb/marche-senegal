@@ -306,6 +306,7 @@
   .prods-grid{grid-template-columns:repeat(2,1fr);gap:7px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 
@@ -319,12 +320,12 @@
   </a>
   <div class="nav-search">
     <input type="text" placeholder="Rechercher dans Mode Fatou..."/>
-    <button class="nav-search-btn">🔍 Rechercher</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i> Rechercher</button>
   </div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
     <button class="nav-cart" onclick="toast('Panier...')">
-      🛒<div class="cart-badge" id="cart-count">0</div>
+      <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
       <span></span><span></span><span></span>
@@ -336,7 +337,7 @@
 <div class="nav-drawer" id="nav-drawer">
   <div class="nav-search" style="max-width:100%;width:100%">
     <input type="text" placeholder="Rechercher..."/>
-    <button class="nav-search-btn">🔍</button>
+    <button class="nav-search-btn"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="nav-drawer-row">
     <button class="nav-btn" style="flex:1;justify-content:center" onclick="toast('Connexion...')">Se connecter</button>
@@ -368,17 +369,17 @@
         <div class="sh-verified">✓ Vendeur Vérifié · CNI validée</div>
         <div class="sh-name">Mode Fatou Ndoye</div>
         <div class="sh-location">
-          <span class="sh-loc-chip">🏛️ Marché Sandaga · Allée 3</span>
-          <span class="sh-loc-chip">📍 Dakar Centre</span>
+          <span class="sh-loc-chip"><i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3</span>
+          <span class="sh-loc-chip"><i class="ic" data-ic="map-pin"></i> Dakar Centre</span>
           <span class="sh-loc-chip" style="background:rgba(76,175,80,.2);border-color:rgba(76,175,80,.3);color:#4CAF50">● Ouverte maintenant</span>
         </div>
         <div class="sh-actions">
-          <button class="sh-btn sh-btn-primary" onclick="openChat()">💬 Contacter</button>
-          <button class="sh-btn sh-btn-gold" onclick="follow()">❤️ Suivre</button>
-          <button class="sh-btn sh-btn-outline" onclick="share()">↗ Partager</button>
+          <button class="sh-btn sh-btn-primary" onclick="openChat()"><i class="ic" data-ic="message-circle"></i> Contacter</button>
+          <button class="sh-btn sh-btn-gold" onclick="follow()"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Suivre</button>
+          <button class="sh-btn sh-btn-outline" onclick="share()"><i class="ic" data-ic="share-2"></i> Partager</button>
         </div>
         <div class="sh-stats-row">
-          <div><div class="sh-stat-n">4.8 ⭐</div><div class="sh-stat-l">Note moyenne</div></div>
+          <div><div class="sh-stat-n">4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="sh-stat-l">Note moyenne</div></div>
           <div><div class="sh-stat-n">234</div><div class="sh-stat-l">Avis clients</div></div>
           <div><div class="sh-stat-n">1 240</div><div class="sh-stat-l">Ventes totales</div></div>
           <div><div class="sh-stat-n">48</div><div class="sh-stat-l">Produits</div></div>
@@ -395,24 +396,24 @@
   <!-- LEFT -->
   <div id="left-col">
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('boutique',this)">🏪 Boutique</div>
-      <div class="tab" onclick="switchTab('produits',this)">📦 Produits</div>
-      <div class="tab" onclick="switchTab('avis',this)">⭐ Avis</div>
-      <div class="tab" onclick="switchTab('infos',this)">ℹ️ Infos</div>
+      <div class="tab active" onclick="switchTab('boutique',this)"><i class="ic" data-ic="store"></i> Boutique</div>
+      <div class="tab" onclick="switchTab('produits',this)"><i class="ic" data-ic="package"></i> Produits</div>
+      <div class="tab" onclick="switchTab('avis',this)"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Avis</div>
+      <div class="tab" onclick="switchTab('infos',this)"><i class="ic" data-ic="info"></i> Infos</div>
     </div>
 
     <!-- TAB BOUTIQUE -->
     <div id="tab-boutique">
       <div class="visit-section">
         <div class="vs-header">
-          <div class="vs-title">🏪 Visitez la boutique</div>
+          <div class="vs-title"><i class="ic" data-ic="store"></i> Visitez la boutique</div>
         </div>
         <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
           <div id="vitrine-scene" style="position:relative;will-change:transform">
             <img id="vitrine-img" alt="Photo de la boutique" style="width:100%;display:block">
           </div>
         </div>
-        <div class="vp-hint" id="vitrine-hint">📌 Appuyez sur un point pour voir le produit</div>
+        <div class="vp-hint" id="vitrine-hint"><i class="ic" data-ic="pin"></i> Appuyez sur un point pour voir le produit</div>
       </div>
 
       <div class="prod-section">
@@ -425,31 +426,31 @@
           <button class="pf" onclick="filterP('wax',this)">Tissu wax</button>
           <button class="pf" onclick="filterP('boubou',this)">Boubou</button>
           <button class="pf" onclick="filterP('bazin',this)">Bazin</button>
-          <button class="pf" onclick="filterP('promo',this)">🔥 Promo</button>
+          <button class="pf" onclick="filterP('promo',this)"><i class="ic" data-ic="flame"></i> Promo</button>
         </div>
         <div class="prods-grid">
           <div class="prod-card" data-cat="boubou promo">
-            <div class="pc-img" style="background:#F0EAF8">👗<div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Boubou wax tissé main — L</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (89)</div><div class="pc-footer"><div><span class="pc-price">15 300 FCFA</span><span class="pc-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
           <div class="prod-card" data-cat="bazin">
-            <div class="pc-img" style="background:#FFF8E7">🧵<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#FFF8E7"><i class="ic" data-ic="spool"></i><div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Bazin brodé cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 5.0 (42)</div><div class="pc-footer"><div><span class="pc-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
           <div class="prod-card" data-cat="wax">
-            <div class="pc-img" style="background:#FDE8E6">👘<div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#FDE8E6"><i class="ic" data-ic="shirt"></i><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Robe wax africaine brodée</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (67)</div><div class="pc-footer"><div><span class="pc-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
           <div class="prod-card" data-cat="wax promo">
-            <div class="pc-img" style="background:#E8F5EC">🎨<div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#E8F5EC"><i class="ic" data-ic="palette"></i><div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Tissu wax hollandais 6 yards</div><div class="pc-rating"><span class="pc-stars">★★★★☆</span> 4.7 (112)</div><div class="pc-footer"><div><span class="pc-price">4 050 FCFA</span><span class="pc-old">4 500</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
           <div class="prod-card" data-cat="boubou promo">
-            <div class="pc-img" style="background:#F0EAF8">🥻<div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Ensemble 3 pièces femme cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (33)</div><div class="pc-footer"><div><span class="pc-price">28 000 FCFA</span><span class="pc-old">35 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
           <div class="prod-card" data-cat="bazin">
-            <div class="pc-img" style="background:#FDF3DC">👒<div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)">🤍</div></div>
+            <div class="pc-img" style="background:#FDF3DC"><i class="ic" data-ic="shirt"></i><div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
             <div class="pc-body"><div class="pc-name">Kaftan bazin riche homme brodé</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (28)</div><div class="pc-footer"><div><span class="pc-price">22 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
           </div>
         </div>
@@ -466,11 +467,11 @@
         <button class="pf" onclick="filterAllProds('boubou',this)">Boubou</button>
         <button class="pf" onclick="filterAllProds('bazin',this)">Bazin</button>
         <button class="pf" onclick="filterAllProds('wax',this)">Tissu wax</button>
-        <button class="pf" onclick="filterAllProds('promo',this)">🔥 Promo</button>
+        <button class="pf" onclick="filterAllProds('promo',this)"><i class="ic" data-ic="flame"></i> Promo</button>
       </div>
       <div class="prods-grid" id="tab-produits-grid">
         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
-          <div style="font-size:2rem;margin-bottom:10px">⏳</div>
+          <div style="font-size:2rem;margin-bottom:10px"><i class="ic" data-ic="hourglass"></i></div>
           <div>Chargement des produits…</div>
         </div>
       </div>
@@ -494,7 +495,7 @@
         </div>
       </div>
       <div id="review-form-wrap" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;display:none">
-        <div style="font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:12px">✍️ Laisser un avis</div>
+        <div style="font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:12px"><i class="ic" data-ic="pen-line"></i> Laisser un avis</div>
         <div style="margin-bottom:10px">
           <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">Votre note</div>
           <div id="star-picker" style="display:flex;gap:6px;font-size:1.6rem;cursor:pointer">
@@ -514,22 +515,22 @@
         <div class="review-card">
           <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 2 jours</div></div><div class="rv-stars">★★★★★</div></div>
           <div class="rv-text">Excellente boutique ! Le boubou est exactement comme sur la vidéo. Fatou est très réactive, elle m'a aidé à choisir la bonne taille. Livraison rapide à Parcelles Assainies.</div>
-          <div class="rv-product">👗 Boubou wax tissé main — Taille L</div>
+          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Boubou wax tissé main — Taille L</div>
         </div>
         <div class="review-card">
           <div class="rv-header"><div class="rv-avatar" style="background:#8B3A8A">AB</div><div><div class="rv-name">Aissatou Ba</div><div class="rv-date">Il y a 5 jours</div></div><div class="rv-stars">★★★★★</div></div>
           <div class="rv-text">Je suis venue au marché Sandaga après avoir vu la visite virtuelle. C'est exactement pareil ! Les tissus wax sont authentiques et les prix sont honnêtes. Merci Fatou !</div>
-          <div class="rv-product">🧵 Bazin brodé cérémonie</div>
+          <div class="rv-product"><i class="ic" data-ic="spool"></i> Bazin brodé cérémonie</div>
         </div>
         <div class="review-card">
           <div class="rv-header"><div class="rv-avatar" style="background:var(--gold);color:var(--dark)">RF</div><div><div class="rv-name">Rokhaya Fall</div><div class="rv-date">Il y a 1 semaine</div></div><div class="rv-stars">★★★★★</div></div>
           <div class="rv-text">J'habite à Thiès et je ne pouvais pas me déplacer. Grâce à la vidéo j'ai pu choisir ma robe en toute confiance. La livraison est arrivée en 2 jours. Vraiment top !</div>
-          <div class="rv-product">👘 Robe wax brodée col rond</div>
+          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Robe wax brodée col rond</div>
         </div>
         <div class="review-card">
           <div class="rv-header"><div class="rv-avatar" style="background:#C0392B">ID</div><div><div class="rv-name">Ibrahima Diallo</div><div class="rv-date">Il y a 2 semaines</div></div><div class="rv-stars">★★★★☆</div></div>
           <div class="rv-text">Très belle boutique, produits de qualité. Je retire une étoile car la livraison a pris 3 jours au lieu de 2. Mais le kaftan bazin est magnifique, ma femme adore.</div>
-          <div class="rv-product">👒 Kaftan bazin riche homme</div>
+          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Kaftan bazin riche homme</div>
         </div>
       </div>
     </div>
@@ -543,8 +544,8 @@
              garantie de retour. Autant d'engagements commerciaux affichés au nom
              d'un vendeur qui ne les avait jamais choisis. Chaque ligne n'apparaît
              plus que si la donnée existe (voir remplirInfosBoutique). -->
-        <div class="it-row" id="it-horaires" style="display:none"><div class="it-icon">🕐</div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub"></div><span class="it-open"></span></div></div>
-        <div class="it-row" id="it-adresse" style="display:none"><div class="it-icon">📍</div><div><div class="it-label">Adresse physique</div><div class="it-sub"></div></div></div>
+        <div class="it-row" id="it-horaires" style="display:none"><div class="it-icon"><i class="ic" data-ic="clock"></i></div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub"></div><span class="it-open"></span></div></div>
+        <div class="it-row" id="it-adresse" style="display:none"><div class="it-icon"><i class="ic" data-ic="map-pin"></i></div><div><div class="it-label">Adresse physique</div><div class="it-sub"></div></div></div>
       </div>
     </div>
   </div>
@@ -552,12 +553,12 @@
   <!-- RIGHT -->
   <div class="right-col">
     <!-- Cette carte annonçait « FATOU15 · -15% sur toute la boutique » sur
-         TOUTES les boutiques, avec un bouton pour copier le code. Aucune route
-         publique n'expose les promotions d'une boutique : l'acheteur copiait un
-         code qui ne pouvait pas fonctionner. Masquée tant que les promotions
-         créées par le vendeur ne sont pas réellement exposées. -->
+         TOUTES les boutiques : le code de la boutique de démonstration, que
+         l'acheteur copiait sans qu'il puisse fonctionner. Elle porte maintenant
+         les promotions réelles du vendeur, lues sur /api/promotions/shop/:id,
+         et reste cachée quand il n'y en a aucune. -->
     <div class="promo-card" id="promo-card" style="display:none">
-      <div class="pc-label">🔥 Promotion active</div>
+      <div class="pc-label"><i class="ic" data-ic="flame"></i> Promotion active</div>
       <div class="pc-code" id="pc-code">—</div>
       <div class="pc-detail" id="pc-detail"></div>
       <button class="pc-copy" id="pc-copy">Copier le code promo</button>
@@ -567,15 +568,15 @@
       <div class="cc-title" id="cc-title">Contacter la boutique</div>
       <div class="cc-btns">
         <button class="cc-btn cc-primary" onclick="openChat()">
-          <div class="cc-icon" style="background:rgba(255,255,255,.2)">💬</div>
+          <div class="cc-icon" style="background:rgba(255,255,255,.2)"><i class="ic" data-ic="message-circle"></i></div>
           <span>Chat dans l'application</span>
         </button>
         <button class="cc-btn" id="btn-whatsapp" onclick="openWhatsApp()">
-          <div class="cc-icon" style="background:#E8F5E9">📱</div>
+          <div class="cc-icon" style="background:#E8F5E9"><i class="ic" data-ic="smartphone"></i></div>
           <span>WhatsApp direct</span>
         </button>
         <button class="cc-btn" id="btn-call" onclick="callShop()">
-          <div class="cc-icon" style="background:var(--gp)">📞</div>
+          <div class="cc-icon" style="background:var(--gp)"><i class="ic" data-ic="phone"></i></div>
           <span>Appeler la boutique</span>
         </button>
       </div>
@@ -583,17 +584,17 @@
 
     <div class="info-card">
       <div class="ic-title">Infos rapides</div>
-      <div class="ic-row"><div class="ic-icon">🕐</div><div><div class="ic-label">Horaires</div><div class="ic-sub">Lun–Sam 8h–20h · Dim 9h–15h</div><span class="ic-open">Ouverte maintenant</span></div></div>
-      <div class="ic-row"><div class="ic-icon">🚚</div><div><div class="ic-label">Livraison Dakar</div><div class="ic-sub">1 000 FCFA · Sous 24h</div></div></div>
-      <div class="ic-row" style="margin-bottom:0"><div class="ic-icon">🔒</div><div><div class="ic-label">Paiement sécurisé</div><div class="ic-sub">Wave · Orange Money · Free Money</div></div></div>
+      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="clock"></i></div><div><div class="ic-label">Horaires</div><div class="ic-sub">Lun–Sam 8h–20h · Dim 9h–15h</div><span class="ic-open">Ouverte maintenant</span></div></div>
+      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison Dakar</div><div class="ic-sub">1 000 FCFA · Sous 24h</div></div></div>
+      <div class="ic-row" style="margin-bottom:0"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Paiement sécurisé</div><div class="ic-sub">Wave · Orange Money · Free Money</div></div></div>
     </div>
 
     <div class="map-card">
-      <div class="map-visual">🗺️<div class="map-pin">📍</div></div>
+      <div class="map-visual"><i class="ic" data-ic="map"></i><div class="map-pin"><i class="ic" data-ic="map-pin"></i></div></div>
       <div class="map-body">
         <div class="map-address"></div>
         <div class="map-sub">Rue Mohamed V, Dakar Centre</div>
-        <button class="map-btn" id="btn-map" onclick="openMap()">📍 Voir sur la carte</button>
+        <button class="map-btn" id="btn-map" onclick="openMap()"><i class="ic" data-ic="map-pin"></i> Voir sur la carte</button>
       </div>
     </div>
 
@@ -623,18 +624,18 @@
 
 <!-- Mobile sticky CTA -->
 <div class="mobile-cta" id="mobile-cta">
-  <button class="sh-btn sh-btn-primary" style="flex:1;justify-content:center" onclick="openChat()">💬 Contacter</button>
-  <button class="sh-btn sh-btn-gold" style="flex:1;justify-content:center" onclick="follow()">❤️ Suivre</button>
+  <button class="sh-btn sh-btn-primary" style="flex:1;justify-content:center" onclick="openChat()"><i class="ic" data-ic="message-circle"></i> Contacter</button>
+  <button class="sh-btn sh-btn-gold" style="flex:1;justify-content:center" onclick="follow()"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Suivre</button>
 </div>
 
 <!-- Mobile nav -->
 <nav class="mobile-nav">
   <div class="mn-items">
-    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
-    <div class="mn-item act"><div class="mn-icon act">🗺️</div><div class="mn-label act">Marchés</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item act"><div class="mn-icon act"><i class="ic" data-ic="map"></i></div><div class="mn-label act">Marchés</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
 
@@ -655,6 +656,57 @@ function getShopIdFromURL() {
 }
 
 // ── Charger la boutique ──
+// Les promotions que le vendeur a créées n'atteignaient aucun acheteur : rien
+// ne les exposait. Une promotion périmée ou épuisée ne descend pas jusqu'ici,
+// le serveur les écarte.
+async function chargerPromotionsBoutique(shopId) {
+  const carte = document.getElementById('promo-card');
+  if (!carte) return;
+
+  const result = await getShopPromotions(shopId);
+  const promos = (result.success && result.data) || [];
+  if (!promos.length) {
+    carte.style.display = 'none';
+    return;
+  }
+
+  // Un code à saisir vaut mieux qu'une annonce : on montre le premier.
+  const promo = promos.find(p => p.code) || promos[0];
+
+  const titre = document.getElementById('pc-code');
+  const detail = document.getElementById('pc-detail');
+  const bouton = document.getElementById('pc-copy');
+
+  if (titre) titre.textContent = promo.code || promo.title;
+
+  if (detail) {
+    const morceaux = [];
+    if (promo.description) morceaux.push(promo.description);
+    else if (promo.discount > 0) morceaux.push('-' + promo.discount + '% sur la boutique');
+    if (promo.minAmount) morceaux.push('dès ' + formatPrice(promo.minAmount));
+    if (promo.endDate) {
+      morceaux.push('jusqu’au ' + new Date(promo.endDate).toLocaleDateString('fr-FR'));
+    }
+    detail.textContent = morceaux.join(' · ');
+  }
+
+  if (bouton) {
+    if (promo.code) {
+      bouton.style.display = '';
+      bouton.textContent = 'Copier le code promo';
+      bouton.onclick = () => {
+        navigator.clipboard?.writeText(promo.code).catch(() => {});
+        showToast('✓ Code ' + promo.code + ' copié !');
+      };
+    } else {
+      // Soldes, vedette ou annonce : rien à copier, seulement à lire.
+      bouton.style.display = 'none';
+    }
+  }
+
+  carte.style.display = '';
+}
+
 async function loadShop(shopId) {
   const result = await getShop(shopId);
 
@@ -665,6 +717,8 @@ async function loadShop(shopId) {
 
   const shop = result.data;
   currentShop = shop;
+
+  chargerPromotionsBoutique(shopId);
 
   // Mettre à jour le titre
   document.title = `${shop.name} — Marché Sénégal`;
@@ -1460,7 +1514,9 @@ function remplirInfosBoutique(shop) {
   }
 }
 
-// ── Compte à rebours promo (expire à 20h00 du jour) ──
+// Ce compte à rebours annonçait une expiration « à 20h00 » que rien ne fondait
+// — la même pour toutes les boutiques, tous les jours. L'échéance réelle du
+// vendeur est maintenant affichée par chargerPromotionsBoutique.
 function startPromoCountdown() {
   const el = document.getElementById('promo-countdown');
   if (!el) return;

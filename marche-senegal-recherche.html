@@ -106,35 +106,36 @@
   .results-area{padding:16px 4vw 80px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 <nav class="nav">
   <a href="marche-senegal-accueil.html" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
-  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..."/><button class="nav-search-btn" onclick="doSearch()">🔍 Rechercher</button></div>
+  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..."/><button class="nav-search-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
-    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">🛒<div class="cart-badge" id="cart-count">0</div></button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'"><i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div></button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div class="nav-drawer" id="nav-drawer">
-  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..."/><button class="nav-search-btn">🔍</button></div>
+  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..."/><button class="nav-search-btn"><i class="ic" data-ic="search"></i></button></div>
   <div class="nav-drawer-row">
     <button class="nav-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
   </div>
 </div>
 <div class="search-hero">
-  <div class="sh-label">🔍 Recherche avancée</div>
+  <div class="sh-label"><i class="ic" data-ic="search"></i> Recherche avancée</div>
   <div class="sh-title">Résultats pour "<span id="search-query">boubou wax</span>"</div>
-  <div class="sh-bar"><input type="text" id="main-search" value="boubou wax" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()">🔍 Rechercher</button></div>
+  <div class="sh-bar"><input type="text" id="main-search" value="boubou wax" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
   <div class="sh-suggestions">
-    <div class="sh-sug" onclick="setSug('boubou wax sandaga')">🏛️ boubou wax sandaga</div>
-    <div class="sh-sug" onclick="setSug('bazin brodé')">🧵 bazin brodé</div>
-    <div class="sh-sug" onclick="setSug('tissu wax hollandais')">🎨 tissu wax hollandais</div>
-    <div class="sh-sug" onclick="setSug('robe wax femme')">👘 robe wax femme</div>
-    <div class="sh-sug" onclick="setSug('kaftan bazin homme')">👒 kaftan bazin homme</div>
+    <div class="sh-sug" onclick="setSug('boubou wax sandaga')"><i class="ic" data-ic="landmark"></i> boubou wax sandaga</div>
+    <div class="sh-sug" onclick="setSug('bazin brodé')"><i class="ic" data-ic="spool"></i> bazin brodé</div>
+    <div class="sh-sug" onclick="setSug('tissu wax hollandais')"><i class="ic" data-ic="palette"></i> tissu wax hollandais</div>
+    <div class="sh-sug" onclick="setSug('robe wax femme')"><i class="ic" data-ic="shirt"></i> robe wax femme</div>
+    <div class="sh-sug" onclick="setSug('kaftan bazin homme')"><i class="ic" data-ic="shirt"></i> kaftan bazin homme</div>
   </div>
   <div class="sh-stats">
     <div><div class="sh-stat-n" id="hero-total">—</div><div class="sh-stat-l">Produits trouvés</div></div>
@@ -184,7 +185,7 @@
       <div class="fs-title">Options</div>
       <div class="cb-list">
         <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur vérifié ✓</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle 🎥</span></div>
+        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle <i class="ic" data-ic="video"></i></span></div>
         <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span></div>
         <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span></div>
         <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>En stock uniquement</span></div>
@@ -206,14 +207,14 @@
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
-<button class="mobile-filter-btn" onclick="openSidebar()">⚙️ Filtres</button>
+<button class="mobile-filter-btn" onclick="openSidebar()"><i class="ic" data-ic="settings"></i> Filtres</button>
 <nav class="mobile-nav">
   <div class="mn-items">
-    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon">🏠</div><div class="mn-label">Accueil</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
-    <div class="mn-item act"><div class="mn-icon act">🔍</div><div class="mn-label act">Recherche</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon"><i class="ic" data-ic="map"></i></div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item act"><div class="mn-icon act"><i class="ic" data-ic="search"></i></div><div class="mn-label act">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
 <script src="api.js"></script>

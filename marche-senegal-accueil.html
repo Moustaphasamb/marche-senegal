@@ -176,22 +176,23 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   .markets-grid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
 <!-- NAV -->
 <nav class="nav">
   <a href="#" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
-  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()">🔍 Rechercher</button></div>
+  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
-    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">🛒<div class="cart-badge" id="cart-count">0</div></button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'"><i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div></button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <!-- DRAWER -->
 <div class="nav-drawer" id="nav-drawer">
-  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()">🔍</button></div>
+  <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()"><i class="ic" data-ic="search"></i></button></div>
   <div class="nav-drawer-row">
     <button class="nav-btn" id="drawer-login-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
   </div>
@@ -203,8 +204,8 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <h1>Tout le marché<br/>sénégalais dans<br/>votre <span class="acc">poche</span></h1>
     <p class="hero-desc">Sandaga, Tilène, HLM, Kermel — tous les marchés du Sénégal en ligne. Achetez et commandez depuis chez vous.</p>
     <div class="hero-btns">
-      <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'">🛍️ Explorer les produits</button>
-      <button class="btn btn-outline-white" onclick="document.getElementById('marches').scrollIntoView({behavior:'smooth'})">🗺️ Choisir un marché</button>
+      <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'"><i class="ic" data-ic="shopping-bag"></i> Explorer les produits</button>
+      <button class="btn btn-outline-white" onclick="document.getElementById('marches').scrollIntoView({behavior:'smooth'})"><i class="ic" data-ic="map"></i> Choisir un marché</button>
     </div>
     <!-- Chiffres remplis par loadMarkets() depuis l'API — on n'affiche rien tant
          qu'on ne sait pas, plutôt que d'afficher une valeur qui serait fausse. -->
@@ -221,15 +222,15 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
           <div class="hp-search"><div class="hp-search-dot"></div><div class="hp-search-text">Chercher un produit...</div></div>
         </div>
         <div class="hp-cats">
-          <div class="hp-cat act"><div class="hp-cat-e">🌾</div><div class="hp-cat-n">Aliment.</div></div>
-          <div class="hp-cat"><div class="hp-cat-e">👗</div><div class="hp-cat-n">Mode</div></div>
-          <div class="hp-cat"><div class="hp-cat-e">🎨</div><div class="hp-cat-n">Artisan.</div></div>
+          <div class="hp-cat act"><div class="hp-cat-e"><i class="ic" data-ic="wheat"></i></div><div class="hp-cat-n">Aliment.</div></div>
+          <div class="hp-cat"><div class="hp-cat-e"><i class="ic" data-ic="shirt"></i></div><div class="hp-cat-n">Mode</div></div>
+          <div class="hp-cat"><div class="hp-cat-e"><i class="ic" data-ic="palette"></i></div><div class="hp-cat-n">Artisan.</div></div>
         </div>
         <div class="hp-prods">
-          <div class="hp-card"><div class="hp-card-img" style="background:#FFF8E7">🥭</div><div class="hp-card-body"><div class="hp-card-name">Mangues fraîches</div><div class="hp-card-price">1 200 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#F0EAF8">👗</div><div class="hp-card-body"><div class="hp-card-name">Boubou wax</div><div class="hp-card-price">18 000 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#E8F5EC">🥜</div><div class="hp-card-body"><div class="hp-card-name">Arachides</div><div class="hp-card-price">500 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#FDE8E6">🏺</div><div class="hp-card-body"><div class="hp-card-name">Poterie</div><div class="hp-card-price">7 500 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#FFF8E7"><i class="ic" data-ic="apple"></i></div><div class="hp-card-body"><div class="hp-card-name">Mangues fraîches</div><div class="hp-card-price">1 200 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i></div><div class="hp-card-body"><div class="hp-card-name">Boubou wax</div><div class="hp-card-price">18 000 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#E8F5EC"><i class="ic" data-ic="bean"></i></div><div class="hp-card-body"><div class="hp-card-name">Arachides</div><div class="hp-card-price">500 FCFA</div></div></div>
+          <div class="hp-card"><div class="hp-card-img" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i></div><div class="hp-card-body"><div class="hp-card-name">Poterie</div><div class="hp-card-price">7 500 FCFA</div></div></div>
         </div>
       </div>
     </div>
@@ -239,7 +240,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <section class="section-wrap white-bg" id="marches">
   <div class="section-top">
     <div>
-      <div class="section-label">🗺️ Marchés</div>
+      <div class="section-label"><i class="ic" data-ic="map"></i> Marchés</div>
       <div class="section-title">Les marchés déjà ouverts</div>
     </div>
   </div>
@@ -261,7 +262,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 </section>
 <!-- PROMO BAND -->
 <div class="promos-band">
-  <div><div class="pb-label">🔥 Offres du moment</div><div class="pb-title">Promotions actives aujourd'hui</div><div class="pb-sub">Les vendeurs partagent leurs meilleures offres</div></div>
+  <div><div class="pb-label"><i class="ic" data-ic="flame"></i> Offres du moment</div><div class="pb-title">Promotions actives aujourd'hui</div><div class="pb-sub">Les vendeurs partagent leurs meilleures offres</div></div>
   <div class="promo-pills">
     <div class="promo-pill"><div class="pp-disc">-15%</div><div class="pp-shop">Mode Fatou · Sandaga</div></div>
     <div class="promo-pill"><div class="pp-disc">-20%</div><div class="pp-shop">Artisan Thiès</div></div>
@@ -271,38 +272,38 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 </div>
 <!-- PRODUITS -->
 <section class="section-wrap bg">
-  <div class="section-top"><div><div class="section-label">🛍️ Catalogue</div><div class="section-title">Produits populaires</div></div><a href="marche-senegal-recherche.html" class="section-link">Voir tout →</a></div>
+  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="shopping-bag"></i> Catalogue</div><div class="section-title">Produits populaires</div></div><a href="marche-senegal-recherche.html" class="section-link">Voir tout →</a></div>
   <div class="prod-filters">
     <button class="pf-btn active" onclick="filterProds('all',this)">Tout</button>
-    <button class="pf-btn" onclick="filterProds('aliment',this)">🌾 Alimentation</button>
-    <button class="pf-btn" onclick="filterProds('mode',this)">👗 Mode</button>
-    <button class="pf-btn" onclick="filterProds('artisan',this)">🎨 Artisanat</button>
-    <button class="pf-btn" onclick="filterProds('beaute',this)">💄 Beauté</button>
-    <button class="pf-btn" onclick="filterProds('maison',this)">🏠 Maison</button>
+    <button class="pf-btn" onclick="filterProds('aliment',this)"><i class="ic" data-ic="wheat"></i> Alimentation</button>
+    <button class="pf-btn" onclick="filterProds('mode',this)"><i class="ic" data-ic="shirt"></i> Mode</button>
+    <button class="pf-btn" onclick="filterProds('artisan',this)"><i class="ic" data-ic="palette"></i> Artisanat</button>
+    <button class="pf-btn" onclick="filterProds('beaute',this)"><i class="ic" data-ic="sparkles"></i> Beauté</button>
+    <button class="pf-btn" onclick="filterProds('maison',this)"><i class="ic" data-ic="house"></i> Maison</button>
   </div>
   <div class="products-grid" id="products-grid">
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF8E7">🥭<div class="prod-badge">-10%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🌊 Ziguinchor</div><div class="prod-name">Mangues fraîches Casamance</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (128)</div><div class="prod-shop">Ferme Diallo · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">1 080 FCFA</span><span class="prod-old-price">1 200</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#F0EAF8">👗<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏛️ Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.8 (234)</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">18 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#E8F5EC">🥜<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🛍️ HLM</div><div class="prod-name">Arachides grillées au feu de bois</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.6 (89)</div><div class="prod-shop">Boutique Samba · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="artisan"><div class="prod-img" style="background:#FDE8E6">🏺<div class="prod-badge">Artisanat</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏖️ Mbour</div><div class="prod-name">Poterie artisanale peinte main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (42)</div><div class="prod-shop">Artisan Mbaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">7 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#FFF8E7">🧵<div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🧵 Tilène</div><div class="prod-name">Bazin brodé cérémonie</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (176)</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">21 250 FCFA</span><span class="prod-old-price">25 000</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="beaute"><div class="prod-img" style="background:#FDF3DC">🫙<div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🏛️ Sandaga</div><div class="prod-name">Beurre de karité pur naturel</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.7 (312)</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="maison"><div class="prod-img" style="background:#E8F5EC">🪑<div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🔧 Colobane</div><div class="prod-name">Chaise en rotin tressée main</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.5 (55)</div><div class="prod-shop">Meubles Gaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF3E0">🐠<div class="prod-badge">Frais</div><div class="prod-wish" onclick="wish(event)">🤍</div></div><div class="prod-body"><div class="prod-market">🐟 Kaolack</div><div class="prod-name">Thiof fumé séché du matin</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (203)</div><div class="prod-shop">Pêcheur Diop · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">4 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF8E7"><i class="ic" data-ic="apple"></i><div class="prod-badge">-10%</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="waves"></i> Ziguinchor</div><div class="prod-name">Mangues fraîches Casamance</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (128)</div><div class="prod-shop">Ferme Diallo · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">1 080 FCFA</span><span class="prod-old-price">1 200</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="landmark"></i> Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.8 (234)</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">18 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#E8F5EC"><i class="ic" data-ic="bean"></i><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="shopping-bag"></i> HLM</div><div class="prod-name">Arachides grillées au feu de bois</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.6 (89)</div><div class="prod-shop">Boutique Samba · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="artisan"><div class="prod-img" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i><div class="prod-badge">Artisanat</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="umbrella"></i> Mbour</div><div class="prod-name">Poterie artisanale peinte main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (42)</div><div class="prod-shop">Artisan Mbaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">7 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#FFF8E7"><i class="ic" data-ic="spool"></i><div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="spool"></i> Tilène</div><div class="prod-name">Bazin brodé cérémonie</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (176)</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">21 250 FCFA</span><span class="prod-old-price">25 000</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="beaute"><div class="prod-img" style="background:#FDF3DC"><i class="ic" data-ic="cylinder"></i><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="landmark"></i> Sandaga</div><div class="prod-name">Beurre de karité pur naturel</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.7 (312)</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="maison"><div class="prod-img" style="background:#E8F5EC"><i class="ic" data-ic="armchair"></i><div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="wrench"></i> Colobane</div><div class="prod-name">Chaise en rotin tressée main</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.5 (55)</div><div class="prod-shop">Meubles Gaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
+    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF3E0"><i class="ic" data-ic="fish"></i><div class="prod-badge">Frais</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="fish"></i> Kaolack</div><div class="prod-name">Thiof fumé séché du matin</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (203)</div><div class="prod-shop">Pêcheur Diop · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">4 500 FCFA</span></div><button class="prod-cart-btn" onclick="addCartFromBtn(event)">+</button></div></div></div>
   </div>
 </section>
 <!-- CATÉGORIES -->
 <section class="section-wrap white-bg">
-  <div class="section-top"><div><div class="section-label">📦 Explorer</div><div class="section-title">Toutes les catégories</div></div></div>
+  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="package"></i> Explorer</div><div class="section-title">Toutes les catégories</div></div></div>
   <div class="cats-grid">
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji">🌾</div><div class="cat-name">Alimentation</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji">👗</div><div class="cat-name">Mode</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisan'"><div class="cat-emoji">🎨</div><div class="cat-name">Artisanat</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=beaute'"><div class="cat-emoji">💄</div><div class="cat-name">Beauté</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=maison'"><div class="cat-emoji">🏠</div><div class="cat-name">Maison</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=electronique'"><div class="cat-emoji">📱</div><div class="cat-name">Électronique</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=sport'"><div class="cat-emoji">⚽</div><div class="cat-name">Sport</div></div>
-    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="cat-emoji">🌿</div><div class="cat-name">Agriculture</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji"><i class="ic" data-ic="wheat"></i></div><div class="cat-name">Alimentation</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji"><i class="ic" data-ic="shirt"></i></div><div class="cat-name">Mode</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisan'"><div class="cat-emoji"><i class="ic" data-ic="palette"></i></div><div class="cat-name">Artisanat</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=beaute'"><div class="cat-emoji"><i class="ic" data-ic="sparkles"></i></div><div class="cat-name">Beauté</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=maison'"><div class="cat-emoji"><i class="ic" data-ic="house"></i></div><div class="cat-name">Maison</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=electronique'"><div class="cat-emoji"><i class="ic" data-ic="smartphone"></i></div><div class="cat-name">Électronique</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=sport'"><div class="cat-emoji"><i class="ic" data-ic="dumbbell"></i></div><div class="cat-name">Sport</div></div>
+    <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="cat-emoji"><i class="ic" data-ic="leaf"></i></div><div class="cat-name">Agriculture</div></div>
   </div>
 </section>
 <!-- HIW -->
@@ -317,19 +318,19 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 </section>
 <!-- BOUTIQUES VEDETTES -->
 <section class="section-wrap bg">
-  <div class="section-top"><div><div class="section-label">⭐ Vedettes</div><div class="section-title">Boutiques les mieux notées</div></div><a href="marche-senegal-recherche.html">Voir tout →</a></div>
+  <div class="section-top"><div><div class="section-label"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Vedettes</div><div class="section-title">Boutiques les mieux notées</div></div><a href="marche-senegal-recherche.html">Voir tout →</a></div>
   <div class="shops-grid" id="shops-grid">
-    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#F0EAF8">👗<div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-market">Marché Sandaga · Dakar</div><div class="shop-stats"><div><div class="ss-val">4.8 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div></div></div>
-    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#E8F5EC">🌾<div class="shop-avatar" style="background:var(--gold);color:var(--dark)">FD</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Ziguinchor</div><div class="shop-name">Ferme Diallo Casamance</div><div class="shop-market">Marché Ziguinchor</div><div class="shop-stats"><div><div class="ss-val">4.9 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">312</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">2 100</div><div class="ss-lbl">Ventes</div></div></div></div></div>
-    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#FDE8E6">🏺<div class="shop-avatar" style="background:#C0392B">AM</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Mbour</div><div class="shop-name">Artisan Mbaye</div><div class="shop-market">Marché Mbour · Petite Côte</div><div class="shop-stats"><div><div class="ss-val">5.0 ⭐</div><div class="ss-lbl">Note</div></div><div><div class="ss-val">98</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">480</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-market">Marché Sandaga · Dakar</div><div class="shop-stats"><div><div class="ss-val">4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#E8F5EC"><i class="ic" data-ic="wheat"></i><div class="shop-avatar" style="background:var(--gold);color:var(--dark)">FD</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Ziguinchor</div><div class="shop-name">Ferme Diallo Casamance</div><div class="shop-market">Marché Ziguinchor</div><div class="shop-stats"><div><div class="ss-val">4.9 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">312</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">2 100</div><div class="ss-lbl">Ventes</div></div></div></div></div>
+    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html'"><div class="shop-banner" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i><div class="shop-avatar" style="background:#C0392B">AM</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Mbour</div><div class="shop-name">Artisan Mbaye</div><div class="shop-market">Marché Mbour · Petite Côte</div><div class="shop-stats"><div><div class="ss-val">5.0 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">98</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">480</div><div class="ss-lbl">Ventes</div></div></div></div></div>
   </div>
 </section>
 <!-- CTA -->
 <section class="cta-section">
-  <h2>Vous êtes vendeur ? 🏪</h2>
+  <h2>Vous êtes vendeur ? <i class="ic" data-ic="store"></i></h2>
   <p>Rejoignez des milliers de commerçants qui ont ouvert leur boutique en ligne sur Marché Sénégal. Gratuit pour commencer.</p>
   <div class="cta-btns">
-    <button class="btn btn-cta-white" onclick="goToShop()">🏪 Ouvrir ma boutique — Gratuit</button>
+    <button class="btn btn-cta-white" onclick="goToShop()"><i class="ic" data-ic="store"></i> Ouvrir ma boutique — Gratuit</button>
     <button class="btn btn-outline-white" onclick="showToast('En savoir plus...')">En savoir plus</button>
   </div>
 </section>
@@ -341,16 +342,16 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div class="footer-col"><h4>Vendeurs</h4><a href="marche-senegal-connexion-vendeur.html">Ouvrir ma boutique</a><a href="marche-senegal-ajout-produit.html">Mes produits</a><a href="marche-senegal-dashboard.html">Mes promotions</a><a href="#">Tarifs</a></div>
     <div class="footer-col"><h4>Support</h4><a href="#">Aide & FAQ</a><a href="#">Nous contacter</a><a href="#">WhatsApp</a></div>
   </div>
-  <div class="footer-bottom"><span>© 2025 Marché Sénégal. Fait avec ❤️ au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
+  <div class="footer-bottom"><span>© 2025 Marché Sénégal. Fait avec <i class="ic ic-red" data-ic="heart" data-ic-fill></i> au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
 </footer>
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <div class="mn-items">
-    <div class="mn-item act"><div class="mn-icon act">🏠</div><div class="mn-label">Accueil</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon">🔍</div><div class="mn-label">Recherche</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon">🛒</div><div class="mn-label">Panier</div></div>
-    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon">👤</div><div class="mn-label">Profil</div></div>
+    <div class="mn-item act"><div class="mn-icon act"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'"><div class="mn-icon"><i class="ic" data-ic="map"></i></div><div class="mn-label">Marchés</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'"><div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'"><div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div></div>
+    <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
 <script src="api.js"></script>

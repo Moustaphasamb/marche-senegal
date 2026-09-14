@@ -313,6 +313,12 @@ async function deletePromotion(id) {
   return await apiCall('/api/promotions/' + id, { method: 'DELETE' });
 }
 
+// Les promotions publiques d'une boutique — ce que le vendeur a créé et que
+// l'acheteur peut enfin voir.
+async function getShopPromotions(shopId) {
+  return await apiCall('/api/promotions/shop/' + shopId);
+}
+
 async function validatePromoCode(code, shopId, amount) {
   return await apiCall('/api/promotions/validate', {
     method: 'POST',

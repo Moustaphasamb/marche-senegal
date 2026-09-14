@@ -178,6 +178,7 @@ a{text-decoration:none;color:inherit}
   .stat-item:nth-child(4){border-top:1px solid var(--border);border-right:none}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -186,7 +187,7 @@ a{text-decoration:none;color:inherit}
 <div class="modal-overlay" id="modal-profile">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">✏️ Modifier le profil</div>
+      <div class="modal-title"><i class="ic" data-ic="pencil"></i> Modifier le profil</div>
       <button class="modal-close" onclick="closeModal('modal-profile')">✕</button>
     </div>
     <div class="modal-body">
@@ -210,7 +211,7 @@ a{text-decoration:none;color:inherit}
 <div class="modal-overlay" id="modal-address">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title" id="modal-address-title">📍 Ajouter une adresse</div>
+      <div class="modal-title" id="modal-address-title"><i class="ic" data-ic="map-pin"></i> Ajouter une adresse</div>
       <button class="modal-close" onclick="closeModal('modal-address')">✕</button>
     </div>
     <div class="modal-body">
@@ -263,11 +264,11 @@ a{text-decoration:none;color:inherit}
 <div class="modal-overlay" id="modal-delete">
   <div class="modal" style="max-width:340px">
     <div class="modal-head">
-      <div class="modal-title">🗑 Supprimer l'adresse ?</div>
+      <div class="modal-title"><i class="ic" data-ic="trash-2"></i> Supprimer l'adresse ?</div>
       <button class="modal-close" onclick="closeModal('modal-delete')">✕</button>
     </div>
     <div class="modal-body" style="text-align:center;padding:20px">
-      <div style="font-size:2.4rem;margin-bottom:10px">⚠️</div>
+      <div style="font-size:2.4rem;margin-bottom:10px"><i class="ic ic-warn" data-ic="triangle-alert"></i></div>
       <div style="font-size:.88rem;color:var(--muted);line-height:1.6">
         Cette action est irréversible.<br/>Voulez-vous vraiment supprimer cette adresse ?
       </div>
@@ -287,10 +288,10 @@ a{text-decoration:none;color:inherit}
     Marché Sénégal
   </a>
   <div class="nav-actions">
-    <button class="nav-btn" onclick="window.location.href='marche-senegal-accueil.html'">🏠 Accueil</button>
-    <button class="nav-btn" onclick="showTab('settings')">👤 Mon profil</button>
+    <button class="nav-btn" onclick="window.location.href='marche-senegal-accueil.html'"><i class="ic" data-ic="house"></i> Accueil</button>
+    <button class="nav-btn" onclick="showTab('settings')"><i class="ic" data-ic="user"></i> Mon profil</button>
     <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
-      🛒<div class="cart-badge" id="cart-count">0</div>
+      <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
   </div>
 </nav>
@@ -304,31 +305,31 @@ a{text-decoration:none;color:inherit}
       <div class="pc-avatar" id="pc-avatar">FN</div>
       <div class="pc-name" id="pc-name">Fatou Ndiaye</div>
       <div class="pc-phone" id="pc-phone">+221 77 000 00 01</div>
-      <div class="pc-badge">🛍️ Acheteur vérifié ✓</div>
-      <button class="pc-edit-btn" onclick="showTab('settings')">✏️ Modifier le profil</button>
+      <div class="pc-badge"><i class="ic" data-ic="shopping-bag"></i> Acheteur vérifié ✓</div>
+      <button class="pc-edit-btn" onclick="showTab('settings')"><i class="ic" data-ic="pencil"></i> Modifier le profil</button>
     </div>
 
     <div class="sidebar-nav">
       <div class="sn-item active" onclick="showTab('orders',this)">
-        <span class="sn-icon">🛒</span> Mes commandes
+        <span class="sn-icon"><i class="ic" data-ic="shopping-cart"></i></span> Mes commandes
         <span class="sn-badge" id="orders-badge">0</span>
       </div>
       <div class="sn-item" onclick="showTab('favorites',this)">
-        <span class="sn-icon">❤️</span> Mes favoris
+        <span class="sn-icon"><i class="ic ic-red" data-ic="heart" data-ic-fill></i></span> Mes favoris
       </div>
       <div class="sn-item" onclick="showTab('addresses',this)">
-        <span class="sn-icon">📍</span> Mes adresses
+        <span class="sn-icon"><i class="ic" data-ic="map-pin"></i></span> Mes adresses
       </div>
       <div class="sn-item" onclick="showTab('payments',this)">
-        <span class="sn-icon">💳</span> Mes paiements
+        <span class="sn-icon"><i class="ic" data-ic="credit-card"></i></span> Mes paiements
       </div>
       <div class="sn-item" onclick="showTab('settings',this)">
-        <span class="sn-icon">⚙️</span> Paramètres
+        <span class="sn-icon"><i class="ic" data-ic="settings"></i></span> Paramètres
       </div>
     </div>
 
     <button class="logout-btn" onclick="logoutUser()">
-      🚪 Se déconnecter
+      <i class="ic" data-ic="log-out"></i> Se déconnecter
     </button>
   </div>
 
@@ -360,12 +361,12 @@ a{text-decoration:none;color:inherit}
     <!-- COMMANDES -->
     <div class="content-card" id="tab-orders">
       <div class="cc-head">
-        <div class="cc-title">🛒 Mes commandes</div>
+        <div class="cc-title"><i class="ic" data-ic="shopping-cart"></i> Mes commandes</div>
         <div class="cc-action" onclick="loadOrders()">Actualiser</div>
       </div>
       <div id="orders-container">
         <div class="empty-state">
-          <div class="es-icon">⏳</div>
+          <div class="es-icon"><i class="ic" data-ic="hourglass"></i></div>
           <div class="es-title">Chargement...</div>
         </div>
       </div>
@@ -374,12 +375,12 @@ a{text-decoration:none;color:inherit}
     <!-- FAVORIS -->
     <div class="content-card" id="tab-favorites" style="display:none">
       <div class="cc-head">
-        <div class="cc-title">❤️ Mes favoris</div>
+        <div class="cc-title"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Mes favoris</div>
         <div class="cc-action" onclick="loadFavorites()">Actualiser</div>
       </div>
       <div id="favorites-container">
         <div class="empty-state">
-          <div class="es-icon">⏳</div>
+          <div class="es-icon"><i class="ic" data-ic="hourglass"></i></div>
           <div class="es-title">Chargement...</div>
         </div>
       </div>
@@ -388,12 +389,12 @@ a{text-decoration:none;color:inherit}
     <!-- ADRESSES -->
     <div class="content-card" id="tab-addresses" style="display:none">
       <div class="cc-head">
-        <div class="cc-title">📍 Mes adresses</div>
+        <div class="cc-title"><i class="ic" data-ic="map-pin"></i> Mes adresses</div>
         <div class="cc-action" onclick="openAddAddress()">+ Ajouter</div>
       </div>
       <div id="addresses-container">
         <div class="empty-state">
-          <div class="es-icon">⏳</div>
+          <div class="es-icon"><i class="ic" data-ic="hourglass"></i></div>
           <div class="es-title">Chargement...</div>
         </div>
       </div>
@@ -402,19 +403,19 @@ a{text-decoration:none;color:inherit}
     <!-- PAIEMENTS -->
     <div class="content-card" id="tab-payments" style="display:none">
       <div class="cc-head">
-        <div class="cc-title">💳 Moyens de paiement</div>
+        <div class="cc-title"><i class="ic" data-ic="credit-card"></i> Moyens de paiement</div>
         <div class="cc-action" onclick="showToast('Ajouter...')">+ Ajouter</div>
       </div>
       <div class="addr-list">
         <div class="addr-card default">
-          <div class="addr-icon">📱</div>
+          <div class="addr-icon"><i class="ic" data-ic="smartphone"></i></div>
           <div class="addr-info">
             <div class="addr-label">Wave <span class="addr-default">Par défaut</span></div>
             <div class="addr-text">+221 77 000 00 01 · Solde disponible</div>
           </div>
         </div>
         <div class="addr-card">
-          <div class="addr-icon">🟠</div>
+          <div class="addr-icon"><i class="ic" data-ic="map-pin"></i></div>
           <div class="addr-info">
             <div class="addr-label">Orange Money</div>
             <div class="addr-text">+221 77 000 00 01</div>
@@ -426,11 +427,11 @@ a{text-decoration:none;color:inherit}
     <!-- PARAMÈTRES -->
     <div class="content-card" id="tab-settings" style="display:none">
       <div class="cc-head">
-        <div class="cc-title">⚙️ Paramètres</div>
+        <div class="cc-title"><i class="ic" data-ic="settings"></i> Paramètres</div>
       </div>
       <div class="settings-list">
         <div class="setting-item" style="cursor:pointer" onclick="openEditProfile()">
-          <div class="si-icon">👤</div>
+          <div class="si-icon"><i class="ic" data-ic="user"></i></div>
           <div class="si-info">
             <div class="si-label">Prénom et nom</div>
             <div class="si-sub" id="settings-name">—</div>
@@ -438,7 +439,7 @@ a{text-decoration:none;color:inherit}
           <div class="si-arrow">›</div>
         </div>
         <div class="setting-item">
-          <div class="si-icon">📱</div>
+          <div class="si-icon"><i class="ic" data-ic="smartphone"></i></div>
           <div class="si-info">
             <div class="si-label">Numéro de téléphone</div>
             <div class="si-sub" id="settings-phone">—</div>
@@ -446,7 +447,7 @@ a{text-decoration:none;color:inherit}
           <div class="si-arrow" style="color:var(--border);cursor:default">›</div>
         </div>
         <div class="setting-item">
-          <div class="si-icon">🔔</div>
+          <div class="si-icon"><i class="ic" data-ic="bell"></i></div>
           <div class="si-info">
             <div class="si-label">Notifications commandes</div>
             <div class="si-sub">Recevoir les mises à jour par SMS</div>
@@ -454,7 +455,7 @@ a{text-decoration:none;color:inherit}
           <div class="si-toggle" onclick="this.classList.toggle('off')"></div>
         </div>
         <div class="setting-item">
-          <div class="si-icon">🎯</div>
+          <div class="si-icon"><i class="ic" data-ic="target"></i></div>
           <div class="si-info">
             <div class="si-label">Notifications promotions</div>
             <div class="si-sub">Recevoir les offres et bons plans</div>
@@ -462,7 +463,7 @@ a{text-decoration:none;color:inherit}
           <div class="si-toggle off" onclick="this.classList.toggle('off')"></div>
         </div>
         <div class="setting-item">
-          <div class="si-icon">🌍</div>
+          <div class="si-icon"><i class="ic" data-ic="globe"></i></div>
           <div class="si-info">
             <div class="si-label">Langue</div>
             <div class="si-sub">Français</div>
@@ -479,22 +480,22 @@ a{text-decoration:none;color:inherit}
 <nav class="mobile-nav">
   <div class="mn-items">
     <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'">
-      <div class="mn-icon">🏠</div><div class="mn-label">Accueil</div>
+      <div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-marche.html'">
-      <div class="mn-icon">🗺️</div><div class="mn-label">Marchés</div>
+      <div class="mn-icon"><i class="ic" data-ic="map"></i></div><div class="mn-label">Marchés</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-recherche.html'">
-      <div class="mn-icon">🔍</div><div class="mn-label">Recherche</div>
+      <div class="mn-icon"><i class="ic" data-ic="search"></i></div><div class="mn-label">Recherche</div>
     </div>
     <div class="mn-item" onclick="window.location.href='marche-senegal-panier.html'">
-      <div class="mn-icon">🛒</div><div class="mn-label">Panier</div>
+      <div class="mn-icon"><i class="ic" data-ic="shopping-cart"></i></div><div class="mn-label">Panier</div>
     </div>
     <div class="mn-item act">
-      <div class="mn-icon">👤</div><div class="mn-label">Profil</div>
+      <div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div>
     </div>
     <div class="mn-item" onclick="logoutUser()" style="color:#C0392B">
-      <div class="mn-icon">🚪</div><div class="mn-label" style="color:#C0392B">Quitter</div>
+      <div class="mn-icon"><i class="ic" data-ic="log-out"></i></div><div class="mn-label" style="color:#C0392B">Quitter</div>
     </div>
   </div>
 </nav>

@@ -80,6 +80,7 @@ body{padding-left:var(--sidebar-w)}
 @media(max-width:960px){.page{grid-template-columns:1fr}.preview-card{position:static}.seller-topbar .st-link{display:none}.seller-topbar .st-link.active{display:flex}}
 @media(max-width:600px){.page{padding:16px 4vw 40px}.photo-grid{grid-template-columns:repeat(3,1fr)}.cat-grid{grid-template-columns:repeat(3,1fr)}.fgrid{grid-template-columns:1fr}.st-sep,.st-title{display:none}}
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -89,10 +90,10 @@ body{padding-left:var(--sidebar-w)}
   <button class="hamburger-btn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
   <a href="marche-senegal-accueil.html" class="st-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>Marché Sénégal</a>
   <span class="st-sep">›</span><span class="st-title">Espace Vendeur</span>
-  <div class="st-nav"><div class="st-link active">✏️ Modifier un produit</div></div>
+  <div class="st-nav"><div class="st-link active"><i class="ic" data-ic="pencil"></i> Modifier un produit</div></div>
   <div class="st-actions">
     <button class="st-btn st-btn-outline" onclick="location.href='marche-senegal-mes-produits.html'">← Annuler</button>
-    <button class="st-btn st-btn-green" id="top-save-btn" onclick="saveProduct()">💾 Enregistrer</button>
+    <button class="st-btn st-btn-green" id="top-save-btn" onclick="saveProduct()"><i class="ic" data-ic="save"></i> Enregistrer</button>
   </div>
 </div>
 
@@ -105,10 +106,10 @@ body{padding-left:var(--sidebar-w)}
   <div>
 
     <div class="form-card">
-      <div class="fc-title"><span>📸</span>Photos du produit</div>
+      <div class="fc-title"><span><i class="ic" data-ic="camera"></i></span>Photos du produit</div>
       <div class="photo-grid" id="photo-grid">
         <div class="photo-slot" id="slot-0" onclick="triggerUpload(0)">
-          <span class="photo-slot-icon">📷</span><span class="photo-slot-text">Photo principale</span>
+          <span class="photo-slot-icon"><i class="ic" data-ic="camera"></i></span><span class="photo-slot-text">Photo principale</span>
           <div class="photo-main-badge">Photo principale</div>
           <button class="photo-del" onclick="event.stopPropagation();removePhoto(0)">✕</button>
         </div>
@@ -120,11 +121,11 @@ body{padding-left:var(--sidebar-w)}
         <div class="photo-slot" id="slot-4" onclick="triggerUpload(4)"><span class="photo-slot-icon">+</span><span class="photo-slot-text">Photo 5</span><button class="photo-del" onclick="event.stopPropagation();removePhoto(4)">✕</button></div>
       </div>
       <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none"/>
-      <p class="photo-hint">📌 Cliquez sur un emplacement pour modifier la photo · JPG, PNG · Max 5 MB</p>
+      <p class="photo-hint"><i class="ic" data-ic="pin"></i> Cliquez sur un emplacement pour modifier la photo · JPG, PNG · Max 5 MB</p>
     </div>
 
     <div class="form-card">
-      <div class="fc-title"><span>📝</span>Informations du produit</div>
+      <div class="fc-title"><span><i class="ic" data-ic="file-text"></i></span>Informations du produit</div>
       <div class="fgrid">
         <div class="fgrid-full field">
           <label class="fl">Nom du produit <span class="fl-req">*</span></label>
@@ -149,9 +150,9 @@ body{padding-left:var(--sidebar-w)}
         <div class="field">
           <label class="fl">Statut du produit</label>
           <select class="fi" id="prod-status">
-            <option value="ACTIVE">✅ Actif — visible par les acheteurs</option>
-            <option value="PAUSED">⏸️ En pause — masqué temporairement</option>
-            <option value="OUT_OF_STOCK">❌ Rupture de stock</option>
+            <option value="ACTIVE">Actif — visible par les acheteurs</option>
+            <option value="PAUSED">En pause — masqué temporairement</option>
+            <option value="OUT_OF_STOCK">Rupture de stock</option>
           </select>
         </div>
         <div class="field">
@@ -184,14 +185,14 @@ body{padding-left:var(--sidebar-w)}
     </div>
 
     <div class="form-card">
-      <div class="fc-title"><span>🏷️</span>Catégorie</div>
+      <div class="fc-title"><span><i class="ic" data-ic="tag"></i></span>Catégorie</div>
       <div class="cat-grid" id="cat-grid">
         <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Chargement…</div>
       </div>
     </div>
 
     <div class="form-card">
-      <div class="fc-title"><span>📐</span>Tailles & Couleurs</div>
+      <div class="fc-title"><span><i class="ic" data-ic="ruler"></i></span>Tailles & Couleurs</div>
       <div class="vrow">
         <div class="vrow-label">Tailles</div>
         <div class="vtags" id="sizes-container">
@@ -223,14 +224,14 @@ body{padding-left:var(--sidebar-w)}
 
   <div>
     <div class="preview-card">
-      <div class="preview-title">📱 Aperçu</div>
+      <div class="preview-title"><i class="ic" data-ic="smartphone"></i> Aperçu</div>
       <div class="preview-phone">
         <div class="pp-screen">
           <div class="pp-img" id="pp-img">
-            <span id="prev-emoji">👗</span>
+            <span id="prev-emoji"><i class="ic" data-ic="shirt"></i></span>
           </div>
           <div class="pp-body">
-            <div class="pp-market">🏛️ Marché Sénégal</div>
+            <div class="pp-market"><i class="ic" data-ic="landmark"></i> Marché Sénégal</div>
             <div class="pp-name" id="prev-name">Nom du produit</div>
             <div style="display:flex;align-items:baseline;gap:4px">
               <span class="pp-price" id="prev-price">0 FCFA</span>
@@ -248,7 +249,7 @@ body{padding-left:var(--sidebar-w)}
         Créé le : <strong id="info-date">—</strong>
       </div>
 
-      <button class="save-btn" id="save-btn" onclick="saveProduct()">💾 Enregistrer les modifications</button>
+      <button class="save-btn" id="save-btn" onclick="saveProduct()"><i class="ic" data-ic="save"></i> Enregistrer les modifications</button>
       <button class="cancel-btn" onclick="location.href='marche-senegal-mes-produits.html'">✕ Annuler sans modifier</button>
     </div>
   </div>

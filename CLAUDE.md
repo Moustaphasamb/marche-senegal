@@ -56,7 +56,33 @@ C:\Users\samb9\Desktop\
 - HTML5 + CSS3 + JavaScript Vanilla
 - Pas de framework — tout en vanilla JS
 - `api.js` est le fichier partagé importé dans chaque page HTML
+- `icons.js` fournit les icônes vectorielles — voir « Système d'icônes » ci-dessous
 - Live Server sur `http://127.0.0.1:5500`
+
+### Système d'icônes — pas d'emoji dans l'interface
+Les emojis ont été remplacés par des icônes vectorielles Lucide (licence ISC).
+`icons.js` est chargé dans le `<head>` de chaque page, avant tout autre script.
+
+**Poser une icône dans le HTML :**
+```html
+<i class="ic" data-ic="shopping-cart"></i>
+```
+Elle prend la taille de la `font-size` du parent (1em) et la couleur du texte
+(`currentColor`). Modificateurs : `data-ic-fill` (pleine), classes `ic-gold`,
+`ic-red`, `ic-ok`, `ic-warn`, `ic-err`, `ic-lg`, `ic-xl`.
+
+**Depuis un template JS :** `msIcon('trash-2')` renvoie la chaîne HTML.
+
+**Filet de sécurité :** tout emoji connu laissé dans un nœud texte est converti
+automatiquement à l'affichage, y compris le contenu injecté via `textContent`
+(toasts, libellés dynamiques) où du HTML serait ignoré. C'est pourquoi des
+emojis subsistent dans le JS sans être visibles à l'écran.
+
+**Limite :** une `<option>` ne peut pas contenir de SVG — y utiliser du texte seul.
+
+**Ajouter une icône :** compléter `tools/icons/emoji-map.json` et
+`tools/icons/lucide-paths.json`, puis `node tools/icons/build.mjs`.
+Ne jamais éditer `icons.js` à la main : il est généré.
 
 ### Backend
 - Node.js v25 + Express

@@ -188,6 +188,7 @@
   .topbar{padding:0 14px;gap:8px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -197,7 +198,7 @@
 <div class="cni-overlay" id="cni-overlay" onclick="closeCNI(event)">
   <div class="cni-box" onclick="event.stopPropagation()">
     <div class="cni-head">
-      <span class="cni-title">📋 Dossier CNI — Vérification</span>
+      <span class="cni-title"><i class="ic" data-ic="clipboard-list"></i> Dossier CNI — Vérification</span>
       <button class="cni-close" onclick="closeCNI()">✕</button>
     </div>
     <div class="cni-vendor-info">
@@ -209,11 +210,11 @@
     </div>
     <div class="cni-photos">
       <div class="cni-photo" id="cni-front-wrap">
-        <div class="cni-photo-empty"><span>🪪</span>Recto non fourni</div>
+        <div class="cni-photo-empty"><span><i class="ic" data-ic="id-card"></i></span>Recto non fourni</div>
         <div class="cni-photo-label">Recto CNI</div>
       </div>
       <div class="cni-photo" id="cni-back-wrap">
-        <div class="cni-photo-empty"><span>🪪</span>Verso non fourni</div>
+        <div class="cni-photo-empty"><span><i class="ic" data-ic="id-card"></i></span>Verso non fourni</div>
         <div class="cni-photo-label">Verso CNI</div>
       </div>
     </div>
@@ -225,7 +226,7 @@
 <div class="mkt-overlay" id="mkt-overlay" onclick="closeMktModal(event)">
   <div class="mkt-box" onclick="event.stopPropagation()">
     <h3>
-      <span id="mkt-modal-title">🗺️ Nouveau marché</span>
+      <span id="mkt-modal-title"><i class="ic" data-ic="map"></i> Nouveau marché</span>
       <button style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted)" onclick="closeMktModal()">✕</button>
     </h3>
     <input type="hidden" id="mkt-edit-id"/>
@@ -283,7 +284,7 @@
     </div>
     <div class="mkt-actions">
       <button class="mkt-btn-cancel" onclick="closeMktModal()">Annuler</button>
-      <button class="mkt-btn-save" onclick="saveMarket()">💾 Enregistrer</button>
+      <button class="mkt-btn-save" onclick="saveMarket()"><i class="ic" data-ic="save"></i> Enregistrer</button>
     </div>
   </div>
 </div>
@@ -292,7 +293,7 @@
 <div class="mkt-overlay" id="disp-overlay" onclick="closeDisputeModal(event)">
   <div class="mkt-box" onclick="event.stopPropagation()">
     <h3>
-      <span>⚖️ Arbitrer le litige</span>
+      <span><i class="ic" data-ic="scale"></i> Arbitrer le litige</span>
       <button style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted)" onclick="closeDisputeModal()">✕</button>
     </h3>
 
@@ -337,7 +338,7 @@
 
     <div class="mkt-actions">
       <button class="mkt-btn-cancel" onclick="closeDisputeModal()">Annuler</button>
-      <button class="mkt-btn-save" onclick="submitDisputeResolution()">⚖️ Trancher</button>
+      <button class="mkt-btn-save" onclick="submitDisputeResolution()"><i class="ic" data-ic="scale"></i> Trancher</button>
     </div>
   </div>
 </div>
@@ -348,7 +349,7 @@
     <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
     <div>
       <div class="sb-logo-text">Marché Sénégal</div>
-      <div class="sb-admin-badge">👑 Admin Panel</div>
+      <div class="sb-admin-badge"><i class="ic" data-ic="crown"></i> Admin Panel</div>
     </div>
   </div>
   <div class="sb-user">
@@ -357,25 +358,25 @@
   </div>
   <nav class="sb-nav">
     <div class="sb-sec">Vue d'ensemble</div>
-    <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-icon">📊</span>Tableau de bord</div>
-    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon">👥</span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">48 260</span></div>
-    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon">🏪</span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">12</span></div>
+    <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-icon"><i class="ic" data-ic="chart-column"></i></span>Tableau de bord</div>
+    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon"><i class="ic" data-ic="users"></i></span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">48 260</span></div>
+    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon"><i class="ic" data-ic="store"></i></span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">12</span></div>
     <div class="sb-sec">Commerce</div>
-    <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon">🛒</span>Commandes<span class="sb-badge green" id="sb-orders-count">—</span></div>
-    <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon">⚖️</span>Litiges<span class="sb-badge" id="sb-disputes-count">—</span></div>
-    <div class="sb-item" onclick="showPage('products',this)"><span class="sb-icon">📦</span>Produits</div>
+    <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon"><i class="ic" data-ic="shopping-cart"></i></span>Commandes<span class="sb-badge green" id="sb-orders-count">—</span></div>
+    <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon"><i class="ic" data-ic="scale"></i></span>Litiges<span class="sb-badge" id="sb-disputes-count">—</span></div>
+    <div class="sb-item" onclick="showPage('products',this)"><span class="sb-icon"><i class="ic" data-ic="package"></i></span>Produits</div>
     <div class="sb-sec">Plateforme</div>
-    <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon">🗺️</span>Marchés</div>
-    <div class="sb-item" onclick="showPage('revenue',this)"><span class="sb-icon">💰</span>Revenus</div>
-    <div class="sb-item" onclick="showPage('deliveries',this)"><span class="sb-icon">🛵</span>Livreurs</div>
-    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon">🎯</span>Promotions</div>
+    <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon"><i class="ic" data-ic="map"></i></span>Marchés</div>
+    <div class="sb-item" onclick="showPage('revenue',this)"><span class="sb-icon"><i class="ic" data-ic="coins"></i></span>Revenus</div>
+    <div class="sb-item" onclick="showPage('deliveries',this)"><span class="sb-icon"><i class="ic" data-ic="bike"></i></span>Livreurs</div>
+    <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon"><i class="ic" data-ic="target"></i></span>Promotions</div>
     <div class="sb-sec">Système</div>
-    <div class="sb-item" onclick="showPage('settings',this)"><span class="sb-icon">⚙️</span>Paramètres</div>
-    <div class="sb-item" onclick="showPage('logs',this)"><span class="sb-icon">📋</span>Logs</div>
+    <div class="sb-item" onclick="showPage('settings',this)"><span class="sb-icon"><i class="ic" data-ic="settings"></i></span>Paramètres</div>
+    <div class="sb-item" onclick="showPage('logs',this)"><span class="sb-icon"><i class="ic" data-ic="clipboard-list"></i></span>Logs</div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-back" onclick="window.location.href='marche-senegal-accueil.html'"><span>🌐</span>Voir le site public</div>
-    <div class="sb-back" onclick="logoutAdmin()"><span>🚪</span>Se déconnecter</div>
+    <div class="sb-back" onclick="window.location.href='marche-senegal-accueil.html'"><span><i class="ic" data-ic="globe"></i></span>Voir le site public</div>
+    <div class="sb-back" onclick="logoutAdmin()"><span><i class="ic" data-ic="log-out"></i></span>Se déconnecter</div>
   </div>
 </aside>
 
@@ -385,11 +386,11 @@
   <div class="tb-title" id="page-title">Tableau de bord</div>
   <div class="tb-search">
     <input type="text" placeholder="Rechercher utilisateur, commande..."/>
-    <button class="tb-search-btn">🔍</button>
+    <button class="tb-search-btn"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="tb-right">
-    <button class="tb-btn" onclick="toast('Notifications admin...')">🔔<div class="tb-notif">14</div></button>
-    <button class="tb-btn" onclick="toast('Exporter rapport...')">📊</button>
+    <button class="tb-btn" onclick="toast('Notifications admin...')"><i class="ic" data-ic="bell"></i><div class="tb-notif">14</div></button>
+    <button class="tb-btn" onclick="toast('Exporter rapport...')"><i class="ic" data-ic="chart-column"></i></button>
     <div class="tb-profile" onclick="toast('Mon profil admin...')"><div class="tb-av">AD</div><span class="tb-name">Admin</span></div>
   </div>
 </div>
@@ -400,20 +401,20 @@
   <!-- ── OVERVIEW ── -->
   <div class="ps active" id="ps-overview">
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val" id="kpi-revenue">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🛒</div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val" id="kpi-orders">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🏪</div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val" id="kpi-shops">2 412</div><div class="kpi-label">Boutiques actives</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">👥</div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val" id="kpi-users">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">⚖️</div><div class="kpi-chg down">↑ +3</div></div><div class="kpi-val">8</div><div class="kpi-label">Litiges ouverts</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">🚚</div><div class="kpi-chg up">↑ +2%</div></div><div class="kpi-val">94%</div><div class="kpi-label">Taux livraison réussie</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">⭐</div><div class="kpi-chg up">↑ +0.1</div></div><div class="kpi-val">4.7</div><div class="kpi-label">Note moyenne globale</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🗺️</div><div class="kpi-chg flat">→ stable</div></div><div class="kpi-val">14</div><div class="kpi-label">Régions couvertes</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="coins"></i></div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val" id="kpi-revenue">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="shopping-cart"></i></div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val" id="kpi-orders">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="store"></i></div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val" id="kpi-shops">2 412</div><div class="kpi-label">Boutiques actives</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p"><i class="ic" data-ic="users"></i></div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val" id="kpi-users">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r"><i class="ic" data-ic="scale"></i></div><div class="kpi-chg down">↑ +3</div></div><div class="kpi-val">8</div><div class="kpi-label">Litiges ouverts</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="truck"></i></div><div class="kpi-chg up">↑ +2%</div></div><div class="kpi-val">94%</div><div class="kpi-label">Taux livraison réussie</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="kpi-chg up">↑ +0.1</div></div><div class="kpi-val">4.7</div><div class="kpi-label">Note moyenne globale</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="map"></i></div><div class="kpi-chg flat">→ stable</div></div><div class="kpi-val">14</div><div class="kpi-label">Régions couvertes</div></div>
     </div>
 
     <div class="grid-2">
       <!-- Revenue chart -->
       <div class="card">
-        <div class="card-header"><div class="card-title">📈 Revenus — 6 derniers mois</div><div class="card-action" onclick="toast('Exporter...')">Exporter CSV →</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="trending-up"></i> Revenus — 6 derniers mois</div><div class="card-action" onclick="toast('Exporter...')">Exporter CSV →</div></div>
         <div class="bar-chart">
           <div class="bc-wrap"><div class="bc-val">7,2M</div><div class="bc-bar g" style="height:58%"></div><div class="bc-label">Nov</div></div>
           <div class="bc-wrap"><div class="bc-val">8,1M</div><div class="bc-bar g" style="height:65%"></div><div class="bc-label">Déc</div></div>
@@ -429,7 +430,7 @@
       </div>
       <!-- Donut -->
       <div class="card">
-        <div class="card-header"><div class="card-title">🥧 Répartition des revenus</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="chart-pie"></i> Répartition des revenus</div></div>
         <div class="donut-wrap">
           <div class="donut">
             <svg width="90" height="90" viewBox="0 0 90 90">
@@ -453,7 +454,7 @@
     <div class="grid-2">
       <!-- Vendor verif -->
       <div class="card">
-        <div class="card-header"><div class="card-title" id="overview-verif-title">🔍 Vérifications en attente</div><div class="card-action" onclick="showPage('vendors',document.querySelector('.sb-item:nth-child(4)'))">Voir tout →</div></div>
+        <div class="card-header"><div class="card-title" id="overview-verif-title"><i class="ic" data-ic="search"></i> Vérifications en attente</div><div class="card-action" onclick="showPage('vendors',document.querySelector('.sb-item:nth-child(4)'))">Voir tout →</div></div>
         <table class="t">
           <thead><tr><th>Vendeur</th><th>Marché</th><th>Statut</th><th>Actions</th></tr></thead>
           <tbody id="overview-verif-tbody"><tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted)">Chargement…</td></tr></tbody>
@@ -461,7 +462,7 @@
       </div>
       <!-- Disputes -->
       <div class="card">
-        <div class="card-header"><div class="card-title" id="overview-disputes-title">⚖️ Litiges ouverts</div><div class="card-action" onclick="showPage('disputes',null)">Gérer →</div></div>
+        <div class="card-header"><div class="card-title" id="overview-disputes-title"><i class="ic" data-ic="scale"></i> Litiges ouverts</div><div class="card-action" onclick="showPage('disputes',null)">Gérer →</div></div>
         <div class="dispute-list" id="overview-disputes-list"><div style="text-align:center;padding:16px;color:var(--muted)">Chargement…</div></div>
       </div>
     </div>
@@ -469,11 +470,11 @@
     <!-- Market stats + Activity -->
     <div class="grid-2">
       <div class="card">
-        <div class="card-header"><div class="card-title">🗺️ Stats par marché</div><div class="card-action" onclick="showPage('markets',null)">Voir tout →</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="map"></i> Stats par marché</div><div class="card-action" onclick="showPage('markets',null)">Voir tout →</div></div>
         <div class="market-stats" id="overview-markets-list"><div style="text-align:center;padding:16px;color:var(--muted)">Chargement…</div></div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">📋 Activité en temps réel</div><div class="card-action" onclick="showPage('logs',document.querySelector('.sb-item:last-child'))">Voir tout →</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="clipboard-list"></i> Activité en temps réel</div><div class="card-action" onclick="showPage('logs',document.querySelector('.sb-item:last-child'))">Voir tout →</div></div>
         <div class="log-list" id="overview-activity">
           <div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>
         </div>
@@ -484,7 +485,7 @@
   <!-- ── USERS ── -->
   <div class="ps" id="ps-users">
     <div class="sec-header">
-      <div class="sec-title" id="users-title">👥 Utilisateurs</div>
+      <div class="sec-title" id="users-title"><i class="ic" data-ic="users"></i> Utilisateurs</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="users-search" oninput="debounceUsersSearch()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
         <select id="users-role-filter" onchange="loadUsers()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
@@ -505,17 +506,17 @@
   <!-- ── VENDORS ── -->
   <div class="ps" id="ps-vendors">
     <div class="sec-header">
-      <div class="sec-title" id="vendors-title">🏪 Vendeurs</div>
-      <button class="sec-btn sec-btn-outline" onclick="toast('Exporter la liste...')">📊 Exporter</button>
+      <div class="sec-title" id="vendors-title"><i class="ic" data-ic="store"></i> Vendeurs</div>
+      <button class="sec-btn sec-btn-outline" onclick="toast('Exporter la liste...')"><i class="ic" data-ic="chart-column"></i> Exporter</button>
     </div>
     <div class="card">
       <table class="t">
         <thead><tr><th>Vendeur</th><th>Marché</th><th>Boutique</th><th>Ventes</th><th>Note</th><th>CNI</th><th>Actions</th></tr></thead>
         <tbody id="vendors-tbody">
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div></div></div></td><td>🏛️ Sandaga</td><td>Mode Fatou</td><td>1 240</td><td>4.8 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Voir</button><button class="ta reject" onclick="toast('Boutique suspendue')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">FD</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ferme Diallo</div></div></div></td><td>🌊 Ziguinchor</td><td>Ferme Diallo Casamance</td><td>2 100</td><td>4.9 ⭐</td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir boutique...')">Voir</button><button class="ta reject" onclick="toast('Suspendu')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div></div></div></td><td>🛍️ HLM</td><td>HLM Alimentation</td><td>En attente</td><td>—</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Validé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">AC</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Artisan Cheikh</div></div></div></td><td>🏖️ Mbour</td><td>Artisan Cheikh Mbour</td><td>480</td><td>5.0 ⭐</td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Boutique réactivée !')">Réactiver</button><button class="ta view" onclick="toast('Dossier...')">Dossier</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div></div></div></td><td><i class="ic" data-ic="landmark"></i> Sandaga</td><td>Mode Fatou</td><td>1 240</td><td>4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Voir</button><button class="ta reject" onclick="toast('Boutique suspendue')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">FD</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ferme Diallo</div></div></div></td><td><i class="ic" data-ic="waves"></i> Ziguinchor</td><td>Ferme Diallo Casamance</td><td>2 100</td><td>4.9 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir boutique...')">Voir</button><button class="ta reject" onclick="toast('Suspendu')">Suspendre</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div></div></div></td><td><i class="ic" data-ic="shopping-bag"></i> HLM</td><td>HLM Alimentation</td><td>En attente</td><td>—</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Validé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
+          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">AC</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Artisan Cheikh</div></div></div></td><td><i class="ic" data-ic="umbrella"></i> Mbour</td><td>Artisan Cheikh Mbour</td><td>480</td><td>5.0 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Boutique réactivée !')">Réactiver</button><button class="ta view" onclick="toast('Dossier...')">Dossier</button></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -523,10 +524,10 @@
 
   <!-- ── ORDERS ── -->
   <div class="ps" id="ps-orders">
-    <div class="sec-header"><div class="sec-title" id="orders-title">🛒 Commandes</div><div style="font-size:.86rem;color:var(--muted)">Total livré : <strong id="orders-revenue" style="color:var(--green)">—</strong></div></div>
+    <div class="sec-header"><div class="sec-title" id="orders-title"><i class="ic" data-ic="shopping-cart"></i> Commandes</div><div style="font-size:.86rem;color:var(--muted)">Total livré : <strong id="orders-revenue" style="color:var(--green)">—</strong></div></div>
     <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">⏳</div></div><div class="kpi-val" id="ord-pending">—</div><div class="kpi-label">En attente de confirmation</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🚚</div></div><div class="kpi-val" id="ord-delivering">—</div><div class="kpi-label">En cours de livraison</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="hourglass"></i></div></div><div class="kpi-val" id="ord-pending">—</div><div class="kpi-label">En attente de confirmation</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="truck"></i></div></div><div class="kpi-val" id="ord-delivering">—</div><div class="kpi-label">En cours de livraison</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val" id="ord-delivered">—</div><div class="kpi-label">Livrées avec succès</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val" id="ord-cancelled">—</div><div class="kpi-label">Annulées / Remboursées</div></div>
     </div>
@@ -542,7 +543,7 @@
   <!-- ── DISPUTES ── -->
   <div class="ps" id="ps-disputes">
     <div class="sec-header">
-      <div class="sec-title" id="disputes-title">⚖️ Litiges</div>
+      <div class="sec-title" id="disputes-title"><i class="ic" data-ic="scale"></i> Litiges</div>
       <select id="disputes-filter" onchange="loadDisputes()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
         <option value="open">Ouverts</option>
         <option value="resolved">Tranchés</option>
@@ -560,22 +561,22 @@
   <!-- ── REVENUE ── -->
   <div class="ps" id="ps-revenue">
     <div class="sec-header">
-      <div class="sec-title" id="revenue-title">💰 Revenus</div>
-      <button class="sec-btn sec-btn-outline" onclick="exportRevenue()">📊 Exporter CSV</button>
+      <div class="sec-title" id="revenue-title"><i class="ic" data-ic="coins"></i> Revenus</div>
+      <button class="sec-btn sec-btn-outline" onclick="exportRevenue()"><i class="ic" data-ic="chart-column"></i> Exporter CSV</button>
     </div>
 
     <!-- KPIs revenus -->
     <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">💰</div><div class="kpi-chg up" id="rev-growth">—</div></div><div class="kpi-val" id="rev-total">—</div><div class="kpi-label">Revenus totaux (FCFA)</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📅</div></div><div class="kpi-val" id="rev-month">—</div><div class="kpi-label">Ce mois-ci</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🛒</div></div><div class="kpi-val" id="rev-orders">—</div><div class="kpi-label">Commandes livrées</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p">🧺</div></div><div class="kpi-val" id="rev-avg">—</div><div class="kpi-label">Panier moyen (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="coins"></i></div><div class="kpi-chg up" id="rev-growth">—</div></div><div class="kpi-val" id="rev-total">—</div><div class="kpi-label">Revenus totaux (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="calendar"></i></div></div><div class="kpi-val" id="rev-month">—</div><div class="kpi-label">Ce mois-ci</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="shopping-cart"></i></div></div><div class="kpi-val" id="rev-orders">—</div><div class="kpi-label">Commandes livrées</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p"><i class="ic" data-ic="shopping-basket"></i></div></div><div class="kpi-val" id="rev-avg">—</div><div class="kpi-label">Panier moyen (FCFA)</div></div>
     </div>
 
     <div class="grid-2">
       <!-- Graphique mensuel -->
       <div class="card">
-        <div class="card-header"><div class="card-title">📈 Revenus mensuels</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="trending-up"></i> Revenus mensuels</div></div>
         <div class="bar-chart" id="rev-chart" style="height:110px;align-items:flex-end">
           <div style="text-align:center;width:100%;padding:20px;color:var(--muted)">Chargement…</div>
         </div>
@@ -584,7 +585,7 @@
 
       <!-- Répartition paiements -->
       <div class="card">
-        <div class="card-header"><div class="card-title">💳 Répartition par moyen de paiement</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="credit-card"></i> Répartition par moyen de paiement</div></div>
         <div id="rev-methods" style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
           <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
         </div>
@@ -593,7 +594,7 @@
 
     <!-- Revenus par marché -->
     <div class="card">
-      <div class="card-header"><div class="card-title">🗺️ Revenus par marché</div></div>
+      <div class="card-header"><div class="card-title"><i class="ic" data-ic="map"></i> Revenus par marché</div></div>
       <table class="t">
         <thead><tr><th>Marché</th><th>Commandes</th><th>Revenus (FCFA)</th><th>Part</th></tr></thead>
         <tbody id="rev-markets"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr></tbody>
@@ -604,7 +605,7 @@
   <!-- ── DELIVERIES ── -->
   <div class="ps" id="ps-deliveries">
     <div class="sec-header">
-      <div class="sec-title" id="deliveries-title">🛵 Livraisons</div>
+      <div class="sec-title" id="deliveries-title"><i class="ic" data-ic="bike"></i> Livraisons</div>
       <select id="deliveries-filter" onchange="loadDeliveries()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
         <option value="">Toutes</option>
         <option value="ASSIGNED">Assignées</option>
@@ -617,8 +618,8 @@
 
     <!-- KPIs livraisons -->
     <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📋</div></div><div class="kpi-val" id="del-assigned">—</div><div class="kpi-label">Assignées</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🛵</div></div><div class="kpi-val" id="del-onway">—</div><div class="kpi-label">En cours</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="clipboard-list"></i></div></div><div class="kpi-val" id="del-assigned">—</div><div class="kpi-label">Assignées</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="bike"></i></div></div><div class="kpi-val" id="del-onway">—</div><div class="kpi-label">En cours</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">✓</div></div><div class="kpi-val" id="del-delivered">—</div><div class="kpi-label">Livrées</div></div>
       <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r">✕</div></div><div class="kpi-val" id="del-failed">—</div><div class="kpi-label">Échouées</div></div>
     </div>
@@ -633,12 +634,12 @@
 
   <!-- ── SETTINGS ── -->
   <div class="ps" id="ps-settings">
-    <div class="sec-header"><div class="sec-title">⚙️ Paramètres</div></div>
+    <div class="sec-header"><div class="sec-title"><i class="ic" data-ic="settings"></i> Paramètres</div></div>
 
     <div class="grid-2">
       <!-- Profil admin -->
       <div class="card">
-        <div class="card-header"><div class="card-title">👤 Mon profil admin</div></div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="user"></i> Mon profil admin</div></div>
         <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
           <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
             <div style="width:56px;height:56px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0" id="settings-av">AD</div>
@@ -694,7 +695,7 @@
   <!-- ── PRODUCTS ── -->
   <div class="ps" id="ps-products">
     <div class="sec-header">
-      <div class="sec-title" id="products-title">📦 Produits</div>
+      <div class="sec-title" id="products-title"><i class="ic" data-ic="package"></i> Produits</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="products-search" oninput="debounceProductsSearch()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;outline:none;background:#fff" type="text" placeholder="🔍 Rechercher..."/>
         <select id="products-status-filter" onchange="loadProducts()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
@@ -716,7 +717,7 @@
   <!-- ── PROMOTIONS ── -->
   <div class="ps" id="ps-promotions">
     <div class="sec-header">
-      <div class="sec-title" id="promotions-title">🎯 Promotions</div>
+      <div class="sec-title" id="promotions-title"><i class="ic" data-ic="target"></i> Promotions</div>
     </div>
     <div class="card">
       <table class="t">
@@ -729,7 +730,7 @@
   <!-- ── LOGS ── -->
   <div class="ps" id="ps-logs">
     <div class="sec-header">
-      <div class="sec-title" id="logs-title">📋 Activité système</div>
+      <div class="sec-title" id="logs-title"><i class="ic" data-ic="clipboard-list"></i> Activité système</div>
       <button class="sec-btn sec-btn-outline" onclick="loadLogs()">↺ Rafraîchir</button>
     </div>
     <div class="card">
@@ -742,19 +743,19 @@
   <!-- ── MARKETS ── -->
   <div class="ps" id="ps-markets">
     <div class="sec-header">
-      <div class="sec-title" id="markets-title">🗺️ Gestion des marchés</div>
+      <div class="sec-title" id="markets-title"><i class="ic" data-ic="map"></i> Gestion des marchés</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="sec-btn sec-btn-outline" id="seed-btn" onclick="seedMarkets()">🌱 Charger tous les marchés</button>
+        <button class="sec-btn sec-btn-outline" id="seed-btn" onclick="seedMarkets()"><i class="ic" data-ic="sprout"></i> Charger tous les marchés</button>
         <button class="sec-btn sec-btn-green" onclick="openMarketModal()">+ Ajouter un marché</button>
       </div>
     </div>
 
     <!-- KPIs marchés -->
     <div class="kpi-grid" id="markets-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">🗺️</div></div><div class="kpi-val" id="mk-total">—</div><div class="kpi-label">Marchés au total</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b">🟢</div></div><div class="kpi-val" id="mk-active">—</div><div class="kpi-label">Marchés actifs</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold">📍</div></div><div class="kpi-val" id="mk-regions">—</div><div class="kpi-label">Régions couvertes</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g">🏪</div></div><div class="kpi-val" id="mk-shops">—</div><div class="kpi-label">Boutiques inscrits</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="map"></i></div></div><div class="kpi-val" id="mk-total">—</div><div class="kpi-label">Marchés au total</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic ic-ok" data-ic="circle-check"></i></div></div><div class="kpi-val" id="mk-active">—</div><div class="kpi-label">Marchés actifs</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="map-pin"></i></div></div><div class="kpi-val" id="mk-regions">—</div><div class="kpi-label">Régions couvertes</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="store"></i></div></div><div class="kpi-val" id="mk-shops">—</div><div class="kpi-label">Boutiques inscrits</div></div>
     </div>
 
     <!-- Filtres par région -->

@@ -307,6 +307,7 @@
   .topbar{padding:0 14px;gap:8px}
 }
 </style>
+<script src="icons.js"></script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -320,7 +321,7 @@
   <div class="tb-title" id="tb-title">Tableau de bord</div>
   <div class="tb-search">
     <input type="text" id="tb-search-input" placeholder="Rechercher un produit..." onkeydown="if(event.key==='Enter')lancerRecherche()"/>
-    <button class="tb-search-btn" onclick="lancerRecherche()">🔍</button>
+    <button class="tb-search-btn" onclick="lancerRecherche()"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="tb-actions">
     <!-- La cloche affichait « 8 » notifications et le bouton d'aide un simple
@@ -343,13 +344,13 @@
         <div class="wb-greeting">Bonjour 👋</div>
         <div class="wb-name">Fatou Ndoye</div>
         <div class="wb-market">
-          🏛️ Marché Sandaga · Allée 3
+          <i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3
           <span class="wb-open">● Boutique ouverte</span>
         </div>
       </div>
       <div class="wb-right">
         <button class="wb-btn wb-btn-primary" onclick="window.location.href='marche-senegal-ajout-produit.html'">+ Ajouter un produit</button>
-        <button class="wb-btn wb-btn-gold" onclick="showPage('promotions',null);allerAuFormulairePromo()">🎯 Créer une promo</button>
+        <button class="wb-btn wb-btn-gold" onclick="showPage('promotions',null);allerAuFormulairePromo()"><i class="ic" data-ic="target"></i> Créer une promo</button>
       </div>
     </div>
 
@@ -357,7 +358,7 @@
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-top">
-          <div class="kpi-icon ki-green">💰</div>
+          <div class="kpi-icon ki-green"><i class="ic" data-ic="coins"></i></div>
           <div class="kpi-change up">↑ +18%</div>
         </div>
         <div class="kpi-val">342 500</div>
@@ -366,7 +367,7 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-top">
-          <div class="kpi-icon ki-gold">🛒</div>
+          <div class="kpi-icon ki-gold"><i class="ic" data-ic="shopping-cart"></i></div>
           <div class="kpi-change up">↑ +12%</div>
         </div>
         <div class="kpi-val">28</div>
@@ -375,7 +376,7 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-top">
-          <div class="kpi-icon ki-blue">📦</div>
+          <div class="kpi-icon ki-blue"><i class="ic" data-ic="package"></i></div>
           
         </div>
         <div class="kpi-val" id="kpi2-val">—</div>
@@ -384,7 +385,7 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-top">
-          <div class="kpi-icon ki-red">⭐</div>
+          <div class="kpi-icon ki-red"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div>
           
         </div>
         <div class="kpi-val">4.8</div>
@@ -395,7 +396,7 @@
            question qu'il se pose en premier. -->
       <div class="kpi-card">
         <div class="kpi-top">
-          <div class="kpi-icon ki-gold">🔒</div>
+          <div class="kpi-icon ki-gold"><i class="ic" data-ic="lock"></i></div>
           <div class="kpi-change flat" id="kpi4-change">→ séquestre</div>
         </div>
         <div class="kpi-val" id="kpi4-val">—</div>
@@ -454,7 +455,7 @@
       <!-- Recent orders -->
       <div class="table-card">
         <div class="tc-header">
-          <div class="tc-title">🛒 Commandes récentes</div>
+          <div class="tc-title"><i class="ic" data-ic="shopping-cart"></i> Commandes récentes</div>
           <div class="tc-link" onclick="window.location.href='marche-senegal-mes-commandes.html'">Voir tout →</div>
         </div>
         <table class="orders-table">
@@ -474,37 +475,37 @@
       <!-- Top products -->
       <div class="table-card">
         <div class="tc-header">
-          <div class="tc-title">🏆 Produits les plus vendus</div>
+          <div class="tc-title"><i class="ic" data-ic="trophy"></i> Produits les plus vendus</div>
           <div class="tc-link" onclick="window.location.href='marche-senegal-mes-produits.html'">Voir tout →</div>
         </div>
         <div class="prod-list">
           <div class="prod-row">
             <div class="pr-rank gold">1</div>
-            <div class="pr-img">👗</div>
+            <div class="pr-img"><i class="ic" data-ic="shirt"></i></div>
             <div class="pr-info"><div class="pr-name">Boubou wax tissé main</div><div class="pr-cat">Mode · Taille L</div></div>
             <div class="pr-right"><div class="pr-sold">89 ventes</div><div class="pr-rev">1,36M FCFA</div></div>
           </div>
           <div class="prod-row">
             <div class="pr-rank">2</div>
-            <div class="pr-img">🧵</div>
+            <div class="pr-img"><i class="ic" data-ic="spool"></i></div>
             <div class="pr-info"><div class="pr-name">Bazin brodé cérémonie</div><div class="pr-cat">Mode · Homme</div></div>
             <div class="pr-right"><div class="pr-sold">42 ventes</div><div class="pr-rev">1,05M FCFA</div></div>
           </div>
           <div class="prod-row">
             <div class="pr-rank">3</div>
-            <div class="pr-img">👘</div>
+            <div class="pr-img"><i class="ic" data-ic="shirt"></i></div>
             <div class="pr-info"><div class="pr-name">Robe wax africaine</div><div class="pr-cat">Mode · Femme</div></div>
             <div class="pr-right"><div class="pr-sold">67 ventes</div><div class="pr-rev">636k FCFA</div></div>
           </div>
           <div class="prod-row">
             <div class="pr-rank">4</div>
-            <div class="pr-img">🎨</div>
+            <div class="pr-img"><i class="ic" data-ic="palette"></i></div>
             <div class="pr-info"><div class="pr-name">Tissu wax hollandais</div><div class="pr-cat">Tissu · 6 yards</div></div>
             <div class="pr-right"><div class="pr-sold">112 ventes</div><div class="pr-rev">504k FCFA</div></div>
           </div>
           <div class="prod-row">
             <div class="pr-rank">5</div>
-            <div class="pr-img">👒</div>
+            <div class="pr-img"><i class="ic" data-ic="shirt"></i></div>
             <div class="pr-info"><div class="pr-name">Kaftan bazin riche</div><div class="pr-cat">Mode · Homme</div></div>
             <div class="pr-right"><div class="pr-sold">28 ventes</div><div class="pr-rev">616k FCFA</div></div>
           </div>
@@ -518,27 +519,27 @@
 
       <!-- Activity -->
       <div class="table-card">
-        <div class="tc-header"><div class="tc-title">🔔 Activité récente</div></div>
+        <div class="tc-header"><div class="tc-title"><i class="ic" data-ic="bell"></i> Activité récente</div></div>
         <div class="activity-list">
-          <div class="act-item"><div class="act-icon ai-green">🛒</div><div class="act-text"><strong>Nouvelle commande</strong> de Moussa Sow — Boubou wax L · 15 300 FCFA</div><div class="act-time">5 min</div></div>
-          <div class="act-item"><div class="act-icon ai-gold">⭐</div><div class="act-text"><strong>Avis 5 étoiles</strong> reçu de Aissatou Ba — "Tissu magnifique, livraison rapide !"</div><div class="act-time">23 min</div></div>
-          <div class="act-item"><div class="act-icon ai-blue">💬</div><div class="act-text"><strong>Message</strong> de Ibrahima Fall — "Est-ce que vous avez le boubou en taille XXL ?"</div><div class="act-time">1h</div></div>
-          <div class="act-item"><div class="act-icon ai-green">💰</div><div class="act-text"><strong>Paiement reçu</strong> — 25 000 FCFA via Wave pour commande #MS-2025-00841</div><div class="act-time">2h</div></div>
-          <div class="act-item"><div class="act-icon ai-red">📦</div><div class="act-text"><strong>Stock faible</strong> — Boubou wax taille L, il reste seulement <strong>4 pièces</strong></div><div class="act-time">3h</div></div>
+          <div class="act-item"><div class="act-icon ai-green"><i class="ic" data-ic="shopping-cart"></i></div><div class="act-text"><strong>Nouvelle commande</strong> de Moussa Sow — Boubou wax L · 15 300 FCFA</div><div class="act-time">5 min</div></div>
+          <div class="act-item"><div class="act-icon ai-gold"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="act-text"><strong>Avis 5 étoiles</strong> reçu de Aissatou Ba — "Tissu magnifique, livraison rapide !"</div><div class="act-time">23 min</div></div>
+          <div class="act-item"><div class="act-icon ai-blue"><i class="ic" data-ic="message-circle"></i></div><div class="act-text"><strong>Message</strong> de Ibrahima Fall — "Est-ce que vous avez le boubou en taille XXL ?"</div><div class="act-time">1h</div></div>
+          <div class="act-item"><div class="act-icon ai-green"><i class="ic" data-ic="coins"></i></div><div class="act-text"><strong>Paiement reçu</strong> — 25 000 FCFA via Wave pour commande #MS-2025-00841</div><div class="act-time">2h</div></div>
+          <div class="act-item"><div class="act-icon ai-red"><i class="ic" data-ic="package"></i></div><div class="act-text"><strong>Stock faible</strong> — Boubou wax taille L, il reste seulement <strong>4 pièces</strong></div><div class="act-time">3h</div></div>
         </div>
       </div>
 
       <!-- Stock alerts -->
       <div class="table-card">
         <div class="tc-header">
-          <div class="tc-title">⚠️ Alertes stock</div>
+          <div class="tc-title"><i class="ic ic-warn" data-ic="triangle-alert"></i> Alertes stock</div>
           <div class="tc-link" onclick="window.location.href='marche-senegal-mes-produits.html'">Gérer →</div>
         </div>
         <div class="stock-list">
-          <div class="stock-item"><div class="st-img">👗</div><div class="st-info"><div class="st-name">Boubou wax tissé main — Taille L</div><div class="st-stock">4 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
-          <div class="stock-item"><div class="st-img">🎨</div><div class="st-info"><div class="st-name">Tissu wax hollandais XXXL</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
-          <div class="stock-item"><div class="st-img">🥻</div><div class="st-info"><div class="st-name">Ensemble 3 pièces cérémonie</div><div class="st-stock">2 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
-          <div class="stock-item"><div class="st-img">👘</div><div class="st-info"><div class="st-name">Robe wax africaine — Taille S</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img"><i class="ic" data-ic="shirt"></i></div><div class="st-info"><div class="st-name">Boubou wax tissé main — Taille L</div><div class="st-stock">4 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img"><i class="ic" data-ic="palette"></i></div><div class="st-info"><div class="st-name">Tissu wax hollandais XXXL</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img"><i class="ic" data-ic="shirt"></i></div><div class="st-info"><div class="st-name">Ensemble 3 pièces cérémonie</div><div class="st-stock">2 pièces restantes</div></div><span class="st-badge stb-low">Stock faible</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
+          <div class="stock-item"><div class="st-img"><i class="ic" data-ic="shirt"></i></div><div class="st-info"><div class="st-name">Robe wax africaine — Taille S</div><div class="st-stock">0 pièce restante</div></div><span class="st-badge stb-out">Rupture</span><span class="st-action" onclick="toast('Réapprovisionner...')">+ Stock</span></div>
         </div>
       </div>
 
@@ -552,7 +553,7 @@
   <!-- ══ PROMOTIONS ══ -->
   <div class="page-section" id="page-promotions">
     <div class="page-header">
-      <div class="ph-title">🎯 Mes promotions</div>
+      <div class="ph-title"><i class="ic" data-ic="target"></i> Mes promotions</div>
       <button class="ph-btn ph-btn-primary" onclick="allerAuFormulairePromo()">+ Nouvelle promotion</button>
     </div>
 
@@ -564,14 +565,14 @@
 
     <!-- New promo form -->
     <div class="new-promo-card">
-      <div class="npc-title">✨ Créer une nouvelle promotion</div>
+      <div class="npc-title"><i class="ic" data-ic="sparkles"></i> Créer une nouvelle promotion</div>
       <div class="promo-type-grid">
-        <div class="ptg-btn selected" data-type="CODE" onclick="selPromoType(this)"><div class="ptg-icon">🏷️</div><div class="ptg-name">Code promo</div></div>
-        <div class="ptg-btn" data-type="SALE" onclick="selPromoType(this)"><div class="ptg-icon">💸</div><div class="ptg-name">Soldes</div></div>
-        <div class="ptg-btn" data-type="OFFER" onclick="selPromoType(this)"><div class="ptg-icon">🎁</div><div class="ptg-name">Offre spéciale</div></div>
-        <div class="ptg-btn" data-type="ANNOUNCEMENT" onclick="selPromoType(this)"><div class="ptg-icon">📢</div><div class="ptg-name">Annonce</div></div>
-        <div class="ptg-btn" data-type="FEATURED" onclick="selPromoType(this)"><div class="ptg-icon">⭐</div><div class="ptg-name">Produit vedette</div></div>
-        <div class="ptg-btn" data-type="FREE_DELIVERY" onclick="selPromoType(this)"><div class="ptg-icon">🚚</div><div class="ptg-name">Livraison gratuite</div></div>
+        <div class="ptg-btn selected" data-type="CODE" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic" data-ic="tag"></i></div><div class="ptg-name">Code promo</div></div>
+        <div class="ptg-btn" data-type="SALE" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic" data-ic="banknote"></i></div><div class="ptg-name">Soldes</div></div>
+        <div class="ptg-btn" data-type="OFFER" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic" data-ic="gift"></i></div><div class="ptg-name">Offre spéciale</div></div>
+        <div class="ptg-btn" data-type="ANNOUNCEMENT" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic" data-ic="megaphone"></i></div><div class="ptg-name">Annonce</div></div>
+        <div class="ptg-btn" data-type="FEATURED" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ptg-name">Produit vedette</div></div>
+        <div class="ptg-btn" data-type="FREE_DELIVERY" onclick="selPromoType(this)"><div class="ptg-icon"><i class="ic" data-ic="truck"></i></div><div class="ptg-name">Livraison gratuite</div></div>
       </div>
       <div class="form-grid">
         <div class="form-field"><div class="form-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex: SANDAGA20" id="promo-code-input" oninput="updatePreview()" style="text-transform:uppercase"/></div>
@@ -585,14 +586,14 @@
         <div><div class="fp-label">Réduction</div><div class="fp-val" id="preview-pct">-20%</div></div>
         <div><div class="fp-label">Durée</div><div class="fp-val" id="preview-duration">7 jours</div></div>
       </div>
-      <button class="promo-submit" id="promo-submit-btn" onclick="submitPromo()">🎯 Activer la promotion</button>
+      <button class="promo-submit" id="promo-submit-btn" onclick="submitPromo()"><i class="ic" data-ic="target"></i> Activer la promotion</button>
     </div>
   </div>
 
   <!-- ══ AVIS CLIENTS ══ -->
   <div class="page-section" id="page-avis">
     <div class="page-header">
-      <div class="ph-title">⭐ Avis clients</div>
+      <div class="ph-title"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Avis clients</div>
       <div style="font-size:.86rem;color:var(--muted)" id="avis-resume">—</div>
     </div>
     <div class="table-card">
