@@ -305,6 +305,24 @@ async function createPromotion(data) {
   });
 }
 
+// ────────────────────────────────
+// LITIGES (vendeur)
+// ────────────────────────────────
+
+// Les litiges ouverts contre ma boutique. Ils ne se voyaient nulle part : le
+// vendeur apprenait la reclamation en s etonnant de ne pas etre paye.
+async function getShopDisputes() {
+  return await apiCall('/api/disputes/shop');
+}
+
+// Sa version des faits, tant que l affaire n est pas jugee.
+async function respondToDispute(id, response) {
+  return await apiCall('/api/disputes/' + id + '/response', {
+    method: 'PATCH',
+    body: JSON.stringify({ response })
+  });
+}
+
 // Corriger une promotion deja en ligne. Supprimer puis recreer remettait le
 // compteur d'utilisations a zero : un quota « 50 premiers clients » redevenait
 // 50 alors que 31 clients en avaient deja profite.
