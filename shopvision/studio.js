@@ -228,8 +228,12 @@
     try {
       const bitmap = await createImageBitmap(file);
       const tooLarge = bitmap.width * bitmap.height > 40000000;
-      $('photoQuality').textContent = bitmap.width < 1200 ? 'Photo petite' : 'Photo adaptée';
-      $('photoQuality').className = 'sv-guide-chip ' + (bitmap.width < 1200 ? 'warn' : 'good'); bitmap.close();
+      const ratio = bitmap.width / bitmap.height;
+      const warning = bitmap.width < 1200 || ratio < 0.65 || ratio > 2.2;
+      $('photoQuality').textContent = warning ? 'Photo à améliorer' : 'Photo adaptée';
+      $('photoQuality').className = 'sv-guide-chip ' + (warning ? 'warn' : 'good');
+      if (warning) feedback('La photo peut fonctionner, mais une image plus nette et moins étirée donnera de meilleurs points produits.');
+      bitmap.close();
       if (tooLarge) throw new Error('Cette photo dépasse 40 mégapixels. Choisissez une version plus petite.');
     } catch (error) { feedback(error.message.includes('mégapixels') ? error.message : 'Cette image ne peut pas être lue. Choisissez une autre photo.', true); return; }
     if (state.image && !await confirmAction('Remplacer la photo ?', 'Les points actuels seront retirés du brouillon. Votre vitrine publiée restera inchangée jusqu’à la prochaine publication.')) return;
