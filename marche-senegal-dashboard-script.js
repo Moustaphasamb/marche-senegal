@@ -336,6 +336,11 @@ const PROMO_TYPE_INFO = {
   FREE_DELIVERY: { icon: '🚚', label: 'Livraison gratuite', cls: 'code'  }
 };
 
+// Le formulaire du bas sert aux deux gestes : creer, et corriger. Cette
+// variable dit lequel — null pour une creation, l'identifiant de la promotion
+// pour une correction.
+let promoEnEdition = null;
+
 async function loadPromotions() {
   const promoList = document.getElementById('promo-list');
   const countLabel = document.getElementById('promo-count-label');
@@ -406,6 +411,10 @@ async function loadPromotions() {
     toggleBtn.onclick = () => togglePromo(promo.id);
     actions.appendChild(toggleBtn);
 
+    const editBtn = mk('div', 'pci-btn', '✏️ Modifier');
+    editBtn.onclick = () => editerPromo(promo);
+    actions.appendChild(editBtn);
+
     const delBtn = mk('div', 'pci-btn', '🗑️ Supprimer');
     delBtn.style.cssText = 'color:var(--red);border-color:rgba(192,57,43,.3)';
     delBtn.onclick = () => deletePromo(promo.id);
@@ -417,11 +426,91 @@ async function loadPromotions() {
   promoList.replaceChildren(frag);
 }
 
+// Une duree est toujours relative a l'instant present : 7 jours veut dire
+// « sept jours a partir de maintenant ». Corriger un titre ne doit pas
+// rallonger la promotion a l'insu du vendeur, d'ou ce choix supplementaire.
+function optionDureeInchangee(afficher) {
+  const select = document.getElementById('promo-duration-select');
+  if (!select) return;
+  let option = select.querySelector('option[value=""]');
+  if (afficher) {
+    if (!option) {
+      option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Échéance inchangée';
+      select.insertBefore(option, select.firstChild);
+    }
+    select.value = '';
+  } else {
+    if (option) option.remove();
+    select.value = '7';
+  }
+}
+
+// Corriger plutot que supprimer-recreer : le compteur d'utilisations et le
+// quota deja entame survivent a la correction.
+function editerPromo(promo) {
+  promoEnEdition = promo.id;
+
+  const bouton = document.querySelector('.ptg-btn[data-type="' + promo.type + '"]');
+  if (bouton) {
+    document.querySelectorAll('.ptg-btn').forEach(b => b.classList.remove('selected'));
+    bouton.classList.add('selected');
+  }
+  // Avant de remplir : cette fonction vide la reduction des types qui n'en
+  // portent pas, et elle passerait apres coup sur ce qu'on vient d'ecrire.
+  majFormulairePromo(promo.type);
+
+  const code = document.getElementById('promo-code-input');
+  const pct = document.getElementById('promo-pct-input');
+  const maxUses = document.getElementById('promo-maxuses-input');
+  if (code) code.value = promo.code || '';
+  if (pct && !pct.disabled) pct.value = promo.discount || '';
+  if (maxUses) maxUses.value = promo.maxUses || '';
+  optionDureeInchangee(true);
+
+  const titre = document.getElementById('promo-form-title');
+  if (titre) titre.textContent = '✏️ Modifier « ' + (promo.code || promo.title) + ' »';
+  const submit = document.getElementById('promo-submit-btn');
+  if (submit) submit.textContent = '💾 Enregistrer les modifications';
+  const annuler = document.getElementById('promo-cancel-btn');
+  if (annuler) annuler.style.display = '';
+
+  updatePreview();
+  const carte = document.querySelector('.new-promo-card');
+  if (carte) carte.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function annulerEditionPromo() {
+  promoEnEdition = null;
+  viderFormulairePromo();
+
+  const titre = document.getElementById('promo-form-title');
+  if (titre) titre.textContent = '✨ Créer une nouvelle promotion';
+  const submit = document.getElementById('promo-submit-btn');
+  if (submit) submit.textContent = '🎯 Activer la promotion';
+  const annuler = document.getElementById('promo-cancel-btn');
+  if (annuler) annuler.style.display = 'none';
+
+  updatePreview();
+}
+
+function viderFormulairePromo() {
+  ['promo-code-input', 'promo-pct-input', 'promo-maxuses-input'].forEach(id => {
+    const champ = document.getElementById(id);
+    if (champ) champ.value = '';
+  });
+  optionDureeInchangee(false);
+}
+
 async function submitPromo() {
   const typeBtn = document.querySelector('.ptg-btn.selected');
   const code    = document.getElementById('promo-code-input')?.value.trim().toUpperCase();
   const discount = document.getElementById('promo-pct-input')?.value;
-  const durationDays = parseInt(document.getElementById('promo-duration-select')?.value || '7');
+  // En correction, « Échéance inchangée » vaut la chaine vide : on n'envoie
+  // alors aucune duree, et le serveur laisse la date de fin en place.
+  const dureeBrute = document.getElementById('promo-duration-select')?.value || '';
+  const durationDays = dureeBrute ? parseInt(dureeBrute) : (promoEnEdition ? null : 7);
   const maxUses = document.getElementById('promo-maxuses-input')?.value;
 
   const type = typeBtn?.getAttribute('data-type') || 'CODE';
@@ -443,29 +532,40 @@ async function submitPromo() {
     ? code
     : (sansReduction ? info.label : info.label + ' -' + discount + '%');
 
-  const btn = document.getElementById('promo-submit-btn');
-  if (btn) { btn.textContent = '⏳ Création...'; btn.disabled = true; }
-
-  const result = await createPromotion({
+  const enCorrection = promoEnEdition;
+  const donnees = {
     title,
     type,
     code: code || null,
     discount: sansReduction ? 0 : parseInt(discount),
-    durationDays,
     maxUses: maxUses ? parseInt(maxUses) : null
-  });
+  };
+  if (durationDays) donnees.durationDays = durationDays;
 
-  if (btn) { btn.textContent = '🎯 Activer la promotion'; btn.disabled = false; }
+  const btn = document.getElementById('promo-submit-btn');
+  if (btn) { btn.textContent = enCorrection ? '⏳ Enregistrement...' : '⏳ Création...'; btn.disabled = true; }
+
+  const result = enCorrection
+    ? await updatePromotion(enCorrection, donnees)
+    : await createPromotion(donnees);
+
+  if (btn) {
+    btn.textContent = enCorrection ? '💾 Enregistrer les modifications' : '🎯 Activer la promotion';
+    btn.disabled = false;
+  }
 
   if (result.success) {
-    showToast('✓ Promotion créée et activée !');
-    if (document.getElementById('promo-code-input')) document.getElementById('promo-code-input').value = '';
-    if (document.getElementById('promo-pct-input'))  document.getElementById('promo-pct-input').value = '';
-    if (document.getElementById('promo-maxuses-input')) document.getElementById('promo-maxuses-input').value = '';
-    updatePreview();
+    if (enCorrection) {
+      showToast('✓ Promotion modifiée');
+      annulerEditionPromo();
+    } else {
+      showToast('✓ Promotion créée et activée !');
+      viderFormulairePromo();
+      updatePreview();
+    }
     loadPromotions();
   } else {
-    showToast(result.message || 'Erreur lors de la création', 'error');
+    showToast(result.message || (enCorrection ? 'Erreur lors de la modification' : 'Erreur lors de la création'), 'error');
   }
 }
 

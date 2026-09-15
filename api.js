@@ -305,6 +305,16 @@ async function createPromotion(data) {
   });
 }
 
+// Corriger une promotion deja en ligne. Supprimer puis recreer remettait le
+// compteur d'utilisations a zero : un quota « 50 premiers clients » redevenait
+// 50 alors que 31 clients en avaient deja profite.
+async function updatePromotion(id, data) {
+  return await apiCall('/api/promotions/' + id, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
 async function togglePromotion(id) {
   return await apiCall('/api/promotions/' + id + '/toggle', { method: 'PATCH' });
 }
