@@ -310,6 +310,15 @@
       </div>
     </div>
 
+    <!-- La défense. Le dossier ne portait que la parole de l'acheteur : on
+         tranchait sans avoir jamais lu celui qu'on allait sanctionner. -->
+    <div class="mkt-form-row full">
+      <div class="mkt-field">
+        <label id="disp-seller-label">Ce que répond le vendeur</label>
+        <div id="disp-seller-response" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.84rem;background:#fff;white-space:pre-wrap"></div>
+      </div>
+    </div>
+
     <div class="mkt-form-row full">
       <div class="mkt-field">
         <label>Décision *</label>
@@ -1578,6 +1587,23 @@ function openDisputeModal(index) {
   document.getElementById('disp-reason').textContent = DISPUTE_REASONS[d.reason] || d.reason;
   document.getElementById('disp-description').textContent = d.description || '';
   document.getElementById('disp-total').textContent = formatPrice(o.total || 0);
+
+  // La version du vendeur. Son absence est elle-même une information : trancher
+  // sans elle est un choix, pas un oubli — encore faut-il le savoir.
+  const defense = document.getElementById('disp-seller-response');
+  const defenseLabel = document.getElementById('disp-seller-label');
+  if (d.sellerResponse) {
+    defense.textContent = d.sellerResponse;
+    defense.style.color = '';
+    defenseLabel.textContent = 'Ce que répond le vendeur'
+      + (d.sellerRespondedAt
+          ? ' · ' + new Date(d.sellerRespondedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+          : '');
+  } else {
+    defense.textContent = "Le vendeur n'a pas donné sa version. Décider maintenant, c'est trancher sans l'avoir entendu.";
+    defense.style.color = 'var(--muted)';
+    defenseLabel.textContent = 'Ce que répond le vendeur';
+  }
 
   // L'admin doit voir où est l'argent avant de décider, pas après.
   const escrowEl = document.getElementById('disp-escrow');

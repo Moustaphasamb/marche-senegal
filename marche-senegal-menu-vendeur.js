@@ -19,6 +19,8 @@ const ENTREES_MENU_VENDEUR = [
   { cle: 'produits',  icone: '📦', texte: 'Mes produits',    href: 'marche-senegal-mes-produits.html',  badge: 'sb-badge-products',   badgeOr: true },
   { cle: 'commandes', icone: '🛒', texte: 'Mes commandes',   href: 'marche-senegal-mes-commandes.html', badge: 'sb-badge-orders' },
   { cle: 'promotions', icone: '🎯', texte: 'Promotions',     href: 'marche-senegal-dashboard.html#promotions', badge: 'sb-badge-promotions', badgeOr: true },
+  // Un litige suspend le paiement du vendeur : il doit le voir sans le chercher.
+  { cle: 'litiges',   icone: '⚖️', texte: 'Litiges',         href: 'marche-senegal-dashboard.html#litiges', badge: 'sb-badge-litiges' },
 
   { section: 'Boutique' },
   { cle: 'ajout',     icone: '➕', texte: 'Ajouter un produit', href: 'marche-senegal-ajout-produit.html' },
@@ -59,7 +61,7 @@ function fichierCourant() {
 // « #promotions » allume Promotions et non Tableau de bord.
 function cleActiveCourante() {
   const fragment = window.location.hash.replace('#', '');
-  if (fragment === 'promotions' || fragment === 'avis') return fragment;
+  if (fragment === 'promotions' || fragment === 'avis' || fragment === 'litiges') return fragment;
   return PAGE_VERS_ENTREE[fichierCourant()] || '';
 }
 

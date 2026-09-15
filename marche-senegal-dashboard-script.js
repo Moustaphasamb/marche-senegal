@@ -616,10 +616,11 @@ function showPage(pageId, navItem) {
   } else if (typeof activerEntreeMenu === 'function') {
     activerEntreeMenu(pageId);
   }
-  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients' };
+  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients', litiges:'Litiges' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
   if (pageId === 'promotions')  loadPromotions();
   if (pageId === 'avis')        loadAvis();
+  if (pageId === 'litiges')     loadLitiges();
 }
 
 // ── Avis clients ──
@@ -858,6 +859,187 @@ function updatePreview() {
   if (document.getElementById('preview-duration')) document.getElementById('preview-duration').textContent = durVal;
 }
 
+
+// ════════════════════════════════════════
+//   LITIGES — ce que le vendeur ignorait
+// ════════════════════════════════════════
+//
+// Un litige se jugeait sur une seule version des faits : l'acheteur écrivait,
+// l'admin tranchait, et le vendeur — dont le paiement est pourtant suspendu le
+// temps de l'examen — n'était ni prévenu ni entendu. Il voit maintenant les
+// dossiers qui visent sa boutique, et peut y donner sa version.
+
+const MOTIFS_LITIGE = {
+  NOT_RECEIVED:     'Commande jamais reçue',
+  DAMAGED:          'Article abîmé',
+  WRONG_ITEM:       'Article ne correspondant pas',
+  INCOMPLETE:       'Commande incomplète',
+  NOT_AS_DESCRIBED: 'Article différent de l’annonce',
+  NOT_REFUNDED:     'Remboursement non reçu',
+  OTHER:            'Autre motif'
+};
+
+const STATUTS_LITIGE = {
+  OPEN:          { texte: 'Ouvert',    cls: 'os-wait' },
+  INVESTIGATING: { texte: 'En examen', cls: 'os-go'   },
+  RESOLVED:      { texte: 'Jugé',      cls: 'os-done' }
+};
+
+// Ce que l'admin a décidé, dit au vendeur dans ses termes à lui.
+const ISSUES_LITIGE = {
+  REFUND_BUYER: 'Le client a été remboursé',
+  FAVOR_SELLER: 'La décision vous a donné raison',
+  REJECTED:     'La réclamation a été jugée infondée'
+};
+
+function litigeEstOuvert(litige) {
+  return litige.status === 'OPEN' || litige.status === 'INVESTIGATING';
+}
+
+async function majBadgeLitiges() {
+  const result = await getShopDisputes();
+  if (!result.success) return;
+  const ouverts = (result.data || []).filter(litigeEstOuvert).length;
+  majBadgeMenu('sb-badge-litiges', ouverts);
+}
+
+async function loadLitiges() {
+  const liste = document.getElementById('litiges-liste');
+  const resume = document.getElementById('litiges-resume');
+  if (!liste) return;
+
+  const result = await getShopDisputes();
+  if (!result.success) {
+    setEmpty(liste, 'Impossible de charger les litiges');
+    return;
+  }
+
+  const litiges = result.data || [];
+  const ouverts = litiges.filter(litigeEstOuvert).length;
+  majBadgeMenu('sb-badge-litiges', ouverts);
+
+  if (resume) {
+    resume.textContent = litiges.length === 0
+      ? 'Aucun litige — tout va bien'
+      : ouverts + (ouverts === 1 ? ' litige en cours' : ' litiges en cours') + ' sur ' + litiges.length;
+  }
+
+  if (!litiges.length) {
+    setEmpty(liste, 'Aucun litige sur vos commandes — c’est la meilleure des nouvelles');
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  litiges.forEach(litige => {
+    const bloc = mk('div', 'avis-bloc');
+    const ligne = mk('div', 'prod-row');
+
+    const statut = STATUTS_LITIGE[litige.status] || STATUTS_LITIGE.OPEN;
+    const puce = mk('div', 'order-status ' + statut.cls, statut.texte);
+
+    const info = mk('div', 'pr-info');
+    info.appendChild(mk('div', 'pr-name', MOTIFS_LITIGE[litige.reason] || 'Réclamation'));
+    info.appendChild(mk('div', 'pr-cat', litige.description || ''));
+
+    const droite = mk('div', 'pr-right');
+    const commande = litige.order?.orderNumber;
+    droite.appendChild(mk('div', 'pr-sold', commande ? 'Commande ' + commande : '—'));
+    droite.appendChild(mk('div', 'pr-rev', formatDate(litige.createdAt)));
+
+    ligne.appendChild(puce); ligne.appendChild(info); ligne.appendChild(droite);
+    bloc.appendChild(ligne);
+
+    // La décision, quand elle est tombée : le vendeur apprenait le verdict en
+    // regardant ses revenus, sans jamais lire ce qui avait été décidé.
+    if (litige.status === 'RESOLVED') {
+      const verdict = mk('div', 'ar-titre',
+        (ISSUES_LITIGE[litige.outcome] || 'Affaire jugée') +
+        (litige.refundAmount ? ' — ' + formatPrice(litige.refundAmount) : ''));
+      bloc.appendChild(verdict);
+      if (litige.resolution) bloc.appendChild(mk('div', 'ar-texte', litige.resolution));
+    }
+
+    bloc.appendChild(zoneVersionVendeur(litige));
+    frag.appendChild(bloc);
+  });
+  liste.replaceChildren(frag);
+}
+
+function zoneVersionVendeur(litige) {
+  const zone = mk('div', 'avis-reponse');
+  zone.id = 'litige-version-' + litige.id;
+
+  if (litige.sellerResponse) {
+    zone.appendChild(mk('div', 'ar-titre', 'Votre version · ' + formatDate(litige.sellerRespondedAt || litige.createdAt)));
+    zone.appendChild(mk('div', 'ar-texte', litige.sellerResponse));
+    if (litigeEstOuvert(litige)) {
+      const modifier = mk('button', 'ar-lien', 'Modifier');
+      modifier.onclick = () => ouvrirSaisieVersion(litige);
+      zone.appendChild(modifier);
+    }
+    return zone;
+  }
+
+  if (!litigeEstOuvert(litige)) {
+    // Dire pourquoi le bouton n'est plus là vaut mieux que de le retirer en silence.
+    zone.appendChild(mk('div', 'ar-texte', 'Affaire jugée sans votre version.'));
+    return zone;
+  }
+
+  const repondre = mk('button', 'ar-lien', 'Donner ma version');
+  repondre.onclick = () => ouvrirSaisieVersion(litige);
+  zone.appendChild(repondre);
+  return zone;
+}
+
+function ouvrirSaisieVersion(litige) {
+  const zone = document.getElementById('litige-version-' + litige.id);
+  if (!zone) return;
+
+  const champ = mk('textarea', 'ar-champ');
+  champ.placeholder = 'Ce qui s’est passé de votre côté : date de remise au livreur, numéro de bordereau, échange avec le client…';
+  champ.maxLength = 1000;
+  champ.value = litige.sellerResponse || '';
+
+  const envoyer = mk('button', 'ar-btn', litige.sellerResponse ? 'Enregistrer' : 'Envoyer à l’arbitrage');
+  envoyer.onclick = () => envoyerVersion(litige, champ.value, envoyer);
+
+  const annuler = mk('button', 'ar-lien', 'Annuler');
+  annuler.onclick = () => zone.replaceWith(zoneVersionVendeur(litige));
+
+  const actions = mk('div', 'ar-actions');
+  actions.appendChild(envoyer);
+  actions.appendChild(annuler);
+
+  zone.replaceChildren(champ, actions);
+  champ.focus();
+}
+
+async function envoyerVersion(litige, texte, bouton) {
+  const propre = (texte || '').trim();
+  // Le serveur applique la même règle ; la dire ici évite un aller-retour.
+  if (propre.length < 10 || propre.length > 1000) {
+    showToast('Donnez votre version en 10 à 1000 caractères', 'error');
+    return;
+  }
+
+  const libelle = bouton.textContent;
+  bouton.textContent = '⏳ Envoi…';
+  bouton.disabled = true;
+
+  const result = await respondToDispute(litige.id, propre);
+
+  bouton.textContent = libelle;
+  bouton.disabled = false;
+
+  if (result.success) {
+    showToast('✓ Votre version a été ajoutée au dossier');
+    loadLitiges();
+  } else {
+    showToast(result.message || 'Erreur lors de l’envoi', 'error');
+  }
+}
+
 // ════════════════════════════════════════
 //   GRAPHIQUES — Données réelles
 // ════════════════════════════════════════
@@ -1023,5 +1205,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // « Promotions » et « Avis clients » ne sont pas des pages : les autres
   // pages vendeur y mènent par un fragment, qu il faut ouvrir a l arrivee.
   const section = window.location.hash.replace('#', '');
-  if (section === 'promotions' || section === 'avis') showPage(section);
+  if (section === 'promotions' || section === 'avis' || section === 'litiges') showPage(section);
+
+  // Le badge des litiges ne peut pas attendre que le vendeur clique : c est
+  // justement ce qu il ignore. Une erreur ici ne doit rien casser d autre.
+  try { await majBadgeLitiges(); } catch (e) { console.error('Badge litiges:', e); }
 });
