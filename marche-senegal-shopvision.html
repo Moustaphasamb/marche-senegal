@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0D1F17">
+  <meta name="description" content="Créez la vitrine interactive de votre boutique Marché Sénégal et reliez votre photo à vos produits.">
+  <title>ShopVision — Ma vitrine · Marché Sénégal</title>
+  <script src="icons.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="shopvision/studio.css">
+</head>
+<body class="sv-page">
+  <a class="sv-skip" href="#studio">Aller au studio</a>
+  <header class="sv-topbar">
+    <button class="sv-icon-button sv-menu" id="menuButton" aria-label="Ouvrir le menu"><i class="ic" data-ic="menu"></i></button>
+    <a href="marche-senegal-ma-boutique.html">Ma boutique</a><span class="sv-separator">/</span><span>Studio ShopVision</span>
+    <a class="sv-top-link" id="publicShopLink" href="marche-senegal-accueil.html" hidden>Voir ma boutique <i class="ic" data-ic="arrow-up-right"></i></a>
+  </header>
+  <main class="sv-main" id="studio">
+    <section class="sv-heading">
+      <div><p class="sv-eyebrow">VOTRE BOUTIQUE, AUTREMENT</p><h1>Faites entrer vos clients.</h1><p class="sv-subtitle">Une photo. Vos produits. Une vitrine à explorer.</p></div>
+      <div class="sv-actions"><button class="sv-button" id="previewButton" disabled><i class="ic" data-ic="eye"></i> Aperçu client</button><button class="sv-button sv-primary" id="publishButton" disabled>Publier ma vitrine <i class="ic" data-ic="arrow-up-right"></i></button></div>
+    </section>
+
+    <section class="sv-access" id="accessPanel" hidden aria-labelledby="accessTitle">
+      <div><h2 id="accessTitle">Votre espace vendeur</h2><p id="accessMessage"></p></div>
+      <a class="sv-button sv-primary" id="accessLink" href="marche-senegal-connexion-vendeur.html">Se connecter</a>
+      <button class="sv-button" id="retryButton" hidden>Réessayer</button>
+    </section>
+    <div id="feedback" class="sv-feedback" role="status" aria-live="polite" hidden></div>
+
+    <div class="sv-studio-grid" id="editor" aria-busy="true">
+      <section class="sv-canvas-card" aria-label="Photo de la boutique">
+        <div class="sv-canvas-toolbar"><div class="sv-scene-title"><i class="ic" data-ic="image"></i><strong>Vue principale</strong><span class="sv-tag" id="sceneStatus">Chargement</span></div><div class="sv-zoom"><button id="zoomOut" class="sv-icon-button" aria-label="Zoom arrière" disabled>−</button><button id="zoomReset" aria-label="Réinitialiser le zoom" disabled>100 %</button><button id="zoomIn" class="sv-icon-button" aria-label="Zoom avant" disabled>+</button></div></div>
+        <div class="sv-scenes-bar" aria-label="Scènes de la boutique"><label for="sceneSelect">Scène</label><select id="sceneSelect" disabled><option value="">Vue principale</option></select><button class="sv-text-button" id="newSceneButton" type="button" disabled>Ajouter une photo</button><span id="sceneSyncState" role="status"></span></div>
+        <div class="sv-stage" id="sceneStage">
+          <div class="sv-scene" id="sceneContent" hidden><img id="sceneImage" alt="Photo de votre boutique à relier aux produits" draggable="false"><div class="sv-hotspot-layer" id="hotspotLayer"></div></div>
+          <div class="sv-empty" id="emptyScene"><div class="sv-photo-symbol"><i class="ic" data-ic="camera"></i><span>+</span></div><p class="sv-eyebrow">LE DÉBUT DE LA VISITE</p><h2>Votre boutique mérite<br>d’être vue.</h2><p>Photographiez votre étal ou votre boutique.<br>Reliez ensuite les articles à votre catalogue.</p><button class="sv-button sv-primary" id="emptyUpload" disabled><i class="ic" data-ic="upload"></i> Importer une photo</button><small>JPG, PNG ou WebP · 15 Mo maximum</small></div>
+        </div>
+        <div class="sv-canvas-footer"><span><i class="ic" data-ic="move"></i> Glissez pour explorer · cliquez pour placer un point</span><button class="sv-text-button" id="replaceImage" disabled>Changer la photo</button></div>
+      </section>
+
+      <aside class="sv-review" aria-labelledby="reviewTitle">
+        <div class="sv-review-heading"><div><p class="sv-eyebrow">LES POINTS DE VOTRE VITRINE</p><h2 id="reviewTitle">Vos produits</h2></div><span class="sv-count" id="hotspotCount">0</span></div>
+        <div class="sv-progress-label"><span id="reviewProgress">Aucun point pour le moment</span><span id="progressPercent">0 %</span></div><div class="sv-progress-track"><div id="progressBar"></div></div>
+        <div class="sv-hotspot-list" id="hotspotList"><div class="sv-list-empty"><i class="ic" data-ic="mouse-pointer-2"></i><h3>Un point, un produit.</h3><p>Ajoutez une photo, puis sélectionnez un article de votre catalogue pour créer votre premier point.</p></div></div>
+        <div class="sv-review-bottom"><button class="sv-button sv-add" id="addHotspot" disabled><i class="ic" data-ic="plus"></i> Ajouter un point</button><p id="catalogSummary">Votre catalogue sera chargé après connexion.</p><a href="marche-senegal-ajout-produit.html">Gérer les produits <i class="ic" data-ic="arrow-up-right"></i></a></div>
+      </aside>
+    </div>
+
+    <section class="sv-bottom-grid">
+      <ol class="sv-steps" aria-label="Étapes de publication"><li id="stepPhoto"><span>01</span><div><strong>Importez</strong><p>La photo de votre boutique</p></div></li><li id="stepProducts"><span>02</span><div><strong>Reliez</strong><p>Les produits de votre catalogue</p></div></li><li id="stepPublished"><span>03</span><div><strong>Partagez</strong><p>Votre vitrine avec vos clients</p></div></li></ol>
+      <aside class="sv-note"><i class="ic" data-ic="sparkles"></i><div><strong>Vous gardez la main.</strong><p>Placez et vérifiez vos points. La détection automatique par IA sera disponible dans une prochaine version.</p></div></aside>
+    </section>
+    <footer class="sv-footer"><span id="saveState" role="status">Connexion au catalogue…</span><button id="discardDraft" class="sv-text-button" hidden>Revenir à la version publiée</button><span>SHOPVISION <span class="sv-dot">·</span> MARCHÉ SÉNÉGAL</span></footer>
+  </main>
+  <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+
+  <dialog class="sv-dialog" id="hotspotDialog" aria-labelledby="dialogTitle">
+    <form id="hotspotForm"><header><div><p class="sv-eyebrow">POINT INTERACTIF</p><h2 id="dialogTitle">Relier un produit</h2></div><button class="sv-icon-button" type="button" data-close="hotspotDialog" aria-label="Fermer">×</button></header>
+      <label>Rechercher dans votre catalogue<input id="productSearch" type="search" placeholder="Nom d’un produit…" autocomplete="off"></label>
+      <label>Produit associé<select id="productSelect" required><option value="">Choisir un produit</option></select></label>
+      <div class="sv-coordinates"><label>Position horizontale (%)<input id="pointX" type="number" min="0" max="100" step="0.1" required></label><label>Position verticale (%)<input id="pointY" type="number" min="0" max="100" step="0.1" required></label></div>
+      <label class="sv-checkbox"><input id="pointApproved" type="checkbox"> J’ai vérifié que ce point désigne le bon produit.</label>
+      <p class="sv-form-error" id="formError" role="alert"></p>
+      <footer><button class="sv-text-button sv-danger" id="deleteHotspot" type="button" hidden>Supprimer ce point</button><button class="sv-button" type="button" data-close="hotspotDialog">Annuler</button><button class="sv-button sv-primary" type="submit">Enregistrer</button></footer>
+    </form>
+  </dialog>
+
+  <dialog class="sv-dialog sv-preview" id="customerDialog" aria-labelledby="previewTitle">
+    <header><div><p class="sv-eyebrow">APERÇU AVANT PUBLICATION</p><h2 id="previewTitle">Explorez votre boutique</h2></div><button class="sv-icon-button" data-close="customerDialog" aria-label="Fermer l’aperçu">×</button></header>
+    <div class="sv-preview-body"><div class="sv-preview-stage"><div id="customerScene"><img id="customerImage" alt="Aperçu de la vitrine"><div id="customerHotspots"></div></div></div><aside id="previewProduct"><p class="sv-eyebrow">LA VISITE CÔTÉ CLIENT</p><h3>Touchez un point.</h3><p>Vos clients retrouvent ici le produit associé, son prix et sa disponibilité.</p><p class="sv-preview-disclaimer">Cet aperçu ne publie rien et ne modifie pas votre panier.</p></aside></div>
+  </dialog>
+  <dialog class="sv-dialog" id="confirmDialog" aria-labelledby="confirmTitle"><header><h2 id="confirmTitle">Confirmer</h2></header><p id="confirmMessage"></p><footer><button class="sv-button" id="confirmCancel">Annuler</button><button class="sv-button sv-primary" id="confirmAccept">Continuer</button></footer></dialog>
+  <script src="api.js"></script>
+  <script src="marche-senegal-menu-vendeur.js"></script>
+  <script src="shopvision/core.js"></script>
+  <script src="shopvision/studio.js"></script>
+</body>
+</html>
