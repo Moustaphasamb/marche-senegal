@@ -27,7 +27,7 @@
   function validDraft(value, ownerId, shopId) {
     return value && value.schema === 1 && value.ownerId === ownerId && value.shopId === shopId && typeof value.base === 'string'
       && Array.isArray(value.hotspots) && value.hotspots.length <= MAX_POINTS
-      && value.hotspots.every(p => p && typeof p.id === 'string' && (p.kind === 'decorative' || p.kind === 'ignored' || typeof p.productId === 'string') && coordinate(p.x) && coordinate(p.y) && typeof p.approved === 'boolean');
+      && value.hotspots.every(p => p && typeof p.id === 'string' && (p.kind === 'decorative' || p.kind === 'ignored' || p.kind === 'candidate' || typeof p.productId === 'string') && coordinate(p.x) && coordinate(p.y) && typeof p.approved === 'boolean');
   }
   const api = { MAX_POINTS, coordinate, safeImageUrl, snapshot, publication, validDraft };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

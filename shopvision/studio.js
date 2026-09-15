@@ -52,6 +52,7 @@
     editableButtons.forEach(id => $(id).disabled = !ready || busy);
     $('addHotspot').disabled ||= !state.image || !products.length || state.hotspots.length >= core.MAX_POINTS;
     $('previewButton').disabled = !ready || busy || !state.image;
+    $('analyzeButton').disabled = !ready || busy || !state.image;
     $('publishButton').disabled = !ready || busy || !dirty || !state.image || !state.hotspots.length || shop?.status !== 'ACTIVE';
     ['zoomIn', 'zoomOut', 'zoomReset'].forEach(id => $(id).disabled = !state.image || busy);
     $('discardDraft').disabled = busy;
@@ -239,6 +240,19 @@
     if (state.image && !await confirmAction('Remplacer la photo ?', 'Les points actuels seront retirés du brouillon. Votre vitrine publiée restera inchangée jusqu’à la prochaine publication.')) return;
     state.hotspots = []; setImage(null, file); changed(); feedback('Photo ajoutée au brouillon. Cliquez sur un article pour le relier à votre catalogue.');
   }
+  async function analyzePhoto() {
+    if (!ready || busy || !state.image) return;
+    if (state.file) { feedback('Publiez ou envoyez d’abord la photo pour lancer son analyse.', true); return; }
+    busy = true; controls(); feedback('Analyse de la photo et recherche dans votre catalogue…');
+    try {
+      const result = await apiCall('/api/shops/me/shopvision/analyze', { method: 'POST', body: JSON.stringify({ imageUrl: state.image }) });
+      if (!result.success) throw new Error(result.message || 'Analyse indisponible.');
+      const zones = result.data?.zones || [];
+      const suggestions = zones.map(zone => { const candidate = zone.candidates?.[0]; return { id: crypto.randomUUID(), productId: candidate?.productId || null, x: (zone.box.x + zone.box.width / 2) * 100, y: (zone.box.y + zone.box.height / 2) * 100, approved: false, kind: candidate ? 'product' : 'candidate', label: zone.label, confidence: zone.confidence, ocrText: zone.ocrText }; });
+      state.hotspots = suggestions; changed(); feedback(suggestions.length ? `${suggestions.length} zone${suggestions.length > 1 ? 's' : ''} proposée${suggestions.length > 1 ? 's' : ''}. Vérifiez chaque association avant publication.` : 'Aucune zone exploitable trouvée. Ajoutez les points manuellement.');
+    } catch (error) { feedback(error.message, true); }
+    finally { busy = false; controls(); render(); }
+  }
   async function publish() {
     if (!ready || busy || !dirty) return;
     let hotspots;
@@ -374,7 +388,7 @@
   $('imageInput').onchange = event => { const file = event.target.files[0]; event.target.value = ''; void importImage(file); };
   $('sceneImage').onload = fitImage;
   $('sceneImage').onerror = () => feedback('La photo ne peut pas être affichée. Réessayez avec une autre image.', true);
-  $('addHotspot').onclick = () => openEdit(); $('previewButton').onclick = preview; $('publishButton').onclick = publish;
+  $('addHotspot').onclick = () => openEdit(); $('analyzeButton').onclick = analyzePhoto; $('previewButton').onclick = preview; $('publishButton').onclick = publish;
   $('productSearch').oninput = () => productOptions($('productSelect').value);
   $('productSelect').onchange = () => { $('pointApproved').checked = false; };
   $('hotspotForm').onsubmit = event => {
