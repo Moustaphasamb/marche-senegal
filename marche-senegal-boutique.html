@@ -407,6 +407,7 @@
       <div class="visit-section">
         <div class="vs-header">
           <div class="vs-title"><i class="ic" data-ic="store"></i> Visitez la boutique</div>
+          <select id="shopvision-scene-select" aria-label="Choisir une vue de la boutique" style="display:none;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:.78rem"></select>
         </div>
         <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
           <div id="vitrine-scene" style="position:relative;will-change:transform">
@@ -959,18 +960,29 @@ function construireFiltresCategories(produits) {
 
 // ── La vitrine cliquable ──
 // La photo de la boutique et les points que le vendeur y a posés.
-let _vitrinePoints = [];
+let _vitrinePoints = [], _shopvisionScenes = [];
 
-function afficherVitrine(shop) {
+async function afficherVitrine(shop) {
   const section = document.querySelector('.visit-section');
   const boite = document.getElementById('vitrine-box');
   const image = document.getElementById('vitrine-img');
   const conseil = document.getElementById('vitrine-hint');
   if (!section || !boite || !image) return;
 
-  if (!shop.showcaseUrl) { section.style.display = 'none'; return; }
-
   section.style.display = '';
+  try {
+    const scenesResult = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
+    if (scenesResult.success && Array.isArray(scenesResult.data) && scenesResult.data.length) {
+      _shopvisionScenes = scenesResult.data;
+      const select = document.getElementById('shopvision-scene-select');
+      select.style.display = '';
+      select.replaceChildren(..._shopvisionScenes.map((scene, i) => new Option(scene.title || 'Vue ' + (i + 1), scene.id)));
+      select.onchange = () => afficherVitrineScene(_shopvisionScenes.find(scene => scene.id === select.value));
+      await afficherVitrineScene(_shopvisionScenes[0]);
+      return;
+    }
+  } catch { /* la vitrine historique reste le secours public */ }
+  if (!shop.showcaseUrl) { section.style.display = 'none'; return; }
   _vitrinePoints = shop.showcaseHotspots || [];
 
   // On ne vide jamais la boîte : l'image et, à la tâche 7, la scène de zoom
@@ -1003,6 +1015,17 @@ function afficherVitrine(shop) {
   image.src = shop.showcaseUrl;
 
   // Sans point, la photo vaut déjà comme vitrine : on la montre sans consigne.
+  if (conseil) conseil.style.display = _vitrinePoints.length ? '' : 'none';
+}
+
+async function afficherVitrineScene(scene) {
+  if (!scene) return;
+  const shop = window.currentShop || {};
+  _vitrinePoints = (scene.hotspots || []).map(point => ({ ...point, x: Number(point.x) * 100, y: Number(point.y) * 100 }));
+  const image = document.getElementById('vitrine-img');
+  image.onload = () => { dessinerPastilles(); activerZoomVitrine(); };
+  image.src = scene.imageUrl;
+  const conseil = document.getElementById('vitrine-hint');
   if (conseil) conseil.style.display = _vitrinePoints.length ? '' : 'none';
 }
 
