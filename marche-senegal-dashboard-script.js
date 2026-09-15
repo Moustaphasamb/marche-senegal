@@ -464,7 +464,8 @@ function editerPromo(promo) {
   const code = document.getElementById('promo-code-input');
   const pct = document.getElementById('promo-pct-input');
   const maxUses = document.getElementById('promo-maxuses-input');
-  if (code) code.value = promo.code || '';
+  // Pour un code promo le champ porte le code ; pour les autres, le message.
+  if (code) code.value = (promo.type === 'CODE' ? promo.code : promo.title) || '';
   if (pct && !pct.disabled) pct.value = promo.discount || '';
   if (maxUses) maxUses.value = promo.maxUses || '';
   optionDureeInchangee(true);
@@ -505,15 +506,17 @@ function viderFormulairePromo() {
 
 async function submitPromo() {
   const typeBtn = document.querySelector('.ptg-btn.selected');
-  const code    = document.getElementById('promo-code-input')?.value.trim().toUpperCase();
+  const type    = typeBtn?.getAttribute('data-type') || 'CODE';
+  // Une seule saisie, deux sens : le code d'un code promo, le message affiché
+  // pour les autres types. Seul un code promo porte un code.
+  const saisie  = document.getElementById('promo-code-input')?.value.trim() || '';
+  const code    = type === 'CODE' ? saisie.toUpperCase() : null;
   const discount = document.getElementById('promo-pct-input')?.value;
   // En correction, « Échéance inchangée » vaut la chaine vide : on n'envoie
   // alors aucune duree, et le serveur laisse la date de fin en place.
   const dureeBrute = document.getElementById('promo-duration-select')?.value || '';
   const durationDays = dureeBrute ? parseInt(dureeBrute) : (promoEnEdition ? null : 7);
   const maxUses = document.getElementById('promo-maxuses-input')?.value;
-
-  const type = typeBtn?.getAttribute('data-type') || 'CODE';
 
   const sansReduction = typePromoSansReduction(type);
 
@@ -527,10 +530,11 @@ async function submitPromo() {
   }
 
   const info = PROMO_TYPE_INFO[type] || PROMO_TYPE_INFO.CODE;
-  // Sans réduction, le titre ne colle pas un « -0% » qui ne veut rien dire.
-  const title = type === 'CODE'
-    ? code
-    : (sansReduction ? info.label : info.label + ' -' + discount + '%');
+  // Ce que le vendeur a écrit devient le titre que ses clients liront. Champ
+  // laissé vide, on retombe sur l'ancien titre fabriqué plutôt que de bloquer :
+  // sans réduction, il ne colle pas un « -0% » qui ne veut rien dire.
+  const titreFabrique = sansReduction ? info.label : info.label + ' -' + discount + '%';
+  const title = (type === 'CODE' ? code : saisie) || titreFabrique;
 
   const enCorrection = promoEnEdition;
   const donnees = {
@@ -746,10 +750,45 @@ async function envoyerReponse(avis, texte, bouton) {
 // à inventer un chiffre que le panier n'appliquait jamais.
 const TYPES_PROMO_SANS_REDUCTION = ['FREE_DELIVERY', 'ANNOUNCEMENT'];
 
-const NOTES_PROMO_ANNONCE = {
-  FREE_DELIVERY: 'Cette promotion affiche « Livraison gratuite » sur votre boutique. Elle ne modifie pas encore le prix ni les frais de livraison au moment du paiement.',
-  ANNOUNCEMENT: 'Une annonce est un message affiché sur votre boutique, par exemple « Arrivage de tissus vendredi ». Elle ne modifie aucun prix.'
+// Chaque type de promotion demande autre chose au vendeur, et deux seulement le
+// lui disaient. Le libellé du champ texte, son exemple et l'explication en
+// dessous changent maintenant avec le type choisi.
+const GUIDE_PROMO = {
+  CODE: {
+    libelle: 'Nom du code',
+    exemple: 'SANDAGA20',
+    note: "Le client tape ce code dans son panier et la réduction s'applique au paiement. Choisissez-le court et facile à retenir : SANDAGA20, TABASKI15."
+  },
+  SALE: {
+    libelle: 'Titre des soldes',
+    exemple: 'Grande braderie de fin de mois',
+    note: "Les soldes s'affichent sur votre boutique avec ce titre et leur pourcentage, par exemple « Grande braderie de fin de mois -30% ». Le client n'a rien à taper."
+  },
+  OFFER: {
+    libelle: "Titre de l'offre",
+    exemple: '2 pagnes achetés, le 3e à -50%',
+    note: "L'offre s'affiche sur votre boutique telle que vous l'écrivez, par exemple « 2 pagnes achetés, le 3e à -50% ». Décrivez-la en une phrase : c'est ce que le client lira."
+  },
+  ANNOUNCEMENT: {
+    libelle: "Texte de l'annonce",
+    exemple: 'Arrivage de bazin riche vendredi',
+    note: 'Une annonce est un message affiché sur votre boutique, par exemple « Arrivage de bazin riche vendredi ». Elle ne modifie aucun prix.'
+  },
+  FEATURED: {
+    libelle: 'Produit mis en avant',
+    exemple: 'Ensemble brodé fait main',
+    note: 'Le produit vedette est mis en avant sur votre boutique avec sa réduction, par exemple « Ensemble brodé fait main -15% ». Nommez-le comme le client le reconnaîtra.'
+  },
+  FREE_DELIVERY: {
+    libelle: 'Texte affiché',
+    exemple: 'Livraison offerte dans tout Dakar',
+    note: 'Ce message affiche « Livraison gratuite » sur votre boutique, par exemple « Livraison offerte dans tout Dakar ». Il ne modifie pas encore le prix ni les frais de livraison au moment du paiement.'
+  }
 };
+
+function guidePromo(type) {
+  return GUIDE_PROMO[type] || GUIDE_PROMO.CODE;
+}
 
 function typePromoSansReduction(type) {
   return TYPES_PROMO_SANS_REDUCTION.includes(type);
@@ -774,13 +813,29 @@ function majFormulairePromo(type) {
     if (sansReduction) saisie.value = '';
   }
 
+  // Ce champ n'acceptait que le code promo : les cinq autres types le trouvaient
+  // désactivé et leur titre était fabriqué sans le vendeur — toutes les annonces
+  // de toutes les boutiques s'appelaient « Annonce ». Il accueille maintenant le
+  // texte de chaque type, avec son libellé et son exemple.
+  const guide = guidePromo(type);
   const champCode = document.getElementById('promo-code-input');
-  if (champCode) champCode.disabled = type !== 'CODE';
+  if (champCode) {
+    champCode.disabled = false;
+    champCode.placeholder = 'Ex : ' + guide.exemple;
+    // Un code se crie en majuscules, pas un message de boutique.
+    champCode.style.textTransform = type === 'CODE' ? 'uppercase' : 'none';
+  }
+  const libelle = document.getElementById('promo-text-label');
+  if (libelle) libelle.textContent = guide.libelle;
+  const libelleApercu = document.getElementById('preview-code-label');
+  if (libelleApercu) libelleApercu.textContent = 'Aperçu — ' + guide.libelle.toLowerCase();
 
+  // L'explication n'était donnée qu'aux deux types sans réduction. Les six en
+  // ont une maintenant, chacune avec l'exemple correspondant.
   const note = document.getElementById('promo-annonce-note');
   if (note) {
-    note.textContent = NOTES_PROMO_ANNONCE[type] || '';
-    note.style.display = sansReduction ? '' : 'none';
+    note.textContent = guide.note;
+    note.style.display = '';
   }
 
   const apercu = document.getElementById('promo-preview');
@@ -789,11 +844,16 @@ function majFormulairePromo(type) {
   updatePreview();
 }
 function updatePreview() {
-  const code = document.getElementById('promo-code-input')?.value.toUpperCase() || 'SANDAGA20';
+  // L'aperçu criait tout en majuscules : bon pour un code, illisible pour un
+  // message. Et il se repliait sur SANDAGA20 même pour une annonce.
+  const typeChoisi = document.querySelector('.ptg-btn.selected')?.getAttribute('data-type') || 'CODE';
+  const guideApercu = guidePromo(typeChoisi);
+  const saisi = document.getElementById('promo-code-input')?.value || '';
+  const code = (typeChoisi === 'CODE' ? saisi.toUpperCase() : saisi) || guideApercu.exemple;
   const pct  = document.getElementById('promo-pct-input')?.value || '20';
   const sel  = document.getElementById('promo-duration-select');
   const durVal = sel ? sel.options[sel.selectedIndex]?.text : '7 jours';
-  if (document.getElementById('preview-code'))    document.getElementById('preview-code').textContent    = code || 'SANDAGA20';
+  if (document.getElementById('preview-code'))    document.getElementById('preview-code').textContent    = code;
   if (document.getElementById('preview-pct'))     document.getElementById('preview-pct').textContent     = '-' + (pct || '20') + '%';
   if (document.getElementById('preview-duration')) document.getElementById('preview-duration').textContent = durVal;
 }
