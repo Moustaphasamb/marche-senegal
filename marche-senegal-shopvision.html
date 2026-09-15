@@ -32,6 +32,7 @@
       <button class="sv-button" id="retryButton" hidden>Réessayer</button>
     </section>
     <div id="feedback" class="sv-feedback" role="status" aria-live="polite" hidden></div>
+    <section class="sv-photo-guide" id="photoGuide" aria-label="Conseils pour la photo"><i class="ic" data-ic="lightbulb"></i><div><strong>Pour une bonne reconnaissance</strong><p>Utilisez une photo nette, bien éclairée, avec les produits visibles. Largeur recommandée : 1 200 px minimum.</p></div><span id="photoQuality" class="sv-guide-chip">En attente de photo</span></section>
 
     <div class="sv-studio-grid" id="editor" aria-busy="true">
       <section class="sv-canvas-card" aria-label="Photo de la boutique">
@@ -66,6 +67,7 @@
       <label>Produit associé<select id="productSelect" required><option value="">Choisir un produit</option></select></label>
       <div class="sv-coordinates"><label>Position horizontale (%)<input id="pointX" type="number" min="0" max="100" step="0.1" required></label><label>Position verticale (%)<input id="pointY" type="number" min="0" max="100" step="0.1" required></label></div>
       <label class="sv-checkbox"><input id="pointApproved" type="checkbox"> J’ai vérifié que ce point désigne le bon produit.</label>
+      <label class="sv-checkbox"><input id="pointDecorative" type="checkbox"> Cette zone est décorative ou n’a pas de produit associé.</label>
       <p class="sv-form-error" id="formError" role="alert"></p>
       <footer><button class="sv-text-button sv-danger" id="deleteHotspot" type="button" hidden>Supprimer ce point</button><button class="sv-button" type="button" data-close="hotspotDialog">Annuler</button><button class="sv-button sv-primary" type="submit">Enregistrer</button></footer>
     </form>

@@ -15,7 +15,9 @@
     if (!Array.isArray(state.hotspots) || !state.hotspots.length) throw new Error('Ajoutez et validez au moins un point.');
     if (state.hotspots.length > MAX_POINTS) throw new Error('La vitrine peut contenir au maximum 50 points.');
     const ids = new Set(products.filter(p => p.status !== 'DELETED').map(p => p.id));
-    return state.hotspots.map(p => {
+    const commercial = state.hotspots.filter(p => p.kind !== 'decorative' && p.kind !== 'ignored');
+    if (!commercial.length) throw new Error('Associez au moins un produit avant de publier.');
+    return commercial.map(p => {
       if (!ids.has(p.productId)) throw new Error('Un produit n’est plus dans votre catalogue. Corrigez son point.');
       if (!coordinate(p.x) || !coordinate(p.y)) throw new Error('Les positions doivent être comprises entre 0 et 100.');
       if (!p.approved) throw new Error('Vérifiez chaque point avant de publier.');
@@ -25,7 +27,7 @@
   function validDraft(value, ownerId, shopId) {
     return value && value.schema === 1 && value.ownerId === ownerId && value.shopId === shopId && typeof value.base === 'string'
       && Array.isArray(value.hotspots) && value.hotspots.length <= MAX_POINTS
-      && value.hotspots.every(p => p && typeof p.id === 'string' && typeof p.productId === 'string' && coordinate(p.x) && coordinate(p.y) && typeof p.approved === 'boolean');
+      && value.hotspots.every(p => p && typeof p.id === 'string' && (p.kind === 'decorative' || p.kind === 'ignored' || typeof p.productId === 'string') && coordinate(p.x) && coordinate(p.y) && typeof p.approved === 'boolean');
   }
   const api = { MAX_POINTS, coordinate, safeImageUrl, snapshot, publication, validDraft };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -155,7 +155,7 @@
     return { x: Math.round(Math.min(100, Math.max(0, x)) * 10) / 10, y: Math.round(Math.min(100, Math.max(0, y)) * 10) / 10, inside: x >= 0 && x <= 100 && y >= 0 && y <= 100 };
   }
   function render() {
-    const count = state.hotspots.length, approved = state.hotspots.filter(h => h.approved && product(h.productId)).length;
+    const count = state.hotspots.length, commercial = state.hotspots.filter(h => h.kind !== 'decorative' && h.kind !== 'ignored'), approved = commercial.filter(h => h.approved && product(h.productId)).length;
     $('hotspotCount').textContent = count;
     $('reviewProgress').textContent = count ? `${approved} sur ${count} vérifiés` : 'Aucun point pour le moment';
     $('progressPercent').textContent = (count ? Math.round(approved / count * 100) : 0) + ' %';
@@ -163,7 +163,7 @@
     $('sceneStatus').textContent = dirty ? 'Brouillon' : shop?.showcaseUrl ? 'Publiée' : 'À créer';
     $('sceneStatus').classList.toggle('published', !dirty && Boolean(shop?.showcaseUrl));
     $('stepPhoto').classList.toggle('done', Boolean(state.image));
-    $('stepProducts').classList.toggle('done', count > 0 && approved === count);
+    $('stepProducts').classList.toggle('done', commercial.length > 0 && approved === commercial.length);
     $('stepPublished').classList.toggle('done', !dirty && Boolean(shop?.showcaseUrl));
     $('hotspotLayer').replaceChildren();
     if (count) $('hotspotList').replaceChildren();
@@ -194,7 +194,8 @@
       if (url) { thumb.src = url; thumb.alt = ''; }
       const copy = element('span', 'sv-row-copy');
       copy.append(element('strong', '', p?.name || 'Produit supprimé'), element('small', '', p ? formatPrice(p.price) : 'Choisissez un autre produit'));
-      row.append(thumb, copy, element('span', 'sv-review-chip' + (hotspot.approved && p ? ' approved' : ''), hotspot.approved && p ? 'Vérifié' : 'À vérifier'));
+      const decorative = hotspot.kind === 'decorative' || hotspot.kind === 'ignored';
+      row.append(thumb, copy, element('span', 'sv-review-chip' + (decorative || hotspot.approved && p ? ' approved' : ''), decorative ? 'Zone ignorée' : hotspot.approved && p ? 'Vérifié' : p ? 'À vérifier' : 'Aucun produit'));
       row.onclick = () => openEdit(hotspot.id); $('hotspotList').append(row);
     });
     controls(); transform();
@@ -215,7 +216,7 @@
     const hotspot = id ? state.hotspots.find(h => h.id === id) : pos;
     $('dialogTitle').textContent = id ? 'Modifier le point' : 'Relier un produit';
     $('productSearch').value = ''; productOptions(hotspot.productId || '');
-    $('pointX').value = hotspot.x; $('pointY').value = hotspot.y; $('pointApproved').checked = Boolean(hotspot.approved);
+    $('pointX').value = hotspot.x; $('pointY').value = hotspot.y; $('pointApproved').checked = Boolean(hotspot.approved); $('pointDecorative').checked = hotspot.kind === 'decorative' || hotspot.kind === 'ignored';
     $('formError').textContent = ''; $('deleteHotspot').hidden = !id;
     $('hotspotDialog').showModal();
   }
@@ -226,7 +227,9 @@
     }
     try {
       const bitmap = await createImageBitmap(file);
-      const tooLarge = bitmap.width * bitmap.height > 40000000; bitmap.close();
+      const tooLarge = bitmap.width * bitmap.height > 40000000;
+      $('photoQuality').textContent = bitmap.width < 1200 ? 'Photo petite' : 'Photo adaptée';
+      $('photoQuality').className = 'sv-guide-chip ' + (bitmap.width < 1200 ? 'warn' : 'good'); bitmap.close();
       if (tooLarge) throw new Error('Cette photo dépasse 40 mégapixels. Choisissez une version plus petite.');
     } catch (error) { feedback(error.message.includes('mégapixels') ? error.message : 'Cette image ne peut pas être lue. Choisissez une autre photo.', true); return; }
     if (state.image && !await confirmAction('Remplacer la photo ?', 'Les points actuels seront retirés du brouillon. Votre vitrine publiée restera inchangée jusqu’à la prochaine publication.')) return;
@@ -372,8 +375,9 @@
   $('productSelect').onchange = () => { $('pointApproved').checked = false; };
   $('hotspotForm').onsubmit = event => {
     event.preventDefault();
-    const values = { productId: $('productSelect').value, x: Number($('pointX').value), y: Number($('pointY').value), approved: $('pointApproved').checked };
-    if (!product(values.productId) || !core.coordinate(values.x) || !core.coordinate(values.y)) { $('formError').textContent = 'Choisissez un produit et des positions entre 0 et 100.'; return; }
+    const decorative = $('pointDecorative').checked;
+    const values = { productId: decorative ? null : $('productSelect').value, x: Number($('pointX').value), y: Number($('pointY').value), approved: decorative || $('pointApproved').checked, kind: decorative ? 'decorative' : 'product' };
+    if ((!decorative && !product(values.productId)) || !core.coordinate(values.x) || !core.coordinate(values.y)) { $('formError').textContent = decorative ? 'Vérifiez la position entre 0 et 100.' : 'Choisissez un produit et des positions entre 0 et 100.'; return; }
     if (editingId) Object.assign(state.hotspots.find(h => h.id === editingId), values);
     else state.hotspots.push({ id: crypto.randomUUID(), ...values });
     $('hotspotDialog').close(); changed(); feedback('');
