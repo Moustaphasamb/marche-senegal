@@ -470,7 +470,7 @@ async function envoyerPhotoCni(file) {
   try {
     const fd = new FormData();
     fd.append('image', file);
-    const res = await fetch(API_URL + '/api/upload/image', {
+    const res = await fetch(API_URL + '/api/upload/identity', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: fd
@@ -957,42 +957,19 @@ async function enregistrerVitrine() {
   else showToastLocal(resultat.message || 'Erreur lors de l\'enregistrement', 'error');
 }
 
-// La vitrine n'a de sens qu'avec une boutique validée et des produits à relier.
+// ShopVision est la seule source d'édition de la vitrine publique.
 async function initVitrine(shop) {
   const indispo = document.getElementById('vitrineIndispo');
   const zone = document.getElementById('vitrineZone');
-
-  if (shop.status !== 'ACTIVE') {
-    indispo.textContent = '⏳ Votre boutique doit être validée avant de créer votre vitrine.';
-    indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
-    zone.style.display = 'none';
-    return;
-  }
-
-  const res = await getMyProducts();
-  _vitrineProduits = (res.success ? res.data : []).filter(p => p.status !== 'DELETED');
-
-  if (!_vitrineProduits.length) {
-    indispo.innerHTML = 'Ajoutez d\'abord un produit à votre catalogue : ' +
-      '<a href="marche-senegal-ajout-produit.html" style="color:var(--green);font-weight:600">Ajouter un produit</a>';
-    indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
-    zone.style.display = 'none';
-    return;
-  }
-
-  _vitrinePhotoUrl = shop.showcaseUrl || null;
-  _vitrinePoints = (shop.showcaseHotspots || []).map(h => ({
-    productId: h.productId,
-    x: h.x,
-    y: h.y,
-    nom: _vitrineProduits.find(p => p.id === h.productId)?.name || 'Produit'
-  }));
-
-  // À partir d'ici seulement, un enregistrement reflète l'état réel de la vitrine.
-  _vitrineEditable = true;
-
-  if (_vitrinePhotoUrl) afficherEditeurVitrine();
-  else dessinerPointsVitrine();
+  const texte = document.createTextNode('Pour ajouter ou modifier une photo et ses produits cliquables, utilisez le studio ShopVision. ');
+  const lien = document.createElement('a');
+  lien.href = 'marche-senegal-shopvision.html';
+  lien.textContent = 'Ouvrir le studio';
+  lien.style.cssText = 'color:var(--green);font-weight:600';
+  indispo.replaceChildren(texte, lien);
+  indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
+  zone.style.display = 'none';
+  _vitrineEditable = false;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

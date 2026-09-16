@@ -746,7 +746,7 @@ async function envoyerPhotoCni(file) {
   try {
     const fd = new FormData();
     fd.append('image', file);
-    const res = await fetch(API_URL + '/api/upload/image', {
+    const res = await fetch(API_URL + '/api/upload/identity', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + token },
       body: fd

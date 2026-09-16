@@ -506,13 +506,12 @@ function getOrderActions(order) {
     `);
   }
 
-  // Le vendeur peut refuser tant que la commande n'est ni livrée ni déjà annulée
-  // (l'API applique la même règle : voir src/lib/access.js côté backend).
-  if (!['DELIVERED', 'CANCELLED'].includes(order.status)) {
+  // Annulation vendeur uniquement avant le début de la préparation.
+  if (['PENDING', 'CONFIRMED'].includes(order.status)) {
     actions.push(`
       <button class="oa-btn cancel"
         onclick="cancelOrder('${order.id}')">
-        ✕ Refuser
+        ✕ ${order.status === 'PENDING' ? 'Refuser' : 'Annuler'}
       </button>
     `);
   }
@@ -529,7 +528,7 @@ function getOrderActions(order) {
 
 // ── Refuser une commande ──
 async function cancelOrder(orderId) {
-  if (!confirm('Refuser cette commande ? Le client en sera averti par SMS.')) return;
+  if (!confirm('Annuler cette commande ? Le client en sera averti par SMS.')) return;
   await updateStatus(orderId, 'CANCELLED');
 }
 

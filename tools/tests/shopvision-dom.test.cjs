@@ -13,6 +13,7 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 15));
 async function setup(options = {}) {
   const dom = new JSDOM(html, { url: 'http://localhost:5500/marche-senegal-shopvision.html', runScripts: 'outside-only' });
   const w = dom.window, calls = [];
+  let sceneRecords = structuredClone(options.scenes || []);
   const shop = { id: 's1', name: 'Boutique de test', status: options.status || 'ACTIVE', showcaseUrl: 'https://example.test/photo.jpg', showcaseHotspots: [{ id: 'h1', productId: 'p1', x: 30, y: 40 }] };
   const products = [{ id: 'p1', shopId: 's1', name: '<img src=x onerror=alert(1)>', price: 12500, stock: 4, status: 'ACTIVE', images: [] }];
   w.structuredClone = structuredClone;
@@ -29,7 +30,26 @@ async function setup(options = {}) {
   w.remplirIdentiteMenu = () => {};
   w.formatPrice = p => p + ' FCFA';
   w.toggleSidebar = () => {};
-  w.apiCall = async (url, request) => { calls.push({ url, request }); return { success: true }; };
+  w.apiCall = async (url, request) => {
+    if (request?.method) calls.push({ url, request });
+    if (url.endsWith('/publish')) {
+      const id = url.split('/').at(-2), scene = sceneRecords.find(item => item.id === id) || { id };
+      Object.assign(scene, { status: 'PUBLISHED' });
+      if (!sceneRecords.includes(scene)) sceneRecords.push(scene);
+      return { success: true, data: structuredClone(scene) };
+    }
+    if (url === '/api/shops/me/shopvision/scenes' && request?.method === 'POST') {
+      const scene = { id: 'scene-new', status: 'DRAFT' }; sceneRecords.push(scene);
+      return { success: true, data: structuredClone(scene) };
+    }
+    if (url === '/api/shops/me/shopvision/scenes') return { success: true, data: structuredClone(sceneRecords) };
+    if (url.includes('/shopvision/scenes/') && request?.method === 'PUT') {
+      const id = url.split('/').at(-1), scene = sceneRecords.find(item => item.id === id) || { id, status: 'DRAFT' };
+      if (!sceneRecords.includes(scene)) sceneRecords.push(scene);
+      return { success: true, data: structuredClone(scene) };
+    }
+    return { success: true };
+  };
   w.indexedDB = { open() { throw new Error('Pas de stockage dans ce test'); } };
   w.eval(core); w.eval(studio); await tick();
   return { dom, w, $: id => w.document.getElementById(id), calls };
@@ -64,10 +84,36 @@ test('validation puis publication transmettent les points au contrat existant', 
   $('addHotspot').click(); $('productSelect').value = 'p1'; $('pointApproved').checked = true;
   $('hotspotForm').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
   $('publishButton').click(); assert.equal($('confirmDialog').open, true); $('confirmAccept').click(); await tick();
-  assert.equal(calls.length, 1); assert.equal(calls[0].url, '/api/shops/me/showcase');
-  const payload = JSON.parse(calls[0].request.body);
+  assert.deepEqual(calls.map(call => call.url), [
+    '/api/shops/me/shopvision/scenes',
+    '/api/shops/me/shopvision/scenes/scene-new/publish',
+    '/api/shops/me/showcase'
+  ]);
+  const payload = JSON.parse(calls[2].request.body);
   assert.equal(payload.hotspots.length, 2); assert.deepEqual(Object.keys(payload.hotspots[1]).sort(), ['productId', 'x', 'y']);
   assert.equal($('sceneStatus').textContent, 'Publiée'); dom.window.close();
+});
+test('la publication d’une scène ShopVision brouillon appelle aussi la route de publication', async () => {
+  const { dom, w, $, calls } = await setup({ scenes: [{ id: 'scene-1', title: 'Scène test', status: 'DRAFT', imageUrl: 'https://example.test/scene.jpg', hotspots: [{ id: 'h1', productId: 'p1', x: 0.3, y: 0.4 }] }] });
+  $('addHotspot').click(); $('productSelect').value = 'p1'; $('pointApproved').checked = true;
+  $('hotspotForm').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  $('publishButton').click(); $('confirmAccept').click(); await tick(); await tick();
+  assert.deepEqual(calls.map(call => call.url), [
+    '/api/shops/me/shopvision/scenes/scene-1',
+    '/api/shops/me/shopvision/scenes/scene-1/publish',
+    '/api/shops/me/showcase'
+  ]);
+  assert.match($('feedback').textContent, /visite multi-photo/); dom.window.close();
+});
+test('ajouter une scène repart sur un brouillon vide sans effacer les scènes enregistrées', async () => {
+  const { dom, $, calls } = await setup({ scenes: [{ id: 'scene-1', title: 'Scène existante', status: 'PUBLISHED', imageUrl: 'https://example.test/scene.jpg', hotspots: [{ id: 'h1', productId: 'p1', x: 0.3, y: 0.4 }] }] });
+  $('newSceneButton').click(); assert.equal($('confirmDialog').open, true);
+  $('confirmAccept').click(); await tick();
+  assert.equal($('sceneSelect').value, '');
+  assert.equal($('sceneSelect').querySelector('option[value="scene-1"]').textContent, 'Scène existante');
+  assert.equal($('sceneImage').hasAttribute('src'), false);
+  assert.match($('saveState').textContent, /Nouvelle scène/);
+  assert.deepEqual(calls, []); dom.window.close();
 });
 test('apercu du brouillon disponible sans publier et sans panier de demonstration', async () => {
   const { dom, $, calls } = await setup();

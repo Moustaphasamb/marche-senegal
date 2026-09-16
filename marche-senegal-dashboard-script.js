@@ -122,12 +122,36 @@ function afficherBandeauValidation(shop, cni) {
   else if (main) main.insertBefore(bandeau, main.firstChild);
 }
 
+function afficherErreurChargementDashboard(message) {
+  const page = document.getElementById('page-dashboard');
+  if (!page) return;
+  let panneau = document.getElementById('dashboard-load-error');
+  if (!panneau) {
+    panneau = document.createElement('section');
+    panneau.id = 'dashboard-load-error';
+    panneau.setAttribute('role', 'alert');
+    panneau.style.cssText = 'padding:24px;border:1px solid #e2b7ad;border-radius:14px;background:#fff8f6;color:#5f2e25;margin:18px 0';
+    const titre = document.createElement('h2'); titre.textContent = 'Tableau de bord indisponible';
+    const detail = document.createElement('p'); detail.id = 'dashboard-load-error-message';
+    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Réessayer';
+    retry.style.cssText = 'padding:10px 16px;border:0;border-radius:8px;background:#176b3a;color:white;cursor:pointer';
+    retry.onclick = () => { panneau.remove(); Array.from(page.children).forEach(child => { child.hidden = false; }); void loadDashboard(); };
+    panneau.append(titre, detail, retry);
+  }
+  panneau.querySelector('#dashboard-load-error-message').textContent = message || 'Le serveur ne répond pas. Vos données seront chargées dès que la connexion sera rétablie.';
+  Array.from(page.children).forEach(child => { if (child !== panneau) child.hidden = true; });
+  if (!panneau.isConnected) page.prepend(panneau);
+}
+
 async function loadDashboard() {
   const result = await getDashboard();
   if (!result.success) {
-    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    afficherErreurChargementDashboard(result.message);
     return;
   }
+  document.getElementById('dashboard-load-error')?.remove();
+  const dashboardPage = document.getElementById('page-dashboard');
+  if (dashboardPage) Array.from(dashboardPage.children).forEach(child => { child.hidden = false; });
 
   const { shop, seller, stats, recentOrders, topProducts, lowStock } = result.data;
   const fullName = [seller.firstName, seller.lastName].filter(Boolean).join(' ');
@@ -353,7 +377,10 @@ async function loadPromotions() {
   }
 
   const promos = result.data;
-  const activeCount = promos.filter(p => p.isActive).length;
+  const now = Date.now();
+  const activeCount = promos.filter(p => p.isActive
+    && (!p.startDate || new Date(p.startDate).getTime() <= now)
+    && (!p.endDate || new Date(p.endDate).getTime() > now)).length;
   if (countLabel) countLabel.textContent = 'Promotions actives (' + activeCount + ')';
 
   if (!promos.length) {
@@ -365,9 +392,10 @@ async function loadPromotions() {
   promos.forEach(promo => {
     const info = PROMO_TYPE_INFO[promo.type] || PROMO_TYPE_INFO.CODE;
     const daysLeft = promo.endDate
-      ? Math.max(0, Math.ceil((new Date(promo.endDate) - Date.now()) / 86400000))
+      ? Math.max(0, Math.ceil((new Date(promo.endDate) - now) / 86400000))
       : null;
-    const isActive = promo.isActive && (daysLeft === null || daysLeft > 0);
+    const notStarted = promo.startDate && new Date(promo.startDate).getTime() > now;
+    const isActive = promo.isActive && !notStarted && (daysLeft === null || daysLeft > 0);
 
     const card = mk('div', 'promo-card-item');
 

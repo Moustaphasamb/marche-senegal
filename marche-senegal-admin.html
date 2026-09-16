@@ -1100,6 +1100,31 @@ function buildVendorActions(actDiv, vendor, shop, badge) {
 // ── Modal CNI ──
 let _cniContext = null;
 
+function afficherPhotoCNI(conteneur, reference, vendorId, face, libelle) {
+  if (!reference) {
+    const vide = document.createElement('div');
+    vide.className = 'cni-photo-empty'; vide.textContent = libelle + ' non fourni';
+    conteneur.appendChild(vide); return;
+  }
+  const img = document.createElement('img');
+  img.alt = 'CNI ' + libelle;
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
+  conteneur.appendChild(img);
+  const urlPromise = reference.startsWith('private:')
+    ? apiCall('/api/admin/vendors/' + encodeURIComponent(vendorId) + '/cni/' + face)
+    : Promise.resolve({ success: true, data: { url: reference } });
+  urlPromise.then(result => {
+    if (!result.success || !result.data?.url) throw new Error(result.message || 'Image indisponible');
+    img.src = result.data.url;
+    img.onclick = () => window.open(result.data.url, '_blank', 'noopener');
+  }).catch(() => {
+    img.remove();
+    const erreur = document.createElement('div');
+    erreur.className = 'cni-photo-empty'; erreur.textContent = 'Photo momentanément indisponible';
+    conteneur.appendChild(erreur);
+  });
+}
+
 function openCNI(vendor, shop, badge, actDiv) {
   _cniContext = { vendor, shop, badge, actDiv };
 
@@ -1113,16 +1138,7 @@ function openCNI(vendor, shop, badge, actDiv) {
   // Photo recto
   const front = document.getElementById('cni-front-wrap');
   front.replaceChildren();
-  if (shop?.cniFrontUrl) {
-    const img = document.createElement('img');
-    img.src = shop.cniFrontUrl;
-    img.alt = 'CNI Recto';
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
-    img.onclick = () => window.open(shop.cniFrontUrl, '_blank');
-    front.appendChild(img);
-  } else {
-    front.innerHTML = '<div class="cni-photo-empty"><span>🪪</span>Recto non fourni</div>';
-  }
+  afficherPhotoCNI(front, shop?.cniFrontUrl, vendor.id, 'front', 'Recto');
   const fl = document.createElement('div');
   fl.className = 'cni-photo-label'; fl.textContent = 'Recto CNI';
   front.appendChild(fl);
@@ -1130,16 +1146,7 @@ function openCNI(vendor, shop, badge, actDiv) {
   // Photo verso
   const back = document.getElementById('cni-back-wrap');
   back.replaceChildren();
-  if (shop?.cniBackUrl) {
-    const img2 = document.createElement('img');
-    img2.src = shop.cniBackUrl;
-    img2.alt = 'CNI Verso';
-    img2.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
-    img2.onclick = () => window.open(shop.cniBackUrl, '_blank');
-    back.appendChild(img2);
-  } else {
-    back.innerHTML = '<div class="cni-photo-empty"><span>🪪</span>Verso non fourni</div>';
-  }
+  afficherPhotoCNI(back, shop?.cniBackUrl, vendor.id, 'back', 'Verso');
   const bl = document.createElement('div');
   bl.className = 'cni-photo-label'; bl.textContent = 'Verso CNI';
   back.appendChild(bl);

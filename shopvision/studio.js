@@ -11,15 +11,17 @@
   let db = null, storageFailed = false, saveQueue = Promise.resolve(), objectUrl = null;
   let previewRequest = 0, dragged = false;
   const editableButtons = ['emptyUpload', 'replaceImage', 'addHotspot'];
-  async function loadScenes() {
+  async function loadScenes(preferredId = currentSceneId) {
     try {
       const result = await apiCall('/api/shops/me/shopvision/scenes');
       if (!result.success || !Array.isArray(result.data)) return;
       scenes = result.data;
       scenesLoaded = true;
-      const select = $('sceneSelect'); select.replaceChildren();
+      const select = $('sceneSelect'); select.replaceChildren(new Option('Nouvelle scène', ''));
       scenes.forEach((scene, index) => select.add(new Option(scene.title || `Scène ${index + 1}`, scene.id)));
-      if (scenes.length) { currentSceneId = scenes[0].id; select.value = currentSceneId; $('sceneSyncState').textContent = `${scenes.length} scène${scenes.length > 1 ? 's' : ''} enregistrée${scenes.length > 1 ? 's' : ''}`; }
+      currentSceneId = scenes.some(scene => scene.id === preferredId) ? preferredId : (scenes[0]?.id || null);
+      select.value = currentSceneId || '';
+      $('sceneSyncState').textContent = `${scenes.length} scène${scenes.length > 1 ? 's' : ''} enregistrée${scenes.length > 1 ? 's' : ''}`;
     } catch { /* La migration peut ne pas être déployée : le studio legacy reste utilisable. */ }
     $('sceneSelect').disabled = !ready || !scenes.length;
     $('newSceneButton').disabled = !ready;
@@ -31,11 +33,18 @@
       const result = currentSceneId
         ? await apiCall(`/api/shops/me/shopvision/scenes/${encodeURIComponent(currentSceneId)}`, { method: 'PUT', body: JSON.stringify(payload) })
         : await apiCall('/api/shops/me/shopvision/scenes', { method: 'POST', body: JSON.stringify(payload) });
-      if (!result.success) return false;
-      if (result.data?.id) currentSceneId = result.data.id;
-      await loadScenes();
+      if (!result.success || !result.data?.id) return false;
+      currentSceneId = result.data.id;
+      let scene = result.data;
+      await loadScenes(currentSceneId);
+      if (scene.status !== 'PUBLISHED') {
+        const publication = await apiCall(`/api/shops/me/shopvision/scenes/${encodeURIComponent(currentSceneId)}/publish`, { method: 'POST' });
+        if (!publication.success) throw new Error(publication.message || 'La scène n’a pas pu être publiée.');
+        scene = publication.data;
+        await loadScenes(scene.id);
+      }
       return true;
-    } catch { return false; }
+    } catch (error) { throw error; }
   }
   const element = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -50,6 +59,8 @@
   }
   function controls() {
     editableButtons.forEach(id => $(id).disabled = !ready || busy);
+    $('sceneSelect').disabled = !ready || !scenes.length;
+    $('newSceneButton').disabled = !ready || busy;
     $('addHotspot').disabled ||= !state.image || !products.length || state.hotspots.length >= core.MAX_POINTS;
     $('previewButton').disabled = !ready || busy || !state.image;
     $('analyzeButton').disabled = !ready || busy || !state.image;
@@ -106,7 +117,7 @@
     });
   }
   function persist() {
-    const value = { schema: 1, ownerId, shopId: shop.id, base, image: state.file ? null : state.image, file: state.file, hotspots: structuredClone(state.hotspots) };
+    const value = { schema: 1, ownerId, shopId: shop.id, sceneId: currentSceneId, base, image: state.file ? null : state.image, file: state.file, hotspots: structuredClone(state.hotspots) };
     $('saveState').textContent = 'Enregistrement du brouillon…';
     saveQueue = saveQueue.then(() => writeDraft(value)).then(() => {
       storageFailed = false; $('saveState').textContent = 'Brouillon enregistré sur cet appareil · non publié';
@@ -280,10 +291,12 @@
       }
       if (!core.safeImageUrl(url)) throw new Error('La photo n’a pas été envoyée correctement.');
       feedback('Publication de votre vitrine…');
+      if (!scenesLoaded) await loadScenes();
+      const sceneSynced = await syncScene(url, hotspots);
+      if (scenesLoaded && !sceneSynced) throw new Error('La scène n’a pas pu être enregistrée. Votre brouillon est conservé.');
       const result = await apiCall('/api/shops/me/showcase', { method: 'PUT', body: JSON.stringify({ showcaseUrl: url, hotspots }) });
       if (!result.success) throw new Error(result.message || 'La publication a échoué. Votre brouillon est conservé.');
       shop.showcaseUrl = url; shop.showcaseHotspots = hotspots;
-      const sceneSynced = await syncScene(url, hotspots);
       base = core.snapshot(shop); dirty = false;
       await saveQueue;
       try { await writeDraft(null); } catch { /* Un vieux brouillon sera détecté par son empreinte à la réouverture. */ }
@@ -376,7 +389,15 @@
   document.querySelectorAll('[data-close]').forEach(button => button.onclick = () => $(button.dataset.close).close());
   $('menuButton').onclick = toggleSidebar;
   $('emptyUpload').onclick = $('replaceImage').onclick = () => { if (ready && !busy) $('imageInput').click(); };
-  $('newSceneButton').onclick = () => { if (ready && !busy) $('imageInput').click(); };
+  $('newSceneButton').onclick = async () => {
+    if (!ready || busy) return;
+    if (state.image && !await confirmAction('Créer une nouvelle scène ?', 'La scène enregistrée restera disponible. Les modifications locales non publiées seront abandonnées.')) return;
+    currentSceneId = null; state.hotspots = []; setImage(null); dirty = false; base = core.snapshot(shop);
+    $('sceneSelect').value = '';
+    try { await saveQueue; await writeDraft(null); } catch { /* La scène enregistrée reste intacte côté serveur. */ }
+    render(); $('saveState').textContent = 'Nouvelle scène · choisissez une photo';
+    $('imageInput').click();
+  };
   $('sceneSelect').onchange = () => {
     const scene = scenes.find(item => item.id === $('sceneSelect').value);
     if (!scene || busy) return;
@@ -441,12 +462,19 @@
     $('catalogSummary').textContent = `${products.length} produit${products.length > 1 ? 's' : ''} dans votre catalogue. Prix et disponibilités liés à votre boutique.`;
     if (shop.status !== 'ACTIVE') access('Votre boutique attend sa validation', 'Vous pouvez préparer votre photo. La publication sera disponible lorsque votre boutique sera active.', 'marche-senegal-ma-boutique.html', 'Consulter mon dossier');
     else if (!products.length) access('Ajoutez votre premier produit', 'La vitrine relie la photo aux vrais articles de votre catalogue.', 'marche-senegal-ajout-produit.html', 'Ajouter un produit');
-    usePublished();
+    await loadScenes();
+    if (currentSceneId) {
+      const firstScene = scenes.find(scene => scene.id === currentSceneId);
+      state.hotspots = (firstScene.hotspots || []).map(h => ({ id: h.id || crypto.randomUUID(), productId: h.productId, x: Number(h.x) * 100, y: Number(h.y) * 100, approved: true }));
+      setImage(firstScene.imageUrl); base = core.snapshot(shop); dirty = false;
+    } else usePublished();
     try {
       db = await openDatabase();
       const draft = await readDraft();
       if (core.validDraft(draft, ownerId, shop.id)) {
         if (draft.base === base || await confirmAction('Un brouillon est disponible', 'Votre vitrine a changé depuis ce brouillon. Voulez-vous reprendre le brouillon local ? Annuler conserve la version actuellement publiée.')) {
+          currentSceneId = scenes.some(scene => scene.id === draft.sceneId) ? draft.sceneId : null;
+          $('sceneSelect').value = currentSceneId || '';
           state.hotspots = draft.hotspots; setImage(draft.image, draft.file instanceof Blob ? draft.file : null);
           dirty = true; $('saveState').textContent = 'Brouillon restauré sur cet appareil · non publié';
         }
