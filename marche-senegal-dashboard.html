@@ -145,6 +145,11 @@
 .ar-lien{background:none;border:none;padding:6px 0;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;transition:color .18s}
 .ar-lien:hover{color:var(--green)}
 .ar-lien-rouge:hover{color:var(--red)}
+/* Les litiges empruntent la ligne des produits, mais pas ses hypothèses : un
+   nom de produit est court, un motif de réclamation ne l'est pas. Tronqué en
+   « Command… », il ne dit plus au vendeur ce qu'on lui reproche. */
+#litiges-liste .pr-name{white-space:normal;overflow:visible;text-overflow:clip}
+#litiges-liste .avis-reponse{padding-left:16px}
 .prod-row:last-child{border-bottom:none}
 .prod-row:hover{background:#fafcfa}
 .pr-rank{width:22px;height:22px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--green);flex-shrink:0}
@@ -301,6 +306,13 @@
   .form-grid{grid-template-columns:1fr}
   .promo-type-grid{grid-template-columns:repeat(2,1fr)}
   .orders-table{font-size:.76rem;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Trois colonnes sur 414 px écrasaient le motif entre l'état et le numéro de
+     commande. Elles s'empilent : l'état, puis ce qu'on reproche, puis la
+     commande concernée — dans l'ordre où le vendeur en a besoin. */
+  #litiges-liste .prod-row{flex-wrap:wrap}
+  #litiges-liste .pr-info{flex:1 1 100%;order:2}
+  #litiges-liste .pr-right{flex:1 1 100%;order:3;text-align:left;margin-top:2px}
+  #litiges-liste .order-status{order:1}
 }
 @media(max-width:400px){
   .kpi-grid{grid-template-columns:1fr 1fr;gap:8px}
