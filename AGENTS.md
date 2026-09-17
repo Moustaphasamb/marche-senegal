@@ -127,7 +127,7 @@ Acheteur  : +221770000001 (Fatou Ndiaye)
 Acheteur2 : +221771111101 (Aminata Diallo)
 Vendeur   : +221770000002 (Fatou Ndoye — boutique: Mode Fatou Ndoye — Sandaga)
 Vendeur2  : +221771111102 (Moussa Sow — boutique: Tissus Moussa Sow — Tilène)
-Admin     : admin@marche-senegal.sn / Admin@2025Secure
+Admin     : voir le gestionnaire de mots de passe — jamais dans ce fichier
 ```
 
 ---
@@ -160,7 +160,8 @@ POST /api/auth/verify-otp       → Vérifier code + retourner JWT
 POST /api/auth/register-buyer   → Finaliser inscription acheteur
 POST /api/auth/register-seller  → Créer boutique vendeur
 POST /api/auth/login-admin      → Connexion admin email/password
-POST /api/auth/setup-admin      → Configurer admin (clé: MARCHE_SENEGAL_ADMIN_2025)
+POST /api/auth/forgot-password  → Code de réinitialisation par email
+POST /api/auth/reset-password   → Valider le code et changer le mot de passe
 GET  /api/auth/me               → Profil connecté (token requis)
 ```
 
