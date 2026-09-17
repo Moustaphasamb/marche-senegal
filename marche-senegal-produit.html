@@ -20,7 +20,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 button,input,select,textarea{font-family:inherit}
 a{text-decoration:none;color:inherit}
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -837,14 +837,21 @@ async function loadProduct(productId) {
   const thumbRow = document.querySelector('.thumb-row');
   const images = prod.images || [];
   if (thumbRow && images.length > 0) {
-  thumbRow.innerHTML = prod.images.map((img, i) => `
-    <div class="thumb ${i === 0 ? 'active' : ''}"
-         onclick="changeImg(this, '${img}')">
-      <img src="${img}"
+  // L'URL vient du vendeur. Elle ne va plus dans un onclick : là, escapeHtml
+  // ne protégerait rien, car le navigateur décode l'attribut avant de le
+  // livrer au moteur JavaScript, et une apostrophe échappée y redevient une
+  // apostrophe qui ferme la chaîne. On la passe par un data- lu au clic.
+  thumbRow.innerHTML = prod.images.map((img, i) => {
+    const src = urlImageSure(img);
+    if (!src) return '';
+    return `
+    <div class="thumb ${i === 0 ? 'active' : ''}" data-img="${escapeHtml(src)}">
+      <img src="${escapeHtml(src)}"
+           alt=""
            style="width:100%;height:100%;object-fit:cover;border-radius:7px"
            onerror="this.parentElement.textContent='👗'"/>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 } else {
   // Pas d'images — garder les miniatures statiques d'origine
   if (thumbRow) thumbRow.style.display = 'none';
@@ -902,20 +909,20 @@ async function loadProduct(productId) {
   // ── Mettre à jour la description ──
   const desc = document.getElementById('tab-desc');
   if (desc) {
-    desc.innerHTML = `
-      <p style="font-size:.9rem;color:var(--text);line-height:1.75;margin-bottom:16px">
-        ${prod.description}
-      </p>
-    `;
+    // La description est saisie par le vendeur. Elle s'affiche telle qu'il
+    // l'a écrite, retours à la ligne compris, mais jamais interprétée.
+    desc.textContent = '';
+    const p = document.createElement('p');
+    p.style.cssText = 'font-size:.9rem;color:var(--text);line-height:1.75;margin-bottom:16px;white-space:pre-wrap';
+    p.textContent = prod.description || '';
+    desc.appendChild(p);
   }
 
   // ── Mettre à jour les tailles ──
   const sizesContainer = document.querySelector('.opt-btns');
   if (sizesContainer && (prod.sizes || []).length > 0) {
     sizesContainer.innerHTML = prod.sizes.map(size => `
-      <div class="opt-btn" onclick="selectSize(this, '${size}')">
-        ${size}
-      </div>
+      <div class="opt-btn" data-size="${escapeHtml(size)}">${escapeHtml(size)}</div>
     `).join('');
   }
 
@@ -933,11 +940,13 @@ async function loadProduct(productId) {
       'Or': '#F9A825'
     };
 
+    // colors[color] est cherché dans le dictionnaire ci-dessus : sa valeur ne
+    // vient donc jamais du vendeur. Le nom, lui, en vient.
     colorsContainer.innerHTML = prod.colors.map(color => `
       <div class="color-btn"
            style="background:${colors[color] || '#888'}"
-           data-name="${color}"
-           onclick="selectColor(this, '${color}')">
+           data-name="${escapeHtml(color)}"
+           data-color="${escapeHtml(color)}">
       </div>
     `).join('');
   }
@@ -1178,9 +1187,12 @@ function changeImg(thumb, imgSrc, bgColor) {
   const mainEmoji= document.getElementById('main-emoji');
   if (!mainImg || !imgSrc) return;
 
-  const isUrl = imgSrc.startsWith('http') || imgSrc.startsWith('/') || imgSrc.startsWith('data:');
-  if (isUrl) {
-    mainImg.style.backgroundImage = 'url(' + imgSrc + ')';
+  // Sans garde-fou, une parenthèse dans l'URL fermerait le url() et laisserait
+  // écrire d'autres déclarations CSS. urlImageSure borne le schéma, les
+  // guillemets bornent la valeur.
+  const src = urlImageSure(imgSrc);
+  if (src) {
+    mainImg.style.backgroundImage = 'url("' + src.replace(/["\\]/g, '') + '")';
     mainImg.style.backgroundSize  = 'cover';
     if (mainEmoji) mainEmoji.style.display = 'none';
   } else {
@@ -1192,6 +1204,26 @@ function changeImg(thumb, imgSrc, bgColor) {
     }
   }
 }
+
+// ── Clics sur les options venues de l'API ──
+//
+// Les options écrites en dur dans la page gardent leur onclick : leurs valeurs
+// sont des constantes que nous avons écrites nous-mêmes. Celles que l'API
+// renvoie portent un data-, lu ici, pour qu'aucune donnée de vendeur ne
+// devienne du code.
+document.addEventListener('click', (event) => {
+  const cible = event.target;
+  if (!cible || typeof cible.closest !== 'function') return;
+
+  const taille = cible.closest('.opt-btn[data-size]');
+  if (taille) return selectSize(taille, taille.dataset.size);
+
+  const couleur = cible.closest('.color-btn[data-color]');
+  if (couleur) return selectColor(couleur, couleur.dataset.color);
+
+  const miniature = cible.closest('.thumb[data-img]');
+  if (miniature) return changeImg(miniature, miniature.dataset.img);
+});
 
 // ── Changer la quantité ──
 function changeQty(delta) {

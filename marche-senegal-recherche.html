@@ -287,8 +287,8 @@ async function loadResults() {
     <div class="rc"
          onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
       <div class="rc-img" style="background:#F0EAF8">
-        ${prod.images?.length > 0
-          ? `<img src="${prod.images[0]}"
+        ${urlImageSure(prod.images?.[0])
+          ? `<img src="${escapeHtml(urlImageSure(prod.images[0]))}" alt=""
                   style="width:100%;height:100%;object-fit:cover"/>`
           : '👗'
         }
@@ -322,7 +322,9 @@ async function loadResults() {
             }
           </div>
           <button class="rc-add"
-            onclick="addCart(event,${JSON.stringify(prod.id)},${JSON.stringify(prod.name)},${prod.price})">
+            data-panier-id="${escapeHtml(prod.id)}"
+            data-panier-nom="${escapeHtml(prod.name)}"
+            data-panier-prix="${Number(prod.price) || 0}">
             +
           </button>
         </div>
@@ -526,6 +528,23 @@ function wish(e) {
 }
 
 // ── Ajouter au panier ──
+// Le nom du produit vient du vendeur : il voyage dans un data-, jamais dans
+// un attribut de gestionnaire d'événement.
+document.addEventListener('click', (event) => {
+  const cible = event.target;
+  if (!cible || typeof cible.closest !== 'function') return;
+
+  const bouton = cible.closest('.rc-add[data-panier-id]');
+  if (!bouton) return;
+
+  addCart(
+    event,
+    bouton.dataset.panierId,
+    bouton.dataset.panierNom,
+    Number(bouton.dataset.panierPrix) || 0
+  );
+});
+
 function addCart(event, productId, productName, price) {
   event.stopPropagation();
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');

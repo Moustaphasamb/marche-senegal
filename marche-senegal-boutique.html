@@ -753,8 +753,8 @@ async function loadShop(shopId) {
   const shLocation = document.querySelector('.sh-location');
   if (shLocation) {
     shLocation.innerHTML = `
-      <span class="sh-loc-chip">🏛️ ${shop.market?.name || ''}</span>
-      <span class="sh-loc-chip">📍 ${shop.market?.city || ''}</span>
+      <span class="sh-loc-chip">🏛️ ${escapeHtml(shop.market?.name || '')}</span>
+      <span class="sh-loc-chip">📍 ${escapeHtml(shop.market?.city || '')}</span>
       <span class="sh-loc-chip" style="background:rgba(76,175,80,.2);
              border-color:rgba(76,175,80,.3);color:#4CAF50">
         ● ${shop.isOpen ? 'Ouverte maintenant' : 'Fermée'}
@@ -765,8 +765,9 @@ async function loadShop(shopId) {
   // Mettre à jour l'avatar
   const shAvatar = document.querySelector('.sh-avatar');
   if (shAvatar) {
-    if (shop.avatarUrl) {
-      shAvatar.innerHTML = `<img src="${shop.avatarUrl}"
+    const avatar = urlImageSure(shop.avatarUrl);
+    if (avatar) {
+      shAvatar.innerHTML = `<img src="${escapeHtml(avatar)}" alt=""
         style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
     } else {
       shAvatar.textContent =
@@ -1339,25 +1340,12 @@ function loadShopReviews(shop) {
     return;
   }
 
-  reviewList.innerHTML = shop.reviews.map(review => `
-    <div class="review-card">
-      <div class="rv-header">
-        <div class="rv-avatar">
-          ${review.user?.firstName?.charAt(0) || '?'}
-        </div>
-        <div>
-          <div class="rv-name">${review.user?.firstName || 'Client'}</div>
-          <div class="rv-date">
-            ${new Date(review.createdAt).toLocaleDateString('fr-FR')}
-          </div>
-        </div>
-        <div class="rv-stars">
-          ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
-        </div>
-      </div>
-      <div class="rv-text">${review.comment || ''}</div>
-    </div>
-  `).join('');
+  // Le commentaire est écrit par un acheteur. Il partait ici en innerHTML,
+  // alors que buildReviewCard — utilisé par l'autre chemin de chargement, plus
+  // bas — construit la même carte en textContent, et en dit davantage
+  // (réponse du vendeur, produit concerné). On n'en garde qu'un.
+  reviewList.textContent = '';
+  shop.reviews.forEach(review => reviewList.appendChild(buildReviewCard(review)));
 }
 
 // ── Changer d'onglet ──
@@ -1457,7 +1445,7 @@ function sendMsg() {
 
   box.innerHTML += `
     <div class="msg me">
-      <div class="msg-bubble">${msg}</div>
+      <div class="msg-bubble">${escapeHtml(msg)}</div>
       <div class="msg-time">${now}</div>
     </div>
   `;

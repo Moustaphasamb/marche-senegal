@@ -588,6 +588,25 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// N'accepte qu'une URL d'image réellement affichable : http(s), chemin
+// relatif, ou data: d'un format matriciel. Tout le reste — javascript:,
+// vbscript:, data:text/html, data:image/svg+xml qui peut porter du script —
+// revient vide, et l'appelant affiche alors son visuel de repli.
+//
+// Échapper ne suffit pas ici : escapeHtml protège la structure du HTML, pas
+// le schéma d'une URL, qui est interprété après décodage.
+function urlImageSure(url) {
+  if (typeof url !== 'string') return '';
+  const propre = url.trim();
+  if (!propre) return '';
+  if (/^https?:\/\//i.test(propre)) return propre;
+  if (/^\/\//.test(propre)) return propre;
+  if (/^data:image\/(png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+/=]+$/i.test(propre)) return propre;
+  // Chemin relatif du site : pas de schéma, donc pas de deux-points.
+  if (/^[A-Za-z0-9._\-/]+$/.test(propre)) return propre;
+  return '';
+}
+
 // Formater un prix en FCFA
 function formatPrice(price) {
   if (price == null || isNaN(price)) return '—';
