@@ -5,27 +5,83 @@
 
 /* ── Variables ── */
 :root {
-  --green:#1B6B3A; --gl:#2E9459; --gp:#E8F5EC; --g2:#B8D8C4;
-  --gold:#E6A817; --gdl:#FDF3DC;
-  --dark:#0D1F17; --text:#1A2E24; --muted:#6B8074;
-  --bg:#F5F7F5; --white:#FAFAF7; --border:#D8E8DE;
+  --green:#1C6845; --gl:#287B53; --gp:#E9F1E8; --g2:#C4D5C5;
+  --gold:#D8A72B; --gdl:#F8EED5;
+  --dark:#10271D; --text:#24352C; --muted:#68766D;
+  --bg:#F5F4EF; --white:#FCFBF7; --border:#E2E2D9;
   --red:#C0392B; --rp:#FDE8E6;
   --blue:#1565C0; --bluep:#E3F2FD;
-  --shadow:0 2px 16px rgba(27,107,58,.09);
-  --shadow-lg:0 8px 40px rgba(27,107,58,.14);
-  --radius:14px;
+  --shadow:0 8px 24px rgba(31,54,39,.06);
+  --shadow-lg:0 18px 48px rgba(31,54,39,.12);
+  --radius:18px;
   --nav-h:68px;
   --sidebar-w:240px; --topbar-h:64px;
+  --font-ui:'Manrope',sans-serif;
+  --font-display:'Newsreader',Georgia,serif;
 }
 
 /* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);overflow-x:hidden;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 button,input,select,textarea{font-family:inherit}
 a{text-decoration:none;color:inherit}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* Shared visual language: warm paper, forest ink, restrained motion. */
+::selection{background:#dce9d9;color:var(--dark)}
+:focus-visible{outline:3px solid #bb8f27;outline-offset:3px}
+a,button,[role="button"],input,select,textarea{transition:color .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .22s ease,transform .22s cubic-bezier(.2,.75,.25,1)}
+button:active,[role="button"]:active{transform:translateY(1px) scale(.985)}
+input,select,textarea{accent-color:var(--green)}
+input:focus,select:focus,textarea:focus{border-color:var(--green)!important;box-shadow:0 0 0 4px rgba(28,104,69,.1)!important;outline:0}
+.nav,.topbar{background:rgba(252,251,247,.94);border-color:rgba(27,54,38,.09);box-shadow:0 4px 24px rgba(35,48,39,.035)}
+.nav-logo,.sb-logo-text{font-family:var(--font-display);font-weight:500;letter-spacing:-.035em}
+.nav-logo{font-size:1.34rem}
+.sb-logo-text{color:#f1f0e7;font-size:1.25rem}
+.sidebar{background:linear-gradient(165deg,#10271d 0%,#0d2119 68%,#152b20 100%);box-shadow:10px 0 34px rgba(12,34,23,.08)}
+.sb-logo{min-height:66px;border-bottom-color:rgba(255,255,255,.07)}
+.sb-shop{padding-top:18px;padding-bottom:18px;border-bottom-color:rgba(255,255,255,.07)}
+.sb-avatar,.tb-profile-av{background:#2a7750}
+.sb-item{border-radius:0 10px 10px 0;margin-right:10px;padding-top:11px;padding-bottom:11px}
+.sb-item.active{background:rgba(57,129,82,.24);color:#f8f8f1}
+.sb-item.active::before{width:3px;background:#d6ae43}
+.sb-section-label{letter-spacing:.13em;color:rgba(241,240,231,.4)}
+.topbar{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.tb-title{font-family:var(--font-display);font-size:1.32rem;font-weight:500;letter-spacing:-.025em}
+.nav-search,.tb-search{box-shadow:none;border-color:#e4e3da}
+.nav-search:focus-within,.tb-search:focus-within{box-shadow:0 0 0 4px rgba(28,104,69,.09)}
+.nav-btn,.nav-cart,.tb-btn,.tb-profile{border-color:#e2e2d9;box-shadow:0 1px 2px rgba(30,44,34,.03)}
+.nav-btn-primary,.nav-search-btn,.tb-search-btn{background:var(--green);border-color:var(--green)}
+.nav-btn-primary:hover,.nav-search-btn:hover,.tb-search-btn:hover{background:#15583a}
+.mobile-nav{background:rgba(252,251,247,.96);backdrop-filter:blur(16px);border-color:rgba(27,54,38,.1)}
+.mn-item.act .mn-icon{background:var(--green)}
+.toast{border-radius:12px;box-shadow:0 16px 40px rgba(13,33,23,.2)}
+
+@media(prefers-reduced-motion:no-preference){
+  body.espace-vendeur .page-section.active{animation:page-arrive .42s cubic-bezier(.2,.7,.2,1) both}
+  body.espace-vendeur .kpi-card,body.espace-vendeur .stat-card,body.espace-vendeur .chart-card,body.espace-vendeur .table-card,body.espace-vendeur .prod-card,body.espace-vendeur .orders-card,body.espace-vendeur .form-card,body.espace-vendeur .card{animation:surface-arrive .48s cubic-bezier(.2,.7,.2,1) both}
+  body.espace-vendeur .kpi-card:nth-child(2),body.espace-vendeur .stat-card:nth-child(2){animation-delay:45ms}
+  body.espace-vendeur .kpi-card:nth-child(3),body.espace-vendeur .stat-card:nth-child(3){animation-delay:90ms}
+  body.espace-vendeur .kpi-card:nth-child(4),body.espace-vendeur .stat-card:nth-child(4){animation-delay:135ms}
+  .sb-item:hover{transform:translateX(3px)}
+  .nav-btn:hover,.nav-cart:hover,.tb-btn:hover,.tb-profile:hover{transform:translateY(-1px)}
+  .prod-card:hover,.kpi-card:hover,.stat-card:hover,.chart-card:hover{transform:translateY(-3px)}
+}
+@keyframes page-arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@keyframes surface-arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Seller workspace components share a calm, lighter-weight editorial scale. */
+body.espace-vendeur h1,body.espace-vendeur .page-header h1,body.espace-vendeur .ph-title,body.espace-vendeur .tb-title{font-family:var(--font-display);font-weight:400;letter-spacing:-.035em;color:#173b2a}
+body.espace-vendeur .page-header h1,body.espace-vendeur h1{font-size:clamp(2rem,3.2vw,3.25rem);line-height:1.02;text-wrap:balance}
+body.espace-vendeur .page-header p{max-width:56ch;line-height:1.65;color:var(--muted)}
+body.espace-vendeur .kpi-card,body.espace-vendeur .stat-card,body.espace-vendeur .chart-card,body.espace-vendeur .table-card,body.espace-vendeur .prod-table-card,body.espace-vendeur .order-card,body.espace-vendeur .orders-card,body.espace-vendeur .promo-card-item,body.espace-vendeur .new-promo-card,body.espace-vendeur .form-card,body.espace-vendeur .preview-card,body.espace-vendeur .card,body.espace-vendeur .prod-card{border:1px solid rgba(38,55,42,.09)!important;border-radius:18px!important;box-shadow:0 6px 24px rgba(35,49,37,.045)}
+body.espace-vendeur .tc-header,body.espace-vendeur .cc-header{border-color:rgba(38,55,42,.08)}
+body.espace-vendeur .prod-row{transition:background-color .2s,transform .2s}
+body.espace-vendeur .prod-row:hover{background:#f7f6ef;transform:translateX(2px)}
+body.espace-vendeur .kpi-value,body.espace-vendeur .stat-value,body.espace-vendeur .stat-card strong,body.espace-vendeur .sb-badge{font-variant-numeric:tabular-nums}
 
 /* ── Drapeau sénégalais ── */
 .flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
@@ -40,7 +96,7 @@ a{text-decoration:none;color:inherit}
    NAVBAR HORIZONTALE — pages acheteur
    ══════════════════════════════════════ */
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
-.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Newsreader',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
 .nav-logo:hover{color:var(--gl)}
 .nav-search{flex:1;min-width:0;max-width:520px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
 .nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
@@ -81,7 +137,7 @@ a{text-decoration:none;color:inherit}
    ══════════════════════════════════════ */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);z-index:100;background:var(--dark);display:flex;flex-direction:column;transition:transform .3s}
 .sb-logo{display:flex;align-items:center;gap:9px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--green)}
+.sb-logo-text{font-family:'Newsreader',serif;font-size:1.1rem;font-weight:900;color:var(--green)}
 .sb-shop{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
 .sb-shop-row{display:flex;align-items:center;gap:10px}
 .sb-avatar{width:38px;height:38px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff;flex-shrink:0}
@@ -152,4 +208,255 @@ body.espace-vendeur .sb-item{text-decoration:none}
   body.espace-vendeur .sidebar.open{transform:translateX(0)}
   body.espace-vendeur .topbar{left:0}
   body.espace-vendeur .hamburger-btn{display:flex}
+}
+
+/* ═══════════════════════════════════════════
+   SPATIAL GLASS — Design system transversal
+   Les tokens donnent une profondeur cohérente sans rendre
+   le contenu commercial transparent.
+   ═══════════════════════════════════════════ */
+:root{
+  --space-ink:#17241f;
+  --space-muted:#6f7c75;
+  --space-canvas:#eef2ed;
+  --space-canvas-deep:#e5ebe5;
+  --space-solid:rgba(255,255,255,.9);
+  --space-solid-strong:#fffefa;
+  --space-glass:rgba(255,255,255,.62);
+  --space-glass-strong:rgba(255,255,255,.78);
+  --space-glass-dark:rgba(18,39,29,.72);
+  --space-line:rgba(35,63,47,.13);
+  --space-line-light:rgba(255,255,255,.62);
+  --space-shadow:0 10px 28px rgba(25,48,35,.08),0 2px 8px rgba(25,48,35,.04);
+  --space-shadow-float:0 22px 55px rgba(25,48,35,.14),0 5px 14px rgba(25,48,35,.06);
+  --space-radius-sm:12px;
+  --space-radius-md:18px;
+  --space-radius-lg:26px;
+  --space-radius-pill:999px;
+  --space-blur:16px;
+  --space-blur-heavy:28px;
+  --buyer-accent:#8c4b31;
+  --buyer-accent-soft:#f5e8df;
+  --seller-accent:#e3b62d;
+  --seller-accent-ink:#402f05;
+}
+
+body:has(.nav):not(.espace-vendeur){
+  --accent:var(--buyer-accent);
+  --accent-soft:var(--buyer-accent-soft);
+  background:
+    radial-gradient(circle at 12% 0%,rgba(188,211,194,.62),transparent 34rem),
+    radial-gradient(circle at 92% 18%,rgba(240,216,188,.42),transparent 30rem),
+    linear-gradient(145deg,var(--space-canvas),#f7f5ef 58%,#ecefe9);
+  color:var(--space-ink);
+}
+
+body.espace-vendeur{
+  --accent:var(--seller-accent);
+  --accent-soft:#fff5cf;
+  background:
+    radial-gradient(circle at 86% 0%,rgba(245,203,72,.2),transparent 28rem),
+    linear-gradient(145deg,#f0f3ee,#f8f7f1 58%,#e9efe9);
+}
+
+/* Level 1: navigation and secondary controls. */
+body:has(.nav) .nav,
+body:has(.topbar) .topbar,
+body:has(.nav) .mobile-nav{
+  background:var(--space-glass-strong);
+  border-color:var(--space-line-light);
+  box-shadow:0 8px 30px rgba(25,48,35,.07);
+  backdrop-filter:blur(var(--space-blur));
+  -webkit-backdrop-filter:blur(var(--space-blur));
+}
+
+body:has(.nav) .nav-search,
+body:has(.topbar) .tb-search,
+body:has(.nav) .nav-btn,
+body:has(.nav) .nav-cart,
+body:has(.topbar) .tb-btn,
+body:has(.topbar) .tb-profile,
+body:has(.nav) .nav-hamburger{
+  background:var(--space-glass);
+  border-color:var(--space-line);
+  box-shadow:inset 0 1px 0 var(--space-line-light),0 4px 14px rgba(25,48,35,.04);
+}
+
+/* Level 2: solid content cards keep product information crisp. */
+body:has(.nav) .prod-card,
+body:has(.nav) .shop-card,
+body:has(.nav) .market-card,
+body:has(.nav) .order-card,
+body:has(.nav) .cart-card,
+body:has(.nav) .profile-card{
+  background:var(--space-solid-strong);
+  border-color:var(--space-line);
+  border-radius:var(--space-radius-md);
+  box-shadow:var(--space-shadow);
+}
+
+body:has(.nav) .prod-card:hover,
+body:has(.nav) .shop-card:hover,
+body:has(.nav) .market-card:hover{
+  box-shadow:var(--space-shadow-float);
+}
+
+/* Level 3: floating panels, filters and dialogs. */
+.modal,.modal-content,.drawer,.dropdown-menu,.filter-panel,.floating-panel,
+.toast,.nav-drawer{
+  background:var(--space-glass-strong);
+  border:1px solid var(--space-line-light);
+  box-shadow:var(--space-shadow-float);
+  backdrop-filter:blur(var(--space-blur-heavy));
+  -webkit-backdrop-filter:blur(var(--space-blur-heavy));
+}
+
+.modal-content,.floating-panel{border-radius:var(--space-radius-lg)}
+.dropdown-menu,.filter-panel,.nav-drawer{border-radius:var(--space-radius-md)}
+
+/* Shared controls: one visual language, predictable touch targets. */
+body:has(.nav) .btn,
+body:has(.topbar) .btn,
+body:has(.nav) button:not(.prod-wish),
+body:has(.topbar) button{
+  min-height:40px;
+  border-radius:var(--space-radius-pill);
+}
+
+body:has(.nav) .btn-primary,
+body:has(.nav) .btn-cta,
+body:has(.nav) .nav-btn-primary,
+body:has(.nav) .nav-search-btn{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+  box-shadow:0 9px 20px color-mix(in srgb,var(--accent) 24%,transparent);
+}
+
+body.espace-vendeur .btn-primary,
+body.espace-vendeur .btn-add,
+body.espace-vendeur .btn-create,
+body.espace-vendeur .nav-btn-primary,
+body.espace-vendeur .tb-search-btn{
+  background:var(--seller-accent);
+  border-color:var(--seller-accent);
+  color:var(--seller-accent-ink);
+  box-shadow:0 9px 20px rgba(227,182,45,.22);
+}
+
+body.espace-vendeur .sb-item.active{background:rgba(227,182,45,.17);color:#fff}
+body.espace-vendeur .sb-item.active::before{background:var(--seller-accent)}
+body.espace-vendeur .sb-plan,.espace-vendeur .sb-badge.gold{background:rgba(227,182,45,.2);color:#f5cf55}
+
+input,select,textarea{
+  border-radius:var(--space-radius-sm);
+  border-color:var(--space-line);
+  background:rgba(255,255,255,.72);
+}
+
+/* Keep large content areas readable while giving them spatial separation. */
+.page-section,.content-section,.section-wrap,.main-content,.page-content{position:relative}
+.section-wrap.bg{background:rgba(255,255,255,.24)}
+
+@media(max-width:768px){
+  body:has(.nav) .nav{padding-inline:16px}
+  body:has(.nav) .nav-logo{font-size:1.18rem}
+  body:has(.nav) .mobile-nav{padding-top:9px}
+  .modal,.modal-content,.drawer,.filter-panel,.floating-panel{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  body:has(.nav) .prod-card,body:has(.nav) .shop-card{border-radius:var(--space-radius-sm)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .modal,.modal-content,.drawer,.dropdown-menu,.filter-panel,.floating-panel,.toast{backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+
+@supports not (selector(:has(*))){
+  .nav,.topbar,.mobile-nav{background:var(--space-glass-strong)}
+}
+
+/* Surfaces communes rencontrées dans les écrans catalogue, panier,
+   commande, profil et administration. Le contenu reste opaque ; seule la
+   couche de support reçoit l'effet spatial. */
+body:has(.nav) .card,
+body:has(.nav) .content-card,
+body:has(.nav) .info-card,
+body:has(.nav) .contact-card,
+body:has(.nav) .detail-panel,
+body:has(.nav) .items-card,
+body:has(.nav) .delivery-card,
+body:has(.nav) .review-card,
+body:has(.nav) .promo-card,
+body:has(.nav) .chat-panel,
+body:has(.nav) .form-box,
+body:has(.nav) .form-card,
+body:has(.nav) .preview-card,
+body:has(.nav) .actions-card,
+body:has(.nav) .cart-section,
+body:has(.nav) .filter-tabs,
+body:has(.nav) .filters-sidebar,
+body:has(.nav) .prod-filters{
+  background:var(--space-solid);
+  border-color:var(--space-line);
+  border-radius:var(--space-radius-md);
+  box-shadow:var(--space-shadow);
+}
+
+body:has(.nav) .hero,
+body:has(.nav) .market-hero,
+body:has(.nav) .shop-hero,
+body:has(.nav) .search-hero,
+body:has(.nav) .cta-section{
+  border-radius:var(--space-radius-lg);
+  box-shadow:var(--space-shadow-float);
+  overflow:hidden;
+}
+
+body:has(.nav) .filter-chip,
+body:has(.nav) .region-filter,
+body:has(.nav) .prod-tabs,
+body:has(.nav) .mode-tabs,
+body:has(.nav) .markets-tabs,
+body:has(.nav) .info-tab{
+  border-color:var(--space-line);
+  border-radius:var(--space-radius-pill);
+  background:var(--space-glass);
+}
+
+body:has(.nav) .filter-chip.active,
+body:has(.nav) .prod-tabs .active,
+body:has(.nav) .mode-tabs .active,
+body:has(.nav) .info-tab.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+
+body.espace-vendeur .card,
+body.espace-vendeur .content-card,
+body.espace-vendeur .info-card,
+body.espace-vendeur .contact-card,
+body.espace-vendeur .form-box,
+body.espace-vendeur .form-card,
+body.espace-vendeur .preview-card,
+body.espace-vendeur .actions-card,
+body.espace-vendeur .chart-card,
+body.espace-vendeur .orders-card,
+body.espace-vendeur .kpi-card{
+  background:var(--space-solid);
+  border-color:var(--space-line);
+  box-shadow:var(--space-shadow);
+}
+
+body.espace-vendeur .filter-chip.active,
+body.espace-vendeur .tab.active,
+body.espace-vendeur .ft-tab.active,
+body.espace-vendeur .mode-tab.active{
+  background:var(--seller-accent);
+  border-color:var(--seller-accent);
+  color:var(--seller-accent-ink);
+}
+
+@media(max-width:768px){
+  body:has(.nav) .hero,body:has(.nav) .market-hero,body:has(.nav) .shop-hero,body:has(.nav) .search-hero,body:has(.nav) .cta-section{border-radius:var(--space-radius-md)}
+  body:has(.nav) .card,body:has(.nav) .content-card,body:has(.nav) .form-box{border-radius:var(--space-radius-sm)}
 }
