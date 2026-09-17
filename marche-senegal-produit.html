@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Produit — Marché Sénégal</title>
 <meta name="description" content="Découvrez les produits authentiques des marchés sénégalais. Paiement Wave et Orange Money."/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
@@ -33,7 +33,7 @@ a{text-decoration:none;color:inherit}
 
 /* ══ NAV ══ */
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
-.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Newsreader',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0;white-space:nowrap}
 .nav-logo:hover{color:var(--gl)}
 .nav-search{flex:1;min-width:0;max-width:500px;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 16px;height:42px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
 .nav-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(27,107,58,.1)}
@@ -130,7 +130,7 @@ a{text-decoration:none;color:inherit}
 .tag-new{background:var(--green);color:#fff}
 .tag-promo{background:var(--rp);color:var(--red)}
 
-.pi-title{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:10px}
+.pi-title{font-family:'Newsreader',serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:10px}
 
 .pi-rating-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .pi-stars{color:var(--gold);font-size:.95rem}
@@ -141,7 +141,7 @@ a{text-decoration:none;color:inherit}
 
 /* Price */
 .pi-price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-.pi-price{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--green)}
+.pi-price{font-family:'Newsreader',serif;font-size:2rem;font-weight:900;color:var(--green)}
 .pi-old{font-size:1.1rem;color:var(--muted);text-decoration:line-through}
 .pi-discount{background:var(--rp);color:var(--red);font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px}
 .pi-price-note{font-size:.76rem;color:var(--muted);margin-bottom:16px}
@@ -264,7 +264,7 @@ a{text-decoration:none;color:inherit}
 /* Reviews tab */
 .rating-summary{display:flex;gap:20px;align-items:center;background:var(--gp);border-radius:var(--radius);padding:20px;margin-bottom:20px;flex-wrap:wrap}
 .rs-big{text-align:center;min-width:80px}
-.rs-num{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;color:var(--dark);line-height:1}
+.rs-num{font-family:'Newsreader',serif;font-size:2.8rem;font-weight:900;color:var(--dark);line-height:1}
 .rs-stars{color:var(--gold);font-size:1rem;margin:5px 0}
 .rs-count{font-size:.72rem;color:var(--muted)}
 .rs-bars{flex:1;display:flex;flex-direction:column;gap:6px;min-width:160px}
@@ -304,7 +304,7 @@ a{text-decoration:none;color:inherit}
 
 /* ══ SIMILAR PRODUCTS ══ */
 .similar-section{padding:0 4vw 60px;max-width:1240px;margin:0 auto}
-.similar-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:18px}
+.similar-title{font-family:'Newsreader',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:18px}
 .similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .sim-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .22s}
 .sim-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--g2)}
@@ -724,7 +724,7 @@ a{text-decoration:none;color:inherit}
 <!-- État d'erreur produit introuvable -->
 <div id="error-state" style="display:none;max-width:480px;margin:80px auto;text-align:center;padding:40px 20px">
   <div style="font-size:3.5rem;margin-bottom:16px"><i class="ic" data-ic="search-x"></i></div>
-  <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:8px">Produit introuvable</div>
+  <div style="font-family:'Newsreader',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:8px">Produit introuvable</div>
   <div style="font-size:.88rem;color:var(--muted);margin-bottom:24px">Ce produit n'existe pas ou a été retiré de la vente.</div>
   <a href="marche-senegal-accueil.html"
     style="background:var(--green);color:#fff;border-radius:99px;padding:10px 28px;font-size:.88rem;font-weight:600;display:inline-block">

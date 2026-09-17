@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Suivi de commande — Marché Sénégal</title>
 <meta name="description" content="Suivez votre commande Marché Sénégal en temps réel."/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
@@ -29,7 +29,7 @@ a{text-decoration:none;color:inherit}
 
 /* NAV */
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);background:rgba(250,250,247,.97);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 4vw;gap:12px}
-.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:'Newsreader',serif;font-size:1.2rem;font-weight:900;color:var(--green);flex-shrink:0}
 .nav-back{display:flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:99px;font-size:.84rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text);transition:all .2s}
 .nav-back:hover{border-color:var(--green);color:var(--green)}
 .nav-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
@@ -60,7 +60,7 @@ a{text-decoration:none;color:inherit}
 .order-header{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
 .oh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .oh-num{font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:3px}
-.oh-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark)}
+.oh-title{font-family:'Newsreader',serif;font-size:1.2rem;font-weight:700;color:var(--dark)}
 .oh-date{font-size:.78rem;color:var(--muted);margin-top:2px}
 .oh-status{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;font-size:.84rem;font-weight:700}
 .ost-pending{background:var(--gdl);color:#8A6100}
@@ -106,7 +106,7 @@ a{text-decoration:none;color:inherit}
 .lt-rider{position:absolute;font-size:1.8rem;animation:moveRider 4s ease-in-out infinite}
 @keyframes moveRider{0%,100%{left:20%;top:50%}50%{left:60%;top:35%}}
 .lt-eta{display:flex;align-items:center;justify-content:space-between}
-.lt-eta-time{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--gold)}
+.lt-eta-time{font-family:'Newsreader',serif;font-size:1.4rem;font-weight:900;color:var(--gold)}
 .lt-eta-label{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:2px}
 .lt-rider-info{display:flex;align-items:center;gap:8px}
 .lt-rider-av{width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700}
@@ -139,7 +139,7 @@ a{text-decoration:none;color:inherit}
 .sc-divider{height:1px;background:var(--border);margin:8px 0}
 .sc-total{display:flex;justify-content:space-between;align-items:center;padding:8px 0 0}
 .sc-total-label{font-size:.96rem;font-weight:700;color:var(--dark)}
-.sc-total-val{font-size:1.1rem;font-weight:900;color:var(--green);font-family:'Playfair Display',serif}
+.sc-total-val{font-size:1.1rem;font-weight:900;color:var(--green);font-family:'Newsreader',serif}
 
 /* DELIVERY INFO */
 .delivery-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
@@ -194,7 +194,7 @@ a{text-decoration:none;color:inherit}
 .modal-box{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:440px;box-shadow:0 24px 80px rgba(0,0,0,.2);animation:modalIn .25s ease}
 @keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.modal-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dark)}
+.modal-title{font-family:'Newsreader',serif;font-size:1.15rem;font-weight:700;color:var(--dark)}
 .modal-close{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.18s}
 .modal-close:hover{border-color:var(--red);color:var(--red)}
 .stars-row{display:flex;gap:6px;margin-bottom:20px;justify-content:center}

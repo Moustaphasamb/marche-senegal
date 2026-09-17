@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Recherche — Marché Sénégal</title>
 <meta name="description" content="Recherchez parmi des milliers de produits des marchés sénégalais. Filtrez par marché, catégorie et prix."/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
 /* HERO */
 .search-hero{margin-top:var(--nav-h);background:var(--dark);padding:36px 4vw 28px;position:relative;overflow:hidden}
 .search-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(230,168,23,.12),transparent 70%);pointer-events:none}
 .sh-label{font-size:.74rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;position:relative;z-index:1}
-.sh-title{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:#fff;margin-bottom:18px;position:relative;z-index:1}
+.sh-title{font-family:'Newsreader',serif;font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:#fff;margin-bottom:18px;position:relative;z-index:1}
 .sh-title span{color:var(--gold)}
 .sh-bar{display:flex;align-items:center;background:#fff;border-radius:12px;padding:5px 5px 5px 18px;max-width:680px;box-shadow:0 8px 32px rgba(0,0,0,.25);position:relative;z-index:1}
 .sh-bar input{flex:1;border:none;outline:none;font-size:.96rem;color:var(--text);background:transparent;min-width:0}
@@ -21,7 +21,7 @@
 .sh-suggestions{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1}
 .sh-sug{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-size:.78rem;padding:5px 13px;border-radius:99px;cursor:pointer;transition:all .2s}.sh-sug:hover{background:rgba(255,255,255,.2);color:#fff}
 .sh-stats{display:flex;gap:22px;margin-top:20px;position:relative;z-index:1;flex-wrap:wrap}
-.sh-stat-n{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--gold)}.sh-stat-l{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:2px}
+.sh-stat-n{font-family:'Newsreader',serif;font-size:1.3rem;font-weight:700;color:var(--gold)}.sh-stat-l{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:2px}
 /* FILTER TABS */
 .filter-tabs{background:#fff;border-bottom:1.5px solid var(--border);padding:0 4vw;display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--nav-h);z-index:90}
 .filter-tabs::-webkit-scrollbar{display:none}
