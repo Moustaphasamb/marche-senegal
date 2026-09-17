@@ -460,3 +460,67 @@ body.espace-vendeur .mode-tab.active{
   body:has(.nav) .hero,body:has(.nav) .market-hero,body:has(.nav) .shop-hero,body:has(.nav) .search-hero,body:has(.nav) .cta-section{border-radius:var(--space-radius-md)}
   body:has(.nav) .card,body:has(.nav) .content-card,body:has(.nav) .form-box{border-radius:var(--space-radius-sm)}
 }
+
+/* Composition acheteur : un premier plan éditorial, puis une fiche
+   produit claire. Le hero garde son fond dense pour garantir le contraste. */
+body:has(.nav) .hero{
+  background:
+    radial-gradient(circle at 82% 12%,rgba(188,218,195,.22),transparent 22rem),
+    radial-gradient(circle at 18% 100%,rgba(140,75,49,.24),transparent 24rem),
+    linear-gradient(135deg,#102b20,#183e2c 58%,#214d38);
+}
+body:has(.nav) .hero-phone,
+body:has(.nav) .hp-card{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.24);
+  box-shadow:0 28px 70px rgba(2,17,10,.28),inset 0 1px 0 rgba(255,255,255,.2);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+body:has(.nav) .hero-phone{border-radius:32px}
+body:has(.nav) .hero-badge{background:rgba(227,182,45,.16);border-color:rgba(227,182,45,.38)}
+body:has(.nav) .hero h1 .acc{color:#f0c85a}
+body:has(.nav) .prod-img,
+body:has(.nav) .pc-img{border-radius:var(--space-radius-md);overflow:hidden}
+body:has(.nav) .prod-card .prod-cart-btn,
+body:has(.nav) .prod-card .add-btn,
+body:has(.nav) .add-cart-btn{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 7px 16px color-mix(in srgb,var(--accent) 22%,transparent)}
+body:has(.nav) .prod-badge,
+body:has(.nav) .pc-badge{border-radius:var(--space-radius-pill);box-shadow:0 4px 12px rgba(25,48,35,.1)}
+
+/* Composition vendeur : workspace solide et actions jaunes hiérarchisées. */
+body.espace-vendeur .main,
+body.espace-vendeur .content,
+body.espace-vendeur .page-content{background:transparent}
+body.espace-vendeur .table-card,
+body.espace-vendeur .prod-table-card,
+body.espace-vendeur .order-card,
+body.espace-vendeur .stat-card{
+  background:var(--space-solid);
+  border-color:var(--space-line);
+  border-radius:var(--space-radius-md);
+  box-shadow:var(--space-shadow);
+}
+body.espace-vendeur .ph-btn-primary,
+body.espace-vendeur .sh-btn-primary,
+body.espace-vendeur .save-btn,
+body.espace-vendeur .publish-btn,
+body.espace-vendeur .add-btn,
+body.espace-vendeur .btn-save{
+  background:var(--seller-accent);
+  border-color:var(--seller-accent);
+  color:var(--seller-accent-ink);
+  box-shadow:0 9px 20px rgba(227,182,45,.2);
+}
+body.espace-vendeur .ph-btn-primary:hover,
+body.espace-vendeur .sh-btn-primary:hover,
+body.espace-vendeur .save-btn:hover,
+body.espace-vendeur .publish-btn:hover{background:#f0c844;border-color:#f0c844;color:#302404}
+body.espace-vendeur .kpi-icon.ki-gold,
+body.espace-vendeur .stat-card:nth-child(2) .sc-icon{background:rgba(227,182,45,.18);color:#9b7612}
+
+@media(max-width:768px){
+  body:has(.nav) .hero-phone{border-radius:24px}
+  body:has(.nav) .prod-img,body:has(.nav) .pc-img{border-radius:var(--space-radius-sm)}
+  body.espace-vendeur .ph-btn-primary,body.espace-vendeur .sh-btn-primary,body.espace-vendeur .save-btn,body.espace-vendeur .publish-btn{min-height:44px}
+}
