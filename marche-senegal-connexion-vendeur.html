@@ -80,6 +80,8 @@
 .submit-btn:disabled{background:var(--muted);cursor:not-allowed}
 .back-btn{width:100%;height:40px;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:10px;font-size:.84rem;font-weight:500;cursor:pointer;margin-top:8px;transition:all .2s}
 .back-btn:hover{border-color:var(--green);color:var(--green)}
+.otp-login{display:none;margin-top:18px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px}
+.otp-login.visible{display:block}
 
 .cni-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .cni-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:16px 10px;background:var(--bg);border:1.5px dashed var(--border);border-radius:12px;cursor:pointer;font-family:inherit;text-align:center;transition:all .2s}
@@ -124,8 +126,11 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="espace-vendeur connexion-vendeur ms-design page-connexion-vendeur">
 <div class="toast" id="toast"></div>
 
 <div class="page">
@@ -214,6 +219,17 @@
         <button class="submit-btn" id="login-btn" onclick="doLogin()">
           Se connecter →
         </button>
+        <div class="link-text" style="margin-top:12px"><span onclick="showOtpLogin()">Se connecter par SMS</span></div>
+        <div class="otp-login" id="otp-login">
+          <div class="fl">Connexion vendeur par SMS</div>
+          <div class="fi-hint" style="margin-bottom:10px">Recevez un code à usage unique sur votre numéro sénégalais.</div>
+          <div class="field"><input class="fi" type="tel" id="otp-phone" placeholder="+221 77 000 00 00" autocomplete="tel"/></div>
+          <button class="submit-btn" id="otp-send-btn" onclick="sendOtpLogin()">Recevoir le code</button>
+          <div id="otp-code-wrap" style="display:none">
+            <div class="field"><label class="fl" for="otp-code">Code reçu par SMS</label><input class="fi" type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/></div>
+            <button class="submit-btn" id="otp-verify-btn" onclick="verifyOtpLogin()">Valider le code</button>
+          </div>
+        </div>
 
         <div style="text-align:center;font-size:.84rem;margin:10px 0">
           <span style="color:var(--green);font-weight:600;cursor:pointer" onclick="window.location.href='marche-senegal-mot-de-passe-oublie.html'">Mot de passe oublié ?</span>
@@ -654,6 +670,43 @@ async function doLogin() {
     btn.disabled = false;
     btn.textContent = 'Se connecter →';
   }
+}
+
+function showOtpLogin() {
+  document.getElementById('otp-login').classList.add('visible');
+  document.getElementById('otp-phone').focus();
+}
+
+async function sendOtpLogin() {
+  const phone = document.getElementById('otp-phone').value.trim();
+  if (!phone) { showToast('Saisissez votre numéro de téléphone'); return; }
+  const btn = document.getElementById('otp-send-btn');
+  btn.disabled = true; btn.textContent = 'Envoi du code...';
+  const result = await sendOTP(phone);
+  if (result.success) {
+    document.getElementById('otp-code-wrap').style.display = 'block';
+    document.getElementById('otp-code').focus();
+    showToast('Code envoyé par SMS');
+    btn.textContent = 'Renvoyer le code';
+  } else {
+    showToast(result.message || 'Impossible d’envoyer le code');
+    btn.textContent = 'Recevoir le code';
+  }
+  btn.disabled = false;
+}
+
+async function verifyOtpLogin() {
+  const phone = document.getElementById('otp-phone').value.trim();
+  const code = document.getElementById('otp-code').value.trim();
+  if (!phone || !code) { showToast('Saisissez le code reçu'); return; }
+  const btn = document.getElementById('otp-verify-btn');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+  const result = await verifyOTP(phone, code);
+  if (!result.success) { showToast(result.message || 'Code invalide ou expiré'); btn.disabled = false; btn.textContent = 'Valider le code'; return; }
+  const role = result.user?.role;
+  if (role !== 'SELLER') { showToast('Ce numéro est associé à un compte acheteur.'); logout(); return; }
+  showToast('Connexion vendeur réussie');
+  setTimeout(() => { window.location.href = 'marche-senegal-dashboard.html'; }, 700);
 }
 
 // ── Validation étape 1 → étape 2 ──
