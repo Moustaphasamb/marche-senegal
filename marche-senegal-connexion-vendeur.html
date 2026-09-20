@@ -207,14 +207,14 @@
           <button class="auth-method" id="seller-login-method-sms" onclick="setSellerLoginMethod('sms')">Téléphone + SMS</button>
         </div>
 
-        <div class="field" id="seller-login-password-field">
+        <div class="field" id="seller-login-identifier-field">
           <label class="fl" for="login-identifier">Email ou numéro de téléphone *</label>
           <input class="fi" type="text" id="login-identifier"
                  placeholder="email@exemple.com ou 77 000 00 00"
                  onkeydown="if(event.key==='Enter')doLogin()"/>
         </div>
 
-        <div class="field">
+        <div class="field" id="seller-login-password-field">
           <label class="fl" for="login-password">Mot de passe *</label>
           <div class="pw-wrap">
             <input class="fi" type="password" id="login-password"
@@ -688,6 +688,7 @@ function setSellerLoginMethod(method) {
   const sms = method === 'sms';
   document.getElementById('seller-login-method-password').classList.toggle('active', !sms);
   document.getElementById('seller-login-method-sms').classList.toggle('active', sms);
+  document.getElementById('seller-login-identifier-field').style.display = sms ? 'none' : '';
   document.getElementById('seller-login-password-field').style.display = sms ? 'none' : '';
   document.getElementById('login-btn').style.display = sms ? 'none' : '';
   document.getElementById('seller-forgot-link').style.display = sms ? 'none' : '';

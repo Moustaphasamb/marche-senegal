@@ -118,11 +118,11 @@
           <button class="auth-method active" id="login-method-password" onclick="setLoginMethod('password')">E-mail + mot de passe</button>
           <button class="auth-method" id="login-method-sms" onclick="setLoginMethod('sms')">Téléphone + SMS</button>
         </div>
-        <div class="field" id="login-password-field">
+        <div class="field" id="login-identifier-field">
           <label class="fl">Email ou numéro de téléphone</label>
           <input class="fi" type="text" id="login-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username" onkeydown="if(event.key==='Enter')submitLogin()"/>
         </div>
-        <div class="field">
+        <div class="field" id="login-password-field">
           <label class="fl">Mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="login-password" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLogin()"/>
@@ -225,6 +225,7 @@ function setLoginMethod(method) {
   var sms = method === 'sms';
   document.getElementById('login-method-password').classList.toggle('active', !sms);
   document.getElementById('login-method-sms').classList.toggle('active', sms);
+  document.getElementById('login-identifier-field').style.display = sms ? 'none' : '';
   document.getElementById('login-password-field').style.display = sms ? 'none' : '';
   document.getElementById('login-btn').style.display = sms ? 'none' : '';
   document.getElementById('forgot-link').style.display = sms ? 'none' : '';
