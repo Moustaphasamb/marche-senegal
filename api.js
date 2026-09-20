@@ -62,10 +62,10 @@ async function apiCall(endpoint, options = {}) {
 // ────────────────────────────────
 
 // Envoyer le code OTP par SMS
-async function sendOTP(phone) {
+async function sendOTP(phone, purpose) {
   return await apiCall('/api/auth/send-otp', {
     method: 'POST',
-    body: JSON.stringify({ phone })
+    body: JSON.stringify({ phone, purpose })
   });
 }
 

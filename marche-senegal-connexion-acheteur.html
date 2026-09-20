@@ -172,6 +172,12 @@
           </div>
         </div>
         <button class="submit-btn" id="register-btn" onclick="submitRegister()">Créer mon compte</button>
+        <div class="otp-login" id="reg-otp-panel">
+          <div class="fl">Vérifiez votre numéro</div>
+          <div class="fi-hint" style="margin-bottom:10px">Un code de sécurité a été envoyé. Validez-le pour terminer votre inscription.</div>
+          <div class="field"><label class="fl" for="reg-otp-code">Code reçu par SMS</label><input class="fi" type="text" id="reg-otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/></div>
+          <button class="submit-btn" id="reg-otp-verify-btn" onclick="verifyRegisterOtp()">Valider et créer mon compte</button>
+        </div>
         <div class="link-text">Déjà un compte ? <span onclick="setMode('login')">Se connecter</span></div>
       </div>
 
@@ -336,6 +342,23 @@ async function submitRegister() {
 
   var parsed = parseIdentifier(identifier);
 
+  if (parsed.phone) {
+    const otpResult = await sendOTP(parsed.phone, 'register');
+    if (!otpResult.success) {
+      showToast(otpResult.message || 'Impossible d’envoyer le code');
+      btn.disabled = false;
+      btn.textContent = 'Créer mon compte';
+      return;
+    }
+    sessionStorage.setItem('pendingBuyerRegistration', JSON.stringify({ firstName, lastName, phone: parsed.phone, password }));
+    document.getElementById('reg-otp-panel').classList.add('visible');
+    document.getElementById('reg-otp-code').focus();
+    btn.disabled = false;
+    btn.textContent = 'Code envoyé';
+    showToast('Code envoyé par SMS');
+    return;
+  }
+
   var result = await apiCall('/api/auth/register-buyer', {
     method: 'POST',
     body: JSON.stringify({ firstName: firstName, lastName: lastName, email: parsed.email, phone: parsed.phone, password: password })
@@ -351,6 +374,26 @@ async function submitRegister() {
     btn.disabled = false;
     btn.textContent = 'Créer mon compte';
   }
+}
+
+async function verifyRegisterOtp() {
+  const pending = JSON.parse(sessionStorage.getItem('pendingBuyerRegistration') || 'null');
+  const code = document.getElementById('reg-otp-code').value.trim();
+  if (!pending || !code) { showToast('Saisissez le code reçu'); return; }
+  const btn = document.getElementById('reg-otp-verify-btn');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+  const verified = await verifyOTP(pending.phone, code);
+  if (!verified.success) { showToast(verified.message || 'Code invalide ou expiré'); btn.disabled = false; btn.textContent = 'Valider et créer mon compte'; return; }
+  localStorage.setItem('token', verified.token);
+  const completed = await apiCall('/api/auth/complete-phone-registration', {
+    method: 'POST',
+    body: JSON.stringify(pending)
+  });
+  if (!completed.success) { showToast(completed.message || 'Impossible de finaliser le compte'); btn.disabled = false; btn.textContent = 'Valider et créer mon compte'; return; }
+  sessionStorage.removeItem('pendingBuyerRegistration');
+  localStorage.setItem('user', JSON.stringify(completed.user));
+  showSuccess('Bienvenue ' + pending.firstName + ' ! 🎉', 'Votre compte est créé. Redirection vers l’accueil...');
+  setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1000);
 }
 </script>
 </body>
