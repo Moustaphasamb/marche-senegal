@@ -104,6 +104,10 @@
 .sb-shop-label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
 .sb-shop-name{font-size:.96rem;font-weight:700;color:var(--dark)}
 .sb-shop-market{font-size:.78rem;color:var(--green);margin-top:2px}
+.toast{max-width:min(92vw,440px);white-space:normal;text-align:center;line-height:1.45;padding:14px 18px;background:#173b2a!important;color:#fff!important;border:1px solid rgba(255,255,255,.14);font-weight:700;box-shadow:0 14px 32px rgba(23,59,42,.24)}
+.auth-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px;background:#f5f4ed;border:1px solid var(--border);border-radius:12px;margin:0 0 18px}
+.auth-method{border:0;background:transparent;color:var(--muted);border-radius:9px;padding:10px 8px;font-size:.78rem;font-weight:700;cursor:pointer;line-height:1.25}
+.auth-method.active{background:#fff;color:var(--green);box-shadow:0 3px 12px rgba(23,59,42,.10)}
 
 .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.8rem}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
@@ -198,8 +202,12 @@
       <div class="step active" id="step-login">
         <div class="form-title">Connexion vendeur <i class="ic" data-ic="store"></i></div>
         <div class="form-sub">Accédez à votre tableau de bord avec votre email ou numéro de téléphone.</div>
+        <div class="auth-methods" aria-label="Choisir un mode de connexion">
+          <button class="auth-method active" id="seller-login-method-password" onclick="setSellerLoginMethod('password')">E-mail + mot de passe</button>
+          <button class="auth-method" id="seller-login-method-sms" onclick="setSellerLoginMethod('sms')">Téléphone + SMS</button>
+        </div>
 
-        <div class="field">
+        <div class="field" id="seller-login-password-field">
           <label class="fl" for="login-identifier">Email ou numéro de téléphone *</label>
           <input class="fi" type="text" id="login-identifier"
                  placeholder="email@exemple.com ou 77 000 00 00"
@@ -231,7 +239,7 @@
           </div>
         </div>
 
-        <div style="text-align:center;font-size:.84rem;margin:10px 0">
+        <div id="seller-forgot-link" style="text-align:center;font-size:.84rem;margin:10px 0">
           <span style="color:var(--green);font-weight:600;cursor:pointer" onclick="window.location.href='marche-senegal-mot-de-passe-oublie.html'">Mot de passe oublié ?</span>
         </div>
 
@@ -261,7 +269,7 @@
         </div>
 
         <div class="form-title">Votre compte <i class="ic" data-ic="user"></i></div>
-        <div class="form-sub">Toutes les informations sont obligatoires.</div>
+        <div class="form-sub">Choisissez un e-mail ou un numéro de téléphone pour créer votre accès. Vous pourrez ajouter l’autre depuis votre profil.</div>
 
         <div class="fi-row">
           <div class="field">
@@ -673,8 +681,18 @@ async function doLogin() {
 }
 
 function showOtpLogin() {
-  document.getElementById('otp-login').classList.add('visible');
-  document.getElementById('otp-phone').focus();
+  setSellerLoginMethod('sms');
+}
+
+function setSellerLoginMethod(method) {
+  const sms = method === 'sms';
+  document.getElementById('seller-login-method-password').classList.toggle('active', !sms);
+  document.getElementById('seller-login-method-sms').classList.toggle('active', sms);
+  document.getElementById('seller-login-password-field').style.display = sms ? 'none' : '';
+  document.getElementById('login-btn').style.display = sms ? 'none' : '';
+  document.getElementById('seller-forgot-link').style.display = sms ? 'none' : '';
+  document.getElementById('otp-login').classList.toggle('visible', sms);
+  if (sms) document.getElementById('otp-phone').focus();
 }
 
 async function sendOtpLogin() {
@@ -913,7 +931,8 @@ function showToast(msg) {
   if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.classList.remove('show'), 5200);
 }
 </script>
 </body>

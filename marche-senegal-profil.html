@@ -38,6 +38,7 @@ a{text-decoration:none;color:inherit}
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:500;opacity:0;transition:all .28s;pointer-events:none;z-index:500;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast{max-width:min(92vw,440px);white-space:normal;text-align:center;line-height:1.45;padding:14px 18px;background:#173b2a!important;color:#fff!important;border:1px solid rgba(255,255,255,.14);font-weight:700;box-shadow:0 14px 32px rgba(23,59,42,.24)}
 
 /* MOBILE NAV */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:#fff;border-top:1.5px solid var(--border);padding:8px 0}
@@ -208,6 +209,15 @@ a{text-decoration:none;color:inherit}
         <label class="form-label">Nom</label>
         <input class="form-input" id="edit-lastname" type="text" placeholder="Votre nom"/>
       </div>
+      <div class="form-group">
+        <label class="form-label">Adresse e-mail <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label>
+        <input class="form-input" id="edit-email" type="email" placeholder="vous@exemple.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Téléphone <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label>
+        <input class="form-input" id="edit-phone" type="tel" placeholder="+221 77 000 00 00" autocomplete="tel"/>
+      </div>
+      <div style="font-size:.78rem;line-height:1.5;color:var(--muted);background:#f5f4ed;border-radius:10px;padding:10px 12px">Gardez au moins un moyen de connexion. Vous pouvez commencer avec votre e-mail, puis ajouter un téléphone plus tard — ou l’inverse.</div>
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="closeModal('modal-profile')">Annuler</button>
@@ -463,6 +473,14 @@ a{text-decoration:none;color:inherit}
           <div class="si-arrow" style="color:var(--border);cursor:default">›</div>
         </div>
         <div class="setting-item">
+          <div class="si-icon"><i class="ic" data-ic="mail"></i></div>
+          <div class="si-info">
+            <div class="si-label">Adresse e-mail</div>
+            <div class="si-sub" id="settings-email">—</div>
+          </div>
+          <div class="si-arrow" style="color:var(--border);cursor:default">›</div>
+        </div>
+        <div class="setting-item">
           <div class="si-icon"><i class="ic" data-ic="bell"></i></div>
           <div class="si-info">
             <div class="si-label">Notifications commandes</div>
@@ -541,6 +559,7 @@ function renderProfile(user) {
   if (el('pc-phone'))      el('pc-phone').textContent = user.phone || '';
   if (el('settings-name')) el('settings-name').textContent = fullName;
   if (el('settings-phone'))el('settings-phone').textContent = user.phone || '';
+  if (el('settings-email'))el('settings-email').textContent = user.email || '';
   if (el('pref-sms-orders')) el('pref-sms-orders').classList.toggle('off', user.smsOrderNotifications === false);
   if (el('pref-promos')) el('pref-promos').classList.toggle('off', user.promoNotifications !== true);
 }
@@ -897,19 +916,24 @@ function openEditProfile() {
   const user = getCurrentUser();
   document.getElementById('edit-firstname').value = user?.firstName || '';
   document.getElementById('edit-lastname').value = user?.lastName || '';
+  document.getElementById('edit-email').value = user?.email || '';
+  document.getElementById('edit-phone').value = user?.phone || '';
   openModal('modal-profile');
 }
 
 async function saveProfile() {
   const firstName = document.getElementById('edit-firstname').value.trim();
   const lastName  = document.getElementById('edit-lastname').value.trim();
+  const email     = document.getElementById('edit-email').value.trim();
+  const phone     = document.getElementById('edit-phone').value.trim();
 
   if (!firstName || !lastName) { showToast('Prénom et nom requis', 'error'); return; }
+  if (!email && !phone) { showToast('Ajoutez au moins un e-mail ou un numéro de téléphone', 'error'); return; }
 
   const btn = document.getElementById('btn-save-profile');
   btn.disabled = true; btn.textContent = 'Enregistrement...';
 
-  const result = await updateProfile({ firstName, lastName });
+  const result = await updateProfile({ firstName, lastName, email, phone });
 
   btn.disabled = false; btn.textContent = 'Enregistrer';
 
@@ -919,6 +943,8 @@ async function saveProfile() {
     if (user) {
       user.firstName = result.user.firstName;
       user.lastName  = result.user.lastName;
+      user.email     = result.user.email;
+      user.phone     = result.user.phone;
       localStorage.setItem('user', JSON.stringify(user));
     }
     renderProfile(result.user);

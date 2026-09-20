@@ -57,6 +57,10 @@
 .sb-icon{font-size:3.5rem;margin-bottom:14px;display:block}
 .sb-title{font-family:'Newsreader',serif;font-size:1.4rem;font-weight:700;color:var(--dark);margin-bottom:7px}
 .sb-sub{font-size:.86rem;color:var(--muted);line-height:1.65}
+.toast{max-width:min(92vw,440px);white-space:normal;text-align:center;line-height:1.45;padding:14px 18px;background:#173b2a!important;color:#fff!important;border:1px solid rgba(255,255,255,.14);font-weight:700;box-shadow:0 14px 32px rgba(23,59,42,.24)}
+.auth-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px;background:#f5f4ed;border:1px solid var(--border);border-radius:12px;margin:0 0 18px}
+.auth-method{border:0;background:transparent;color:var(--muted);border-radius:9px;padding:10px 8px;font-size:.78rem;font-weight:700;cursor:pointer;line-height:1.25}
+.auth-method.active{background:#fff;color:var(--green);box-shadow:0 3px 12px rgba(23,59,42,.10)}
 @media(max-width:860px){.page{grid-template-columns:1fr}.left{display:none}.right{min-height:100svh;padding:28px 20px 34px;align-items:flex-start}.form-box{max-width:520px;margin-top:clamp(18px,10vh,72px)}}
 @media(max-width:480px){.fi-row{grid-template-columns:1fr}}
 @media(max-width:380px){.right{padding-inline:16px}.mode-tabs{margin-bottom:22px}.form-title{font-size:1.45rem}.form-sub{font-size:.84rem;margin-bottom:20px}.link-text{font-size:.78rem}.submit-btn{height:50px}}
@@ -110,7 +114,11 @@
       <div id="form-login">
         <div class="form-title">Bon retour ! 👋</div>
         <div class="form-sub">Connectez-vous pour accéder à vos commandes et favoris.</div>
-        <div class="field">
+        <div class="auth-methods" aria-label="Choisir un mode de connexion">
+          <button class="auth-method active" id="login-method-password" onclick="setLoginMethod('password')">E-mail + mot de passe</button>
+          <button class="auth-method" id="login-method-sms" onclick="setLoginMethod('sms')">Téléphone + SMS</button>
+        </div>
+        <div class="field" id="login-password-field">
           <label class="fl">Email ou numéro de téléphone</label>
           <input class="fi" type="text" id="login-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username" onkeydown="if(event.key==='Enter')submitLogin()"/>
         </div>
@@ -122,7 +130,7 @@
           </div>
         </div>
         <button class="submit-btn" id="login-btn" onclick="submitLogin()">Se connecter</button>
-        <div class="link-text" style="margin-bottom:10px"><span onclick="window.location.href='marche-senegal-mot-de-passe-oublie.html'">Mot de passe oublié ?</span></div>
+        <div class="link-text" id="forgot-link" style="margin-bottom:10px"><span onclick="window.location.href='marche-senegal-mot-de-passe-oublie.html'">Mot de passe oublié ?</span></div>
         <div class="link-text" style="margin-bottom:10px"><span onclick="showOtpLogin()">Se connecter par SMS</span></div>
         <div class="otp-login" id="otp-login">
           <div class="fl">Connexion rapide par SMS</div>
@@ -154,7 +162,7 @@
         <div class="field">
           <label class="fl">Email ou numéro de téléphone *</label>
           <input class="fi" type="text" id="reg-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username"/>
-          <div class="fi-hint">Vous pouvez utiliser votre email ou votre numéro Wave / Orange Money</div>
+          <div class="fi-hint">Choisissez au moins un moyen : e-mail ou numéro de téléphone. Vous pourrez ajouter l’autre depuis votre profil.</div>
         </div>
         <div class="field">
           <label class="fl">Mot de passe *</label>
@@ -209,7 +217,19 @@ function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(function() { t.classList.remove('show'); }, 5200);
+}
+
+function setLoginMethod(method) {
+  var sms = method === 'sms';
+  document.getElementById('login-method-password').classList.toggle('active', !sms);
+  document.getElementById('login-method-sms').classList.toggle('active', sms);
+  document.getElementById('login-password-field').style.display = sms ? 'none' : '';
+  document.getElementById('login-btn').style.display = sms ? 'none' : '';
+  document.getElementById('forgot-link').style.display = sms ? 'none' : '';
+  document.getElementById('otp-login').classList.toggle('visible', sms);
+  if (sms) document.getElementById('otp-phone').focus();
 }
 
 function showSuccess(title, sub) {
@@ -227,8 +247,7 @@ function parseIdentifier(identifier) {
 }
 
 function showOtpLogin() {
-  document.getElementById('otp-login').classList.add('visible');
-  document.getElementById('otp-phone').focus();
+  setLoginMethod('sms');
 }
 
 async function sendOtpLogin() {
