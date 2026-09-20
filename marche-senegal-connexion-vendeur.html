@@ -314,6 +314,23 @@
         </div>
       </div>
 
+      <!-- ── INSCRIPTION ÉTAPE 1B — Vérification du téléphone ── -->
+      <div class="step" id="step-register-otp">
+        <div class="progress">
+          <div class="prog-step"><div class="prog-dot active">1</div><span class="prog-label active">Vérification</span></div>
+          <div class="prog-line"></div>
+          <div class="prog-step"><div class="prog-dot pending">2</div><span class="prog-label pending">Boutique</span></div>
+        </div>
+        <div class="form-title">Vérifiez votre téléphone <i class="ic" data-ic="shield-check"></i></div>
+        <div class="form-sub">Un code de sécurité a été envoyé. Validez-le avant de continuer la création de votre boutique.</div>
+        <div class="field">
+          <label class="fl" for="seller-reg-otp-code">Code reçu par SMS</label>
+          <input class="fi" type="text" id="seller-reg-otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/>
+        </div>
+        <button class="submit-btn" id="seller-reg-otp-btn" onclick="verifySellerRegisterOtp()">Valider et continuer</button>
+        <button class="back-btn" onclick="showStep('step-register-1')">← Modifier mes informations</button>
+      </div>
+
       <!-- ── INSCRIPTION ÉTAPE 2 — Infos boutique ── -->
       <div class="step" id="step-register-2">
 
@@ -728,8 +745,8 @@ async function verifyOtpLogin() {
   setTimeout(() => { window.location.href = 'marche-senegal-dashboard.html'; }, 700);
 }
 
-// ── Validation étape 1 → étape 2 ──
-function goToStep2() {
+// ── Validation étape 1 → OTP ou étape 2 ──
+async function goToStep2() {
   const firstName = document.getElementById('reg-first-name').value.trim();
   const lastName  = document.getElementById('reg-last-name').value.trim();
   const identifierRaw = document.getElementById('reg-identifier').value.trim();
@@ -770,6 +787,36 @@ function goToStep2() {
     phone: parsed.type === 'phone' ? parsed.value : null
   };
 
+  if (regData.phone) {
+    const otp = await sendOTP(regData.phone, 'register');
+    if (!otp.success) {
+      showToast(otp.message || 'Impossible d’envoyer le code');
+      return;
+    }
+    showStep('step-register-otp');
+    document.getElementById('seller-reg-otp-code').focus();
+    showToast('Code envoyé par SMS');
+    return;
+  }
+
+  showStep('step-register-2');
+}
+
+async function verifySellerRegisterOtp() {
+  const code = document.getElementById('seller-reg-otp-code').value.trim();
+  if (!regData.phone || !code) { showToast('Saisissez le code reçu'); return; }
+  const btn = document.getElementById('seller-reg-otp-btn');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+  const verified = await verifyOTP(regData.phone, code);
+  if (!verified.success) {
+    showToast(verified.message || 'Code invalide ou expiré');
+    btn.disabled = false; btn.textContent = 'Valider et continuer';
+    return;
+  }
+  localStorage.setItem('token', verified.token);
+  localStorage.setItem('user', JSON.stringify(verified.user));
+  btn.disabled = false; btn.textContent = 'Valider et continuer';
+  showToast('Téléphone vérifié');
   showStep('step-register-2');
 }
 
