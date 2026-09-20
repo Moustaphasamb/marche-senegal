@@ -1,0 +1,271 @@
+/* Accueil immersif — styles limités à cette page. */
+body.accueil-immersif {
+  --home-paper:#f7f6f0; --home-ink:#142d22; --home-line:#dedfd4;
+  --home-gutter:clamp(22px,5.6vw,100px);
+  background:var(--home-paper);color:var(--home-ink);font-family:'Manrope',Arial,sans-serif;
+}
+.accueil-immersif .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.accueil-immersif .home-skip {position:fixed;left:20px;top:-80px;z-index:600;background:#fff;padding:16px;color:#143e2b;border-radius:8px}
+.accueil-immersif .home-skip:focus {top:12px}
+.accueil-immersif [hidden] {display:none!important}
+.accueil-immersif :is(section,[id]) {scroll-margin-top:104px}
+body.accueil-immersif .nav {
+  height:88px;min-height:88px;padding:0 var(--home-gutter);gap:36px;
+  background:rgba(12,32,24,.10);border-bottom:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:none;color:#fff;transition:background .3s,border-color .3s,box-shadow .3s;
+}
+body.accueil-immersif.home-scrolled .nav {
+  background:rgba(249,249,243,.96);color:var(--home-ink);
+  border-color:var(--home-line);box-shadow:0 6px 30px #143e2b0a;
+}
+body.accueil-immersif .nav-logo {color:inherit;gap:12px;min-width:175px;font-family:'Manrope',Arial,sans-serif;letter-spacing:-.035em}
+body.accueil-immersif .nav-logo-text {display:block;font-size:19px;line-height:1.1;font-weight:700}
+.accueil-immersif .brand-country {display:block;font-size:15px;letter-spacing:.08em;font-weight:400;margin-top:3px}
+.accueil-immersif .brand-mark {width:42px;height:44px;border:1px solid #ffffff70;display:grid;place-items:center;border-radius:12px;font-size:24px}
+.accueil-immersif.home-scrolled .brand-mark {border-color:#1b6b3a40;color:#1b6b3a}
+.accueil-immersif .home-nav-links {display:flex;align-items:center;gap:28px;margin:auto;font-size:13px;font-weight:600}
+.accueil-immersif .home-nav-links a {position:relative;padding-block:12px}
+.accueil-immersif .home-nav-links a::after {content:'';position:absolute;bottom:5px;left:0;right:0;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.accueil-immersif .home-nav-links a:hover::after {transform:scaleX(1)}
+body.accueil-immersif .nav-actions {gap:18px}
+body.accueil-immersif .nav-btn-login {color:inherit;background:transparent;border:none;padding:0;font-size:13px;box-shadow:none}
+.accueil-immersif .nav-seller-link {display:flex;align-items:center;gap:14px;background:#f6f5ee;color:#173b2b;padding:12px 18px;border-radius:7px;font-size:12px;font-weight:700}
+.accueil-immersif .nav-seller-link:hover {background:#f4c542;color:#302407}
+body.accueil-immersif .nav-cart,body.accueil-immersif .nav-hamburger {background:transparent;border-color:#ffffff60;color:inherit;box-shadow:none;border-radius:9px}
+.accueil-immersif.home-scrolled :is(.nav-cart,.nav-hamburger) {border-color:#1b6b3a35}
+.accueil-immersif .nav-hamburger span {background:currentColor}
+body.accueil-immersif .cart-badge {background:#c3dbbd;color:#173b2b;border-color:#143a2b}
+body.accueil-immersif .nav-drawer {top:88px;background:#fcfbf7;border-radius:0 0 20px 20px}
+.accueil-immersif .drawer-links {display:grid;gap:6px}
+.accueil-immersif .drawer-links a {padding:12px;border-bottom:1px solid var(--home-line);font-weight:600}
+body.accueil-immersif .hero {
+  isolation:isolate;position:relative;display:flex;flex-direction:column;align-items:stretch;
+  justify-content:center;width:100%;max-width:none;height:auto;
+  min-height:clamp(710px,94svh,960px);margin:0;padding:148px var(--home-gutter) 148px;
+  background:#193a29;border-radius:0;box-shadow:none;overflow:hidden;
+}
+body.accueil-immersif .hero::before {
+  content:'';position:absolute;inset:0;width:auto;height:auto;border-radius:0;z-index:-1;
+  background:linear-gradient(90deg,rgba(5,25,17,.83),rgba(5,25,17,.45) 52%,rgba(5,25,17,.06)),
+  linear-gradient(0deg,rgba(5,25,17,.65),transparent 35%,transparent 72%,rgba(5,25,17,.28));
+}
+body.accueil-immersif .hero::after {display:none}
+.accueil-immersif .hero-stage {position:absolute;inset:0;z-index:-2;overflow:hidden;margin:0;background:#193a29}
+.accueil-immersif .hero-scene,.accueil-immersif #hero-video {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 1.25s ease;transform:scale(1.045)}
+.accueil-immersif .hero-scene.is-current {opacity:1}
+.accueil-immersif .hero-scene {animation:home-pan 16s ease-in-out infinite alternate;animation-play-state:paused}
+.accueil-immersif .hero.is-animating .hero-scene.is-current {animation-play-state:running}
+.accueil-immersif .hero.is-video #hero-video {opacity:1;transform:none}
+@keyframes home-pan {from{transform:scale(1.045) translateX(0)}to{transform:scale(1.13) translateX(-1%)}}
+body.accueil-immersif .hero-content {position:relative;max-width:830px;z-index:1}
+.accueil-immersif .hero-eyebrow {display:flex;align-items:center;gap:10px;color:#e7eddd;font-size:11px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;margin-bottom:27px}
+.accueil-immersif .hero-eyebrow>span:first-child {width:7px;height:7px;background:#d8e9ba;border-radius:50%;box-shadow:0 0 0 5px #ffffff12}
+body.accueil-immersif .hero h1 {
+  max-width:none;font:400 clamp(56px,6.6vw,106px)/1.03 'Newsreader',Georgia,serif;
+  letter-spacing:-.045em;color:#fffdf1;margin:0 0 27px;text-wrap:balance;
+}
+.accueil-immersif .hero h1 em {font-weight:400;color:#d8e9ba}
+body.accueil-immersif .hero-desc {font-size:15px;line-height:1.8;color:#f0f0e6;max-width:550px;margin-bottom:28px}
+.accueil-immersif .hero-search {display:flex;align-items:center;gap:15px;background:#fffdf6;color:#173b2b;max-width:610px;padding:7px 7px 7px 22px;border:1px solid #fff;border-radius:12px;box-shadow:0 10px 35px #03130d20}
+.accueil-immersif .hero-search>.ic {font-size:21px;flex-shrink:0}
+.accueil-immersif .hero-search input {min-width:0;width:100%;border:none;background:transparent;box-shadow:none!important;padding:10px 0;font-size:15px;color:#173b2b}
+.accueil-immersif .hero-search input::placeholder {color:#71796e}
+.accueil-immersif .hero-search input:focus {outline:0}
+.accueil-immersif .hero-search:focus-within {outline:3px solid #d6e8b5;outline-offset:4px}
+body.accueil-immersif .hero-search button {height:49px;flex-shrink:0;display:flex;align-items:center;gap:22px;border:0;border-radius:8px;background:#1b6b3a;color:#fff;padding:0 22px;font-size:13px;font-weight:700}
+.accueil-immersif .hero-search button:hover {background:#124e2b}
+.accueil-immersif .hero-search button span {font-size:20px}
+.accueil-immersif .home-arrow::after {content:'↗';font-family:Arial,sans-serif;font-weight:400}
+.accueil-immersif .hero-suggestions {display:flex;flex-wrap:wrap;gap:9px;align-items:center;color:#e8edde;font-size:11px;margin-top:15px}
+.accueil-immersif .hero-suggestions>span {margin-right:4px;color:#d6dccf}
+.accueil-immersif .hero-suggestions a {border-bottom:1px solid #ffffff55;padding:4px 0;margin-right:12px}
+.accueil-immersif .hero-suggestions a:hover {color:#d8e9ba;border-color:#d8e9ba}
+.accueil-immersif .hero-footer {position:absolute;bottom:32px;left:var(--home-gutter);right:var(--home-gutter);display:flex;justify-content:space-between;align-items:flex-end;gap:24px;color:#fff}
+.accueil-immersif .hero-explore {display:flex;align-items:center;gap:14px;font-size:12px}
+.accueil-immersif .explore-arrow {width:40px;height:40px;border:1px solid #ffffff60;border-radius:50%;display:grid;place-items:center;font-size:20px}
+.accueil-immersif .hero-scene-control {display:flex;gap:22px;align-items:center}
+.accueil-immersif .scene-caption {display:grid;grid-template-columns:auto 1fr;gap:4px 14px;text-align:left}
+.accueil-immersif #scene-number {grid-row:span 2;font-size:10px;color:#d4e2c9;align-self:center;letter-spacing:.08em}
+.accueil-immersif #scene-title {font-size:12px;font-weight:600}
+.accueil-immersif #scene-credit {font-size:9px;color:#d5ddcc}
+.accueil-immersif .scene-buttons {display:flex;align-items:center;gap:2px}
+body.accueil-immersif .scene-dot {position:relative;width:32px;min-height:44px;border:none;background:transparent;padding:0;cursor:pointer}
+.accueil-immersif .scene-dot::after {content:'';display:block;width:18px;height:3px;margin:auto;background:#ffffff60;border-radius:4px;transition:background .3s}
+.accueil-immersif .scene-dot.is-current::after {background:#e4ecce}
+body.accueil-immersif #hero-motion {width:42px;height:42px;background:#12332380;color:#fff;border:1px solid #ffffff60;border-radius:50%;margin-left:7px;cursor:pointer}
+.accueil-immersif #hero-motion:disabled {opacity:.6;cursor:default}
+.accueil-immersif .home-intro {padding:32px var(--home-gutter);display:flex;justify-content:space-between;align-items:center;gap:28px;border-bottom:1px solid var(--home-line);background:#f0f0e6}
+.accueil-immersif .home-intro>p {font-size:13px;line-height:1.8;color:#697160}
+.accueil-immersif .home-intro strong {font-weight:600;color:var(--home-ink)}
+.accueil-immersif .intro-note {display:flex;gap:14px;align-items:center;font-size:12px;line-height:1.8;color:#697160}
+.accueil-immersif .intro-note>.ic {font-size:30px;color:#1b6b3a}
+body.accueil-immersif .hero-stats {display:flex;gap:30px;margin:0}
+.accueil-immersif .hero-stats>div {display:grid;grid-template-columns:auto auto;gap:10px;align-items:center}
+body.accueil-immersif .hstat-num {font:400 38px/1 'Newsreader',Georgia,serif;color:#1b6b3a}
+body.accueil-immersif .hstat-label {color:#65725f;font-size:10px;max-width:70px;line-height:1.6}
+body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:88px var(--home-gutter);background:var(--home-paper)}
+body.accueil-immersif .section-top {margin-bottom:32px;gap:28px}
+.accueil-immersif .section-label {text-transform:uppercase;letter-spacing:.15em;font-size:10px;color:#456244;font-weight:700;margin-bottom:18px}
+body.accueil-immersif .section-title {font:400 clamp(35px,3.7vw,56px)/1.1 'Newsreader',Georgia,serif;letter-spacing:-.035em;color:#18392a}
+.accueil-immersif .section-title em {font-weight:400;color:#52745a}
+.accueil-immersif .section-description {font-size:13px;line-height:1.8;color:#697160;max-width:410px;margin-top:18px}
+.accueil-immersif .section-link {font-size:12px;border-bottom:1px solid #1b6b3a;padding-block:8px}
+.accueil-immersif .mk-live {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+body.accueil-immersif .mk-card {position:relative;display:flex;flex-direction:column;align-items:stretch;padding:0;min-width:0;background:#fffdf7;text-align:left;border:1px solid var(--home-line);border-radius:13px;overflow:hidden;box-shadow:none}
+.accueil-immersif .mk-picture {position:relative;display:block;aspect-ratio:1.65;overflow:hidden;background:#e4e8dd}
+.accueil-immersif .mk-picture img {width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.accueil-immersif .mk-card:hover .mk-picture img {transform:scale(1.04)}
+.accueil-immersif .mk-photo-credit {display:block;font-size:10px;color:#596951;padding:7px 17px 12px;line-height:1.4}
+.accueil-immersif .mk-body {position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:18px 22px 23px}
+.accueil-immersif .mk-name {font:400 29px/1.2 'Newsreader',Georgia,serif;color:#143e2b}
+.accueil-immersif .mk-city {font-size:12px;line-height:1.6;color:#667560}
+.accueil-immersif .mk-count {background:#eaf0e5;color:#1b6b3a;font-size:10px;padding:4px 10px;margin-top:13px;border-radius:4px}
+.accueil-immersif .mk-arrow {position:absolute;right:22px;top:24px;font-size:23px;color:#1b6b3a}
+body.accueil-immersif .mk-toggle {background:transparent;border:1px solid #bcc9b8;border-radius:7px;color:#214e32;min-height:46px;padding:12px 22px}
+.accueil-immersif .mk-more {margin-top:23px;font-size:12px}
+.accueil-immersif .home-universes {background:#ebece2}
+.accueil-immersif .universe-grid {display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px}
+.accueil-immersif .universe-card {position:relative;min-height:380px;overflow:hidden;border-radius:12px;color:#fff;background:#173b2b}
+.accueil-immersif .universe-card img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s}
+.accueil-immersif .universe-card::after {content:'';position:absolute;inset:0;background:linear-gradient(0deg,#092718dd,transparent 85%)}
+.accueil-immersif .universe-card:hover img {transform:scale(1.05)}
+.accueil-immersif .universe-copy {position:absolute;bottom:26px;left:26px;right:26px;z-index:1;display:flex;flex-direction:column;gap:13px}
+.accueil-immersif .universe-copy small {font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.accueil-immersif .universe-copy strong {font:400 clamp(28px,2.4vw,38px)/1.1 'Newsreader',Georgia,serif;letter-spacing:-.035em}
+.accueil-immersif .universe-copy>span {display:flex;justify-content:space-between;align-items:center;font-size:11px;border-top:1px solid #ffffff50;padding-top:14px}
+.accueil-immersif .universe-copy b {font-size:22px}
+.accueil-immersif .universe-credit {font-size:9px;color:#707b66;margin-top:12px}
+body.accueil-immersif .products-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+body.accueil-immersif .prod-filters {background:transparent;border:0;box-shadow:none;padding:0 0 22px;gap:8px}
+body.accueil-immersif .pf-btn {min-height:42px;border-radius:7px;padding-inline:18px;font-size:12px}
+body.accueil-immersif .pf-btn.active {background:#1b6b3a;color:#fff;border-color:#1b6b3a}
+body.accueil-immersif .prod-card {border-radius:13px;border:1px solid var(--home-line);box-shadow:none}
+body.accueil-immersif .prod-img {height:240px;border-radius:0}
+body.accueil-immersif .prod-body {padding:18px}
+body.accueil-immersif .prod-name {font-size:15px}
+body.accueil-immersif .prod-price {font-size:16px;white-space:nowrap}
+body.accueil-immersif .prod-old-price {display:block;margin:3px 0 0;white-space:nowrap}
+body.accueil-immersif .prod-footer {gap:8px;flex-wrap:wrap}
+body.accueil-immersif .prod-cart-btn {height:40px;width:40px;flex-shrink:0}
+body.accueil-immersif .cats-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+body.accueil-immersif .cat-card {display:flex;align-items:center;gap:17px;padding:22px;text-align:left;border-radius:10px;box-shadow:none;background:#f1f1e8}
+.accueil-immersif .cat-emoji {font-size:25px;color:#2f613d;margin:0}
+.accueil-immersif .cat-name {font-size:13px}
+body.accueil-immersif .dark-bg {background:#143b29;color:#fff}
+.accueil-immersif .hiw-title {font:400 clamp(36px,3.8vw,56px)/1.1 'Newsreader',Georgia,serif}
+.accueil-immersif .hiw-sub {color:#c5d3c1;font-size:14px}
+.accueil-immersif .hiw-grid {gap:0}
+.accueil-immersif .hiw-card {border:none;border-right:1px solid #ffffff20;border-radius:0;background:transparent;padding:20px 30px}
+.accueil-immersif .hiw-card:last-child {border-right:0}
+.accueil-immersif .hiw-num {background:transparent;color:#bcd4a9;font:400 38px/1 'Newsreader',Georgia,serif;margin-bottom:24px}
+.accueil-immersif .hiw-card-title {font-size:15px}
+.accueil-immersif .hiw-text {font-size:13px;color:#c5d3c1}
+body.accueil-immersif .shop-card {border-radius:13px;box-shadow:none}
+.accueil-immersif .shop-banner {height:140px}
+body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#eee8d4;padding:80px var(--home-gutter);color:#302407}
+.accueil-immersif .seller-invitation {font-size:10px;text-transform:uppercase;letter-spacing:.17em}
+.accueil-immersif .cta-section h2 {font-size:clamp(40px,4.8vw,70px);color:#302407;letter-spacing:-.04em;margin-top:20px}
+.accueil-immersif .cta-section p {color:#6b5e3f;font-size:14px}
+.accueil-immersif .cta-section .btn-cta-white {background:#f4c542;color:#302407;box-shadow:none;border-radius:7px}
+.accueil-immersif .cta-section .btn-outline-white {border-color:#948469;color:#302407;border-radius:7px}
+.accueil-immersif footer {padding:62px var(--home-gutter) 30px;background:#102d20}
+.accueil-immersif .footer-logo {font-size:25px;color:#d7e8c7}
+.accueil-immersif .footer-brand p,.accueil-immersif .footer-col a {font-size:12px;color:#b2c3b0}
+.accueil-immersif .footer-col h4 {color:#e3ecda}
+.accueil-immersif .footer-bottom {color:#b2c3b0}
+.accueil-immersif.reveal-ready .home-reveal {opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1)}
+.accueil-immersif.reveal-ready .home-reveal.is-visible {opacity:1;transform:none}
+@media(min-width:1800px) {
+  body.accueil-immersif {--home-gutter:max(90px,calc((100vw - 1580px)/2))}
+}
+@media(max-width:1150px) {
+  .accueil-immersif .home-nav-links {gap:15px;font-size:11px}
+  body.accueil-immersif .nav {gap:22px}
+  .accueil-immersif .nav-seller-link {display:none}
+  .accueil-immersif .hero h1 {font-size:76px}
+}
+@media(max-width:900px) {
+  body.accueil-immersif .nav {height:76px;min-height:76px;padding-inline:24px}
+  .accueil-immersif .home-nav-links {display:none}
+  body.accueil-immersif .nav-actions {margin-left:auto}
+  body.accueil-immersif .nav-drawer {top:76px}
+  body.accueil-immersif .hero {min-height:760px;padding:150px 32px 180px}
+  body.accueil-immersif .hero h1 {font-size:72px;max-width:760px}
+  .accueil-immersif .hero-footer {left:32px;right:32px}
+  .accueil-immersif .intro-note {display:none}
+  body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:64px 28px}
+  .accueil-immersif .mk-live {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .accueil-immersif .universe-grid {gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .accueil-immersif .universe-copy {left:18px;right:18px}
+  .accueil-immersif .universe-card {min-height:310px}
+  body.accueil-immersif .products-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.accueil-immersif .cats-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .accueil-immersif .hiw-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:25px}
+  .accueil-immersif .hero-scene-control {gap:10px}
+}
+@media(max-width:600px) {
+  body.accueil-immersif .nav {height:72px;min-height:72px;padding:0 20px}
+  body.accueil-immersif .nav-logo {min-width:0;gap:8px}
+  body.accueil-immersif .nav-logo .nav-logo-text {display:block;font-size:17px}
+  .accueil-immersif .brand-country {font-size:12px}
+  .accueil-immersif .brand-mark {width:35px;height:38px;font-size:20px}
+  body.accueil-immersif .nav-actions {gap:10px}
+  body.accueil-immersif .nav-drawer {top:72px}
+  body.accueil-immersif .hero {min-height:740px;padding:132px 24px 174px;justify-content:flex-start}
+  body.accueil-immersif .hero h1 {font-size:clamp(46px,12.5vw,72px);line-height:1.07;max-width:none;letter-spacing:-.05em;margin-bottom:25px}
+  .accueil-immersif .hero-eyebrow {font-size:9px;letter-spacing:.14em;margin-bottom:25px}
+  body.accueil-immersif .hero-desc {font-size:13px;line-height:1.8;max-width:34ch;margin-bottom:25px}
+  .accueil-immersif .desktop-break {display:none}
+  .accueil-immersif .hero-stage img {object-position:62% center}
+  body.accueil-immersif .hero::before {background:linear-gradient(90deg,#072618d9,#07261870),linear-gradient(0deg,#09291dec,transparent 65%)}
+  .accueil-immersif .hero-search {gap:9px;padding:6px 6px 6px 12px;border-radius:9px}
+  .accueil-immersif .hero-search>.ic {font-size:17px}
+  .accueil-immersif .hero-search input {font-size:16px}
+  body.accueil-immersif .hero-search button {padding:0 12px;font-size:11px;gap:6px;height:46px}
+  .accueil-immersif .hero-search button span {display:none}
+  .accueil-immersif .hero-suggestions {font-size:10px;gap:6px}
+  .accueil-immersif .hero-suggestions>span {flex-basis:100%;margin-top:5px}
+  .accueil-immersif .hero-footer {left:24px;right:24px;bottom:28px;flex-direction:column;align-items:stretch;gap:22px}
+  .accueil-immersif .hero-explore {font-size:11px}
+  .accueil-immersif .explore-arrow {width:32px;height:32px}
+  .accueil-immersif .hero-scene-control {justify-content:space-between}
+  .accueil-immersif .scene-caption {gap:4px 8px}
+  .accueil-immersif #scene-title {font-size:10px}
+  .accueil-immersif #scene-credit {font-size:8px}
+  .accueil-immersif #scene-number {font-size:9px}
+  body.accueil-immersif .scene-dot {width:25px}
+  body.accueil-immersif #hero-motion {width:36px;height:36px;margin-left:2px}
+  .accueil-immersif .home-intro {padding:25px 24px;flex-direction:column;align-items:flex-start;gap:18px}
+  .accueil-immersif .home-intro>p {font-size:13px}
+  body.accueil-immersif .hero-stats {gap:32px}
+  body.accueil-immersif .hstat-num {font-size:31px}
+  body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:54px 22px}
+  body.accueil-immersif .section-title {font-size:37px}
+  .accueil-immersif .section-label {font-size:9px;margin-bottom:14px}
+  .accueil-immersif .section-description {font-size:12px}
+  .accueil-immersif .mk-live {grid-template-columns:1fr}
+  .accueil-immersif .mk-picture {aspect-ratio:1.75}
+  .accueil-immersif .universe-grid {grid-template-columns:1fr}
+  .accueil-immersif .universe-card {min-height:310px}
+  .accueil-immersif .universe-copy strong {font-size:35px}
+  body.accueil-immersif .products-grid {gap:12px}
+  body.accueil-immersif .prod-img {height:170px}
+  body.accueil-immersif .prod-body {padding:12px}
+  body.accueil-immersif .prod-name {font-size:13px}
+  body.accueil-immersif .prod-price {font-size:14px}
+  body.accueil-immersif .cat-card {padding:18px 12px;gap:10px}
+  .accueil-immersif .cat-name {font-size:12px}
+  .accueil-immersif .hiw-grid {grid-template-columns:1fr;gap:6px}
+  .accueil-immersif .hiw-card {border-right:0;border-bottom:1px solid #ffffff20;padding:24px 0}
+  .accueil-immersif .hiw-num {margin-bottom:16px}
+  .accueil-immersif .footer-grid {grid-template-columns:1fr 1fr;gap:30px}
+  .accueil-immersif .footer-brand {grid-column:1/-1}
+  body.accueil-immersif .mobile-nav {background:rgba(251,252,247,.91);border-color:rgba(27,63,43,.12)}
+  body.accueil-immersif .mn-label {font-size:10px}
+  body.accueil-immersif .mn-item.act .mn-icon {color:#fff}
+}
+@media(prefers-reduced-motion:reduce) {
+  .accueil-immersif .hero-scene {animation:none;transform:none;transition:none}
+  .accueil-immersif.reveal-ready .home-reveal {opacity:1;transform:none}
+}

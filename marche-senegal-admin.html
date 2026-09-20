@@ -189,8 +189,10 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-admin">
 <div class="toast" id="toast"></div>
 <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
@@ -694,7 +696,7 @@
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
             <span style="font-size:.84rem;color:var(--muted)">Paiements</span>
-            <span style="font-size:.84rem;font-weight:500;color:var(--dark)">Wave · Orange Money · Free Money</span>
+            <span id="admin-moyens-paiement" style="font-size:.84rem;font-weight:500;color:var(--dark)">—</span>
           </div>
         </div>
       </div>
@@ -2465,6 +2467,30 @@ async function changeAdminPassword() {
 }
 
 // ── Auth + initialisation ──
+// ── Moyens de paiement réellement actifs ──
+//
+// Le panneau annonçait « Wave · Orange Money · Free Money » en dur. En
+// production, /api/payments/methods ne renvoie que WAVE, et seulement si
+// WAVE_API_KEY est posée — sinon la liste est vide et rien n'encaisse.
+// L'administrateur lisait donc l'inverse de l'état réel de sa plateforme.
+async function afficherMoyensPaiement() {
+  const cible = document.getElementById('admin-moyens-paiement');
+  if (!cible) return;
+  const noms = { WAVE: 'Wave', ORANGE_MONEY: 'Orange Money', FREE_MONEY: 'Free Money',
+                 CARD: 'Carte bancaire', CASH: 'Espèces à la livraison' };
+  try {
+    const res = await fetch(API_URL + '/api/payments/methods');
+    const json = await res.json();
+    const methodes = json?.data?.methods || [];
+    cible.textContent = methodes.length
+      ? methodes.map((m) => noms[m] || m).join(' · ')
+      : 'Aucun — aucun paiement ne peut être encaissé';
+    if (!methodes.length) cible.style.color = 'var(--red)';
+  } catch {
+    cible.textContent = 'État indisponible';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
 
@@ -2475,6 +2501,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const sbName = document.querySelector('.sb-user-name');
   if (sbName && user.email) sbName.textContent = user.email;
+
+  afficherMoyensPaiement();
 
   await loadAdminStats();
   loadOverviewActivity();

@@ -20,7 +20,7 @@
   --radius:14px;--nav-h:68px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text)}
 a{text-decoration:none;color:inherit}
 
 .flag{display:flex;width:30px;height:19px;border-radius:3px;overflow:hidden;flex-shrink:0}
@@ -81,6 +81,11 @@ a{text-decoration:none;color:inherit}
 .tc-title{font-size:.96rem;font-weight:600;color:var(--dark);margin-bottom:18px;display:flex;align-items:center;gap:8px}
 
 .tracking-steps{display:flex;flex-direction:column;gap:0;position:relative}
+.market-shop-tracking{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);gap:8px}
+.market-shop-tracking.show{display:grid}
+.mst-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:11px;background:#fafcfa}
+.mst-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0}.mst-dot.active{background:var(--green);box-shadow:0 0 0 4px var(--gp)}.mst-dot.done{background:var(--green)}
+.mst-info{min-width:0;flex:1}.mst-name{font-size:.8rem;font-weight:700;color:var(--dark)}.mst-status{font-size:.7rem;color:var(--muted);margin-top:2px}
 .tracking-steps::before{content:'';position:absolute;left:18px;top:20px;bottom:20px;width:2px;background:var(--border)}
 .ts-item{display:flex;gap:14px;position:relative;z-index:1;padding-bottom:22px}
 .ts-item:last-child{padding-bottom:0}
@@ -101,10 +106,6 @@ a{text-decoration:none;color:inherit}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 .lt-title{font-size:.9rem;font-weight:600}
 .lt-sub{font-size:.74rem;color:rgba(255,255,255,.5);margin-left:auto}
-.lt-map{background:rgba(255,255,255,.08);border-radius:10px;height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;overflow:hidden}
-.lt-map-bg{position:absolute;inset:0;opacity:.15;font-size:8rem;display:flex;align-items:center;justify-content:center}
-.lt-rider{position:absolute;font-size:1.8rem;animation:moveRider 4s ease-in-out infinite}
-@keyframes moveRider{0%,100%{left:20%;top:50%}50%{left:60%;top:35%}}
 .lt-eta{display:flex;align-items:center;justify-content:space-between}
 .lt-eta-time{font-family:'Newsreader',serif;font-size:1.4rem;font-weight:900;color:var(--gold)}
 .lt-eta-label{font-size:.72rem;color:rgba(255,255,255,.5);margin-top:2px}
@@ -209,8 +210,10 @@ a{text-decoration:none;color:inherit}
 .review-hint{font-size:.75rem;color:var(--muted);text-align:center;margin-top:10px}
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-commande">
 <div class="toast" id="toast"></div>
 
 <!-- MODAL AVIS -->
@@ -240,7 +243,7 @@ a{text-decoration:none;color:inherit}
 <nav class="nav">
   <a href="marche-senegal-accueil.html" class="nav-logo">
     <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
-    Marché Sénégal
+    <span class="nav-logo-text">Marché Sénégal</span>
   </a>
   <button class="nav-back" onclick="window.location.href='marche-senegal-profil.html'">
     ← Mes commandes
@@ -305,29 +308,31 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
-    <!-- LIVE TRACKER — visible seulement si en livraison -->
+    <!-- LIVE TRACKER — visible seulement si en livraison
+         Ce bloc annonçait « Suivi en temps réel » avec une carte animée, un
+         délai de « ~15 min » et un livreur nommé « Mamadou Diallo — Livreur
+         certifié ✓ ». Rien de tout cela n'existait : aucune position n'est
+         remontée, aucun délai n'est calculé, et le modèle Delivery ne connaît
+         pas la notion de certification. Le vrai livreur, quand il est
+         renseigné, tient dans deliveryName et deliveryPhone. -->
     <div class="live-tracker" id="live-tracker" style="display:none">
       <div class="lt-header">
         <div class="lt-pulse"></div>
-        <div class="lt-title"><i class="ic" data-ic="bike"></i> Livreur en route</div>
-        <div class="lt-sub">Suivi en temps réel</div>
-      </div>
-      <div class="lt-map">
-        <div class="lt-map-bg"><i class="ic" data-ic="map"></i></div>
-        <div class="lt-rider"><i class="ic" data-ic="bike"></i></div>
+        <div class="lt-title"><i class="ic" data-ic="bike"></i> Commande en livraison</div>
+        <div class="lt-sub" id="lt-sub"></div>
       </div>
       <div class="lt-eta">
         <div>
-          <div class="lt-eta-time">~15 min</div>
-          <div class="lt-eta-label">Temps estimé d'arrivée</div>
+          <div class="lt-eta-time" id="lt-eta-time"></div>
+          <div class="lt-eta-label" id="lt-eta-label"></div>
         </div>
-        <div class="lt-rider-info">
-          <div class="lt-rider-av">MD</div>
+        <div class="lt-rider-info" id="lt-rider-info" style="display:none">
+          <div class="lt-rider-av" id="lt-rider-av"></div>
           <div>
-            <div class="lt-rider-name">Mamadou Diallo</div>
-            <div class="lt-rider-phone">Livreur certifié ✓</div>
+            <div class="lt-rider-name" id="lt-rider-name"></div>
+            <div class="lt-rider-phone" id="lt-rider-phone"></div>
           </div>
-          <button class="lt-call" onclick="showToast('📞 Appel livreur...')"><i class="ic" data-ic="phone"></i></button>
+          <a class="lt-call" id="lt-call" href="#" aria-label="Appeler le livreur"><i class="ic" data-ic="phone"></i></a>
         </div>
       </div>
     </div>
@@ -337,6 +342,9 @@ a{text-decoration:none;color:inherit}
       <div class="tc-title"><i class="ic" data-ic="map-pin"></i> Suivi de la commande</div>
       <div class="tracking-steps" id="tracking-steps">
         <!-- Généré dynamiquement -->
+      </div>
+      <div class="market-shop-tracking" id="market-shop-tracking">
+        <!-- Généré pour chaque boutique d’un Panier Marché -->
       </div>
     </div>
 
@@ -399,6 +407,13 @@ a{text-decoration:none;color:inherit}
           <div class="dc-val" id="dc-date">—</div>
         </div>
       </div>
+      <div class="dc-row" id="dc-note-row" style="display:none">
+        <div class="dc-icon"><i class="ic" data-ic="navigation"></i></div>
+        <div class="dc-info">
+          <div class="dc-label">Instruction de livraison</div>
+          <div class="dc-val" id="dc-note">—</div>
+        </div>
+      </div>
       <div class="dc-row">
         <div class="dc-icon"><i class="ic" data-ic="credit-card"></i></div>
         <div class="dc-info">
@@ -444,6 +459,7 @@ a{text-decoration:none;color:inherit}
 // ════════════════════════════════════════
 
 let currentOrder = null;
+let currentMarketOrder = null;
 
 // ── Récupérer l'ID de la commande depuis l'URL ──
 function getOrderIdFromURL() {
@@ -485,6 +501,37 @@ async function loadOrder(orderId) {
   renderOrder(currentOrder);
 }
 
+async function loadMarketOrder(marketOrderId) {
+  const result = await getMarketOrder(marketOrderId);
+  document.getElementById('loading-state').style.display = 'none';
+  if (!result.success) {
+    document.getElementById('order-content').innerHTML = `
+      <div style="text-align:center;padding:60px;color:var(--muted)">
+        <div style="font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:8px">Commande Marché introuvable</div>
+        <button onclick="window.location.href='marche-senegal-profil.html'" style="background:var(--green);color:#fff;border:0;border-radius:99px;padding:11px 22px">Mes commandes</button>
+      </div>`;
+    document.getElementById('order-content').style.display = 'block';
+    return;
+  }
+  currentMarketOrder = result.data;
+  const orders = currentMarketOrder.orders || [];
+  currentOrder = {
+    ...currentMarketOrder,
+    _isMarketOrder: true,
+    orders,
+    shop: {
+      name: `${currentMarketOrder.market?.name || 'Marché'} · ${orders.length} boutique${orders.length > 1 ? 's' : ''}`
+    },
+    items: orders.flatMap(order => (order.items || []).map(item => ({
+      ...item,
+      shopId: order.shopId,
+      shopName: order.shop?.name || 'Boutique'
+    })))
+  };
+  document.getElementById('order-content').style.display = 'block';
+  renderOrder(currentOrder);
+}
+
 // ── Afficher la commande ──
 function renderOrder(order) {
 
@@ -506,19 +553,21 @@ function renderOrder(order) {
   statusEl.className = 'oh-status ' + getStatusClass(order.status);
 
   // Stats
-  document.getElementById('ohs-items').textContent = order.items?.length || 0;
+  document.getElementById('ohs-items').textContent = (order.items || []).reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
   document.getElementById('ohs-total').textContent =
     (order.total / 1000).toFixed(0) + 'K FCFA';
   document.getElementById('ohs-delivery').textContent =
-    order.deliveryType === 'PICKUP' ? 'Retrait' : '1 000 FCFA';
+    order.deliveryType === 'PICKUP' ? 'Retrait' : formatPrice(order.deliveryFee);
 
   // Live tracker — visible si en livraison
   if (order.status === 'DELIVERING') {
     document.getElementById('live-tracker').style.display = 'block';
+    renderLivreur(order);
   }
 
   // Tracking steps
   renderTrackingSteps(order.status);
+  renderMarketShopTracking(order);
 
   // Boutique
   const shopName = order.shop?.name || 'Boutique';
@@ -547,14 +596,26 @@ function renderOrder(order) {
         ? 'Retrait en boutique'
         : 'Adresse non spécifiée';
 
-  const deliveryDate = new Date(order.createdAt);
-  deliveryDate.setDate(deliveryDate.getDate() + 2);
+  const deliveryDate = order.delivery?.estimatedAt ? new Date(order.delivery.estimatedAt) : null;
   document.getElementById('dc-date').textContent =
     order.status === 'DELIVERED'
       ? '✅ Livré'
-      : deliveryDate.toLocaleDateString('fr-FR', {
+      : deliveryDate
+        ? deliveryDate.toLocaleDateString('fr-FR', {
           weekday: 'long', day: 'numeric', month: 'long'
-        });
+        })
+        : order.deliveryType === 'PICKUP'
+          ? 'Après confirmation de la boutique'
+          : ['READY', 'DELIVERING'].includes(order.status)
+            ? 'Prévue prochainement — suivi en cours'
+            : 'Estimation : 24 à 48 h après confirmation';
+
+  const noteRow = document.getElementById('dc-note-row');
+  const note = document.getElementById('dc-note');
+  if (note && order.notes) {
+    note.textContent = order.notes;
+    if (noteRow) noteRow.style.display = '';
+  }
 
   // Actions
   renderActions(order);
@@ -595,6 +656,71 @@ function renderTrackingSteps(status) {
   }).join('');
 }
 
+// ── Afficher le livreur réellement affecté ──
+//
+// Le bloc affichait « Mamadou Diallo — Livreur certifié ✓ » et « ~15 min » à
+// tout acheteur dont la commande passait en livraison, sur n'importe quelle
+// commande. Le bouton d'appel n'appelait personne : il affichait un message.
+//
+// Ce qui existe vraiment tient dans order.delivery : un nom, un téléphone et
+// une heure estimée, tous facultatifs. Chaque élément absent reste caché
+// plutôt que d'être remplacé par une valeur plausible.
+function renderLivreur(order) {
+  const livraison = order.delivery;
+
+  const sousTitre = document.getElementById('lt-sub');
+  if (sousTitre) {
+    sousTitre.textContent = livraison?.trackingCode
+      ? 'Suivi n° ' + livraison.trackingCode
+      : 'Votre commande est en route';
+  }
+
+  // Heure estimée : affichée seulement si le livreur en a saisi une.
+  const heure = document.getElementById('lt-eta-time');
+  const libelle = document.getElementById('lt-eta-label');
+  if (heure && libelle) {
+    if (livraison?.estimatedAt) {
+      const quand = new Date(livraison.estimatedAt);
+      heure.textContent = quand.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      libelle.textContent = 'Arrivée estimée';
+    } else {
+      heure.textContent = '';
+      libelle.textContent = 'Heure d\'arrivée non communiquée';
+    }
+  }
+
+  // Identité du livreur : rien à afficher tant qu'aucun nom n'est enregistré.
+  const bloc = document.getElementById('lt-rider-info');
+  if (!bloc) return;
+  const nom = livraison?.deliveryName;
+  if (!nom) { bloc.style.display = 'none'; return; }
+  bloc.style.display = '';
+
+  const initiales = document.getElementById('lt-rider-av');
+  if (initiales) {
+    const mots = nom.trim().split(/\s+/);
+    initiales.textContent = (mots[0]?.charAt(0) || '') + (mots[1]?.charAt(0) || '');
+  }
+
+  const nomEl = document.getElementById('lt-rider-name');
+  if (nomEl) nomEl.textContent = nom;
+
+  // Le téléphone remplace « Livreur certifié ✓ » : un fait vérifiable, à la
+  // place d'une certification qui n'existe nulle part dans le modèle.
+  const telEl = document.getElementById('lt-rider-phone');
+  const lien = document.getElementById('lt-call');
+  const tel = livraison?.deliveryPhone;
+  if (telEl) telEl.textContent = tel || '';
+  if (lien) {
+    if (tel) {
+      lien.href = 'tel:' + tel.replace(/[^\d+]/g, '');
+      lien.style.display = '';
+    } else {
+      lien.style.display = 'none';
+    }
+  }
+}
+
 // ── Afficher les articles ──
 function renderItems(items) {
   const container = document.getElementById('items-list');
@@ -619,6 +745,7 @@ function renderItems(items) {
       <div class="ir-info">
         <div class="ir-name">${item.name}</div>
         <div class="ir-variant">
+          ${item.shopName ? '<strong>' + escapeHtml(item.shopName) + '</strong><br>' : ''}
           ${item.size ? 'Taille : ' + item.size : ''}
           ${item.size && item.color ? ' · ' : ''}
           ${item.color ? item.color : ''}
@@ -656,26 +783,44 @@ function renderActions(order) {
     `);
   }
 
-  // Laisser un avis — si livré
+  // Un panier Marché peut contenir plusieurs boutiques : chaque boutique
+  // reçoit son propre avis après livraison.
   if (order.status === 'DELIVERED') {
-    actions.push(`
-      <button class="ac-btn ac-btn-green" onclick="leaveReview()">
-        ⭐ Laisser un avis
-      </button>
-    `);
+    if (order._isMarketOrder) {
+      (order.orders || []).filter(child => child.shopId && child.status === 'DELIVERED').forEach(child => actions.push(`
+        <button class="ac-btn ac-btn-green" onclick="leaveReviewForShop('${child.shopId}')">
+          ⭐ Avis — ${escapeHtml(child.shop?.name || 'Boutique')}
+        </button>
+      `));
+    } else {
+      actions.push(`
+        <button class="ac-btn ac-btn-green" onclick="leaveReview()">
+          ⭐ Laisser un avis
+        </button>
+      `);
+    }
+    if (!order._isMarketOrder) {
     actions.push(`
       <button class="ac-btn" onclick="reorder()">
         🔄 Recommander les mêmes articles
       </button>
     `);
+    }
   }
 
-  // Contacter le vendeur — toujours disponible
-  actions.push(`
-    <button class="ac-btn" onclick="contactSeller()">
-      💬 Contacter le vendeur
-    </button>
-  `);
+  if (order._isMarketOrder) {
+    (order.orders || []).forEach(child => actions.push(`
+      <button class="ac-btn" onclick="contactSeller('${child.shopId}')">
+        💬 ${escapeHtml(child.shop?.name || 'Contacter la boutique')}
+      </button>
+    `));
+  } else {
+    actions.push(`
+      <button class="ac-btn" onclick="contactSeller()">
+        💬 Contacter le vendeur
+      </button>
+    `);
+  }
 
   // Signaler un problème — si livré ou en cours
   if (!['PENDING', 'CANCELLED'].includes(order.status)) {
@@ -697,7 +842,11 @@ async function confirmDelivery() {
   btn.textContent = '⏳ Confirmation...';
   btn.disabled = true;
 
-  const result = await updateOrderStatus(currentOrder.id, 'DELIVERED');
+  const eligibles = currentOrder._isMarketOrder
+    ? currentOrder.orders.filter(order => ['DELIVERING', 'READY'].includes(order.status))
+    : [currentOrder];
+  const results = await Promise.all(eligibles.map(order => updateOrderStatus(order.id, 'DELIVERED')));
+  const result = { success: results.length > 0 && results.every(item => item.success) };
 
   if (result.success) {
     showToast('✅ Réception confirmée ! Merci pour votre commande.');
@@ -713,7 +862,11 @@ async function cancelOrder() {
   if (!currentOrder) return;
   if (!confirm('Voulez-vous vraiment annuler cette commande ?')) return;
 
-  const result = await updateOrderStatus(currentOrder.id, 'CANCELLED');
+  const annulables = currentOrder._isMarketOrder
+    ? currentOrder.orders.filter(order => order.status === 'PENDING')
+    : [currentOrder];
+  const results = await Promise.all(annulables.map(order => updateOrderStatus(order.id, 'CANCELLED')));
+  const result = { success: results.length > 0 && results.every(item => item.success) };
 
   if (result.success) {
     showToast('Commande annulée');
@@ -725,15 +878,26 @@ async function cancelOrder() {
 
 // ── Modal Avis ──
 let selectedRating = 0;
+let reviewShopId = null;
 
 function leaveReview() {
   if (!currentOrder?.shopId) return;
+  leaveReviewForShop(currentOrder.shopId, currentOrder.shop?.name || '');
+}
+
+function leaveReviewForShop(shopId) {
+  if (!shopId) return;
+  reviewShopId = shopId;
+  const boutique = currentOrder?._isMarketOrder
+    ? currentOrder.orders?.find(child => child.shopId === shopId)?.shop
+    : currentOrder?.shop;
+  const shopName = boutique?.name || '';
   selectedRating = 0;
   document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('review-comment').value = '';
   document.getElementById('submit-review-btn').disabled = true;
   document.getElementById('review-shop-name').textContent =
-    currentOrder.shop?.name ? `Boutique : ${escapeHtml(currentOrder.shop.name)}` : '';
+    shopName ? `Boutique : ${shopName}` : '';
   document.getElementById('review-modal').classList.add('open');
 }
 
@@ -752,7 +916,7 @@ function selectStar(val) {
 }
 
 async function submitReview() {
-  if (!selectedRating || !currentOrder?.shopId) return;
+  if (!selectedRating || !reviewShopId) return;
 
   const btn = document.getElementById('submit-review-btn');
   btn.textContent = '⏳ Envoi...';
@@ -761,13 +925,14 @@ async function submitReview() {
   const comment = document.getElementById('review-comment').value.trim();
 
   const result = await createReview({
-    shopId: currentOrder.shopId,
+    shopId: reviewShopId,
     rating: selectedRating,
     comment: comment || undefined
   });
 
   if (result.success) {
     document.getElementById('review-modal').classList.remove('open');
+    reviewShopId = null;
     showToast('⭐ Merci pour votre avis !');
   } else {
     showToast('❌ ' + (result.message || 'Erreur lors de l\'envoi'), 'error');
@@ -785,8 +950,8 @@ function reorder() {
       name: item.name,
       price: item.price,
       quantity: item.quantity,
-      shopId: currentOrder.shopId,
-      shopName: currentOrder.shop?.name
+      shopId: item.shopId || currentOrder.shopId,
+      shopName: item.shopName || currentOrder.shop?.name
     });
   });
   localStorage.setItem('cart', JSON.stringify(cart));
@@ -794,13 +959,14 @@ function reorder() {
   setTimeout(() => window.location.href = 'marche-senegal-panier.html', 1500);
 }
 
-function contactSeller() {
+function contactSeller(shopId) {
   if (!isLoggedIn()) {
     showToast('Connectez-vous pour contacter le vendeur');
     return;
   }
-  if (!currentOrder?.shopId) return;
-  window.location.href = 'marche-senegal-chat.html?shopId=' + currentOrder.shopId;
+  const targetShopId = shopId || currentOrder?.shopId;
+  if (!targetShopId) return;
+  window.location.href = 'marche-senegal-chat.html?shopId=' + targetShopId;
 }
 
 function reportProblem() {
@@ -889,20 +1055,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const params = new URLSearchParams(location.search);
   const orderId = getOrderIdFromURL();
+  const marketOrderId = params.get('marketOrderId');
 
-  if (!orderId) {
+  if (!orderId && !marketOrderId) {
     window.location.href = 'marche-senegal-profil.html';
     return;
   }
 
-  await loadOrder(orderId);
+  if (marketOrderId) await loadMarketOrder(marketOrderId);
+  else await loadOrder(orderId);
 
   // Retour depuis Wave Checkout — attendre la confirmation webhook puis afficher succès
   if (params.get('wave_ok') === '1') {
     showToast('✅ Paiement Wave reçu ! Confirmation en cours...');
-    pollWavePayment(orderId, 0);
+    if (marketOrderId) pollMarketWavePayment(marketOrderId, 0);
+    else pollWavePayment(orderId, 0);
   }
 });
+
+async function pollMarketWavePayment(marketOrderId, attempts) {
+  if (attempts > 15) {
+    showToast('ℹ️ Paiement reçu — confirmation en cours, veuillez patienter.');
+    return;
+  }
+  try {
+    const result = await apiCall('/api/payments/market/' + marketOrderId + '/status');
+    if (result.paid) {
+      showToast('✅ Paiement confirmé ! Les boutiques préparent votre commande.');
+      await loadMarketOrder(marketOrderId);
+      retirerArticlesCommandeDuPanier(currentOrder);
+      localStorage.removeItem('marketCheckout');
+      history.replaceState(null, '', '?marketOrderId=' + marketOrderId);
+    } else {
+      setTimeout(() => pollMarketWavePayment(marketOrderId, attempts + 1), 2000);
+    }
+  } catch (e) {
+    setTimeout(() => pollMarketWavePayment(marketOrderId, attempts + 1), 3000);
+  }
+}
+
+function renderMarketShopTracking(order) {
+  const container = document.getElementById('market-shop-tracking');
+  if (!container) return;
+  if (!order._isMarketOrder || !Array.isArray(order.orders) || order.orders.length < 2) {
+    container.classList.remove('show');
+    container.replaceChildren();
+    return;
+  }
+  const orderStatus = ['PENDING','CONFIRMED','PREPARING','READY','DELIVERING','DELIVERED'];
+  const labels = {
+    PENDING: 'En attente de confirmation', CONFIRMED: 'Confirmée', PREPARING: 'En préparation',
+    READY: 'Prête', DELIVERING: 'En livraison', DELIVERED: 'Livrée', CANCELLED: 'Annulée'
+  };
+  container.innerHTML = `<div style="font-size:.78rem;font-weight:700;color:var(--dark);margin-bottom:2px">Avancement par boutique</div>` + order.orders.map(child => {
+    const index = orderStatus.indexOf(child.status);
+    const groupIndex = orderStatus.indexOf(order.status);
+    const state = child.status === 'DELIVERED' ? 'done' : index >= 0 && index >= groupIndex ? 'active' : '';
+    return `<div class="mst-row"><span class="mst-dot ${state}"></span><div class="mst-info"><div class="mst-name">${escapeHtml(child.shop?.name || 'Boutique')}</div><div class="mst-status">${labels[child.status] || child.status}</div></div></div>`;
+  }).join('');
+  container.classList.add('show');
+}
 
 async function pollWavePayment(orderId, attempts) {
   if (attempts > 15) {
@@ -913,16 +1125,44 @@ async function pollWavePayment(orderId, attempts) {
     const result = await apiCall('/api/payments/' + orderId + '/status');
     if (result.paid) {
       showToast('✅ Paiement confirmé ! Commande en cours de traitement.');
+      await loadOrder(orderId);
+      retirerArticlesCommandeDuPanier(currentOrder);
       // Nettoyer l'URL sans recharger la page
       history.replaceState(null, '', '?id=' + orderId);
-      // Recharger l'ordre pour afficher le bon statut
-      await loadOrder(orderId);
     } else {
       setTimeout(() => pollWavePayment(orderId, attempts + 1), 2000);
     }
   } catch (e) {
     setTimeout(() => pollWavePayment(orderId, attempts + 1), 3000);
   }
+}
+
+function retirerArticlesCommandeDuPanier(order) {
+  if (order?._isMarketOrder) {
+    for (const child of order.orders || []) retirerArticlesCommandeDuPanier(child);
+    localStorage.removeItem('marketCheckout');
+    return;
+  }
+  if (!order?.items?.length) return;
+  let panier;
+  try { panier = JSON.parse(localStorage.getItem('cart') || '[]'); }
+  catch (_) { panier = []; }
+  for (const ligne of order.items) {
+    let aRetirer = Number(ligne.quantity) || 0;
+    panier = panier.filter(article => {
+      const correspond = String(article.productId) === String(ligne.productId)
+        && String(article.shopId) === String(order.shopId)
+        && (article.size || null) === (ligne.size || null)
+        && (article.color || null) === (ligne.color || null);
+      if (!correspond || aRetirer <= 0) return true;
+      const q = Number(article.quantity) || 0;
+      if (q > aRetirer) { article.quantity = q - aRetirer; aRetirer = 0; return true; }
+      aRetirer -= q;
+      return false;
+    });
+  }
+  localStorage.setItem('cart', JSON.stringify(panier));
+  localStorage.removeItem('pendingOrder:' + order.shopId);
 }
 </script>
 </body>

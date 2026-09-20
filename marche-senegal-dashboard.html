@@ -320,8 +320,11 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="espace-vendeur ms-design page-dashboard">
 <div class="toast" id="toast"></div>
 <!-- La barre laterale est construite par marche-senegal-menu-vendeur.js -->
 
@@ -474,13 +477,7 @@
           <thead>
             <tr><th>Client</th><th>Produit</th><th>Montant</th><th>Statut</th><th></th></tr>
           </thead>
-          <tbody>
-            <tr><td>Moussa Sow</td><td>Boubou wax L</td><td style="font-weight:600;color:var(--green)">15 300</td><td><span class="order-status os-wait">En attente</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
-            <tr><td>Aissatou Ba</td><td>Bazin brodé</td><td style="font-weight:600;color:var(--green)">25 000</td><td><span class="order-status os-go">En livraison</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
-            <tr><td>Ibrahima Fall</td><td>Tissu wax 6y</td><td style="font-weight:600;color:var(--green)">4 500</td><td><span class="order-status os-done">Livré</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
-            <tr><td>Rokhaya Faye</td><td>Robe wax M</td><td style="font-weight:600;color:var(--green)">9 500</td><td><span class="order-status os-wait">En attente</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
-            <tr><td>Cheikh Diop</td><td>Kaftan bazin</td><td style="font-weight:600;color:var(--green)">22 000</td><td><span class="order-status os-cancel">Annulé</span></td><td><span class="order-action" onclick="toast('Voir commande...')">Voir →</span></td></tr>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
 
@@ -532,13 +529,7 @@
       <!-- Activity -->
       <div class="table-card">
         <div class="tc-header"><div class="tc-title"><i class="ic" data-ic="bell"></i> Activité récente</div></div>
-        <div class="activity-list">
-          <div class="act-item"><div class="act-icon ai-green"><i class="ic" data-ic="shopping-cart"></i></div><div class="act-text"><strong>Nouvelle commande</strong> de Moussa Sow — Boubou wax L · 15 300 FCFA</div><div class="act-time">5 min</div></div>
-          <div class="act-item"><div class="act-icon ai-gold"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="act-text"><strong>Avis 5 étoiles</strong> reçu de Aissatou Ba — "Tissu magnifique, livraison rapide !"</div><div class="act-time">23 min</div></div>
-          <div class="act-item"><div class="act-icon ai-blue"><i class="ic" data-ic="message-circle"></i></div><div class="act-text"><strong>Message</strong> de Ibrahima Fall — "Est-ce que vous avez le boubou en taille XXL ?"</div><div class="act-time">1h</div></div>
-          <div class="act-item"><div class="act-icon ai-green"><i class="ic" data-ic="coins"></i></div><div class="act-text"><strong>Paiement reçu</strong> — 25 000 FCFA via Wave pour commande #MS-2025-00841</div><div class="act-time">2h</div></div>
-          <div class="act-item"><div class="act-icon ai-red"><i class="ic" data-ic="package"></i></div><div class="act-text"><strong>Stock faible</strong> — Boubou wax taille L, il reste seulement <strong>4 pièces</strong></div><div class="act-time">3h</div></div>
-        </div>
+        <div class="activity-list"></div>
       </div>
 
       <!-- Stock alerts -->
@@ -590,6 +581,7 @@
         <div class="form-field"><div class="form-label" id="promo-text-label">Nom du code</div><input class="form-input" type="text" placeholder="Ex : SANDAGA20" id="promo-code-input" oninput="updatePreview()" style="text-transform:uppercase"/></div>
         <div class="form-field" id="promo-pct-field"><div class="form-label">Réduction (%)</div><input class="form-input" type="number" placeholder="Ex: 20" id="promo-pct-input" min="1" max="80" oninput="updatePreview()"/></div>
         <div class="form-field"><div class="form-label">Durée</div><select class="form-input" id="promo-duration-select"><option value="1">1 jour</option><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
+        <div class="form-field"><div class="form-label">Accès fidélité</div><select class="form-input" id="promo-early-access-select"><option value="0" selected>Public à la date de lancement</option><option value="12">Argent+ · 12 h avant</option><option value="24">Argent+ · 24 h avant</option></select></div>
         <div class="form-field"><div class="form-label">Utilisations max.</div><input class="form-input" type="number" id="promo-maxuses-input" placeholder="Illimité si vide"/></div>
       </div>
       <div id="promo-annonce-note" style="display:none;font-size:.8rem;color:#8A6100;background:var(--gdl);border:1px solid rgba(230,168,23,.35);border-radius:10px;padding:10px 14px;margin-bottom:14px"></div>

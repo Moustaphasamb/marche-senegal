@@ -351,8 +351,10 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-panier">
 
 <div class="toast" id="toast"></div>
 
@@ -478,28 +480,23 @@
       <!-- ADRESSE DE LIVRAISON -->
       <div class="sec-title" style="margin-top:8px"><i class="ic" data-ic="map-pin"></i> Adresse de livraison</div>
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
-        <div class="addr-list">
-          <div class="addr-card selected" onclick="selectAddr(this)">
-            <div class="addr-icon"><i class="ic" data-ic="house"></i></div>
-            <div>
-              <div class="addr-label">Domicile</div>
-              <div class="addr-text">Cité Keur Gorgui, Villa 12<br/>Dakar, Sénégal</div>
-            </div>
-            <div class="addr-radio"></div>
+        <div class="addr-list" id="checkout-addresses">Chargement des adresses…</div>
+        <details style="margin-top:12px">
+          <summary style="cursor:pointer;color:var(--green);font-weight:600">+ Ajouter une adresse</summary>
+          <div style="display:grid;gap:8px;margin-top:12px">
+            <input id="address-label" class="ps-input" placeholder="Libellé (ex. Domicile)" maxlength="60">
+            <input id="address-line" class="ps-input" placeholder="Adresse complète" maxlength="240">
+            <input id="address-city" class="ps-input" placeholder="Ville" maxlength="100">
+            <input id="address-region" class="ps-input" placeholder="Région (facultatif)" maxlength="100">
+            <button type="button" class="ps-btn" onclick="addCheckoutAddress()">Enregistrer l’adresse</button>
           </div>
-          <div class="addr-card" onclick="selectAddr(this)">
-            <div class="addr-icon"><i class="ic" data-ic="briefcase"></i></div>
-            <div>
-              <div class="addr-label">Bureau</div>
-              <div class="addr-text">Plateau, Rue Carnot<br/>Dakar Centre, Sénégal</div>
-            </div>
-            <div class="addr-radio"></div>
-          </div>
-          <div class="addr-add" onclick="toast('Ajouter une adresse...')">
-            <span style="font-size:1.1rem">+</span>
-            <span>Ajouter une nouvelle adresse</span>
-          </div>
-        </div>
+        </details>
+      </div>
+
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
+        <div class="ps-title"><i class="ic" data-ic="navigation"></i> Repère pour le livreur <span style="font-size:.72rem;color:var(--muted);font-weight:400">(facultatif)</span></div>
+        <textarea id="delivery-note" class="ps-input" rows="3" maxlength="500" placeholder="Ex. près de la pharmacie, appeler avant d’arriver…" style="resize:vertical;padding:11px 14px;line-height:1.45"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:6px">Ces instructions seront transmises au vendeur et au livreur.</div>
       </div>
 
       <!-- CODE PROMO -->
@@ -515,6 +512,15 @@
             <div class="ps-applied-desc" id="applied-desc"></div>
           </div>
           <button class="ps-remove" onclick="removePromo()">✕ Retirer</button>
+        </div>
+        <div style="margin-top:12px;font-size:.78rem;color:var(--muted)">Vous avez une récompense fidélité ?</div>
+        <div class="ps-input-row" style="margin-top:6px">
+          <input class="ps-input" type="text" placeholder="Code FID-..." id="reward-input"/>
+          <button class="ps-btn" onclick="applyReward()">Utiliser</button>
+        </div>
+        <div class="ps-applied" id="reward-applied" style="display:none">
+          <div><div class="ps-applied-code" id="reward-code"></div><div class="ps-applied-desc" id="reward-desc"></div></div>
+          <button class="ps-remove" onclick="removeReward()">✕ Retirer</button>
         </div>
       </div>
 
@@ -625,15 +631,58 @@
 
 let cart = [];
 let promoApplied = null;
-let deliveryFees = {};
+let rewardApplied = null;
+let marketDeliveryType = 'DELIVERY';
 let selectedPayment = 'WAVE';
 let selectedAddressId = null;
+let selectedMarketId = null;
 let lastOrderId = null;
+let lastMarketOrderId = null;
+let lastOrderNumber = null;
+let lastMarketKey = null;
 let currentPaymentId = null;
+
+function marketKey(item) {
+  return String(item.marketId || item.marketName || ('boutique-' + (item.shopId || 'inconnue')));
+}
+
+function itemsDuMarcheActif() {
+  return selectedMarketId ? cart.filter(item => marketKey(item) === selectedMarketId) : cart;
+}
+
+async function hydrateCartMetadata() {
+  const incomplets = cart.filter(item => !item.shopId || !item.marketId);
+  if (!incomplets.length) return;
+  const details = await Promise.all(incomplets.map(async item => {
+    try {
+      const result = await getProduct(item.productId);
+      return [item.productId, result.success ? result.data : null];
+    } catch (_) { return [item.productId, null]; }
+  }));
+  const parProduit = new Map(details);
+  let changed = false;
+  cart.forEach(item => {
+    const product = parProduit.get(item.productId);
+    if (!product) return;
+    item.shopId = product.shopId;
+    item.shopName = product.shop?.name || item.shopName;
+    item.marketId = product.shop?.market?.id || product.shop?.marketId || item.marketId;
+    item.marketName = product.shop?.market?.name || item.marketName;
+    item.image = item.image || product.images?.[0] || null;
+    changed = true;
+  });
+  if (changed) {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    loadCart();
+  }
+}
 
 // ── Charger le panier depuis localStorage ──
 function loadCart() {
-  cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  try {
+    const saved = JSON.parse(localStorage.getItem('cart') || '[]');
+    cart = Array.isArray(saved) ? saved.filter(item => item && item.productId && Number.isFinite(Number(item.price)) && Number(item.quantity) > 0) : [];
+  } catch (_) { cart = []; }
 
   const cartSection = document.querySelector('.cart-section');
   if (!cartSection) return;
@@ -662,10 +711,21 @@ function loadCart() {
     return;
   }
 
-  // Grouper les articles par boutique
-  // Si shopId est null, on groupe tous ensemble sous 'default'
-  const byShop = {};
+  const byMarket = {};
   cart.forEach(item => {
+    const key = marketKey(item);
+    if (!byMarket[key]) byMarket[key] = {
+      name: item.marketName || 'Marché de la boutique',
+      items: []
+    };
+    byMarket[key].items.push(item);
+  });
+  if (!selectedMarketId || !byMarket[selectedMarketId]) selectedMarketId = Object.keys(byMarket)[0];
+  const marketItems = byMarket[selectedMarketId].items;
+
+  // Grouper les articles du marché actif par boutique.
+  const byShop = {};
+  marketItems.forEach(item => {
     const key = item.shopId || 'default';
     if (!byShop[key]) {
       byShop[key] = {
@@ -676,30 +736,44 @@ function loadCart() {
     byShop[key].items.push(item);
   });
 
-  cartSection.innerHTML = Object.entries(byShop).map(([shopId, group]) => `
-    <div class="shop-group">
+  const shopCount = Object.keys(byShop).length;
+  const marketSelectors = Object.keys(byMarket).length > 1 ? `
+    <div style="display:flex;gap:8px;overflow:auto;padding:2px 1px 12px;scrollbar-width:none">
+      ${Object.entries(byMarket).map(([key, market]) => `
+        <button type="button" data-market-select="${escapeHtml(key)}" style="white-space:nowrap;border:1px solid ${key === selectedMarketId ? '#0d5c36' : 'var(--border)'};background:${key === selectedMarketId ? '#e9f4ed' : '#fff'};color:${key === selectedMarketId ? '#0d5c36' : 'var(--muted)'};border-radius:999px;padding:9px 13px;font-weight:700;cursor:pointer">
+          ${escapeHtml(market.name)} · ${market.items.reduce((sum, item) => sum + item.quantity, 0)}
+        </button>`).join('')}
+    </div>` : '';
+  cartSection.innerHTML = marketSelectors + `
+    <div style="background:linear-gradient(135deg,#0d5c36,#16794a);color:#fff;border-radius:18px;padding:17px 18px;margin-bottom:14px;display:flex;gap:12px;align-items:center;box-shadow:0 12px 30px rgba(13,92,54,.16)">
+      <div style="width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:1.25rem"><i class="ic" data-ic="shopping-bag"></i></div>
+      <div><strong style="display:block;font-size:.96rem">Panier ${escapeHtml(byMarket[selectedMarketId].name)}</strong><span style="display:block;margin-top:3px;font-size:.78rem;opacity:.86">${shopCount} boutique${shopCount > 1 ? 's' : ''}, un seul paiement et une seule livraison</span></div>
+    </div>
+  ` + Object.entries(byShop).map(([shopId, group]) => `
+    <div class="shop-group checkout-selected">
       <div class="sg-header">
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
         <div class="sg-icon">🏪</div>
-        <div class="sg-name">${group.shopName}</div>
+        <div class="sg-name">${escapeHtml(group.shopName)}</div></div>
         <div class="sg-verified">✓ Vérifié</div>
       </div>
       ${group.items.map(item => `
-        <div class="cart-item" data-product-id="${item.productId}">
+        <div class="cart-item" data-product-id="${escapeHtml(item.productId)}">
           <div class="ci-img" style="background:#F0EAF8">
             ${item.image
-              ? `<img src="${item.image}"
+              ? `<img src="${escapeHtml(imageURL(item.image))}"
                       style="width:100%;height:100%;object-fit:cover"/>`
               : '👗'
             }
           </div>
           <div class="ci-info">
             <div class="ci-market-tag">
-              ${item.marketName || item.shopName || '🏪 Boutique'}
+              ${escapeHtml(item.marketName || item.shopName || '🏪 Boutique')}
             </div>
-            <div class="ci-name">${item.name}</div>
+            <div class="ci-name">${escapeHtml(item.name)}</div>
             <div class="ci-variant">
-              ${item.size ? 'Taille : ' + item.size : ''}
-              ${item.color ? ' · ' + item.color : ''}
+              ${item.size ? 'Taille : ' + escapeHtml(item.size) : ''}
+              ${item.color ? ' · ' + escapeHtml(item.color) : ''}
             </div>
             <div class="ci-bottom">
               <div>
@@ -707,51 +781,77 @@ function loadCart() {
               </div>
               <div style="display:flex;align-items:center;gap:8px">
                 <div class="qty-ctrl">
-                  <button class="qty-btn"
-                    onclick="changeQty('${item.productId}', -1)">−</button>
-                  <div class="qty-num" id="qty-${item.productId}">
+                  <button class="qty-btn" data-qty-delta="-1">−</button>
+                  <div class="qty-num" id="qty-${escapeHtml(item.productId)}">
                     ${item.quantity}
                   </div>
-                  <button class="qty-btn"
-                    onclick="changeQty('${item.productId}', 1)">+</button>
+                  <button class="qty-btn" data-qty-delta="1">+</button>
                 </div>
-                <button class="ci-delete"
-                  onclick="removeItem('${item.productId}')"
+                <button class="ci-delete" data-remove-item
                   title="Supprimer">🗑</button>
               </div>
             </div>
           </div>
         </div>
       `).join('')}
-      <div class="delivery-choice">
-        <div class="dc-btn selected" onclick="selectDelivery(this, 'livraison')">
+    </div>
+  `).join('') + `
+    <div class="shop-group checkout-selected" style="border-color:rgba(13,92,54,.2)">
+      <div class="sg-header"><div class="sg-icon"><i class="ic" data-ic="truck"></i></div><div class="sg-name">Réception de toute la commande</div></div>
+      <div class="delivery-choice" id="market-delivery-choice">
+        <div class="dc-btn ${marketDeliveryType === 'DELIVERY' ? 'selected' : ''}" onclick="selectDelivery(this, 'livraison')">
           <div class="dc-icon">🚚</div>
           <div>
-            <div class="dc-label">Livraison à domicile</div>
-            <div class="dc-sub">1 000 FCFA · Demain avant 18h</div>
+            <div class="dc-label">Une livraison groupée</div>
+            <div class="dc-sub">1 000 FCFA pour toutes les boutiques</div>
           </div>
           <div class="dc-radio"></div>
         </div>
-        <div class="dc-btn" onclick="selectDelivery(this, 'retrait')">
+        <div class="dc-btn ${marketDeliveryType === 'PICKUP' ? 'selected' : ''}" onclick="selectDelivery(this, 'retrait')">
           <div class="dc-icon">🏪</div>
           <div>
-            <div class="dc-label">Retrait en boutique</div>
-            <div class="dc-sub">Gratuit · Disponible maintenant</div>
+            <div class="dc-label">Retrait au marché</div>
+            <div class="dc-sub">Gratuit · Les vendeurs préparent séparément</div>
           </div>
           <div class="dc-radio"></div>
         </div>
       </div>
     </div>
-  `).join('');
+  `;
 
-  // Associer data-shop-id et initialiser les frais par boutique
+  // Associer les boutiques sans en sélectionner une seule : elles participent
+  // toutes à la commande groupée.
   cartSection.querySelectorAll('.shop-group').forEach((sg, i) => {
     const id = Object.keys(byShop)[i];
-    sg.dataset.shopId = id;
-    if (deliveryFees[id] === undefined) deliveryFees[id] = 1000;
+    if (id) sg.dataset.shopId = id;
   });
 
+  cartSection.onclick = event => {
+    const productRow = event.target.closest('.cart-item');
+    const marketButton = event.target.closest('[data-market-select]');
+    if (marketButton) selectMarket(marketButton.dataset.marketSelect);
+    else if (productRow && event.target.closest('[data-qty-delta]')) changeQty(productRow.dataset.productId, Number(event.target.closest('[data-qty-delta]').dataset.qtyDelta));
+    else if (productRow && event.target.closest('[data-remove-item]')) removeItem(productRow.dataset.productId);
+  };
+
   updateSummary();
+}
+
+function selectMarket(id) {
+  selectedMarketId = id;
+  promoApplied = null;
+  rewardApplied = null;
+  const applied = document.getElementById('promo-applied');
+  if (applied) applied.style.display = 'none';
+  loadCart();
+  showToast('Panier du marché sélectionné');
+}
+
+function imageURL(value) {
+  try {
+    const url = new URL(String(value), location.origin);
+    return (url.protocol === 'https:' || url.origin === location.origin) ? url.href : '';
+  } catch (_) { return ''; }
 }
 
 // ── Changer la quantité ──
@@ -760,7 +860,8 @@ function changeQty(productId, delta) {
   if (!item) return;
 
   item.quantity = Math.max(1, item.quantity + delta);
-  document.getElementById('qty-' + productId).textContent = item.quantity;
+  const qtyNode = document.getElementById('qty-' + CSS.escape(productId));
+  if (qtyNode) qtyNode.textContent = item.quantity;
 
   localStorage.setItem('cart', JSON.stringify(cart));
   updateSummary();
@@ -779,12 +880,10 @@ function removeItem(productId) {
 
 // ── Sélectionner livraison/retrait ──
 function selectDelivery(btn, type) {
-  const group = btn.closest('.delivery-choice');
+  const group = document.getElementById('market-delivery-choice');
   group.querySelectorAll('.dc-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  const shopGroup = group.closest('.shop-group');
-  const shopId = shopGroup?.dataset.shopId || 'default';
-  deliveryFees[shopId] = type === 'livraison' ? 1000 : 0;
+  marketDeliveryType = type === 'livraison' ? 'DELIVERY' : 'PICKUP';
   updateSummary();
   showToast(type === 'livraison'
     ? '🚚 Livraison à domicile sélectionnée'
@@ -795,7 +894,58 @@ function selectDelivery(btn, type) {
 function selectAddr(card) {
   document.querySelectorAll('.addr-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
+  selectedAddressId = card.dataset.addressId || null;
   showToast('📍 Adresse sélectionnée');
+}
+
+async function loadCheckoutAddresses() {
+  const target = document.getElementById('checkout-addresses');
+  if (!target) return;
+  try {
+    const result = await getAddresses();
+    const addresses = result?.data?.data || result?.data || [];
+    if (!Array.isArray(addresses) || addresses.length === 0) {
+      target.textContent = 'Ajoutez une adresse pour vous faire livrer. Le retrait en boutique reste disponible.';
+      selectedAddressId = null;
+      return;
+    }
+    if (!addresses.some(address => address.id === selectedAddressId)) {
+      selectedAddressId = addresses.find(address => address.isDefault)?.id || addresses[0].id;
+    }
+    target.replaceChildren(...addresses.map(address => {
+      const card = document.createElement('div');
+      card.className = 'addr-card' + (address.id === selectedAddressId ? ' selected' : '');
+      card.dataset.addressId = address.id;
+      card.onclick = () => selectAddr(card);
+      const label = document.createElement('strong');
+      label.className = 'addr-label'; label.textContent = address.label;
+      const text = document.createElement('div');
+      text.className = 'addr-text';
+      text.textContent = [address.address, address.city, address.region].filter(Boolean).join(', ');
+      card.append(label, text);
+      return card;
+    }));
+  } catch (error) {
+    target.textContent = 'Impossible de charger vos adresses. Réessayez ou choisissez le retrait en boutique.';
+    console.error('Chargement des adresses:', error);
+  }
+}
+
+async function addCheckoutAddress() {
+  const data = {
+    label: document.getElementById('address-label').value.trim(),
+    address: document.getElementById('address-line').value.trim(),
+    city: document.getElementById('address-city').value.trim(),
+    region: document.getElementById('address-region').value.trim() || 'Dakar'
+  };
+  if (!data.label || !data.address || !data.city) { showToast('Renseignez le libellé, l’adresse et la ville'); return; }
+  try {
+    const result = await createAddress(data);
+    if (!result?.success) { showToast(result?.message || 'Adresse non enregistrée'); return; }
+    selectedAddressId = result.data?.id || result.data?.data?.id || null;
+    await loadCheckoutAddresses();
+    showToast('Adresse enregistrée');
+  } catch (error) { showToast('Impossible d’enregistrer cette adresse'); }
 }
 
 // ── Sélectionner le paiement ──
@@ -850,7 +1000,7 @@ async function loadPaymentMethods() {
 // sur chaque boutique du panier, et on retient celle qui l'accepte.
 function boutiquesDuPanier() {
   const parBoutique = {};
-  cart.forEach(item => {
+  itemsDuMarcheActif().forEach(item => {
     const shopId = item.shopId || 'default';
     parBoutique[shopId] = (parBoutique[shopId] || 0) + item.price * item.quantity;
   });
@@ -961,30 +1111,50 @@ function removePromo() {
   showToast('Code promo retiré');
 }
 
+async function applyReward() {
+  const input = document.getElementById('reward-input');
+  const code = input?.value.trim().toUpperCase();
+  if (!code) { showToast('Entrez votre code fidélité'); return; }
+  const result = await validateLoyaltyReward(code);
+  if (!result.success) { showToast('❌ ' + (result.message || 'Récompense invalide'), 'error'); return; }
+  rewardApplied = result.data;
+  document.getElementById('reward-applied').style.display = 'flex';
+  document.getElementById('reward-code').textContent = result.data.code;
+  document.getElementById('reward-desc').textContent = `−${formatPrice(result.data.amount)} sur cette commande`;
+  input.value = '';
+  updateSummary();
+  showToast('✓ Récompense fidélité appliquée !');
+}
+
+function removeReward() {
+  rewardApplied = null;
+  document.getElementById('reward-applied').style.display = 'none';
+  updateSummary();
+  showToast('Récompense retirée');
+}
+
 // ── Mettre à jour le récapitulatif ──
 function updateSummary() {
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const items = itemsDuMarcheActif();
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   // La remise vient du serveur, calculée sur la boutique du code : la calculer
   // ici sur le panier entier annonçait plus que ce que la commande appliquait.
-  const discount = promoApplied ? promoApplied.reduction : 0;
-  // Un code « livraison gratuite » efface les frais de sa boutique — et d'elle
-  // seule : les autres vendeurs du panier livrent toujours à leurs frais.
-  const fraisOfferts = (promoApplied && promoApplied.livraisonOfferte)
-    ? (deliveryFees[promoApplied.shopId] || 0)
-    : 0;
-  const totalDeliveryFee = Object.values(deliveryFees).reduce((s, f) => s + f, 0) - fraisOfferts;
+  const discount = (promoApplied ? promoApplied.reduction : 0) + (rewardApplied ? Math.min(rewardApplied.amount, subtotal) : 0);
+  // La livraison est facturée une seule fois pour toutes les boutiques.
+  const totalDeliveryFee = marketDeliveryType === 'PICKUP' || promoApplied?.livraisonOfferte ? 0 : 1000;
   const total = subtotal + totalDeliveryFee - discount;
 
   // Lignes produits dynamiques
   const summaryItems = document.getElementById('summary-items');
   if (summaryItems) {
     while (summaryItems.firstChild) summaryItems.removeChild(summaryItems.firstChild);
-    cart.forEach(item => {
+    items.forEach(item => {
       const row = document.createElement('div');
       row.className = 'sr';
       const lbl = document.createElement('span');
       lbl.className = 'sr-label';
-      const name = item.name.length > 22 ? item.name.substring(0, 22) + '…' : item.name;
+      const safeName = String(item.name || 'Produit');
+      const name = safeName.length > 22 ? safeName.substring(0, 22) + '…' : safeName;
       lbl.textContent = name + ' × ' + item.quantity;
       const val = document.createElement('span');
       val.className = 'sr-value';
@@ -1015,13 +1185,30 @@ function updateSummary() {
   if (discountEl) discountEl.textContent = '−' + formatPrice(discount);
 
   // Mettre à jour le compteur panier
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   if (cartCountEl) cartCountEl.textContent = totalItems;
 
   // Mettre à jour le titre
   const secTitle = document.querySelector('.sec-title');
   if (secTitle) secTitle.textContent =
     `🛒 Mon panier (${totalItems} article${totalItems > 1 ? 's' : ''})`;
+  const summaryTitle = document.querySelector('.summary-title');
+  const shopCount = new Set(items.map(item => item.shopId || 'default')).size;
+  if (summaryTitle) summaryTitle.textContent = shopCount > 1 ? `Panier Marché · ${shopCount} boutiques` : 'Récapitulatif de commande';
+}
+
+function getMarketCheckoutKey() {
+  const signature = itemsDuMarcheActif()
+    .map(item => [item.productId, item.size || '', item.color || '', item.quantity].join(':'))
+    .sort()
+    .join('|');
+  try {
+    const saved = JSON.parse(localStorage.getItem('marketCheckout') || 'null');
+    if (saved?.signature === signature && saved?.key) return saved.key;
+  } catch (_) {}
+  const key = self.crypto?.randomUUID?.() || ('checkout-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+  localStorage.setItem('marketCheckout', JSON.stringify({ signature, key }));
+  return key;
 }
 
 // ── Payer ──
@@ -1040,33 +1227,40 @@ async function payNow() {
     return;
   }
 
+  const itemsToOrder = itemsDuMarcheActif();
+  if (!itemsToOrder.length || itemsToOrder.some(item => !item.shopId)) {
+    showToast('Un article ne peut pas encore être commandé. Retirez-le puis ajoutez-le à nouveau.');
+    return;
+  }
+  const deliveryType = marketDeliveryType;
+  if (deliveryType === 'DELIVERY' && !selectedAddressId) {
+    showToast('Ajoutez ou sélectionnez une adresse, ou choisissez le retrait en boutique.');
+    return;
+  }
+
   const payBtn = document.querySelector('.pay-btn');
   payBtn.innerHTML = '⏳ Création de la commande...';
   payBtn.style.background = 'var(--muted)';
   payBtn.disabled = true;
 
-  const byShop = {};
-  cart.forEach(item => {
-    const shopId = item.shopId || 'default';
-    if (!byShop[shopId]) byShop[shopId] = [];
-    byShop[shopId].push(item);
-  });
-
   try {
-    for (const [shopId, items] of Object.entries(byShop)) {
+      lastMarketKey = selectedMarketId;
       const orderData = {
-        shopId,
-        items: items.map(item => ({
+        items: itemsToOrder.map(item => ({
           productId: item.productId,
           quantity: item.quantity,
           size: item.size || null,
           color: item.color || null
         })),
-        deliveryType: (deliveryFees[shopId] ?? 1000) === 0 ? 'PICKUP' : 'DELIVERY',
-        promoCode: (promoApplied && promoApplied.shopId === shopId) ? promoApplied.code : null
+        deliveryType,
+        addressId: deliveryType === 'DELIVERY' ? selectedAddressId : undefined,
+        promoCode: promoApplied?.code || null,
+        loyaltyRewardCode: rewardApplied?.code || null,
+        notes: document.getElementById('delivery-note')?.value.trim() || null,
+        checkoutKey: getMarketCheckoutKey()
       };
 
-      const result = await createOrder(orderData);
+      const result = await createMarketOrder(orderData);
 
       if (!result.success) {
         showToast('❌ ' + result.message);
@@ -1075,8 +1269,10 @@ async function payNow() {
         payBtn.disabled = false;
         return;
       }
-      lastOrderId = result.data?.id || result.data?.order?.id || null;
-    }
+      lastMarketOrderId = result.data?.id || null;
+      lastOrderId = result.data?.orders?.[0]?.id || null;
+      lastOrderNumber = result.data?.orderNumber || null;
+      if (!lastMarketOrderId) throw new Error('Commande groupée sans identifiant');
 
     // Initier le paiement
     // Le montant à payer se lit sur la commande, côté serveur : le total que
@@ -1086,7 +1282,7 @@ async function payNow() {
     const initRes = await fetch(API_URL + '/api/payments/initiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ orderId: lastOrderId, method: selectedPayment })
+      body: JSON.stringify({ marketOrderId: lastMarketOrderId, method: selectedPayment })
     });
     const initData = await initRes.json();
 
@@ -1101,7 +1297,6 @@ async function payNow() {
 
     // Wave réel → redirection vers Wave Checkout
     if (initData.wave_launch_url) {
-      localStorage.removeItem('cart');
       showToast('Redirection vers Wave...');
       setTimeout(() => { window.location.href = initData.wave_launch_url; }, 600);
       return;
@@ -1177,13 +1372,18 @@ async function confirmPayment() {
     // Fermer le modal Wave
     document.getElementById('wave-overlay').classList.remove('show');
 
-    // Vider le panier
-    localStorage.removeItem('cart');
+    // Les articles des autres marchés restent dans le panier pour leur propre
+    // commande groupée.
+    cart = cart.filter(item => marketKey(item) !== lastMarketKey);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.removeItem('marketCheckout');
+    loadCart();
+    loadCheckoutAddresses();
 
     // Afficher le numéro de commande et l'overlay succès
     const orderNumEl = document.getElementById('sc-order-num');
-    if (orderNumEl && lastOrderId) {
-      orderNumEl.textContent = '#MS-' + String(lastOrderId).substring(0, 8).toUpperCase();
+    if (orderNumEl && lastMarketOrderId) {
+      orderNumEl.textContent = lastOrderNumber || ('#MSM-' + String(lastMarketOrderId).substring(0, 8).toUpperCase());
     }
     document.getElementById('success-overlay').classList.add('show');
 
@@ -1206,6 +1406,8 @@ function closeSuccess(dest) {
   document.getElementById('success-overlay').classList.remove('show');
   if (dest === 'home') {
     window.location.href = 'marche-senegal-accueil.html';
+  } else if (lastMarketOrderId) {
+    window.location.href = 'marche-senegal-commande.html?marketOrderId=' + lastMarketOrderId;
   } else if (lastOrderId) {
     window.location.href = 'marche-senegal-commande.html?id=' + lastOrderId;
   } else {
@@ -1227,6 +1429,8 @@ function addToCartFromSuggested(prod) {
       quantity: 1,
       shopId: prod.shopId || null,
       shopName: prod.shop?.name || null,
+      marketId: prod.shop?.market?.id || prod.shop?.marketId || null,
+      marketName: prod.shop?.market?.name || null,
       image: (prod.images || [])[0] || null
     });
   }
@@ -1310,8 +1514,10 @@ document.addEventListener('click', function(e) {
 });
 
 // ── Initialisation ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   loadCart();
+  await hydrateCartMetadata();
+  loadCheckoutAddresses();
   loadSuggestedProducts();
   loadPaymentMethods();
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Marché Sénégal — Accueil</title>
+<title>Marché Sénégal — Les marchés et boutiques du Sénégal en ligne</title>
 <meta name="description" content="La marketplace des marchés du Sénégal. Achetez auprès des boutiques de Sandaga, Tilène, HLM, Touba et Ziguinchor. Paiement Wave et Orange Money."/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
@@ -84,7 +84,9 @@
 .pb-label{font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
 .pb-title{font-family:'Newsreader',serif;font-size:clamp(1.2rem,2.5vw,1.9rem);font-weight:400;color:#fff}.pb-sub{font-size:.85rem;color:rgba(255,255,255,.5);margin-top:.3rem}
 .promo-pills{display:flex;gap:10px;flex-wrap:wrap}
-.promo-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius);padding:12px 16px;text-align:center;min-width:105px}
+.promo-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius);padding:12px 16px;text-align:center;min-width:125px}
+.promo-pill .pp-code{display:inline-flex;margin-top:7px;padding:4px 9px;border:1px dashed rgba(255,255,255,.45);border-radius:99px;background:rgba(255,255,255,.1);color:#fff;font:600 .66rem Manrope,sans-serif;cursor:pointer}
+.promo-pill .pp-code:hover{background:rgba(255,255,255,.2)}
 .pp-disc{font-size:1.2rem;font-weight:400;color:var(--gold);font-family:'Newsreader',serif}.pp-shop{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:3px}
 /* PRODUCTS */
 .prod-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.4rem}
@@ -177,71 +179,83 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 }
 </style>
 <script src="icons.js"></script>
+<link rel="preload" href="assets/banner-hero.jpg" as="image" fetchpriority="high"/>
+<link rel="stylesheet" href="accueil-immersif.css"/>
+<script src="accueil-immersif.js" defer></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="accueil-immersif ms-design page-accueil">
+<a class="home-skip" href="#contenu">Aller au contenu</a>
 <div class="toast" id="toast"></div>
 <!-- NAV -->
-<nav class="nav">
-  <a href="#" class="nav-logo"><div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div><span class="nav-logo-text">Marché Sénégal</span></a>
-  <div class="nav-search"><input type="text" placeholder="Rechercher un produit, une boutique, un marché..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
+<nav class="nav" aria-label="Navigation principale">
+  <a href="marche-senegal-accueil.html" class="nav-logo" aria-label="Marché Sénégal, accueil"><span class="brand-mark" aria-hidden="true"><i class="ic" data-ic="store"></i></span><span class="nav-logo-text">Marché<span class="brand-country">Sénégal</span></span></a>
+  <div class="home-nav-links"><a href="#marches">Nos marchés</a><a href="#catalogue">Les produits</a><a href="#comment-ca-marche">Comment ça marche</a></div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
-    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'"><i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div></button>
-    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    <a class="nav-seller-link" href="marche-senegal-connexion-vendeur.html">Devenir vendeur <span class="home-arrow" aria-hidden="true"></span></a>
+    <button class="nav-cart" aria-label="Ouvrir mon panier" onclick="window.location.href='marche-senegal-panier.html'"><i class="ic" data-ic="shopping-bag" aria-hidden="true"></i><span class="cart-badge" id="cart-count">0</span></button>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-drawer" onclick="toggleMenu()"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <!-- DRAWER -->
 <div class="nav-drawer" id="nav-drawer">
   <div class="nav-search" style="max-width:100%;width:100%"><input type="text" placeholder="Rechercher..." onkeydown="if(event.key==='Enter')goToSearch()"/><button class="nav-search-btn" onclick="goToSearch()"><i class="ic" data-ic="search"></i></button></div>
+  <div class="drawer-links"><a href="#marches">Explorer les marchés</a><a href="#catalogue">Découvrir les produits</a><a href="marche-senegal-connexion-vendeur.html">Espace vendeur</a></div>
   <div class="nav-drawer-row">
     <button class="nav-btn" id="drawer-login-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
   </div>
 </div>
 <!-- HERO -->
-<section class="hero">
-  <div>
-    <div class="hero-badge"><span class="hero-badge-dot"></span><span id="hero-greeting">La marketplace #1 du Sénégal</span></div>
-    <h1>Tout le marché<br/>sénégalais dans<br/>votre <span class="acc">poche</span></h1>
-    <p class="hero-desc">Sandaga, Tilène, HLM, Kermel — tous les marchés du Sénégal en ligne. Achetez et commandez depuis chez vous.</p>
-    <div class="hero-btns">
-      <button class="btn btn-white" onclick="window.location.href='marche-senegal-recherche.html'"><i class="ic" data-ic="shopping-bag"></i> Explorer les produits</button>
-      <button class="btn btn-outline-white" onclick="document.getElementById('marches').scrollIntoView({behavior:'smooth'})"><i class="ic" data-ic="map"></i> Choisir un marché</button>
-    </div>
-    <!-- Chiffres remplis par loadMarkets() depuis l'API — on n'affiche rien tant
-         qu'on ne sait pas, plutôt que d'afficher une valeur qui serait fausse. -->
-    <div class="hero-stats">
-      <div><div class="hstat-num" id="hstat-markets">—</div><div class="hstat-label">Marchés référencés</div></div>
-      <div><div class="hstat-num" id="hstat-regions">—</div><div class="hstat-label">Régions couvertes</div></div>
-    </div>
+<main id="contenu">
+<section class="hero" aria-labelledby="home-title">
+  <figure class="hero-stage" aria-hidden="true">
+    <img class="hero-scene is-current" src="assets/banner-hero.jpg" width="1920" height="1086" fetchpriority="high" decoding="async" alt=""/>
+    <img class="hero-scene" data-src="assets/type-ville-sainte.jpg" width="1920" height="1086" decoding="async" alt=""/>
+    <img class="hero-scene" data-src="assets/type-fleuve.jpg" width="1920" height="1086" decoding="async" alt=""/>
+    <video id="hero-video" data-video-src="" muted loop playsinline preload="none" poster="assets/banner-hero.jpg" tabindex="-1"></video>
+  </figure>
+  <div class="hero-content">
+    <p class="hero-eyebrow"><span></span><span id="hero-greeting">D’ici. Tout simplement.</span></p>
+    <h1 id="home-title">Le Sénégal,<br/>à portée de <em>main.</em></h1>
+    <p class="hero-desc">Les couleurs de nos marchés. Le talent de nos commerçants.<br class="desktop-break"/> Retrouvez ce qui vous ressemble, près de chez vous.</p>
+    <form class="hero-search" action="marche-senegal-recherche.html" method="get" role="search">
+      <label class="sr-only" for="hero-query">Quel produit recherchez-vous ?</label>
+      <i class="ic" data-ic="search" aria-hidden="true"></i>
+      <input id="hero-query" type="search" name="q" placeholder="Un produit, une envie…" enterkeyhint="search" maxlength="160"/>
+      <button type="submit">Rechercher <span class="home-arrow" aria-hidden="true"></span></button>
+    </form>
+    <div class="hero-suggestions"><span>À découvrir</span><a href="marche-senegal-recherche.html?category=mode">Mode &amp; wax</a><a href="marche-senegal-recherche.html?category=artisan">Artisanat</a><a href="marche-senegal-recherche.html?category=aliment">Saveurs locales</a></div>
   </div>
-  <div class="hero-right">
-    <div class="hero-phone">
-      <div class="hp-screen">
-        <div class="hp-top">
-          <div class="hp-toprow"><div class="hp-topname">Bonjour, Fatou 👋</div><div class="hp-avatar">F</div></div>
-          <div class="hp-search"><div class="hp-search-dot"></div><div class="hp-search-text">Chercher un produit...</div></div>
-        </div>
-        <div class="hp-cats">
-          <div class="hp-cat act"><div class="hp-cat-e"><i class="ic" data-ic="wheat"></i></div><div class="hp-cat-n">Aliment.</div></div>
-          <div class="hp-cat"><div class="hp-cat-e"><i class="ic" data-ic="shirt"></i></div><div class="hp-cat-n">Mode</div></div>
-          <div class="hp-cat"><div class="hp-cat-e"><i class="ic" data-ic="palette"></i></div><div class="hp-cat-n">Artisan.</div></div>
-        </div>
-        <div class="hp-prods">
-          <div class="hp-card"><div class="hp-card-img" style="background:#FFF8E7"><i class="ic" data-ic="apple"></i></div><div class="hp-card-body"><div class="hp-card-name">Mangues fraîches</div><div class="hp-card-price">1 200 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i></div><div class="hp-card-body"><div class="hp-card-name">Boubou wax</div><div class="hp-card-price">18 000 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#E8F5EC"><i class="ic" data-ic="bean"></i></div><div class="hp-card-body"><div class="hp-card-name">Arachides</div><div class="hp-card-price">500 FCFA</div></div></div>
-          <div class="hp-card"><div class="hp-card-img" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i></div><div class="hp-card-body"><div class="hp-card-name">Poterie</div><div class="hp-card-price">7 500 FCFA</div></div></div>
-        </div>
+  <div class="hero-footer">
+    <a class="hero-explore" href="#marches"><span class="explore-arrow" aria-hidden="true">↓</span> Entrez dans nos marchés</a>
+    <div class="hero-scene-control" role="group" aria-label="Ambiances du Sénégal">
+      <div class="scene-caption"><span id="scene-number">01 / 03</span><span id="scene-title">Au rythme des marchés</span><small id="scene-credit">Visuel d’ambiance</small></div>
+      <div class="scene-buttons">
+        <button type="button" class="scene-dot is-current" data-scene="0" aria-label="Afficher l’ambiance des marchés" aria-pressed="true"></button>
+        <button type="button" class="scene-dot" data-scene="1" aria-label="Afficher l’illustration du patrimoine" aria-pressed="false"></button>
+        <button type="button" class="scene-dot" data-scene="2" aria-label="Afficher l’illustration des rives du fleuve" aria-pressed="false"></button>
+        <button type="button" id="hero-motion" aria-label="Mettre les animations en pause" aria-pressed="false"><span id="motion-symbol" aria-hidden="true">Ⅱ</span></button>
       </div>
     </div>
   </div>
 </section>
+<div class="home-intro">
+  <p>Un pays de rencontres.<br/><strong>Des marchés à explorer.</strong></p>
+  <div class="intro-note"><i class="ic" data-ic="map" aria-hidden="true"></i><span>Du quartier au bout du pays,<br/>découvrez les boutiques référencées.</span></div>
+  <div class="hero-stats" aria-label="Couverture du catalogue">
+    <div><span class="hstat-num" id="hstat-markets">—</span><span class="hstat-label">Marchés référencés</span></div>
+    <div><span class="hstat-num" id="hstat-regions">—</span><span class="hstat-label">Régions représentées</span></div>
+  </div>
+</div>
 <!-- MARCHÉS -->
 <section class="section-wrap white-bg" id="marches">
   <div class="section-top">
     <div>
       <div class="section-label"><i class="ic" data-ic="map"></i> Marchés</div>
-      <div class="section-title">Les marchés déjà ouverts</div>
+      <h2 class="section-title">Chaque marché,<br/><em>une découverte.</em></h2>
+      <p class="section-description">Poussez la porte des marchés qui accueillent déjà des boutiques.</p>
     </div>
   </div>
   <!-- Seuls les marchés qui ont au moins une boutique s'affichent d'emblée.
@@ -260,6 +274,15 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div class="mk-empty" id="markets-none" hidden>Aucun marché ne correspond à cette recherche.</div>
   </div>
 </section>
+<section class="home-universes" aria-labelledby="universes-title">
+  <div class="section-top"><div><p class="section-label">L’inspiration est ici</p><h2 class="section-title" id="universes-title">Toutes les couleurs<br/><em>de chez nous.</em></h2></div><p class="section-description">Une matière, une saveur, une histoire.<br/>Laissez-vous guider par vos envies.</p></div>
+  <div class="universe-grid">
+    <a class="universe-card" href="marche-senegal-recherche.html?category=mode"><img src="assets/banner-mode.jpg" alt="" loading="lazy" width="1920" height="1086"/><span class="universe-copy"><small>01 — S’habiller</small><strong>Le sens du style.</strong><span>Mode &amp; accessoires <b class="home-arrow" aria-hidden="true"></b></span></span></a>
+    <a class="universe-card" href="marche-senegal-recherche.html?category=aliment"><img src="assets/type-fleuve.jpg" alt="" loading="lazy" width="1920" height="1086"/><span class="universe-copy"><small>02 — Savourer</small><strong>Le goût d’ici.</strong><span>Alimentation <b class="home-arrow" aria-hidden="true"></b></span></span></a>
+    <a class="universe-card" href="marche-senegal-recherche.html?category=artisan"><img src="assets/type-ville-sainte.jpg" alt="" loading="lazy" width="1920" height="1086"/><span class="universe-copy"><small>03 — S’entourer</small><strong>Le beau, à la main.</strong><span>Artisanat <b class="home-arrow" aria-hidden="true"></b></span></span></a>
+  </div>
+  <p class="universe-credit">Visuels d’ambiance et illustrations.</p>
+</section>
 <!-- PROMO BAND -->
 <div class="promos-band">
   <div><div class="pb-label"><i class="ic" data-ic="flame"></i> Offres du moment</div><div class="pb-title">Promotions actives aujourd'hui</div><div class="pb-sub">Les vendeurs partagent leurs meilleures offres</div></div>
@@ -271,8 +294,8 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   <div class="promo-pills" id="promo-pills"></div>
 </div>
 <!-- PRODUITS -->
-<section class="section-wrap bg">
-  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="shopping-bag"></i> Catalogue</div><div class="section-title">Produits populaires</div></div><a href="marche-senegal-recherche.html" class="section-link">Voir tout →</a></div>
+<section class="section-wrap bg" id="catalogue">
+  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="shopping-bag"></i> Catalogue</div><h2 class="section-title">Vos prochaines <em>trouvailles.</em></h2></div><a href="marche-senegal-recherche.html" class="section-link">Voir tout →</a></div>
   <div class="prod-filters">
     <button class="pf-btn active" onclick="filterProds('all',this)">Tout</button>
     <button class="pf-btn" onclick="filterProds('aliment',this)"><i class="ic" data-ic="wheat"></i> Alimentation</button>
@@ -281,20 +304,11 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <button class="pf-btn" onclick="filterProds('beaute',this)"><i class="ic" data-ic="sparkles"></i> Beauté</button>
     <button class="pf-btn" onclick="filterProds('maison',this)"><i class="ic" data-ic="house"></i> Maison</button>
   </div>
-  <div class="products-grid" id="products-grid">
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF8E7"><i class="ic" data-ic="apple"></i><div class="prod-badge">-10%</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="waves"></i> Ziguinchor</div><div class="prod-name">Mangues fraîches Casamance</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (128)</div><div class="prod-shop">Ferme Diallo · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">1 080 FCFA</span><span class="prod-old-price">1 200</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="landmark"></i> Sandaga</div><div class="prod-name">Boubou wax tissé main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.8 (234)</div><div class="prod-shop">Mode Fatou · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">18 000 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#E8F5EC"><i class="ic" data-ic="bean"></i><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="shopping-bag"></i> HLM</div><div class="prod-name">Arachides grillées au feu de bois</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.6 (89)</div><div class="prod-shop">Boutique Samba · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">500 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="artisan"><div class="prod-img" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i><div class="prod-badge">Artisanat</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="umbrella"></i> Mbour</div><div class="prod-name">Poterie artisanale peinte main</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 5.0 (42)</div><div class="prod-shop">Artisan Mbaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">7 500 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="mode"><div class="prod-img" style="background:#FFF8E7"><i class="ic" data-ic="spool"></i><div class="prod-badge">-15%</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="spool"></i> Tilène</div><div class="prod-name">Bazin brodé cérémonie</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (176)</div><div class="prod-shop">Tissus Aminata · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">21 250 FCFA</span><span class="prod-old-price">25 000</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="beaute"><div class="prod-img" style="background:#FDF3DC"><i class="ic" data-ic="cylinder"></i><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="landmark"></i> Sandaga</div><div class="prod-name">Beurre de karité pur naturel</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.7 (312)</div><div class="prod-shop">Beauté Naturelle · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">3 500 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="maison"><div class="prod-img" style="background:#E8F5EC"><i class="ic" data-ic="armchair"></i><div class="prod-badge new">Nouveau</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="wrench"></i> Colobane</div><div class="prod-name">Chaise en rotin tressée main</div><div class="prod-rating"><span class="prod-stars">★★★★☆</span> 4.5 (55)</div><div class="prod-shop">Meubles Gaye · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">12 000 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-    <div class="prod-card" data-cat="aliment"><div class="prod-img" style="background:#FFF3E0"><i class="ic" data-ic="fish"></i><div class="prod-badge">Frais</div><div class="prod-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div><div class="prod-body"><div class="prod-market"><i class="ic" data-ic="fish"></i> Kaolack</div><div class="prod-name">Thiof fumé séché du matin</div><div class="prod-rating"><span class="prod-stars">★★★★★</span> 4.9 (203)</div><div class="prod-shop">Pêcheur Diop · Vérifié ✓</div><div class="prod-footer"><div><span class="prod-price">4 500 FCFA</span></div><button class="prod-cart-btn">+</button></div></div></div>
-  </div>
+  <div class="products-grid" id="products-grid"></div>
 </section>
 <!-- CATÉGORIES -->
 <section class="section-wrap white-bg">
-  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="package"></i> Explorer</div><div class="section-title">Toutes les catégories</div></div></div>
+  <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="package"></i> Explorer</div><h2 class="section-title">À chacun <em>ses envies.</em></h2></div></div>
   <div class="cats-grid">
     <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=aliment'"><div class="cat-emoji"><i class="ic" data-ic="wheat"></i></div><div class="cat-name">Alimentation</div></div>
     <div class="cat-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="cat-emoji"><i class="ic" data-ic="shirt"></i></div><div class="cat-name">Mode</div></div>
@@ -307,8 +321,8 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   </div>
 </section>
 <!-- HIW -->
-<section class="section-wrap dark-bg">
-  <div class="hiw-header"><div class="hiw-title">Comment ça marche ?</div><p class="hiw-sub">Commander sur Marché Sénégal c'est simple, rapide et sécurisé.</p></div>
+<section class="section-wrap dark-bg" id="comment-ca-marche">
+  <div class="hiw-header"><h2 class="hiw-title">Le marché, en toute simplicité.</h2><p class="hiw-sub">Commander sur Marché Sénégal c'est simple, rapide et sécurisé.</p></div>
   <div class="hiw-grid">
     <div class="hiw-card"><div class="hiw-num">1</div><div class="hiw-card-title">Cherchez votre produit</div><div class="hiw-text">Tapez un mot-clé ou choisissez un marché. Filtrez par prix, note et localisation.</div></div>
     <div class="hiw-card"><div class="hiw-num">2</div><div class="hiw-card-title">Visitez la boutique</div><div class="hiw-text">Regardez la vidéo de la boutique, discutez avec le vendeur, consultez les avis.</div></div>
@@ -318,22 +332,20 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 </section>
 <!-- BOUTIQUES VEDETTES -->
 <section class="section-wrap bg">
-  <div class="section-top"><div><div class="section-label"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Vedettes</div><div class="section-title">Boutiques les mieux notées</div></div><a href="marche-senegal-recherche.html">Voir tout →</a></div>
-  <div class="shops-grid" id="shops-grid">
-    <div class="shop-card" onclick="window.location.href='marche-senegal-recherche.html?category=mode'"><div class="shop-banner" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="shop-avatar" style="background:var(--green)">MF</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Sandaga</div><div class="shop-name">Mode Fatou Ndoye</div><div class="shop-market">Marché Sandaga · Dakar</div><div class="shop-stats"><div><div class="ss-val">4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">234</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">1 240</div><div class="ss-lbl">Ventes</div></div></div></div></div>
-    <div class="shop-card" onclick="window.location.href='marche-senegal-recherche.html?category=agriculture'"><div class="shop-banner" style="background:#E8F5EC"><i class="ic" data-ic="wheat"></i><div class="shop-avatar" style="background:var(--gold);color:var(--dark)">FD</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Ziguinchor</div><div class="shop-name">Ferme Diallo Casamance</div><div class="shop-market">Marché Ziguinchor</div><div class="shop-stats"><div><div class="ss-val">4.9 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">312</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">2 100</div><div class="ss-lbl">Ventes</div></div></div></div></div>
-    <div class="shop-card" onclick="window.location.href='marche-senegal-recherche.html?category=artisanat'"><div class="shop-banner" style="background:#FDE8E6"><i class="ic" data-ic="amphora"></i><div class="shop-avatar" style="background:#C0392B">AM</div></div><div class="shop-body"><div class="shop-verified">✓ Vérifié · Mbour</div><div class="shop-name">Artisan Mbaye</div><div class="shop-market">Marché Mbour · Petite Côte</div><div class="shop-stats"><div><div class="ss-val">5.0 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="ss-lbl">Note</div></div><div><div class="ss-val">98</div><div class="ss-lbl">Avis</div></div><div><div class="ss-val">480</div><div class="ss-lbl">Ventes</div></div></div></div></div>
-  </div>
+  <div class="section-top"><div><div class="section-label"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Vedettes</div><h2 class="section-title">Derrière chaque boutique,<br/><em>un savoir-faire.</em></h2></div><a href="marche-senegal-recherche.html">Voir tout →</a></div>
+  <div class="shops-grid" id="shops-grid"></div>
 </section>
 <!-- CTA -->
 <section class="cta-section">
-  <h2>Vous êtes vendeur ? <i class="ic" data-ic="store"></i></h2>
-  <p>Rejoignez des milliers de commerçants qui ont ouvert leur boutique en ligne sur Marché Sénégal. Gratuit pour commencer.</p>
+  <span class="seller-invitation">L’espace des commerçants</span>
+  <h2>Votre talent mérite<br/>sa <em>vitrine.</em></h2>
+  <p>Ouvrez votre boutique en ligne sur Marché Sénégal et vendez aux acheteurs de votre marché. L'inscription est gratuite.</p>
   <div class="cta-btns">
     <button class="btn btn-cta-white" onclick="goToShop()"><i class="ic" data-ic="store"></i> Ouvrir ma boutique — Gratuit</button>
-    <button class="btn btn-outline-white" onclick="showToast('En savoir plus...')">En savoir plus</button>
+    <a class="btn btn-outline-white" href="marche-senegal-connexion-vendeur.html">Accéder à mon espace →</a>
   </div>
 </section>
+</main>
 <!-- FOOTER -->
 <footer>
   <div class="footer-grid">
@@ -342,7 +354,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div class="footer-col"><h4>Vendeurs</h4><a href="marche-senegal-connexion-vendeur.html">Ouvrir ma boutique</a><a href="marche-senegal-ajout-produit.html">Mes produits</a><a href="marche-senegal-dashboard.html">Mes promotions</a><a href="#">Tarifs</a></div>
     <div class="footer-col"><h4>Support</h4><a href="#">Aide & FAQ</a><a href="#">Nous contacter</a><a href="#">WhatsApp</a></div>
   </div>
-  <div class="footer-bottom"><span>© 2025 Marché Sénégal. Fait avec <i class="ic ic-red" data-ic="heart" data-ic-fill></i> au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
+  <div class="footer-bottom"><span>© 2026 Marché Sénégal. Fait avec <i class="ic ic-red" data-ic="heart" data-ic-fill></i> au Sénégal.</span><div class="footer-flags"><div class="fc-dot" style="background:#00853F"></div><div class="fc-dot" style="background:#FDEF42"></div><div class="fc-dot" style="background:#E31B23"></div></div></div>
 </footer>
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
@@ -396,6 +408,23 @@ async function loadPromosBand() {
 
     pastille.appendChild(remise);
     pastille.appendChild(boutique);
+
+    if (promo.code) {
+      const code = document.createElement('button');
+      code.type = 'button';
+      code.className = 'pp-code';
+      code.textContent = 'Copier ' + promo.code;
+      code.title = 'Copier le code promo';
+      code.onclick = (event) => {
+        event.stopPropagation();
+        const copie = navigator.clipboard?.writeText
+          ? navigator.clipboard.writeText(promo.code)
+          : Promise.reject(new Error('clipboard indisponible'));
+        copie.then(() => showToast('✓ Code ' + promo.code + ' copié'))
+          .catch(() => showToast('Code : ' + promo.code));
+      };
+      pastille.appendChild(code);
+    }
 
     // Le code ne sert à rien s'il ne mène nulle part : la pastille ouvre la
     // boutique qui l'offre.
@@ -471,11 +500,23 @@ async function loadProducts(filters = {}) {
               : ''
             }
           </div>
-          <button class="prod-cart-btn" onclick="addToCart(event, ${JSON.stringify(prod.id)}, ${JSON.stringify(prod.name)}, ${prod.price})">+</button>
+          <button class="prod-cart-btn" type="button"
+                  data-cart-id="${escapeHtml(prod.id)}"
+                  data-cart-name="${escapeHtml(prod.name)}"
+                  data-cart-price="${Number(prod.price) || 0}"
+                  aria-label="Ajouter ${escapeHtml(prod.name)} au panier">+</button>
         </div>
       </div>
     </div>
   `).join('');
+  grid.querySelectorAll('[data-cart-id]').forEach(button => {
+    button.addEventListener('click', event => addToCart(
+      event,
+      button.dataset.cartId,
+      button.dataset.cartName,
+      Number(button.dataset.cartPrice) || 0
+    ));
+  });
 }
 
 // ── Emojis des marchés (mapping client-side) ──
@@ -549,14 +590,20 @@ async function loadMarkets() {
       ? ouverts.map(m => {
           const n = m._count?.shops ?? 0;
           return `
-    <button class="mk-card" onclick="goMarket('${m.id}')">
-      <span class="mk-emoji" aria-hidden="true">${getMktEmojiAcc(m.name)}</span>
+    <article class="mk-card">
+      <a class="mk-main" href="marche-senegal-marche.html?id=${encodeURIComponent(m.id)}">
+      <span class="mk-picture"><img src="${escapeHtml(urlImageSure(m.imageUrl) || 'assets/banner-placeholder.svg')}" alt="" loading="lazy" width="720" height="440"/></span>
       <span class="mk-body">
         <span class="mk-name">${escapeHtml(nomCourtMarche(m.name))}</span>
         <span class="mk-city">${escapeHtml(sousTitreMarche(nomCourtMarche(m.name), m))}</span>
         <span class="mk-count">${n} boutique${n > 1 ? 's' : ''}</span>
+        <span class="mk-arrow home-arrow" aria-hidden="true"></span>
       </span>
-    </button>`;
+      </a>
+      ${CREDITS_BANNIERES[m.imageUrl]?.page
+        ? '<a class="mk-photo-credit" href="' + escapeHtml(CREDITS_BANNIERES[m.imageUrl].page) + '" target="_blank" rel="noopener noreferrer license">' + escapeHtml(CREDITS_BANNIERES[m.imageUrl].texte) + '</a>'
+        : '<span class="mk-photo-credit">' + escapeHtml(CREDITS_BANNIERES[m.imageUrl]?.texte || '') + '</span>'}
+    </article>`;
         }).join('')
       : '<div class="mk-empty">Aucune boutique n\'est encore ouverte. Parcourez les marchés référencés ci-dessous.</div>';
   }
@@ -619,11 +666,25 @@ function filterMarketsBySearch(q) {
 
 // ── Charger les boutiques vedettes depuis l'API ──
 async function loadFeaturedShops() {
-  const result = await getShops();
-  if (!result.success || !result.data?.length) return;
-
   const grid = document.getElementById('shops-grid');
   if (!grid) return;
+
+  const result = await getShops();
+
+  // Ce « return » précoce était placé avant la récupération de la grille :
+  // quand l'API échouait, les trois boutiques d'exemple — avec leurs notes,
+  // leurs ventes et leur « ✓ Vérifié » — restaient affichées sans limite de
+  // temps. La grille part désormais vide du serveur, et un échec affiche un
+  // message plutôt qu'un catalogue inventé.
+  if (!result.success || !result.data?.length) {
+    const vide = document.createElement('div');
+    vide.style.cssText = 'grid-column:1/-1;text-align:center;padding:32px;color:var(--muted);font-size:.88rem';
+    vide.textContent = result.success
+      ? 'Aucune boutique à afficher pour le moment.'
+      : 'Impossible de charger les boutiques. Vérifiez votre connexion.';
+    grid.replaceChildren(vide);
+    return;
+  }
 
   const colors = ['#1B6B3A', '#E6A817', '#C0392B', '#2980B9', '#8E44AD'];
   grid.innerHTML = result.data.slice(0, 3).map((shop, i) => {
@@ -660,6 +721,7 @@ function goMarket(marketId) {
 
 // ── Ajouter au panier ──
 function addToCart(event, productId, productName, price) {
+  event.preventDefault();
   event.stopPropagation();
 
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -787,6 +849,7 @@ function toggleMenu() {
   const d = document.getElementById('nav-drawer');
   h.classList.toggle('open');
   d.classList.toggle('open');
+  h.setAttribute('aria-expanded', String(d.classList.contains('open')));
 }
 
 // ── Mettre à jour le compteur panier ──
@@ -834,6 +897,7 @@ document.addEventListener('click', function(e) {
       !d.contains(e.target) && !h.contains(e.target)) {
     d.classList.remove('open');
     h.classList.remove('open');
+    h.setAttribute('aria-expanded', 'false');
   }
 });
 
@@ -867,8 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartCount();
   updateAuthButton();
   updateHeroGreeting();
-  // focus 'left' : le texte du hero est à gauche, on l'y protège davantage.
-  applyBanner(document.querySelector('.hero'), HERO_BANNER, { focus: 'left' });
+  // Le visuel animé du hero est géré par accueil-immersif.js.
 
   // Le contenu de démonstration part avant tout appel réseau. Il attendait
   // auparavant la fin du chargement des marchés : sur une connexion lente,

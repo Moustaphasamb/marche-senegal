@@ -354,8 +354,10 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-produit">
 
 <div class="toast" id="toast"></div>
 
@@ -429,60 +431,31 @@ a{text-decoration:none;color:inherit}
         <div class="tab-nav-item active" onclick="switchProdTab('desc',this)">Description</div>
         <div class="tab-nav-item" onclick="switchProdTab('specs',this)">Caractéristiques</div>
         <div class="tab-nav-item" id="tab-avis-btn" onclick="switchProdTab('avis',this)">Avis (…)</div>
-        <div class="tab-nav-item" onclick="switchProdTab('qa',this)">Q&A (12)</div>
+        <div class="tab-nav-item" onclick="switchProdTab('qa',this)">Questions</div>
       </div>
 
       <!-- DESC -->
-      <div id="tab-desc" class="desc-content">
-        <p>Le <strong>Boubou wax tissé main</strong> est une pièce d'exception confectionnée à la main par les artisans sénégalais. Ce vêtement traditionnel allie l'élégance du wax hollandais à la finesse du travail artisanal local.</p>
-        <h4>Points forts</h4>
-        <ul class="desc-list">
-          <li>Tissu wax hollandais 100% coton certifié</li>
-          <li>Couture et broderie entièrement faites à la main</li>
-          <li>Colorants naturels résistants au lavage</li>
-          <li>Coupe ample et confortable, idéale pour les cérémonies</li>
-          <li>Disponible en plusieurs tailles du S au XXXL</li>
-          <li>Livraison dans toutes les régions du Sénégal</li>
-        </ul>
-        <h4>Entretien</h4>
-        <ul class="desc-list">
-          <li>Lavage à la main recommandé à l'eau froide</li>
-          <li>Ne pas utiliser de javel ou d'eau de Javel</li>
-          <li>Séchage à l'ombre pour préserver les couleurs</li>
-          <li>Repassage à température moyenne côté envers</li>
-        </ul>
-      </div>
+      <div id="tab-desc" class="desc-content"></div>
 
       <!-- SPECS -->
       <div id="tab-specs" style="display:none">
-        <table class="spec-table">
-          <tr><td>Matière</td><td>100% Coton — Tissu wax hollandais</td></tr>
-          <tr><td>Origine</td><td>Fabriqué au Sénégal — Marché Sandaga, Dakar</td></tr>
-          <tr><td>Tailles disponibles</td><td>S · M · L · XL · XXL · XXXL</td></tr>
-          <tr><td>Couleurs</td><td>Bleu/Or · Rouge/Noir · Vert/Blanc · Multicolore</td></tr>
-          <tr><td>Poids</td><td>Environ 350g</td></tr>
-          <tr><td>Longueur</td><td>Sol (taille L : 140cm)</td></tr>
-          <tr><td>Occasion</td><td>Cérémonie · Tabaski · Korité · Sortie élégante</td></tr>
-          <tr><td>Garantie</td><td>7 jours retour · Échange ou remboursement</td></tr>
-          <tr><td>Vendeur</td><td>Mode Fatou Ndoye — Vérifié ✓</td></tr>
-          <tr><td>Référence</td><td>MFN-BWX-2025-L</td></tr>
-        </table>
+        <table class="spec-table"><tbody id="spec-rows"></tbody></table>
       </div>
 
       <!-- AVIS -->
       <div id="tab-avis" style="display:none">
         <div class="rating-summary">
           <div class="rs-big">
-            <div class="rs-num">4.9</div>
-            <div class="rs-stars">★★★★★</div>
-            <div class="rs-count">89 avis</div>
+            <div class="rs-num"></div>
+            <div class="rs-stars"></div>
+            <div class="rs-count"></div>
           </div>
           <div class="rs-bars">
-            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">5★</span><div class="rb-bg"><div class="rb-fill" style="width:78%"></div></div><span class="rb-pct">78%</span></div>
-            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">4★</span><div class="rb-bg"><div class="rb-fill" style="width:16%"></div></div><span class="rb-pct">16%</span></div>
-            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">3★</span><div class="rb-bg"><div class="rb-fill" style="width:4%"></div></div><span class="rb-pct">4%</span></div>
-            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">2★</span><div class="rb-bg"><div class="rb-fill" style="width:2%"></div></div><span class="rb-pct">2%</span></div>
-            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct">0%</span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">5★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">4★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">3★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">2★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+            <div class="rb-row"><span style="width:16px;flex-shrink:0;font-size:.72rem">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
           </div>
         </div>
         <div id="prod-review-form" style="display:none;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
@@ -501,63 +474,18 @@ a{text-decoration:none;color:inherit}
         </div>
 
         <div class="reviews-list">
-          <div class="review-card">
-            <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 3 jours · Dakar</div></div><div class="rv-stars">★★★★★</div></div>
-            <div class="rv-text">Qualité exceptionnelle ! Le tissu est exactement comme sur la photo, les couleurs sont vives et la couture est parfaite. Ma femme est ravie. La livraison a été rapide.</div>
-            <div class="rv-verified">✓ Achat vérifié</div>
-          </div>
-          <div class="review-card">
-            <div class="rv-header"><div class="rv-avatar" style="background:#8B3A8A">AB</div><div><div class="rv-name">Aissatou Ba</div><div class="rv-date">Il y a 1 semaine · Thiès</div></div><div class="rv-stars">★★★★★</div></div>
-            <div class="rv-text">J'ai commandé pour la Tabaski et je n'ai pas été déçue. Le boubou est magnifique, la taille correspond parfaitement au guide. Fatou a répondu rapidement à mes questions sur WhatsApp.</div>
-            <div class="rv-verified">✓ Achat vérifié</div>
-          </div>
-          <div class="review-card">
-            <div class="rv-header"><div class="rv-avatar" style="background:var(--gold);color:var(--dark)">OF</div><div><div class="rv-name">Ousmane Fall</div><div class="rv-date">Il y a 2 semaines · Saint-Louis</div></div><div class="rv-stars">★★★★★</div></div>
-            <div class="rv-text">Très bon produit. La broderie est fine et bien faite. Le tissu wax est authentique. Prix juste pour la qualité. Je recommande cette boutique les yeux fermés.</div>
-            <div class="rv-verified">✓ Achat vérifié</div>
-          </div>
         </div>
       </div>
 
       <!-- Q&A -->
       <div id="tab-qa" style="display:none">
         <div class="qa-list">
-          <div class="qa-item">
-            <div class="qa-q" onclick="toggleQa(this)">
-              <span>Est-ce que le tissu rétrécit au lavage ?</span>
-              <span class="qa-arrow">▼</span>
-            </div>
-            <div class="qa-a">Non, le tissu wax hollandais ne rétrécit pas si vous respectez les instructions d'entretien. Lavage à la main à l'eau froide et séchage à l'ombre recommandés.</div>
-          </div>
-          <div class="qa-item">
-            <div class="qa-q" onclick="toggleQa(this)">
-              <span>Faites-vous des commandes sur mesure ?</span>
-              <span class="qa-arrow">▼</span>
-            </div>
-            <div class="qa-a">Oui ! Contactez-moi directement sur le chat ou WhatsApp avec vos mesures. Délai de 5 à 7 jours pour une confection sur mesure. Supplément de 5 000 FCFA.</div>
-          </div>
-          <div class="qa-item">
-            <div class="qa-q" onclick="toggleQa(this)">
-              <span>Livrez-vous en dehors de Dakar ?</span>
-              <span class="qa-arrow">▼</span>
-            </div>
-            <div class="qa-a">Oui, je livre dans toutes les 14 régions du Sénégal via le réseau de livraison Marché Sénégal. Délai 2 à 4 jours selon la région. Frais entre 2 500 et 5 000 FCFA.</div>
-          </div>
-          <div class="qa-item">
-            <div class="qa-q" onclick="toggleQa(this)">
-              <span>Quelle taille prendre pour 1m70 et 80kg ?</span>
-              <span class="qa-arrow">▼</span>
-            </div>
-            <div class="qa-a">Pour ces mensurations je recommande la taille XL. Le boubou est ample donc si vous voulez plus de volume prenez XXL. N'hésitez pas à me contacter pour un conseil personnalisé.</div>
-          </div>
-          <div class="qa-ask" style="cursor:default">
-            <div class="qa-ask-text" style="margin-bottom:10px">Vous avez une question ? <strong>Posez-la directement au vendeur</strong></div>
-            <textarea id="qa-input" rows="2"
-              style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:8px 12px;font-size:.82rem;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s;margin-bottom:8px"
-              placeholder="Ex : Est-ce disponible en taille M bleue ?"></textarea>
-            <button onclick="submitQuestion()"
-              style="background:var(--green);color:#fff;border:none;border-radius:99px;padding:8px 20px;font-size:.8rem;font-weight:600;cursor:pointer;width:100%;transition:background .2s">
-              Envoyer ma question →
+          <div class="qa-empty" style="text-align:center;padding:32px 16px;color:var(--muted)">
+            <div style="font-size:.9rem;color:var(--text);font-weight:600;margin-bottom:6px">Une question sur ce produit ?</div>
+            <div style="font-size:.84rem;margin-bottom:16px">Écrivez au vendeur : il vous répond dans la messagerie.</div>
+            <button type="button" id="qa-chat-btn"
+              style="background:var(--green);color:#fff;border:none;border-radius:99px;padding:11px 24px;font-size:.85rem;font-weight:600;cursor:pointer">
+              Contacter le vendeur
             </button>
           </div>
         </div>
@@ -568,23 +496,21 @@ a{text-decoration:none;color:inherit}
   <!-- RIGHT — PRODUCT INFO -->
   <div class="product-info">
     <div class="pi-tags" id="pi-tags">
-      <span class="pi-tag tag-market"><i class="ic" data-ic="landmark"></i> Sandaga</span>
-      <span class="pi-tag tag-cat"><i class="ic" data-ic="shirt"></i> Mode</span>
     </div>
 
-    <h1 class="pi-title">Boubou wax tissé main — Qualité supérieure</h1>
+    <h1 class="pi-title"></h1>
 
     <div class="pi-rating-row">
-      <span class="pi-stars">★★★★★</span>
-      <span class="pi-rating-num">4.9</span>
-      <span class="pi-rating-count" onclick="switchProdTab('avis',document.querySelectorAll('.tab-nav-item')[2])">(89 avis)</span>
-      <span class="pi-sales">1 240 vendus</span>
+      <span class="pi-stars"></span>
+      <span class="pi-rating-num"></span>
+      <span class="pi-rating-count" onclick="switchProdTab('avis',document.querySelectorAll('.tab-nav-item')[2])"></span>
+      <span class="pi-sales"></span>
     </div>
 
     <div class="pi-price-row">
-      <span class="pi-price">15 300 FCFA</span>
-      <span class="pi-old">18 000 FCFA</span>
-      <span class="pi-discount">-15%</span>
+      <span class="pi-price"></span>
+      <span class="pi-old"></span>
+      <span class="pi-discount"></span>
     </div>
     <div class="pi-price-note" id="pi-price-note" style="display:none"></div>
 
@@ -598,37 +524,20 @@ a{text-decoration:none;color:inherit}
     <!-- Taille -->
     <div class="opt-section">
       <div class="opt-label">
-        Taille : <strong id="selected-size">L</strong>
+        Taille : <strong id="selected-size"></strong>
         <span class="opt-guide" onclick="toast('Guide des tailles...')">Guide des tailles →</span>
       </div>
-      <div class="opt-btns">
-        <div class="opt-btn" onclick="selectSize(this,'S')">S</div>
-        <div class="opt-btn" onclick="selectSize(this,'M')">M</div>
-        <div class="opt-btn selected" onclick="selectSize(this,'L')">L</div>
-        <div class="opt-btn" onclick="selectSize(this,'XL')">XL</div>
-        <div class="opt-btn" onclick="selectSize(this,'XXL')">XXL</div>
-        <div class="opt-btn out" onclick="toast('Taille non disponible')">XXXL</div>
-      </div>
+      <div class="opt-btns"></div>
     </div>
 
     <!-- Couleur -->
     <div class="opt-section">
-      <div class="opt-label">Couleur : <strong id="selected-color">Bleu/Or</strong></div>
-      <div class="color-btns">
-        <div class="color-btn selected" style="background:linear-gradient(135deg,#1565C0,#F9A825)" data-name="Bleu/Or" onclick="selectColor(this,'Bleu/Or')"></div>
-        <div class="color-btn" style="background:linear-gradient(135deg,#C62828,#212121)" data-name="Rouge/Noir" onclick="selectColor(this,'Rouge/Noir')"></div>
-        <div class="color-btn" style="background:linear-gradient(135deg,#2E7D32,#FAFAFA)" data-name="Vert/Blanc" onclick="selectColor(this,'Vert/Blanc')"></div>
-        <div class="color-btn" style="background:linear-gradient(135deg,#6A1B9A,#F57F17)" data-name="Violet/Or" onclick="selectColor(this,'Violet/Or')"></div>
-        <div class="color-btn" style="background:linear-gradient(135deg,#BF360C,#E65100)" data-name="Multicolore" onclick="selectColor(this,'Multicolore')"></div>
-      </div>
+      <div class="opt-label">Couleur : <strong id="selected-color"></strong></div>
+      <div class="color-btns"></div>
     </div>
 
     <!-- Stock -->
-    <div class="stock-row">
-      <div class="stock-dot stock-low"></div>
-      <span style="font-weight:600;color:var(--text)">Stock limité</span>
-      <span style="color:var(--muted)">— Il ne reste que <strong>4 pièces</strong> en taille L</span>
-    </div>
+    <div class="stock-row"></div>
 
     <!-- Qty + Add to cart -->
     <div class="cart-row">
@@ -1019,6 +928,10 @@ async function loadProduct(productId) {
     if (reviewForm) reviewForm.style.display = 'block';
   }
 
+  // ── Caractéristiques et contact vendeur ──
+  renderSpecs(prod);
+  brancherContactVendeur(prod);
+
   // ── Vérifier si favori ──
   if (isLoggedIn()) {
     const favResult = await checkFavorite(prod.id);
@@ -1028,6 +941,74 @@ async function loadProduct(productId) {
       if (wishBtn) wishBtn.textContent = '❤️';
     }
   }
+}
+
+// ── Caractéristiques du produit ──
+//
+// Ce tableau contenait la fiche d'un boubou d'exemple — matière, référence,
+// vendeur, « Garantie 7 jours retour » — et aucun script ne la remplaçait :
+// les mêmes lignes s'affichaient sur chaque produit du catalogue. Il ne
+// montre désormais que ce que le vendeur a réellement renseigné, et une
+// ligne absente de la base ne s'affiche pas du tout.
+function renderSpecs(prod) {
+  const corps = document.getElementById('spec-rows');
+  if (!corps) return;
+
+  const lignes = [
+    ['Catégorie',            prod.category?.name],
+    ['Vendeur',              prod.shop?.name],
+    ['Marché',               prod.shop?.market?.name],
+    ['Tailles disponibles',  (prod.sizes || []).join(' · ')],
+    ['Couleurs',             (prod.colors || []).join(' · ')],
+    ['Poids',                prod.weight ? prod.weight + ' g' : ''],
+    ['Délai de préparation', prod.preparationLabel],
+    ['Référence',            prod.sku]
+  ];
+
+  corps.replaceChildren();
+  for (const [intitule, valeur] of lignes) {
+    if (!valeur) continue;
+    const tr = document.createElement('tr');
+    const td1 = document.createElement('td');
+    td1.textContent = intitule;
+    const td2 = document.createElement('td');
+    // textContent, jamais innerHTML : ces valeurs viennent du vendeur.
+    td2.textContent = valeur;
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    corps.appendChild(tr);
+  }
+
+  if (!corps.children.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 2;
+    td.style.color = 'var(--muted)';
+    td.textContent = 'Le vendeur n\'a pas renseigné de caractéristiques pour ce produit.';
+    tr.appendChild(td);
+    corps.appendChild(tr);
+  }
+}
+
+// ── Contacter le vendeur ──
+//
+// L'onglet « Questions » affichait quatre échanges inventés, signés du
+// vendeur, et son bouton d'envoi affichait « Question envoyée au vendeur ! »
+// sans appeler quoi que ce soit : aucune route ne reçoit de question.
+// L'acheteur repartait en croyant avoir écrit. Le bouton ouvre maintenant la
+// messagerie, qui elle existe réellement.
+function brancherContactVendeur(prod) {
+  const bouton = document.getElementById('qa-chat-btn');
+  if (!bouton) return;
+  const shopId = prod.shop?.id;
+  if (!shopId) {
+    bouton.disabled = true;
+    bouton.textContent = 'Messagerie indisponible';
+    return;
+  }
+  bouton.addEventListener('click', () => {
+    window.location.href = 'marche-senegal-chat.html?shopId=' + encodeURIComponent(shopId);
+  });
 }
 
 // ── Mettre à jour les barres de notation (produit) ──
@@ -1260,7 +1241,9 @@ function addToCart() {
       color: selectedColor,
       image: (currentProduct.images || [])[0] || null,
       shopId: currentProduct.shopId,
-      shopName: currentProduct.shop?.name
+      shopName: currentProduct.shop?.name,
+      marketId: currentProduct.shop?.market?.id || currentProduct.shop?.marketId || null,
+      marketName: currentProduct.shop?.market?.name || null
     });
   }
 
@@ -1380,7 +1363,16 @@ async function loadSimilarProducts(prod) {
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const ex = cart.find(i => i.productId === p.id);
         if (ex) { ex.quantity++; } else {
-          cart.push({ productId: p.id, name: p.name, price: p.price, quantity: 1, shopId: p.shopId, shopName: p.shop?.name });
+          cart.push({
+            productId: p.id,
+            name: p.name,
+            price: p.price,
+            quantity: 1,
+            shopId: p.shopId,
+            shopName: p.shop?.name,
+            marketId: p.shop?.market?.id || p.shop?.marketId || null,
+            marketName: p.shop?.market?.name || null
+          });
         }
         localStorage.setItem('cart', JSON.stringify(cart));
         cartCount = cart.reduce((s, i) => s + i.quantity, 0);
@@ -1502,14 +1494,11 @@ async function submitProdReview() {
   }
 }
 
-// ── Formulaire Q&A ──
-function submitQuestion() {
-  const input = document.getElementById('qa-input');
-  const q = input?.value.trim();
-  if (!q) { showToast('Veuillez écrire votre question'); return; }
-  showToast('✓ Question envoyée au vendeur !');
-  if (input) input.value = '';
-}
+// submitQuestion() est partie avec le formulaire Q&A : elle affichait
+// « ✓ Question envoyée au vendeur ! » sans rien envoyer, aucune route ne
+// recevant de question. brancherContactVendeur() ouvre la messagerie à la
+// place. toggleQa() est partie avec les quatre échanges inventés qu'elle
+// dépliait.
 
 // Le bouton « copier le code » copiait FATOU15 pour toutes les boutiques.
 // Il reviendra avec les promotions publiques d'une boutique.
@@ -1522,14 +1511,6 @@ function switchProdTab(tab, el) {
     const el = document.getElementById('tab-' + t);
     if (el) el.style.display = t === tab ? '' : 'none';
   });
-}
-
-// ── Toggle Q&A ──
-function toggleQa(el) {
-  const item = el.closest('.qa-item');
-  const wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.qa-item').forEach(i => i.classList.remove('open'));
-  if (!wasOpen) item.classList.add('open');
 }
 
 // ── Hamburger menu ──

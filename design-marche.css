@@ -1,0 +1,287 @@
+/* Direction commune : papier chaud, titres éditoriaux, acheteurs verts et vendeurs jaunes.
+   Chargée après les styles locaux. L'accueil conserve sa composition immersive. */
+body.ms-design:not(.accueil-immersif) {
+  --font-ui:'Manrope',sans-serif;--font-display:'Newsreader',Georgia,serif;
+  --bg:#f5f4ed;--white:#fffdf7;--border:#dedfd4;--radius:14px;
+  --shadow:0 5px 22px rgba(27,43,31,.045);--shadow-lg:0 16px 40px rgba(27,43,31,.10);
+  --nav-h:80px;--ms-gutter:clamp(20px,5.6vw,90px);
+  font-family:var(--font-ui);font-size:15px;color:var(--text);background:var(--bg);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+body.ms-design:not(.espace-vendeur):not(.accueil-immersif) {--green:#1c6845;--gl:#155639;--gp:#e9efe3;--g2:#c8d8bf;--dark:#173b2a;--text:#293a2d;--muted:#66715f;--gold:#c49b35}
+body.ms-design.espace-vendeur {--bg:#f9f6ed;--white:#fffdf7;--border:#e5dcc7}
+.ms-design *,.ms-design *::before,.ms-design *::after {box-sizing:border-box}
+.ms-design :is(button,input,select,textarea) {font-family:inherit}
+.ms-design :is(main,.main,.page,.page-wrap,.content,.results-area,.profile-content) {min-width:0}
+.ms-design :is(img,video) {max-width:100%}
+.ms-design :is(button,a,[tabindex]):focus-visible {outline:3px solid var(--gold);outline-offset:4px}
+.ms-design .ms-skip {position:fixed;top:8px;left:12px;z-index:1100;padding:12px 20px;background:#fffdf7;color:#173b2a;border:2px solid #173b2a;border-radius:8px;transform:translateY(-160%)}
+.ms-design .ms-skip:focus {transform:translateY(0)}
+.ms-design:not(.accueil-immersif) :is(.page-title,.ph-title,.form-title,.section-title,.sec-hd-title,.oh-title,.cc-title,.sv-heading h1) {font-family:var(--font-display);font-weight:400;letter-spacing:-.035em;line-height:1.1;text-wrap:balance}
+.ms-design:not(.accueil-immersif) :is(.page-title,.ph-title) {font-size:clamp(30px,3.1vw,46px)}
+.ms-design:not(.accueil-immersif) :is(.section-title,.sec-hd-title,.cc-title) {font-size:clamp(24px,2.3vw,32px)}
+.ms-design:not(.accueil-immersif) :is(.page-header,.ph) {margin-bottom:28px;gap:16px}
+/* La transparence sur papier protège la lecture des écrans métier. */
+body.ms-design:not(.accueil-immersif) .nav {height:var(--nav-h);min-height:var(--nav-h);padding-inline:var(--ms-gutter);background:rgba(255,253,247,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:none}
+body.ms-design:not(.accueil-immersif) .nav-logo {font-family:var(--font-ui);font-size:17px;font-weight:700;letter-spacing:-.04em;gap:11px}
+.ms-design:not(.accueil-immersif) .nav-logo .flag {width:25px;height:18px;border-radius:3px}
+.ms-design:not(.accueil-immersif) .nav-search {height:46px;border-radius:9px;background:var(--white);box-shadow:none;border-width:1px}
+.ms-design:not(.accueil-immersif) :is(.nav-search-btn,.nav-btn) {border-radius:7px;min-height:38px;font-size:12px}
+.ms-design:not(.accueil-immersif) :is(.nav-cart,.nav-hamburger) {min-width:42px;min-height:42px}
+.ms-design:not(.accueil-immersif) .nav-drawer {top:var(--nav-h);background:var(--white);border-color:var(--border)}
+.ms-design:not(.accueil-immersif) .mobile-nav {background:rgba(255,253,247,.96);backdrop-filter:blur(18px);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--border)}
+.ms-design:not(.accueil-immersif) .breadcrumb {padding:18px var(--ms-gutter);background:var(--bg);border-bottom:0;font-size:12px;line-height:1.6}
+/* Surfaces et catalogue. Les couleurs des statuts ne sont pas remplacées. */
+body.ms-design:not(.accueil-immersif) :is(.prod-card,.rc,.shop-card,.profile-card,.content-card,.order-header,.tracking-card,.items-card,.summary-card,.delivery-card,.actions-card,.seller-card,.info-card,.contact-card,.map-card,.form-card,.preview-card,.card,.chart-card,.table-card,.orders-card,.stat-card,.kpi-card,.sidebar-nav) {border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.ms-design:not(.accueil-immersif) :is(.prod-card,.rc,.shop-card) {overflow:hidden;background:var(--white);transition:transform .25s ease,box-shadow .25s ease}
+.ms-design:not(.accueil-immersif) :is(.prod-body,.rc-body) {padding:18px}
+.ms-design:not(.accueil-immersif) :is(.prod-img,.rc-img) {height:220px;background-color:#ebece2}
+.ms-design:not(.accueil-immersif) :is(.prod-img,.rc-img) img {width:100%;height:100%;object-fit:cover}
+.ms-design:not(.accueil-immersif) :is(.prod-name,.rc-name) {font-size:15px;line-height:1.5;font-weight:600}
+.ms-design:not(.accueil-immersif) :is(.prod-shop,.rc-shop) {font-size:12px;line-height:1.6}
+.ms-design:not(.accueil-immersif) :is(.prod-price,.rc-price) {font-size:16px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ms-design:not(.accueil-immersif) :is(.prod-old-price,.prod-old,.rc-old) {display:block;white-space:nowrap;margin:3px 0 0}
+.ms-design:not(.accueil-immersif) :is(.prod-footer,.rc-footer) {gap:8px;flex-wrap:wrap}
+.ms-design:not(.accueil-immersif) :is(.prod-cart-btn,.rc-add,.prod-add) {min-height:40px;min-width:40px;flex-shrink:0}
+.ms-design:not(.accueil-immersif) :is(.btn-primary,.btn-secondary,.btn-outline,.btn-save,.save-btn,.submit-btn,.publish-btn,.add-btn,.checkout-btn,.ph-btn,.sh-btn,.apply-btn,.sb-apply,.wb-btn,.sv-primary,.sv-secondary) {min-height:46px;border-radius:8px;line-height:1.4}
+.ms-design:not(.accueil-immersif) :is(.form-input,.form-select,.fi,.fi-input,.fi-select,.input-field,.field-input) {min-height:48px;border-radius:8px;background:var(--white);font-size:15px;border-width:1px}
+.ms-design:not(.accueil-immersif) textarea {line-height:1.65}
+.ms-design:not(.accueil-immersif) :is(.tabs,.filter-tabs,.orders-tabs) {border-color:var(--border)}
+.ms-design:not(.accueil-immersif) :is(.tab,.ft-tab,.filter-chip,.pg,.pagination button) {min-height:44px}
+.ms-design:not(.accueil-immersif) :is(.stat-value,.kpi-value,.stat-card strong) {font-variant-numeric:tabular-nums;font-family:var(--font-display);font-weight:400;font-size:clamp(28px,3vw,42px)}
+/* Le tissu est un fond d'ambiance, pas une photographie de produit. */
+body.ms-design.page-recherche .search-hero {padding:68px var(--ms-gutter) 42px;background:linear-gradient(90deg,rgba(13,39,26,.96),rgba(13,39,26,.83) 58%,rgba(13,39,26,.58)),url('assets/banner-mode.jpg') center/cover}
+body.ms-design.page-recherche .sh-title {font-size:clamp(36px,4.6vw,66px);font-weight:400;letter-spacing:-.045em;line-height:1.08;max-width:1000px;margin-bottom:26px}
+body.ms-design.page-recherche .sh-title span {color:#d4e4ae}
+.ms-design.page-recherche :is(.sh-label,.sh-stat-l) {color:#d2daca}
+.ms-design.page-recherche .sh-label {letter-spacing:.16em;font-size:11px;margin-bottom:20px}
+.ms-design.page-recherche .sh-bar {min-height:62px;max-width:740px;background:#fffdf7;border-radius:10px;box-shadow:none}
+.ms-design.page-recherche .sh-bar-btn {height:50px;border-radius:7px}
+.ms-design.page-recherche .sh-sug {border-radius:5px;min-height:36px;font-size:12px}
+.ms-design.page-recherche .filter-tabs {padding-inline:var(--ms-gutter);background:var(--white)}
+.ms-design.page-recherche .filters-sidebar {background:var(--white);box-shadow:none;padding:28px 22px}
+.ms-design.page-recherche .results-area {padding-top:32px}
+.ms-design.page-recherche .results-grid {gap:20px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+/* Marchés et boutiques conservent les photographies déjà associées au lieu. */
+.ms-design.page-marche .market-hero {padding:72px var(--ms-gutter);min-height:350px}
+.ms-design.page-marche .mh-title {font-size:clamp(44px,5.5vw,78px);font-weight:400;letter-spacing:-.04em}
+.ms-design.page-marche .mh-title em {color:#d4e4ae}
+.ms-design.page-marche :is(.mh-location,.mhstat-l) {color:#d8e0d1}
+.ms-design.page-marche .mh-info-card {backdrop-filter:blur(12px);background:rgba(16,36,23,.55);padding:24px;border-color:#ffffff30}
+.ms-design.page-marche .content {padding-top:36px}
+.ms-design.page-marche .sidebar {background:var(--white);box-shadow:none}
+.ms-design.page-marche .shop-banner {height:150px}
+.ms-design.page-boutique .sh-banner {height:110px}
+.ms-design.page-boutique .sh-info {padding:0 var(--ms-gutter) 42px}
+.ms-design.page-boutique .sh-name {font-size:clamp(38px,4.8vw,68px);font-weight:400;letter-spacing:-.035em;line-height:1.1}
+.ms-design.page-boutique :is(.sh-location,.sh-stat-l) {color:#d4dece}
+.ms-design.page-boutique .sh-avatar {border-radius:15px;width:86px;height:86px}
+.ms-design.page-boutique .sh-stats-row {border-top:1px solid #ffffff30;padding-top:18px;margin-top:22px;gap:30px}
+.ms-design.page-boutique .main {max-width:1440px;padding-top:42px;gap:32px}
+.ms-design.page-produit .main {max-width:1440px;gap:clamp(24px,4vw,60px);padding-top:36px}
+.ms-design.page-produit .pi-title {font-size:clamp(32px,3.2vw,48px);font-weight:400;letter-spacing:-.035em;line-height:1.12}
+.ms-design.page-produit .pi-price {font-size:38px;font-weight:400}
+.ms-design.page-produit .main-img {border-radius:16px;border:1px solid var(--border);background-color:#ebece2}
+.ms-design.page-panier .main {max-width:1320px;gap:36px;padding-top:36px}
+.ms-design.page-profil .main {max-width:1360px;gap:30px;padding-top:36px}
+.ms-design.page-commande .main {max-width:1000px;padding-top:36px}
+.ms-design.page-commande :is(.order-header,.tracking-card,.delivery-card) {padding:28px}
+/* Connexions : fond photographique acheteur, jaune chaleureux vendeur. */
+.ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .left {padding:clamp(32px,5.5vw,90px);background:linear-gradient(135deg,rgba(13,39,26,.93),rgba(13,39,26,.67)),url('assets/banner-hero.jpg') 62% center/cover}
+.ms-design:is(.page-connexion-acheteur,.page-mot-de-passe-oublie) .left::before,.ms-design:is(.page-connexion-acheteur,.page-mot-de-passe-oublie) .left::after {display:none}
+.ms-design:is(.page-connexion-acheteur,.page-mot-de-passe-oublie) .left-logo-text {color:#fffdf7;font-family:var(--font-ui);font-size:18px;letter-spacing:-.03em}
+.ms-design:is(.page-connexion-acheteur,.page-mot-de-passe-oublie) .left-title span {color:#d4e4ae}
+.ms-design:is(.page-connexion-acheteur,.page-mot-de-passe-oublie) .left-sub {color:#e0e5db}
+body.ms-design.page-connexion-vendeur .left {background:linear-gradient(145deg,rgba(250,207,78,.97),rgba(255,231,157,.88)),url('assets/banner-mode.jpg') center/cover}
+.ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .left-title {font-size:clamp(42px,4.4vw,66px);font-weight:400;letter-spacing:-.045em;line-height:1.07;max-width:12ch}
+.ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .right {background:var(--white);padding:48px clamp(24px,5vw,76px)}
+.ms-design .form-title {font-size:clamp(32px,3vw,44px)}
+.ms-design :is(.form-sub,.left-sub) {font-size:14px;line-height:1.8}
+.ms-design :is(.pw-eye,.fi-eye) {z-index:2;min-width:40px;min-height:40px;display:grid;place-items:center}
+.ms-design :is(.pw-eye,.fi-eye):active {transform:translateY(-50%)}
+.ms-design :is(.fi-password,.pw-wrap) input {padding-right:54px}
+body.ms-design.page-connexion-admin {background:radial-gradient(ellipse at top left,#37533a,#12271d 70%)}
+.ms-design.page-connexion-admin .card {background:var(--white);padding:40px;border:1px solid #ffffff30;box-shadow:0 28px 90px #0003}
+.ms-design.page-connexion-admin .card-title {font-size:36px;font-weight:400;letter-spacing:-.04em}
+/* Espaces de travail : conserver la place des données et des actions. */
+.ms-design:is(.espace-vendeur,.page-admin) .topbar {background:rgba(255,253,247,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);box-shadow:none}
+.ms-design.espace-vendeur .topbar {background:rgba(255,247,219,.94)}
+.ms-design:is(.espace-vendeur,.page-admin) .tb-title {font-size:24px;font-family:var(--font-display);font-weight:400}
+.ms-design:is(.espace-vendeur,.page-admin) .sb-logo-text {font-family:var(--font-ui);font-weight:700;font-size:18px;letter-spacing:-.04em}
+.ms-design:is(.espace-vendeur,.page-admin) .sb-item {padding-block:13px;font-size:13px}
+.ms-design.espace-vendeur .welcome-bar {padding:32px;background:linear-gradient(110deg,#30280f,#685425);border-radius:14px;margin-bottom:28px}
+.ms-design.espace-vendeur .wb-name {font-size:clamp(30px,3.5vw,48px);font-weight:400;letter-spacing:-.035em}
+.ms-design.espace-vendeur .wb-greeting {font-size:12px;letter-spacing:.05em}
+.ms-design.espace-vendeur :is(.form-card,.preview-card) {padding:26px}
+.ms-design.espace-vendeur :is(.fc-title,.card-title,.tc-title,.cc-title) {font-family:var(--font-display);font-size:24px;font-weight:400;letter-spacing:-.025em}
+.ms-design:is(.espace-vendeur,.page-admin) :is(.kpi-card,.stat-card) {padding:24px}
+.ms-design:is(.espace-vendeur,.page-admin) :is(.table-wrap,.table-scroll) {overflow-x:auto;max-width:100%;overscroll-behavior-inline:contain}
+.ms-design.page-admin .card-title {font-family:var(--font-display);font-size:24px;font-weight:400}
+.ms-design.page-admin .sb-logo-text {color:#fffdf7}
+.ms-design.page-shopvision .sv-canvas-card {border-radius:16px;border-color:var(--border);box-shadow:var(--shadow)}
+.ms-design.page-shopvision .sv-heading h1 {font-size:clamp(34px,3.8vw,54px)}
+.ms-design .ms-menu-lines {display:block;width:18px;height:2px;background:currentColor;box-shadow:0 -5px currentColor,0 5px currentColor;border-radius:2px}
+.ms-design.page-modifier-produit .st-logo {color:#f4c542;font-family:var(--font-ui);font-size:17px;font-weight:700}
+.ms-design.page-modifier-produit .page>div {min-width:0}
+.ms-design.page-modifier-produit :is(.fi,.fi-prefix input) {min-width:0;max-width:100%}
+/* Messagerie : garder la saisie visible sur écran mobile. */
+body.ms-design.page-chat {height:100dvh;background:#eeefe5}
+.ms-design.page-chat .nav {padding-inline:clamp(16px,4vw,64px)}
+.ms-design.page-chat .messages-wrap {padding:28px max(18px,calc((100vw - 980px)/2));gap:18px}
+.ms-design.page-chat .bubble {font-size:15px;line-height:1.7;padding:14px 18px;box-shadow:0 3px 12px #1a302408}
+.ms-design.page-chat .input-bar {padding:16px max(18px,calc((100vw - 980px)/2));padding-bottom:max(16px,env(safe-area-inset-bottom));background:var(--white)}
+.ms-design.page-chat .msg-input {min-width:0;min-height:48px;border-radius:10px;font-size:16px}
+.ms-design.page-chat .send-btn {width:48px;height:48px}
+@media(prefers-reduced-motion:no-preference) {
+  .ms-design:not(.accueil-immersif) :is(.market-hero .mh-inner,.search-hero>.sh-title,.shop-hero .sh-info,.left-content,.form-box,.welcome-bar,.order-header) {animation:ms-arrive .65s cubic-bezier(.2,.7,.2,1) both}
+  .ms-design:not(.accueil-immersif) :is(.prod-card,.rc,.shop-card):hover {transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+}
+@keyframes ms-arrive {from {opacity:0;transform:translateY(12px)}to {opacity:1;transform:translateY(0)}}
+@media(min-width:1100px) {
+  .ms-design.page-produit .main {grid-template-columns:minmax(0,1.1fr) minmax(380px,.9fr)}
+  .ms-design.page-boutique .main {grid-template-columns:minmax(0,1fr) 320px}
+}
+@media(max-width:900px) {
+  body.ms-design:not(.accueil-immersif) {--nav-h:68px;--ms-gutter:24px}
+  .ms-design.page-recherche .results-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .ms-design.page-recherche .search-hero {padding:42px var(--ms-gutter) 30px}
+  .ms-design.page-marche .market-hero {padding:46px var(--ms-gutter)}
+  .ms-design.page-boutique .main {gap:22px;padding-top:28px}
+  .ms-design.page-boutique .sh-banner {height:64px}
+  .ms-design.page-boutique .sh-avatar {width:64px;height:64px}
+  .ms-design:is(.espace-vendeur,.page-admin) :is(.kpi-card,.stat-card) {padding:18px}
+}
+@media(max-width:600px) {
+  body.ms-design:not(.accueil-immersif) {--ms-gutter:18px;font-size:15px}
+  body.ms-design:not(.accueil-immersif) .nav-logo {font-size:15px}
+  body.ms-design:not(.accueil-immersif) .nav-logo .nav-logo-text {display:inline}
+  .ms-design:not(.accueil-immersif) :is(.prod-body,.rc-body) {padding:12px}
+  .ms-design:not(.accueil-immersif) :is(.prod-img,.rc-img) {height:clamp(130px,38vw,190px)}
+  .ms-design:not(.accueil-immersif) :is(.prod-name,.rc-name) {font-size:13px}
+  .ms-design:not(.accueil-immersif) :is(.prod-price,.rc-price) {font-size:14px}
+  .ms-design:not(.accueil-immersif) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea) {font-size:16px}
+  .ms-design.page-recherche .sh-bar {padding-left:12px}
+  .ms-design.page-recherche .sh-bar-btn {padding-inline:12px;font-size:12px}
+  .ms-design.page-recherche .sh-suggestions {gap:6px}
+  .ms-design.page-marche .mh-title {font-size:44px}
+  .ms-design.page-marche .mh-info-card {width:100%;min-width:0}
+  .ms-design.page-boutique .sh-name {font-size:38px}
+  .ms-design.page-boutique .sh-meta {min-width:0;flex-basis:calc(100% - 90px)}
+  .ms-design.page-boutique .sh-stats-row {gap:20px}
+  .ms-design.page-panier .main,.ms-design.page-profil .main {gap:20px;padding-top:24px}
+  .ms-design.page-commande :is(.order-header,.tracking-card,.delivery-card) {padding:20px}
+  .ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .right {padding:32px 22px}
+  .ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .left {padding:32px 24px}
+  .ms-design:is(.page-connexion-acheteur,.page-connexion-vendeur,.page-mot-de-passe-oublie) .left-title {font-size:42px}
+  .ms-design.page-connexion-admin .card {padding:28px 22px}
+  .ms-design.espace-vendeur .welcome-bar {padding:24px}
+  .ms-design.espace-vendeur :is(.form-card,.preview-card) {padding:20px}
+  .ms-design:is(.espace-vendeur,.page-admin) .tb-title {font-size:21px}
+  .ms-design.page-chat .msg-row {max-width:92%}
+  .ms-design.page-chat .nav-back {font-size:12px;padding-inline:10px}
+  .ms-design:is(.espace-vendeur,.page-admin) .topbar {padding-inline:14px;gap:10px}
+  .ms-design:is(.espace-vendeur,.page-admin) .tb-title {min-width:0;flex:1;white-space:normal;line-height:1.1;font-size:20px}
+  .ms-design:is(.espace-vendeur,.page-admin) :is(.tb-profile-name,.tb-name) {display:none}
+  .ms-design:is(.espace-vendeur,.page-admin) .tb-profile {padding:5px}
+  .ms-design:is(.espace-vendeur,.page-admin) :is(.tb-actions,.tb-right) {gap:6px}
+  body.ms-design.page-ajout-produit {--topbar-h:116px}
+  .ms-design.page-ajout-produit .topbar {flex-wrap:wrap;align-content:center;row-gap:8px}
+  .ms-design.page-ajout-produit .tb-title {flex-basis:calc(100% - 60px)}
+  .ms-design.page-ajout-produit .tb-actions {width:100%;margin:0}
+  .ms-design.page-ajout-produit .tb-actions button {flex:1;min-height:42px;justify-content:center}
+  .ms-design.page-ajout-produit .tb-actions .tb-profile {display:none}
+  body.ms-design.page-profil .nav-logo .nav-logo-text {display:none}
+  .ms-design.page-profil .nav-actions {gap:6px}
+  .ms-design.page-profil .nav-btn {padding-inline:10px}
+  body.ms-design.page-modifier-produit {--nav-h:116px}
+  .ms-design.page-modifier-produit .seller-topbar {height:116px;flex-wrap:wrap;align-content:center;gap:8px;padding:10px 18px}
+  .ms-design.page-modifier-produit .st-nav {display:none}
+  .ms-design.page-modifier-produit .st-actions {width:100%;margin:0}
+  .ms-design.page-modifier-produit .st-btn {flex:1;min-height:42px;border-radius:8px}
+  .ms-design.page-produit .tab-nav {overflow-x:auto;max-width:100%}
+  .ms-design.page-modifier-produit .page {grid-template-columns:minmax(0,1fr)}
+  .ms-design.page-modifier-produit .photo-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ms-design.page-modifier-produit .fgrid {grid-template-columns:minmax(0,1fr)}
+  .ms-design.page-modifier-produit .fgrid-full {grid-column:1/-1}
+  .ms-design.page-dashboard .kpi-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ms-design.page-dashboard .kpi-card {min-width:0}
+  .ms-design.page-dashboard :is(.charts-row,.bottom-row,.charts-row>div,.bottom-row>div) {min-width:0}
+  .ms-design.page-dashboard :is(.kpi-value,.kpi-val) {font-size:clamp(24px,7vw,32px);overflow-wrap:anywhere}
+  .ms-design:is(.espace-vendeur,.page-admin) :is(.table-card,.prod-table-card,.orders-card) {overflow-x:auto}
+  .ms-design.page-panier .ps-btn {white-space:normal;flex-shrink:1;max-width:100%;height:auto;min-height:44px}
+  .ms-design.page-panier .ps-input {min-width:0;width:100%}
+}
+@media(max-width:360px) {
+  body.ms-design:not(.accueil-immersif) .nav-logo .nav-logo-text {display:none}
+  .ms-design.page-panier .main {grid-template-columns:minmax(0,1fr)}
+  .ms-design.page-panier :is(.cart-section,.summary-card) {min-width:0}
+  .ms-design.page-panier .sec-title {font-size:26px}
+  .ms-design.page-shopvision .sv-canvas-toolbar {flex-wrap:wrap;padding:12px;gap:12px}
+  .ms-design.page-shopvision .sv-zoom {margin-left:auto}
+}
+/* Navigation mobile flottante : plus lisible, plus tactile, moins générique. */
+@media(max-width:900px) {
+  body.ms-design {padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+  body.ms-design .mobile-nav {
+    left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));width:auto;
+    padding:6px 7px 6px;
+    min-height:68px;
+    box-sizing:border-box;
+    transform:translateZ(0);
+    will-change:transform;
+    border:1px solid rgba(27,63,43,.12);border-radius:18px;
+    background:rgba(255,253,247,.91);
+    -webkit-backdrop-filter:blur(22px) saturate(1.25);backdrop-filter:blur(22px) saturate(1.25);
+    box-shadow:0 12px 34px rgba(18,48,31,.16),0 2px 8px rgba(18,48,31,.06);
+    overflow:hidden;
+  }
+  body.ms-design .mobile-nav::before {content:'';position:absolute;inset:0 20% auto;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent)}
+  body.ms-design .mn-items {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;position:relative;width:100%}
+  body.ms-design .nav-actions {flex:0 0 auto;min-width:42px}
+  body.ms-design .nav-cart {flex:0 0 42px;position:relative;transform:none}
+  body.ms-design .mn-item {position:relative;min-width:0;min-height:55px;padding:5px 2px 4px;gap:3px;border-radius:13px;color:#687468;isolation:isolate}
+  body.ms-design .mn-item::before {content:'';position:absolute;inset:2px;border-radius:12px;background:transparent;z-index:-1;transition:background .2s ease,transform .2s ease}
+  body.ms-design .mn-icon {width:30px;height:30px;border-radius:10px;background:#edf0e8;color:#526258;font-size:15px;border:1px solid rgba(28,104,69,.04)}
+  body.ms-design .mn-label {font-size:9px;line-height:12px;font-weight:600;color:#6c776d;letter-spacing:-.01em}
+  body.ms-design .mn-item.act::before {background:#edf4e9}
+  body.ms-design .mn-item.act .mn-icon {color:#fff;background:linear-gradient(145deg,#23784e,#155d3b);border-color:#155d3b;box-shadow:0 5px 12px rgba(28,104,69,.22)}
+  body.ms-design .mn-item.act .mn-label {color:#155d3b;font-weight:750}
+  body.ms-design .mn-item.act::after {content:'';position:absolute;bottom:1px;width:14px;height:2px;border-radius:99px;background:#1c6845}
+  body.ms-design .mn-item:active::before {background:#e8eee4;transform:scale(.96)}
+}
+/* Cartes catalogue compactes : même hiérarchie, quelle que soit la longueur
+   des noms. Les informations intégrales restent accessibles sur la fiche. */
+body.ms-design:not(.espace-vendeur) :is(.prod-card,.rc) {border-radius:16px;position:relative;background:#fffdf8;border:1px solid #e1e4d8;box-shadow:0 3px 12px #20392806}
+body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img) {height:190px;border-radius:0;overflow:hidden}
+body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img)[style*="background:#F0EAF8"] {background:linear-gradient(145deg,#edf1e5,#e3e9d9)!important}
+body.ms-design:not(.espace-vendeur) :is(.prod-body,.rc-body) {padding:12px 14px;display:flex;flex-direction:column;gap:5px;min-width:0}
+body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {display:block;max-width:100%;width:fit-content;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px;padding:0;background:none;border-radius:0;font-size:10px;color:#56704b;margin:0}
+body.ms-design:not(.espace-vendeur) :is(.prod-name,.rc-name) {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:14px;font-weight:600;line-height:19px;height:38px;margin:0;color:#20382a}
+body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:16px;margin:0;color:#72796a}
+body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:10px;line-height:16px;gap:4px;margin:0;white-space:nowrap}
+body.ms-design:not(.espace-vendeur) :is(.prod-stars,.rc-stars) {font-size:9px;letter-spacing:-.5px}
+body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer) {display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;gap:6px;min-height:44px;margin-top:3px;padding-top:8px;border-top:1px solid #edf0e6}
+body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer)>div {min-width:0}
+body.ms-design:not(.espace-vendeur) :is(.prod-price,.rc-price) {font-size:14px;font-weight:750;line-height:18px;white-space:normal;margin:0;color:#1c6845}
+body.ms-design:not(.espace-vendeur) :is(.prod-old-price,.prod-old,.rc-old) {display:block;font-size:10px;line-height:14px;margin:1px 0 0;color:#858a7f;white-space:normal}
+body.ms-design:not(.espace-vendeur) :is(.prod-cart-btn,.prod-add,.rc-add) {width:40px;height:40px;min-width:40px;min-height:40px;border-radius:12px;box-shadow:none;font-size:21px;font-weight:400;background:#1c6845;color:white;align-self:center}
+body.ms-design:not(.espace-vendeur) :is(.prod-wish,.rc-wish) {width:36px;height:36px;min-width:36px;min-height:36px;top:9px;right:9px;background:#fffdf9e8;border:1px solid #dce2d5;box-shadow:none}
+body.ms-design:not(.espace-vendeur) :is(.prod-badge,.rc-badge) {top:10px;left:10px;border-radius:6px;padding:4px 7px;font-size:10px;font-weight:700;box-shadow:none}
+body.ms-design:not(.espace-vendeur) .prod-market-tag {max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:none;padding:0;margin:0;font-size:10px;line-height:18px;color:#56704b}
+body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:40px;height:40px;min-height:40px;min-width:40px;border-radius:12px;box-shadow:none;font-size:21px}
+@media(max-width:600px) {
+  body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img) {height:clamp(118px,35vw,150px)}
+  body.ms-design:not(.espace-vendeur) :is(.prod-body,.rc-body) {padding:10px;gap:4px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-name,.rc-name) {font-size:12px;line-height:17px;height:34px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {font-size:10px;line-height:14px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {font-size:9px;line-height:14px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-price,.rc-price) {font-size:12px;line-height:16px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:9px;gap:3px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer) {grid-template-columns:minmax(0,1fr) 36px;gap:4px;padding-top:6px;min-height:42px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-cart-btn,.prod-add,.rc-add) {width:36px;height:36px;min-width:36px;min-height:36px;border-radius:10px;font-size:20px}
+  body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:36px;height:36px;min-width:36px;min-height:36px;border-radius:10px;font-size:20px}
+  body.ms-design:not(.espace-vendeur) .prod-market-tag {font-size:9px;line-height:14px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .ms-design *,.ms-design *::before,.ms-design *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

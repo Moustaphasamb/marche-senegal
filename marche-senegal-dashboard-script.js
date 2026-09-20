@@ -496,6 +496,8 @@ function editerPromo(promo) {
   if (code) code.value = (promo.type === 'CODE' ? promo.code : promo.title) || '';
   if (pct && !pct.disabled) pct.value = promo.discount || '';
   if (maxUses) maxUses.value = promo.maxUses || '';
+  const early = document.getElementById('promo-early-access-select');
+  if (early) early.value = String(promo.earlyAccessHours || 0);
   optionDureeInchangee(true);
 
   const titre = document.getElementById('promo-form-title');
@@ -529,6 +531,8 @@ function viderFormulairePromo() {
     const champ = document.getElementById(id);
     if (champ) champ.value = '';
   });
+  const early = document.getElementById('promo-early-access-select');
+  if (early) early.value = '0';
   optionDureeInchangee(false);
 }
 
@@ -545,6 +549,7 @@ async function submitPromo() {
   const dureeBrute = document.getElementById('promo-duration-select')?.value || '';
   const durationDays = dureeBrute ? parseInt(dureeBrute) : (promoEnEdition ? null : 7);
   const maxUses = document.getElementById('promo-maxuses-input')?.value;
+  const earlyAccessHours = parseInt(document.getElementById('promo-early-access-select')?.value || '0');
 
   const sansReduction = typePromoSansReduction(type);
 
@@ -570,7 +575,8 @@ async function submitPromo() {
     type,
     code: code || null,
     discount: sansReduction ? 0 : parseInt(discount),
-    maxUses: maxUses ? parseInt(maxUses) : null
+    maxUses: maxUses ? parseInt(maxUses) : null,
+    earlyAccessHours
   };
   if (durationDays) donnees.durationDays = durationDays;
 

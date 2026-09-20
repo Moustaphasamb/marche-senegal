@@ -81,8 +81,11 @@ body{padding-left:var(--sidebar-w)}
 @media(max-width:600px){.page{padding:16px 4vw 40px}.photo-grid{grid-template-columns:repeat(3,1fr)}.cat-grid{grid-template-columns:repeat(3,1fr)}.fgrid{grid-template-columns:1fr}.st-sep,.st-title{display:none}}
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="espace-vendeur ms-design page-modifier-produit">
 <div class="toast" id="toast"></div>
 
 <!-- La barre laterale est construite par marche-senegal-menu-vendeur.js -->
@@ -274,6 +277,15 @@ function triggerUpload(i) { activeSlot = i; document.getElementById('file-input'
 
 async function handleFileChange(file) {
   if (!file) return;
+  const typesAutorises = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!typesAutorises.includes(file.type)) {
+    showToastLocal('Format refusé : JPG, PNG ou WebP uniquement', 'error');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showToastLocal('Photo trop lourde : 5 Mo maximum', 'error');
+    return;
+  }
   const token = localStorage.getItem('token');
   if (!token) { showToastLocal('Connectez-vous pour uploader', 'error'); return; }
   renderLoadingSlot(activeSlot);

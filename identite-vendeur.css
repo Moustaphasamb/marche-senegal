@@ -1,0 +1,114 @@
+/* Identité vendeur : jaune pour les actions, brun foncé pour le texte.
+   Les anciennes variables --green restent foncées pour garantir la lisibilité
+   des liens et des composants qui gardent du texte blanc. */
+body.espace-vendeur {
+  --seller-accent: #f4c542;
+  --seller-accent-ink: #302407;
+  --accent: var(--seller-accent);
+  --accent-soft: #fff4cc;
+  --green: #785507;
+  --gl: #654604;
+  --gp: #fff4cc;
+  --g2: #ead493;
+  --gold: #f4c542;
+  --gdl: #fff4cc;
+  --dark: #30280f;
+  --text: #352f20;
+  --muted: #74684d;
+  --bg: #faf7ee;
+  --border: #e6dcc1;
+  --space-ink: #352f20;
+  --space-muted: #74684d;
+  --space-line: rgba(112,83,18,.18);
+  --space-shadow: 0 10px 28px rgba(82,62,15,.07);
+  color: var(--text);
+  background: linear-gradient(135deg,#fff9e5,#faf8f2 65%);
+  accent-color: #785507;
+}
+body.espace-vendeur .sidebar {
+  background: #30280f;
+  border-right: 1px solid #665222;
+}
+body.espace-vendeur .sidebar .sb-logo-text { color: #f4c542; }
+body.espace-vendeur .sb-item { color: #e2d9bf; }
+body.espace-vendeur .sb-section-label { color: #beb394; }
+body.espace-vendeur .sb-item:hover { background: #483b19; color: #fff7df; }
+body.espace-vendeur .sb-item.active {
+  background: var(--seller-accent); color: var(--seller-accent-ink); font-weight: 700;
+}
+body.espace-vendeur .sb-item.active::before { background: #fff0b1; }
+body.espace-vendeur .sb-item.active .sb-badge.gold { background: #302407; color: #fff4cc; }
+body.espace-vendeur .topbar {
+  background: #fff6d9; border-bottom: 1px solid #e6d391;
+}
+body.espace-vendeur .welcome-bar {
+  background: linear-gradient(135deg,#30280f,#66501b);
+}
+body.espace-vendeur .welcome-bar :is(.wb-greeting,.wb-market) { color: #e7dabc; }
+body.espace-vendeur.sv-page {
+  --sv-accent: #785507;
+  --sv-ink: #352f20;
+  --sv-muted: #74684d;
+  --sv-line: #e6dcc1;
+  --sv-paper: #fffdf7;
+}
+body.espace-vendeur .sv-topbar { background: #fff6d9; }
+body.espace-vendeur .sv-heading h1 { color: #352f20; }
+body.espace-vendeur :is(.sb-avatar,.tb-profile-av) {
+  background: var(--seller-accent); color: var(--seller-accent-ink);
+}
+body.espace-vendeur :is(.wb-btn-primary,.sv-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
+  .sh-btn-primary,.save-btn,.publish-btn,.add-btn,.btn-save,.st-btn-green,
+  .submit-btn,.tb-search-btn,.send-btn) {
+  background: var(--seller-accent);
+  border-color: var(--seller-accent);
+  color: var(--seller-accent-ink);
+  box-shadow: 0 4px 12px rgba(122,90,10,.12);
+}
+body.espace-vendeur :is(.wb-btn-primary,.sv-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
+  .sh-btn-primary,.save-btn,.publish-btn,.add-btn,.btn-save,.st-btn-green,
+  .submit-btn,.tb-search-btn,.send-btn):hover:not(:disabled) {
+  background: #e9b82d; border-color: #e9b82d; color: #302407;
+}
+body.espace-vendeur :is(.filter-chip.active,.tab.active,.ft-tab.active,
+  .mode-tab.active,.info-tab.active,.vtag.sel,.cg-btn.sel,.market-btn.sel) {
+  background: var(--seller-accent); border-color: #b78a16; color: #302407;
+}
+body.espace-vendeur :is(button,a,input,select,textarea):focus-visible {
+  outline: 3px solid #8a6208; outline-offset: 3px;
+}
+body.espace-vendeur :is(input,select,textarea):focus {
+  border-color: #8a6208;
+}
+body.espace-vendeur button:disabled {
+  opacity: .55; cursor: not-allowed; box-shadow: none;
+}
+/* La connexion porte l'identité vendeur avant même l'authentification. */
+body.connexion-vendeur .left {
+  background: linear-gradient(145deg,#f4c542,#ffe9a0);
+}
+body.connexion-vendeur .left::before,
+body.connexion-vendeur .left::after { display: none; }
+body.connexion-vendeur :is(.left-title,.left-title span,.left-logo-text,.plan-name) {
+  color: #302407;
+}
+body.connexion-vendeur :is(.left-sub,.plan-desc,.ls-text,.plan-price) { color: #594415; }
+body.connexion-vendeur :is(.plan,.left-switch) {
+  background: rgba(255,255,255,.32); border-color: rgba(89,68,21,.2);
+}
+body.connexion-vendeur .left-badge {
+  background: #302407; color: #ffe9a0; border-color: #302407;
+}
+body.connexion-vendeur .ls-btn {
+  background: #fff9e6; color: #302407; border-color: #9b7b2b;
+}
+body.connexion-vendeur .right { background: #fffdf7; }
+body.connexion-vendeur .form-box { box-shadow: none; background: transparent; }
+/* La messagerie choisit le thème de l'espace réellement consulté. */
+body.espace-vendeur .nav { background: #fff6d9; border-color: #e6d391; }
+body.espace-vendeur .msg-row.mine .bubble {
+  background: var(--seller-accent); color: var(--seller-accent-ink);
+}
+body.espace-vendeur :is(.ch-avatar,.conv-avatar,.msg-row.mine .msg-avatar) {
+  background: var(--seller-accent); color: var(--seller-accent-ink);
+}

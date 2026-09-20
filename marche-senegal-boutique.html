@@ -307,8 +307,10 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-boutique">
 
 <div class="toast" id="toast"></div>
 
@@ -366,8 +368,8 @@
     <div class="sh-avatar-row">
       <div class="sh-avatar">MF</div>
       <div class="sh-meta">
-        <div class="sh-verified">✓ Vendeur Vérifié · CNI validée</div>
-        <div class="sh-name">Mode Fatou Ndoye</div>
+        <div class="sh-verified" style="display:none"></div>
+        <div class="sh-name"></div>
         <div class="sh-location">
           <span class="sh-loc-chip"><i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3</span>
           <span class="sh-loc-chip"><i class="ic" data-ic="map-pin"></i> Dakar Centre</span>
@@ -486,13 +488,13 @@
     <!-- TAB AVIS -->
     <div id="tab-avis" style="display:none">
       <div class="rating-summary">
-        <div class="rs-big"><div class="rs-num">4.8</div><div class="rs-stars">★★★★★</div><div class="rs-count">234 avis</div></div>
+        <div class="rs-big"><div class="rs-num"></div><div class="rs-stars"></div><div class="rs-count"></div></div>
         <div class="rs-bars">
-          <div class="rb-row"><span class="rb-star">5★</span><div class="rb-bg"><div class="rb-fill" style="width:72%"></div></div><span class="rb-pct">72%</span></div>
-          <div class="rb-row"><span class="rb-star">4★</span><div class="rb-bg"><div class="rb-fill" style="width:20%"></div></div><span class="rb-pct">20%</span></div>
-          <div class="rb-row"><span class="rb-star">3★</span><div class="rb-bg"><div class="rb-fill" style="width:6%"></div></div><span class="rb-pct">6%</span></div>
-          <div class="rb-row"><span class="rb-star">2★</span><div class="rb-bg"><div class="rb-fill" style="width:2%"></div></div><span class="rb-pct">2%</span></div>
-          <div class="rb-row"><span class="rb-star">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct">0%</span></div>
+          <div class="rb-row"><span class="rb-star">5★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+          <div class="rb-row"><span class="rb-star">4★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+          <div class="rb-row"><span class="rb-star">3★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+          <div class="rb-row"><span class="rb-star">2★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
+          <div class="rb-row"><span class="rb-star">1★</span><div class="rb-bg"><div class="rb-fill" style="width:0%"></div></div><span class="rb-pct"></span></div>
         </div>
       </div>
       <div id="review-form-wrap" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;display:none">
@@ -512,28 +514,7 @@
         </button>
       </div>
 
-      <div class="review-list">
-        <div class="review-card">
-          <div class="rv-header"><div class="rv-avatar" style="background:#4A90D9">MS</div><div><div class="rv-name">Moussa Sow</div><div class="rv-date">Il y a 2 jours</div></div><div class="rv-stars">★★★★★</div></div>
-          <div class="rv-text">Excellente boutique ! Le boubou est exactement comme sur la vidéo. Fatou est très réactive, elle m'a aidé à choisir la bonne taille. Livraison rapide à Parcelles Assainies.</div>
-          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Boubou wax tissé main — Taille L</div>
-        </div>
-        <div class="review-card">
-          <div class="rv-header"><div class="rv-avatar" style="background:#8B3A8A">AB</div><div><div class="rv-name">Aissatou Ba</div><div class="rv-date">Il y a 5 jours</div></div><div class="rv-stars">★★★★★</div></div>
-          <div class="rv-text">Je suis venue au marché Sandaga après avoir vu la visite virtuelle. C'est exactement pareil ! Les tissus wax sont authentiques et les prix sont honnêtes. Merci Fatou !</div>
-          <div class="rv-product"><i class="ic" data-ic="spool"></i> Bazin brodé cérémonie</div>
-        </div>
-        <div class="review-card">
-          <div class="rv-header"><div class="rv-avatar" style="background:var(--gold);color:var(--dark)">RF</div><div><div class="rv-name">Rokhaya Fall</div><div class="rv-date">Il y a 1 semaine</div></div><div class="rv-stars">★★★★★</div></div>
-          <div class="rv-text">J'habite à Thiès et je ne pouvais pas me déplacer. Grâce à la vidéo j'ai pu choisir ma robe en toute confiance. La livraison est arrivée en 2 jours. Vraiment top !</div>
-          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Robe wax brodée col rond</div>
-        </div>
-        <div class="review-card">
-          <div class="rv-header"><div class="rv-avatar" style="background:#C0392B">ID</div><div><div class="rv-name">Ibrahima Diallo</div><div class="rv-date">Il y a 2 semaines</div></div><div class="rv-stars">★★★★☆</div></div>
-          <div class="rv-text">Très belle boutique, produits de qualité. Je retire une étoile car la livraison a pris 3 jours au lieu de 2. Mais le kaftan bazin est magnifique, ma femme adore.</div>
-          <div class="rv-product"><i class="ic" data-ic="shirt"></i> Kaftan bazin riche homme</div>
-        </div>
-      </div>
+      <div class="review-list"></div>
     </div>
 
     <!-- TAB INFOS -->
@@ -585,9 +566,15 @@
 
     <div class="info-card">
       <div class="ic-title">Infos rapides</div>
-      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="clock"></i></div><div><div class="ic-label">Horaires</div><div class="ic-sub">Lun–Sam 8h–20h · Dim 9h–15h</div><span class="ic-open">Ouverte maintenant</span></div></div>
-      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison Dakar</div><div class="ic-sub">1 000 FCFA · Sous 24h</div></div></div>
-      <div class="ic-row" style="margin-bottom:0"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Paiement sécurisé</div><div class="ic-sub">Wave · Orange Money · Free Money</div></div></div>
+      <!-- Ces trois lignes étaient écrites en dur, identiques pour toutes les
+           boutiques : des horaires que le vendeur n'a pas saisis, un « Sous
+           24h » que rien ne garantit, et trois moyens de paiement dont un
+           seul encaisse réellement en production. Chaque ligne se remplit
+           maintenant depuis les données de la boutique, et disparaît quand
+           la donnée n'existe pas. -->
+      <div class="ic-row" id="ic-horaires" style="display:none"><div class="ic-icon"><i class="ic" data-ic="clock"></i></div><div><div class="ic-label">Horaires</div><div class="ic-sub" id="ic-horaires-val"></div></div></div>
+      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison</div><div class="ic-sub">1 000 FCFA — délai indiqué par le vendeur</div></div></div>
+      <div class="ic-row" id="ic-paiement" style="margin-bottom:0;display:none"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Moyens de paiement</div><div class="ic-sub" id="ic-paiement-val"></div></div></div>
     </div>
 
     <div class="map-card">
@@ -748,6 +735,8 @@ async function loadShop(shopId) {
       shVerified.style.display = 'none';
     }
   }
+
+  renderInfosRapides(shop);
 
   // Mettre à jour la localisation
   const shLocation = document.querySelector('.sh-location');
@@ -1670,6 +1659,58 @@ function blocReponseVendeur(review, nomBoutique) {
 }
 
 // ── Charger les avis depuis l'API dédiée ──
+// ── Infos rapides : horaires et moyens de paiement réels ──
+//
+// Le panneau affichait « Lun–Sam 8h–20h · Ouverte maintenant », « 1 000 FCFA
+// · Sous 24h » et « Wave · Orange Money · Free Money » — les mêmes valeurs
+// pour chaque boutique du site. Aucune n'était vérifiée : les horaires ne
+// venaient pas du vendeur, le délai n'existait nulle part, et deux des trois
+// moyens de paiement n'encaissent pas.
+//
+// Les frais de livraison, eux, sont réels : order.routes.js les fixe à
+// 1 000 FCFA hors retrait en boutique. C'est la seule valeur conservée.
+const JOURS = { lundi: 'Lun', mardi: 'Mar', mercredi: 'Mer', jeudi: 'Jeu',
+                vendredi: 'Ven', samedi: 'Sam', dimanche: 'Dim' };
+const NOMS_PAIEMENT = { WAVE: 'Wave', ORANGE_MONEY: 'Orange Money',
+                        FREE_MONEY: 'Free Money', CARD: 'Carte bancaire',
+                        CASH: 'Espèces à la livraison' };
+
+async function renderInfosRapides(shop) {
+  // Horaires — affichés seulement si le vendeur les a saisis.
+  const ligneHoraires = document.getElementById('ic-horaires');
+  const valHoraires = document.getElementById('ic-horaires-val');
+  const horaires = shop?.openingHours;
+  if (ligneHoraires && valHoraires && horaires && typeof horaires === 'object') {
+    const parts = [];
+    for (const [jour, plage] of Object.entries(horaires)) {
+      if (!plage) continue;
+      const libelle = JOURS[String(jour).toLowerCase()] || jour;
+      parts.push(libelle + ' ' + (typeof plage === 'string' ? plage : ''));
+    }
+    if (parts.length) {
+      valHoraires.textContent = parts.join(' · ');
+      ligneHoraires.style.display = '';
+    }
+  }
+
+  // Moyens de paiement — la route /api/payments/methods existe précisément
+  // pour n'annoncer que ce qui encaisse vraiment. En production sans clé
+  // Wave, elle renvoie une liste vide et la ligne reste masquée.
+  const lignePaiement = document.getElementById('ic-paiement');
+  const valPaiement = document.getElementById('ic-paiement-val');
+  if (!lignePaiement || !valPaiement) return;
+  try {
+    const res = await fetch(API_URL + '/api/payments/methods');
+    const json = await res.json();
+    const methodes = json?.data?.methods || [];
+    if (!methodes.length) return;
+    valPaiement.textContent = methodes.map((m) => NOMS_PAIEMENT[m] || m).join(' · ');
+    lignePaiement.style.display = '';
+  } catch {
+    // Réseau indisponible : mieux vaut ne rien annoncer qu'annoncer à tort.
+  }
+}
+
 async function loadShopReviewsFromAPI(shopId) {
   const result = await getShopReviews(shopId);
   if (!result.success) return;

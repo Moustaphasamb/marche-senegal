@@ -14,6 +14,8 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
 // ────────────────────────────────
 async function apiCall(endpoint, options = {}) {
   try {
+    const { redirectOnUnauthorized = true, ...requestOptions } = options;
+
     // Récupérer le token de connexion s'il existe
     const token = localStorage.getItem('token');
 
@@ -30,7 +32,7 @@ async function apiCall(endpoint, options = {}) {
 
     // Faire la requête
     const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
+      ...requestOptions,
       headers
     });
 
@@ -41,7 +43,7 @@ async function apiCall(endpoint, options = {}) {
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      if (!window.location.pathname.includes('connexion')) {
+      if (redirectOnUnauthorized && !window.location.pathname.includes('connexion')) {
         window.location.href = 'marche-senegal-accueil.html';
       }
       return { success: false, message: 'Session expirée, veuillez vous reconnecter' };
@@ -208,9 +210,50 @@ async function createOrder(orderData) {
   });
 }
 
+// Fidélité acheteur — points calculés uniquement sur les commandes livrées.
+async function getMyLoyalty() {
+  return await apiCall('/api/auth/me/loyalty');
+}
+
+async function redeemLoyaltyReward(pointsCost) {
+  return await apiCall('/api/auth/me/loyalty/rewards', {
+    method: 'POST',
+    body: JSON.stringify({ pointsCost })
+  });
+}
+
+async function validateLoyaltyReward(code) {
+  return await apiCall('/api/auth/me/loyalty/rewards/validate', {
+    method: 'POST',
+    body: JSON.stringify({ code })
+  });
+}
+
+// Panier Marché : une seule commande acheteur, plusieurs commandes vendeurs.
+async function createMarketOrder(orderData) {
+  return await apiCall('/api/market-orders', {
+    method: 'POST',
+    body: JSON.stringify(orderData)
+  });
+}
+
+async function getMarketOrder(id) {
+  return await apiCall(`/api/market-orders/${id}`);
+}
+
+async function getMyMarketOrders() {
+  return await apiCall('/api/market-orders/me');
+}
+
 // Récupérer mes commandes
 async function getMyOrders() {
   return await apiCall('/api/orders/me');
+}
+
+// Préparer une ancienne commande pour un nouvel achat.
+async function getOrderToReorder(id, isMarketOrder = false) {
+  const prefix = isMarketOrder ? '/api/market-orders' : '/api/orders';
+  return await apiCall(`${prefix}/${encodeURIComponent(id)}/reorder`);
 }
 
 // Récupérer une commande par son ID
@@ -237,12 +280,25 @@ async function updateProfile(data) {
   });
 }
 
+async function getMyProfile() {
+  return await apiCall('/api/auth/me');
+}
+
+async function updateNotificationPreferences(data) {
+  return await apiCall('/api/auth/me/preferences', {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  });
+}
+
 // ────────────────────────────────
 // ADRESSES
 // ────────────────────────────────
 
 async function getAddresses() {
-  return await apiCall('/api/addresses');
+  // Le panier reste accessible sans connexion : l'interface peut afficher
+  // les options de retrait et proposer la connexion au moment du paiement.
+  return await apiCall('/api/addresses', { redirectOnUnauthorized: false });
 }
 
 async function createAddress(data) {

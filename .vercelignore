@@ -1,0 +1,9 @@
+.git
+.vercel
+.claude
+.superpowers
+files
+tools
+AGENTS.md
+CLAUDE.md
+*.log

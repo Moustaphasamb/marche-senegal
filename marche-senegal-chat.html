@@ -86,6 +86,7 @@ a{text-decoration:none;color:inherit}
 .conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
 .conv-corps{flex:1;min-width:0}
 .conv-nom{font-size:.9rem;font-weight:600;color:var(--dark)}
+.conv-fidelite{display:inline-flex;margin-left:6px;padding:2px 7px;border-radius:99px;background:#fff4d6;color:#8a6100;font-size:.62rem;font-weight:700;vertical-align:middle}
 .conv-extrait{font-size:.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .conv-droite{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
 .conv-date{font-size:.7rem;color:var(--muted)}
@@ -99,8 +100,11 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-chat">
 <div class="toast" id="toast"></div>
 
 <!-- NAV -->
@@ -306,6 +310,12 @@ async function afficherConversations() {
     const nom = document.createElement('div');
     nom.className = 'conv-nom';
     nom.textContent = fil.acheteur?.firstName || 'Client';
+    if (fil.niveauFidelite === 'Or' || fil.niveauFidelite === 'Platine') {
+      const badge = document.createElement('span');
+      badge.className = 'conv-fidelite';
+      badge.textContent = fil.niveauFidelite === 'Platine' ? 'Prioritaire · Platine' : 'Client fidèle · Or';
+      nom.appendChild(badge);
+    }
     const extrait = document.createElement('div');
     extrait.className = 'conv-extrait';
     extrait.textContent = fil.dernierMessage || '';
@@ -478,6 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   currentShopId = getShopIdFromURL();
   // Vendeur de CETTE boutique seulement : ailleurs, il est un client.
   estVendeur = currentUser?.role === 'SELLER' && currentUser?.shop?.id === currentShopId;
+  document.body.classList.toggle('espace-vendeur', estVendeur);
 
   if (!currentShopId) {
     window.location.href = 'marche-senegal-accueil.html';

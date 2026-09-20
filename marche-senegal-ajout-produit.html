@@ -110,8 +110,11 @@
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="espace-vendeur ms-design page-ajout-produit">
 <div class="toast" id="toast"></div>
 
 <!-- La barre laterale est construite par marche-senegal-menu-vendeur.js -->
@@ -354,6 +357,15 @@ function triggerUpload(slotIndex){
 
 async function handleFileChange(file){
   if(!file) return;
+  const typesAutorises = ['image/jpeg', 'image/png', 'image/webp'];
+  if(!typesAutorises.includes(file.type)){
+    toast('Format refusé : JPG, PNG ou WebP uniquement');
+    return;
+  }
+  if(file.size > 5 * 1024 * 1024){
+    toast('Photo trop lourde : 5 Mo maximum');
+    return;
+  }
   const token = localStorage.getItem('token');
   if(!token){ toast('Connectez-vous pour uploader'); return; }
 

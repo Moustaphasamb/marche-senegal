@@ -85,6 +85,11 @@ a{text-decoration:none;color:inherit}
 .stat-item:last-child{border-right:none}
 .stat-val{font-family:'Newsreader',serif;font-size:1.5rem;font-weight:900;color:var(--dark);margin-bottom:3px}
 .stat-label{font-size:.72rem;color:var(--muted)}
+.loyalty-card{padding:18px 20px;background:linear-gradient(135deg,#fffaf0,#fff);border-top:1px solid var(--border)}
+.loyalty-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.loyalty-title{font-size:.9rem;font-weight:700;color:var(--dark)}.loyalty-level{background:var(--gdl);color:#8A6100;border-radius:99px;padding:4px 10px;font-size:.7rem;font-weight:700}
+.loyalty-meta{display:flex;justify-content:space-between;gap:10px;margin:10px 0 7px;font-size:.75rem;color:var(--muted)}.loyalty-points{font-weight:800;color:var(--green)}
+.loyalty-track{height:8px;background:#f0eadb;border-radius:99px;overflow:hidden}.loyalty-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#f3c64d);border-radius:inherit;transition:width .4s ease}
+.loyalty-benefits{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}.loyalty-benefit{font-size:.68rem;color:#6f5716;background:#fff4d6;border:1px solid #f0d98c;border-radius:99px;padding:4px 8px}
 
 /* ORDERS */
 .orders-list{display:flex;flex-direction:column}
@@ -99,6 +104,8 @@ a{text-decoration:none;color:inherit}
 .oi-right{text-align:right;flex-shrink:0}
 .oi-price{font-size:.9rem;font-weight:700;color:var(--green);margin-bottom:4px}
 .oi-status{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.oi-reorder{margin-top:7px;border:1px solid var(--green);background:var(--gp);color:var(--green);border-radius:99px;padding:5px 9px;font:600 .68rem Manrope,sans-serif;cursor:pointer;white-space:nowrap}
+.oi-reorder:hover{background:var(--green);color:#fff}
 .os-delivered{background:var(--gp);color:var(--green)}
 .os-delivering{background:var(--bluep, #E3F2FD);color:#1565C0}
 .os-pending{background:var(--gdl);color:#8A6100}
@@ -179,8 +186,10 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 <script src="icons.js"></script>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
 </head>
-<body>
+<body class="ms-design page-profil">
 <div class="toast" id="toast"></div>
 
 <!-- MODAL : Modifier le profil -->
@@ -285,7 +294,7 @@ a{text-decoration:none;color:inherit}
 <nav class="nav">
   <a href="marche-senegal-accueil.html" class="nav-logo">
     <div class="flag"><span class="fg"></span><span class="fy"></span><span class="fr"></span></div>
-    Marché Sénégal
+    <span class="nav-logo-text">Marché Sénégal</span>
   </a>
   <div class="nav-actions">
     <button class="nav-btn" onclick="window.location.href='marche-senegal-accueil.html'"><i class="ic" data-ic="house"></i> Accueil</button>
@@ -355,6 +364,13 @@ a{text-decoration:none;color:inherit}
           <div class="stat-val" id="stat-reviews">0</div>
           <div class="stat-label">Avis laissés</div>
         </div>
+      </div>
+      <div class="loyalty-card">
+        <div class="loyalty-head"><div class="loyalty-title">🏅 Programme fidélité</div><div class="loyalty-level" id="loyalty-level">Bronze</div></div>
+        <div class="loyalty-meta"><span id="loyalty-next">Gagnez des points avec vos commandes livrées</span><span class="loyalty-points" id="loyalty-points">0 point</span></div>
+        <div class="loyalty-track"><div class="loyalty-fill" id="loyalty-fill"></div></div>
+        <div class="loyalty-benefits" id="loyalty-benefits"></div>
+        <div id="loyalty-rewards" style="margin-top:12px"></div>
       </div>
     </div>
 
@@ -452,7 +468,7 @@ a{text-decoration:none;color:inherit}
             <div class="si-label">Notifications commandes</div>
             <div class="si-sub">Recevoir les mises à jour par SMS</div>
           </div>
-          <div class="si-toggle" onclick="this.classList.toggle('off')"></div>
+          <div class="si-toggle" id="pref-sms-orders" data-pref="smsOrderNotifications" onclick="toggleNotificationPreference('smsOrderNotifications', this)"></div>
         </div>
         <div class="setting-item">
           <div class="si-icon"><i class="ic" data-ic="target"></i></div>
@@ -460,7 +476,15 @@ a{text-decoration:none;color:inherit}
             <div class="si-label">Notifications promotions</div>
             <div class="si-sub">Recevoir les offres et bons plans</div>
           </div>
-          <div class="si-toggle off" onclick="this.classList.toggle('off')"></div>
+          <div class="si-toggle off" id="pref-promos" data-pref="promoNotifications" onclick="toggleNotificationPreference('promoNotifications', this)"></div>
+        </div>
+        <div class="setting-item" style="opacity:.72">
+          <div class="si-icon"><i class="ic" data-ic="message-circle"></i></div>
+          <div class="si-info">
+            <div class="si-label">Notifications WhatsApp</div>
+            <div class="si-sub">Bientôt disponible après activation du compte professionnel</div>
+          </div>
+          <div class="si-toggle off" aria-disabled="true" title="Bientôt disponible"></div>
         </div>
         <div class="setting-item">
           <div class="si-icon"><i class="ic" data-ic="globe"></i></div>
@@ -517,15 +541,21 @@ function renderProfile(user) {
   if (el('pc-phone'))      el('pc-phone').textContent = user.phone || '';
   if (el('settings-name')) el('settings-name').textContent = fullName;
   if (el('settings-phone'))el('settings-phone').textContent = user.phone || '';
+  if (el('pref-sms-orders')) el('pref-sms-orders').classList.toggle('off', user.smsOrderNotifications === false);
+  if (el('pref-promos')) el('pref-promos').classList.toggle('off', user.promoNotifications !== true);
 }
 
 // ── Charger le profil ──
 async function loadProfile() {
-  const user = getCurrentUser();
+  const localUser = getCurrentUser();
+  const remote = await getMyProfile();
+  const user = remote.success ? remote.user : localUser;
   if (!user) { window.location.href = 'marche-senegal-connexion-acheteur.html'; return; }
 
+  if (remote.success && remote.user) localStorage.setItem('user', JSON.stringify(remote.user));
   renderProfile(user);
   await loadOrders();
+  loadLoyalty();
   getFavorites().then(r => {
     if (r.success) { const el = document.getElementById('stat-favorites'); if (el) el.textContent = r.data.length; }
   });
@@ -537,13 +567,23 @@ async function loadOrders() {
   if (!container) return;
   container.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><div class="es-title">Chargement...</div></div>';
 
-  const result = await getMyOrders();
+  const [result, marketResult] = await Promise.all([getMyOrders(), getMyMarketOrders()]);
   if (!result.success) {
     container.innerHTML = '<div class="empty-state"><div class="es-icon">❌</div><div class="es-title">Erreur de chargement</div><div class="es-sub">Impossible de charger vos commandes</div></div>';
     return;
   }
 
-  const orders = result.data;
+  const marketOrders = marketResult.success ? (marketResult.data || []).map(group => ({
+    ...group,
+    _isMarketOrder: true,
+    shop: { name: `${group.market?.name || 'Marché'} · ${group.shopCount || group.orders?.length || 0} boutiques` },
+    items: (group.orders || []).flatMap(order => order.items || []),
+    _href: `marche-senegal-commande.html?marketOrderId=${encodeURIComponent(group.id)}`
+  })) : [];
+  const orders = [...(result.data || []).map(order => ({
+    ...order,
+    _href: `marche-senegal-commande.html?id=${encodeURIComponent(order.id)}`
+  })), ...marketOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const badge = document.getElementById('orders-badge');
   if (badge) badge.textContent = orders.length;
   const statOrders = document.getElementById('stat-orders');
@@ -559,22 +599,134 @@ async function loadOrders() {
   }
 
   container.innerHTML = `<div class="orders-list">${orders.map(order => `
-    <div class="order-item" onclick="window.location.href='marche-senegal-commande.html?id=${order.id}'">
+    <div class="order-item" data-order-link="${escapeHtml(order._href)}">
       <div class="oi-img">${order.items[0]?.imageUrl ? `<img src="${escapeHtml(order.items[0].imageUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : '👗'}</div>
       <div class="oi-info">
         <div class="oi-num">${escapeHtml(order.orderNumber)}</div>
-        <div class="oi-name">${escapeHtml(order.items[0]?.name || 'Commande')}${order.items.length > 1 ? ` <span style="color:var(--muted)">+${order.items.length - 1} article(s)</span>` : ''}</div>
+        <div class="oi-name">${order._isMarketOrder ? 'Panier Marché' : escapeHtml(order.items[0]?.name || 'Commande')}${order.items.length > 1 ? ` <span style="color:var(--muted)">+${order.items.length - 1} article(s)</span>` : ''}</div>
         <div class="oi-shop">🏪 ${escapeHtml(order.shop?.name || '')}</div>
       </div>
       <div class="oi-right">
         <div class="oi-price">${formatPrice(order.total)}</div>
         <div class="oi-status ${getStatusClass(order.status)}">${getStatusLabel(order.status)}</div>
+        <button class="oi-reorder" type="button" data-reorder-id="${escapeHtml(order.id)}">↻ Recommander</button>
       </div>
     </div>`).join('')}</div>`;
+  container.querySelectorAll('[data-order-link]').forEach(card => {
+    card.addEventListener('click', () => { window.location.href = card.dataset.orderLink; });
+  });
+  container.querySelectorAll('[data-reorder-id]').forEach(button => {
+    button.addEventListener('click', event => {
+      const order = orders.find(item => String(item.id) === String(button.dataset.reorderId));
+      if (order) reorderFromHistory(order, event);
+    });
+  });
 }
 
-function getStatusClass(s) { return {'PENDING':'os-pending','CONFIRMED':'os-delivering','PREPARING':'os-delivering','DELIVERING':'os-delivering','DELIVERED':'os-delivered','CANCELLED':'os-cancelled'}[s] || 'os-pending'; }
-function getStatusLabel(s) { return {'PENDING':'⏳ En attente','CONFIRMED':'✓ Confirmé','PREPARING':'📦 En préparation','DELIVERING':'🚚 En livraison','DELIVERED':'✅ Livré','CANCELLED':'❌ Annulé'}[s] || s; }
+async function loadLoyalty() {
+  const result = await getMyLoyalty();
+  if (!result.success) return;
+  const loyalty = result.data;
+  const points = document.getElementById('loyalty-points');
+  const level = document.getElementById('loyalty-level');
+  const next = document.getElementById('loyalty-next');
+  const fill = document.getElementById('loyalty-fill');
+  const benefits = document.getElementById('loyalty-benefits');
+  const rewardsBox = document.getElementById('loyalty-rewards');
+  if (points) points.textContent = `${loyalty.points} point${loyalty.points === 1 ? '' : 's'}`;
+  if (level) level.textContent = loyalty.level;
+  if (next) next.textContent = loyalty.nextLevel
+    ? `${loyalty.pointsToNextLevel} point${loyalty.pointsToNextLevel === 1 ? '' : 's'} avant le niveau ${loyalty.nextLevel}`
+    : 'Niveau Platine atteint';
+  if (fill) fill.style.width = `${loyalty.progress}%`;
+  if (benefits) {
+    benefits.replaceChildren(...(loyalty.benefits || []).map(benefit => {
+      const chip = document.createElement('span');
+      chip.className = 'loyalty-benefit';
+      chip.textContent = '✓ ' + benefit;
+      return chip;
+    }));
+  }
+  if (rewardsBox) {
+    rewardsBox.replaceChildren();
+    const title = document.createElement('div');
+    title.textContent = 'Récompenses disponibles';
+    title.style.cssText = 'font-size:.72rem;font-weight:700;color:var(--dark);margin-bottom:7px';
+    rewardsBox.appendChild(title);
+    const catalog = loyalty.rewardCatalog || [];
+    const rewards = loyalty.rewards || [];
+    const available = new Set(rewards.filter(item => item.status === 'AVAILABLE').map(item => item.pointsCost));
+    catalog.forEach(item => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:.72rem;color:var(--muted)';
+      const label = document.createElement('span');
+      label.textContent = `${item.label} · ${item.pointsCost} points`;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = available.has(item.pointsCost) ? 'Déjà obtenu' : 'Obtenir';
+      button.disabled = available.has(item.pointsCost) || loyalty.availablePoints < item.pointsCost;
+      button.style.cssText = 'border:1px solid var(--border);border-radius:999px;background:#fff;padding:5px 9px;font-size:.68rem;color:var(--green);cursor:pointer';
+      button.onclick = () => redeemLoyalty(item.pointsCost);
+      row.append(label, button);
+      rewardsBox.appendChild(row);
+    });
+  }
+}
+
+async function redeemLoyalty(pointsCost) {
+  const result = await redeemLoyaltyReward(pointsCost);
+  showToast(result.success ? `✓ ${result.message} Code : ${result.data.code}` : (result.message || 'Récompense indisponible'), result.success ? 'success' : 'error');
+  if (result.success) loadLoyalty();
+}
+
+async function toggleNotificationPreference(key, element) {
+  const enabled = element.classList.contains('off');
+  element.classList.toggle('off', !enabled);
+  element.style.pointerEvents = 'none';
+  const result = await updateNotificationPreferences({ [key]: enabled });
+  element.style.pointerEvents = '';
+  if (!result.success) {
+    element.classList.toggle('off', enabled);
+    showToast(result.message || 'Préférence non enregistrée');
+    return;
+  }
+  const user = getCurrentUser() || {};
+  localStorage.setItem('user', JSON.stringify({ ...user, [key]: enabled }));
+  showToast(enabled ? 'Notifications activées' : 'Notifications désactivées');
+}
+
+function getStatusClass(s) { return {'PENDING':'os-pending','CONFIRMED':'os-delivering','PREPARING':'os-delivering','READY':'os-delivering','DELIVERING':'os-delivering','DELIVERED':'os-delivered','CANCELLED':'os-cancelled'}[s] || 'os-pending'; }
+function getStatusLabel(s) { return {'PENDING':'⏳ En attente','CONFIRMED':'✓ Confirmé','PREPARING':'📦 En préparation','READY':'✓ Prête','DELIVERING':'🚚 En livraison','DELIVERED':'✅ Livré','CANCELLED':'❌ Annulé'}[s] || s; }
+
+async function reorderFromHistory(order, event) {
+  event?.stopPropagation();
+  const button = event?.currentTarget;
+  if (button) { button.disabled = true; button.textContent = 'Préparation…'; }
+  const result = await getOrderToReorder(order.id, Boolean(order._isMarketOrder));
+  if (!result.success) {
+    showToast(result.message || 'Impossible de préparer la recommande');
+    if (button) { button.disabled = false; button.textContent = '↻ Recommander'; }
+    return;
+  }
+
+  const current = JSON.parse(localStorage.getItem('cart') || '[]');
+  for (const item of result.data.items || []) {
+    const existing = current.find(saved => saved.productId === String(item.productId)
+      && (saved.size || null) === (item.size || null)
+      && (saved.color || null) === (item.color || null));
+    if (existing) existing.quantity += item.quantity;
+    else current.push({
+      productId: String(item.productId), name: item.name, price: item.price,
+      quantity: item.quantity, size: item.size, color: item.color,
+      shopId: item.shopId, marketId: item.marketId, marketName: item.marketName,
+      image: item.imageUrl || null
+    });
+  }
+  localStorage.setItem('cart', JSON.stringify(current));
+  const unavailable = result.data.unavailable?.length || 0;
+  showToast(unavailable ? `✓ Panier préparé · ${unavailable} article indisponible` : '✓ Panier préparé');
+  window.setTimeout(() => { window.location.href = 'marche-senegal-panier.html'; }, 500);
+}
 
 // ── Charger les favoris ──
 async function loadFavorites() {

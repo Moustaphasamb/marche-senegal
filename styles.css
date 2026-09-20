@@ -235,8 +235,8 @@ body.espace-vendeur .sb-item{text-decoration:none}
   --space-radius-pill:999px;
   --space-blur:16px;
   --space-blur-heavy:28px;
-  --buyer-accent:#8c4b31;
-  --buyer-accent-soft:#f5e8df;
+  --buyer-accent:#1b6b3a;
+  --buyer-accent-soft:#e8f5ec;
   --seller-accent:#e3b62d;
   --seller-accent-ink:#402f05;
 }
@@ -523,4 +523,190 @@ body.espace-vendeur .stat-card:nth-child(2) .sc-icon{background:rgba(227,182,45,
   body:has(.nav) .hero-phone{border-radius:24px}
   body:has(.nav) .prod-img,body:has(.nav) .pc-img{border-radius:var(--space-radius-sm)}
   body.espace-vendeur .ph-btn-primary,body.espace-vendeur .sh-btn-primary,body.espace-vendeur .save-btn,body.espace-vendeur .publish-btn{min-height:44px}
+}
+
+/* ═══════════════════════════════════════════
+   POLISH RESPONSIVE — cohérence finale multi-écrans
+   Cette couche reste centralisée afin que les 16 pages gardent le même rythme.
+   ═══════════════════════════════════════════ */
+:root{
+  --content-max:1380px;
+  --ease-ms:cubic-bezier(.2,.72,.24,1);
+}
+
+body{
+  line-height:1.5;
+  font-size:clamp(14px,.18vw + 13px,16px);
+  font-size-adjust:.52;
+}
+
+h1,h2,h3,h4,p{ text-wrap:pretty; }
+h1,h2,h3{ line-height:1.12; }
+
+button,.btn,a[role="button"]{ -webkit-tap-highlight-color:transparent; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid rgba(216,167,43,.72);
+  outline-offset:3px;
+}
+
+body:has(.nav) .nav{
+  padding-inline:max(16px,calc((100vw - var(--content-max))/2));
+}
+body:has(.nav) .nav-logo{
+  font-weight:700;
+  letter-spacing:-.025em;
+}
+body:has(.nav) .nav-search{ margin-inline:clamp(8px,2vw,30px); }
+
+/* Le hero reste lisible et respirant sans devenir gigantesque sur desktop. */
+body:has(.nav) .hero{
+  min-height:min(570px,calc(100svh - var(--nav-h) - 20px));
+  max-width:var(--content-max);
+  margin-inline:auto;
+  padding-inline:clamp(24px,5vw,76px);
+}
+body:has(.nav) .hero > div:first-child{ position:relative;z-index:2;max-width:590px; }
+body:has(.nav) .hero h1{ font-size:clamp(2.45rem,4.2vw,3.75rem);letter-spacing:-.03em; }
+body:has(.nav) .hero-desc{ max-width:48ch; }
+
+/* Une animation courte et commune, sans déplacer les cartes au chargement. */
+@media(prefers-reduced-motion:no-preference){
+  body:has(.nav) .hero > div:first-child{ animation:ms-content-in .55s var(--ease-ms) both; }
+  body:has(.nav) .hero-phone{ animation:ms-phone-in .7s .08s var(--ease-ms) both; }
+  body:has(.nav) .market-card,body:has(.nav) .mk-card,body:has(.nav) .prod-card,
+  body:has(.nav) .shop-card,body:has(.nav) .cat-card,body:has(.nav) .rc{
+    transition:transform .24s var(--ease-ms),box-shadow .24s var(--ease-ms),border-color .2s ease;
+  }
+}
+@keyframes ms-content-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes ms-phone-in{from{opacity:0;transform:translateY(18px) rotate(1deg)}to{opacity:1;transform:none}}
+
+/* Espaces tactiles minimums sur les interfaces mobiles. */
+@media(max-width:900px){
+  body:has(.nav){ padding-bottom:calc(68px + env(safe-area-inset-bottom)); }
+  body:has(.nav) .mobile-nav{ padding-bottom:max(10px,env(safe-area-inset-bottom)); }
+  body:has(.nav) .mn-item{ min-height:42px; }
+  body:has(.nav) .mn-label{ font-size:.68rem; }
+  body:has(.nav) .hero{ min-height:clamp(440px,calc(100svh - 90px),570px); }
+  body:has(.nav) .hero-right{ display:none; }
+  body:has(.nav) .section-wrap{ padding-block:clamp(40px,7vw,64px); }
+  body:has(.nav) .products-grid,body:has(.nav) .results-grid{ gap:clamp(10px,2.2vw,16px); }
+}
+
+@media(max-width:600px){
+  body:has(.nav) .nav{ min-height:58px; }
+  body:has(.nav) .nav-logo .nav-logo-text{ display:inline; font-size:1rem; }
+  body:has(.nav) .nav-logo{ gap:7px; }
+  body:has(.nav) .nav-actions{ gap:6px; }
+  body:has(.nav) .nav-hamburger{ width:38px;height:38px; }
+  body:has(.nav) .hero{
+    min-height:clamp(455px,calc(100svh - 88px),560px);
+    padding:clamp(34px,9vw,52px) 20px 32px;
+    align-content:center;
+  }
+  body:has(.nav) .hero h1{ font-size:clamp(2.05rem,9.6vw,2.7rem);line-height:1.04; }
+  body:has(.nav) .hero-desc{ font-size:.92rem;line-height:1.62;max-width:35ch; }
+  body:has(.nav) .hero-btns{ gap:10px;margin-bottom:1.5rem; }
+  body:has(.nav) .hero-btns .btn{ width:min(100%,320px);justify-content:center;min-height:46px; }
+  body:has(.nav) .hero-stats{ gap:1.15rem; }
+  body:has(.nav) .hstat-label{ font-size:.68rem; }
+  body:has(.nav) .section-top{ align-items:flex-start; }
+  body:has(.nav) .section-title{ font-size:clamp(1.55rem,7vw,2rem); }
+  body:has(.nav) .prod-img,body:has(.nav) .rc-img{ height:clamp(124px,34vw,155px); }
+  body:has(.nav) .prod-body,body:has(.nav) .rc-body{ padding:10px; }
+  body:has(.nav) .prod-name,body:has(.nav) .rc-name{ font-size:.82rem; }
+  body:has(.nav) .prod-price,body:has(.nav) .rc-price{ font-size:.9rem; }
+  body:has(.nav) .search-hero{ padding:30px 20px 24px; }
+  body:has(.nav) .sh-title{ font-size:clamp(1.55rem,7vw,2.1rem);line-height:1.1; }
+  body:has(.nav) .sh-bar{ min-height:50px; }
+  body:has(.nav) .sh-bar-btn{ height:40px;padding-inline:14px; }
+}
+
+@media(max-width:350px){
+  body:has(.nav) .nav-logo .nav-logo-text{ display:none; }
+  body:has(.nav) .hero h1{ font-size:1.95rem; }
+  body:has(.nav) .hero-btns .btn{ padding-inline:14px; }
+}
+
+@media(prefers-reduced-motion:reduce){
+  body:has(.nav) .hero > div:first-child,body:has(.nav) .hero-phone{ animation:none; }
+}
+
+/* ═══════════════════════════════════════════
+   SCALE & HIERARCHY — interface plus ample
+   Les écrans précédents manquaient de présence : cette couche augmente
+   l'échelle utile sans casser les petits écrans.
+   ═══════════════════════════════════════════ */
+:root{
+  --content-max:1480px;
+  --space-gutter:clamp(20px,4.6vw,78px);
+}
+
+body{
+  font-size:clamp(15px,.22vw + 14px,17px);
+  color:#173126;
+}
+
+body:has(.nav) .nav{
+  min-height:74px;
+  padding-inline:var(--space-gutter);
+}
+body:has(.nav) .nav-logo{font-size:1.08rem;}
+body:has(.nav) .nav-search{min-height:44px;}
+
+body:has(.nav) .hero{
+  min-height:min(650px,calc(100svh - 92px));
+  padding-inline:clamp(30px,7vw,112px);
+}
+body:has(.nav) .hero h1{
+  font-size:clamp(3rem,5.1vw,5.25rem);
+  line-height:1.02;
+  max-width:11ch;
+}
+body:has(.nav) .hero-desc{
+  font-size:clamp(1rem,.35vw + .92rem,1.16rem);
+  max-width:52ch;
+}
+body:has(.nav) .hero-phone{width:clamp(230px,20vw,290px);}
+
+body:has(.nav) .section-wrap{
+  padding-inline:var(--space-gutter);
+}
+body:has(.nav) .section-title{
+  font-size:clamp(2rem,3.1vw,3rem);
+  letter-spacing:-.035em;
+}
+body:has(.nav) .section-subtitle{font-size:1rem;}
+
+body:has(.nav) .prod-card,
+body:has(.nav) .market-card,
+body:has(.nav) .mk-card,
+body:has(.nav) .shop-card,
+body:has(.nav) .cat-card{
+  border-radius:18px;
+}
+body:has(.nav) .prod-body,
+body:has(.nav) .rc-body{padding:clamp(14px,1.5vw,20px);}
+body:has(.nav) .prod-name,
+body:has(.nav) .rc-name{font-size:clamp(.95rem,.25vw + .84rem,1.12rem);}
+body:has(.nav) .prod-price,
+body:has(.nav) .rc-price{font-size:clamp(1rem,.3vw + .9rem,1.2rem);}
+
+@media(max-width:900px){
+  body:has(.nav) .nav{min-height:64px;padding-inline:16px;}
+  body:has(.nav) .hero{min-height:clamp(480px,calc(100svh - 94px),610px);}
+}
+
+@media(max-width:600px){
+  body:has(.nav) .hero{
+    padding:42px 22px 36px;
+    border-radius:0;
+  }
+  body:has(.nav) .hero h1{
+    font-size:clamp(2.55rem,12vw,3.45rem);
+    max-width:10ch;
+  }
+  body:has(.nav) .hero-desc{font-size:1rem;max-width:34ch;}
+  body:has(.nav) .section-wrap{padding-inline:18px;}
+  body:has(.nav) .section-title{font-size:clamp(1.8rem,9vw,2.35rem);}
 }
