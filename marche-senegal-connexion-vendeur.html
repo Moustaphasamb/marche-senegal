@@ -371,8 +371,7 @@
           <div id="custom-location-fields" style="display:none;margin-top:12px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px">
             <div class="field"><label class="fl" for="reg-location-name">Quartier ou lieu *</label><input class="fi" id="reg-location-name" placeholder="Ex : Parcelles Assainies unité 15"></div>
             <div class="field"><label class="fl" for="reg-location-city">Ville / région *</label><input class="fi" id="reg-location-city" placeholder="Ex : Dakar"></div>
-            <div class="field"><label class="fl" for="reg-location-address">Adresse ou repère *</label><input class="fi" id="reg-location-address" placeholder="Ex : près de la pharmacie…"></div>
-            <div class="fi-row"><div class="field"><label class="fl" for="reg-location-latitude">Latitude</label><input class="fi" type="number" step="any" id="reg-location-latitude" placeholder="Facultatif"></div><div class="field"><label class="fl" for="reg-location-longitude">Longitude</label><input class="fi" type="number" step="any" id="reg-location-longitude" placeholder="Facultatif"></div></div>
+            <div class="field"><label class="fl" for="reg-location-address">Localisation, adresse ou repère *</label><input class="fi" id="reg-location-address" placeholder="Ex : près de la pharmacie, villa 12…"></div>
           </div>
         </div>
 
@@ -984,8 +983,6 @@ async function doRegister() {
     payload.locationName = locationName;
     payload.locationCity = locationCity;
     payload.address = locationAddress;
-    payload.latitude = document.getElementById('reg-location-latitude')?.value || null;
-    payload.longitude = document.getElementById('reg-location-longitude')?.value || null;
   }
   if (regData.email) payload.email = regData.email;
   if (regData.phone) payload.phone = regData.phone;
