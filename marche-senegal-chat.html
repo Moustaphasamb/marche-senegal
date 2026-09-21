@@ -159,8 +159,11 @@ function afficherErreurMessagerie(message) {
   action.textContent = isLoggedIn() ? 'Réessayer' : 'Se reconnecter';
   action.onclick = () => {
     if (isLoggedIn()) window.location.reload();
-    else window.location.href = currentUser?.role === 'SELLER'
-      ? 'marche-senegal-connexion-vendeur.html' : 'marche-senegal-connexion-acheteur.html';
+    else {
+      const portail = currentUser?.role === 'SELLER'
+        ? 'marche-senegal-connexion-vendeur.html' : 'marche-senegal-connexion-acheteur.html';
+      window.location.href = portail + '?next=' + encodeURIComponent('marche-senegal-chat.html' + window.location.search);
+    }
   };
   zone.replaceChildren(texte, action);
 }

@@ -506,10 +506,17 @@ const MARKET_EMOJIS = {
 // Mieux vaut dire franchement que la liste n'a pas pu être chargée.
 
 // ── Vérifier si déjà connecté ──
+function destinationMessagesVendeur() {
+  const next = new URLSearchParams(window.location.search).get('next');
+  if (!next) return 'marche-senegal-dashboard.html';
+  const url = new URL(next, window.location.href);
+  return url.origin === window.location.origin && url.pathname.endsWith('/marche-senegal-chat.html')
+    ? url.pathname.split('/').pop() + url.search : 'marche-senegal-dashboard.html';
+}
 document.addEventListener('DOMContentLoaded', async () => {
   const user = getCurrentUser();
   if (user) {
-    if (user.role === 'SELLER') { window.location.href = 'marche-senegal-dashboard.html'; return; }
+    if (user.role === 'SELLER') { window.location.href = destinationMessagesVendeur(); return; }
     if (user.role === 'ADMIN')  { window.location.href = 'marche-senegal-admin.html'; return; }
     if (user.role === 'BUYER')  { window.location.href = 'marche-senegal-accueil.html'; return; }
   }
@@ -697,7 +704,7 @@ async function doLogin() {
     localStorage.setItem('user', JSON.stringify(result.user));
     showToast('Connexion réussie !');
     setTimeout(() => {
-      if (role === 'SELLER') window.location.href = 'marche-senegal-dashboard.html';
+      if (role === 'SELLER') window.location.href = destinationMessagesVendeur();
       else if (role === 'ADMIN') window.location.href = 'marche-senegal-admin.html';
     }, 800);
   } else {
@@ -752,7 +759,7 @@ async function verifyOtpLogin() {
   const role = result.user?.role;
   if (role !== 'SELLER') { showToast('Ce numéro est associé à un compte acheteur.'); logout(); return; }
   showToast('Connexion vendeur réussie');
-  setTimeout(() => { window.location.href = 'marche-senegal-dashboard.html'; }, 700);
+  setTimeout(() => { window.location.href = destinationMessagesVendeur(); }, 700);
 }
 
 // ── Validation étape 1 → OTP ou étape 2 ──

@@ -194,12 +194,19 @@
 
 <script src="api.js"></script>
 <script>
+function destinationMessagesApresConnexion() {
+  const next = new URLSearchParams(window.location.search).get('next');
+  if (!next) return 'marche-senegal-accueil.html';
+  const url = new URL(next, window.location.href);
+  return url.origin === window.location.origin && url.pathname.endsWith('/marche-senegal-chat.html')
+    ? url.pathname.split('/').pop() + url.search : 'marche-senegal-accueil.html';
+}
 document.addEventListener('DOMContentLoaded', function() {
   var user = getCurrentUser();
   if (user) {
     if (user.role === 'SELLER') window.location.href = 'marche-senegal-dashboard.html';
     else if (user.role === 'ADMIN') window.location.href = 'marche-senegal-admin.html';
-    else window.location.href = 'marche-senegal-accueil.html';
+    else window.location.href = destinationMessagesApresConnexion();
   }
 });
 
@@ -285,7 +292,7 @@ async function verifyOtpLogin() {
   if (!result.success) { showToast(result.message || 'Code invalide ou expiré'); btn.disabled = false; btn.textContent = 'Valider le code'; return; }
   const role = result.user?.role;
   showSuccess('Connexion réussie ! 👋', 'Redirection en cours...');
-  setTimeout(() => { window.location.href = role === 'SELLER' ? 'marche-senegal-dashboard.html' : role === 'ADMIN' ? 'marche-senegal-admin.html' : 'marche-senegal-accueil.html'; }, 700);
+  setTimeout(() => { window.location.href = role === 'SELLER' ? 'marche-senegal-dashboard.html' : role === 'ADMIN' ? 'marche-senegal-admin.html' : destinationMessagesApresConnexion(); }, 700);
 }
 
 async function submitLogin() {
@@ -319,7 +326,7 @@ async function submitLogin() {
     }
 
     showSuccess('Bon retour ! 👋', 'Connexion réussie. Redirection vers l\'accueil...');
-    setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1200);
+    setTimeout(function() { window.location.href = destinationMessagesApresConnexion(); }, 1200);
   } else {
     showToast(result.message || 'Identifiant ou mot de passe incorrect');
     btn.disabled = false;
@@ -368,7 +375,7 @@ async function submitRegister() {
     localStorage.setItem('token', result.token);
     localStorage.setItem('user', JSON.stringify(result.user));
     showSuccess('Bienvenue ' + firstName + ' ! 🎉', 'Votre compte est créé. Redirection vers l\'accueil...');
-    setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1500);
+    setTimeout(function() { window.location.href = destinationMessagesApresConnexion(); }, 1500);
   } else {
     showToast(result.message || 'Erreur lors de la création du compte');
     btn.disabled = false;
@@ -393,7 +400,7 @@ async function verifyRegisterOtp() {
   sessionStorage.removeItem('pendingBuyerRegistration');
   localStorage.setItem('user', JSON.stringify(completed.user));
   showSuccess('Bienvenue ' + pending.firstName + ' ! 🎉', 'Votre compte est créé. Redirection vers l’accueil...');
-  setTimeout(function() { window.location.href = 'marche-senegal-accueil.html'; }, 1000);
+  setTimeout(function() { window.location.href = destinationMessagesApresConnexion(); }, 1000);
 }
 </script>
 </body>
