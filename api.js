@@ -177,6 +177,7 @@ async function getShops(filters = {}) {
 
   if (filters.marketId) params.append('marketId', filters.marketId);
   if (filters.rating)   params.append('rating', filters.rating);
+  if (filters.q)        params.append('q', filters.q);
   if (filters.page)     params.append('page', filters.page);
 
   const query = params.toString() ? `?${params.toString()}` : '';

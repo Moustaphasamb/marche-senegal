@@ -160,7 +160,13 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
           <p style="text-align:center;color:var(--muted);font-size:.84rem;padding:16px;">Chargement des marchés…</p>
         </div>
         <div id="mktNoResult" style="display:none;text-align:center;padding:16px;color:var(--muted);font-size:.84rem;">Aucun marché trouvé</div>
-        <p class="field-hint" style="margin-top:10px;">Sélectionnez le marché où se trouve votre boutique.</p>
+        <button type="button" class="upload-btn" id="customLocationBtn" onclick="selectCustomLocation()" style="margin-top:10px;width:100%">📍 Autre lieu — mon quartier / ma ville</button>
+        <div id="customLocationFields" style="display:none;margin-top:14px;padding:14px;border:1px solid rgba(27,107,58,.18);border-radius:14px;background:#f7fbf8">
+          <p class="field-hint" style="margin:0 0 10px">Votre boutique n’est pas dans un marché référencé ? Renseignez son emplacement directement.</p>
+          <div class="field"><label for="shopLocationName">Quartier ou lieu *</label><input type="text" id="shopLocationName" placeholder="Ex : Parcelles Assainies unité 15" maxlength="120"></div>
+          <div class="field"><label for="shopLocationCity">Ville / région *</label><input type="text" id="shopLocationCity" placeholder="Ex : Dakar" maxlength="100"></div>
+        </div>
+        <p class="field-hint" style="margin-top:10px;">La localisation est enregistrée dans l’application pour permettre aux acheteurs de vous retrouver par quartier, ville ou adresse.</p>
       </div>
 
       <!-- Localisation précise -->
@@ -176,7 +182,7 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
           <div class="field"><label for="shopLatitude">Latitude <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label><input type="number" id="shopLatitude" step="any" placeholder="14.7167"></div>
           <div class="field"><label for="shopLongitude">Longitude <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label><input type="number" id="shopLongitude" step="any" placeholder="-17.4677"></div>
         </div>
-        <p class="field-hint">Les coordonnées permettent d’ouvrir directement l’itinéraire dans Google Maps.</p>
+        <p class="field-hint">Les coordonnées sont facultatives. L’adresse, le quartier et la ville suffisent pour être retrouvé dans la recherche interne.</p>
       </div>
 
       <!-- Identité -->
@@ -333,6 +339,8 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
 let shopId = null;
 let _selectedMarketId = null;
 let _selectedMarketName = null;
+let shopLocationType = 'MARKET';
+const AUTRE_LIEU_MARKET_ID = '00000000-0000-0000-0000-000000000001';
 let _allMktsBoutique = [];
 
 const MKT_EMOJIS_B = {
@@ -582,6 +590,7 @@ async function enregistrerCni() {
 
 /* ── Sélecteur de marché ── */
 function _renderMktFiltered(markets) {
+  markets = markets.filter(m => m.id !== AUTRE_LIEU_MARKET_ID);
   const grid = document.getElementById('mktGrid');
   const noResult = document.getElementById('mktNoResult');
   if (!markets.length) {
@@ -630,6 +639,11 @@ function filterMktBtns(query) {
 function selectMarket(id, name) {
   _selectedMarketId = id;
   _selectedMarketName = name;
+  shopLocationType = 'MARKET';
+  const fields = document.getElementById('customLocationFields');
+  if (fields) fields.style.display = 'none';
+  const customBtn = document.getElementById('customLocationBtn');
+  if (customBtn) customBtn.classList.remove('selected');
   document.querySelectorAll('.mkt-btn').forEach(btn =>
     btn.classList.toggle('selected', btn.dataset.id === id)
   );
@@ -637,15 +651,29 @@ function selectMarket(id, name) {
   if (pvMarket) pvMarket.textContent = '📍 ' + name;
 }
 
+function selectCustomLocation() {
+  _selectedMarketId = AUTRE_LIEU_MARKET_ID;
+  _selectedMarketName = 'Autre lieu';
+  shopLocationType = 'CUSTOM';
+  document.querySelectorAll('.mkt-btn').forEach(btn => btn.classList.remove('selected'));
+  const customBtn = document.getElementById('customLocationBtn');
+  if (customBtn) customBtn.classList.add('selected');
+  const fields = document.getElementById('customLocationFields');
+  if (fields) fields.style.display = 'block';
+  const pvMarket = document.getElementById('pvMarket');
+  if (pvMarket) pvMarket.textContent = '📍 Autre lieu';
+}
+
 async function loadMarkets(currentMarketId) {
   try {
     const res = await apiCall('/api/markets');
     if (res.success && res.data?.length) {
-      _allMktsBoutique = res.data;
-      _renderMktFiltered(res.data);
+      _allMktsBoutique = res.data.filter(m => m.id !== AUTRE_LIEU_MARKET_ID);
+      _renderMktFiltered(_allMktsBoutique);
       if (currentMarketId) {
         const m = res.data.find(x => x.id === currentMarketId);
-        if (m) selectMarket(m.id, m.name);
+        if (m && currentMarketId !== AUTRE_LIEU_MARKET_ID) selectMarket(m.id, m.name);
+        else if (currentMarketId === AUTRE_LIEU_MARKET_ID) selectCustomLocation();
       }
     }
   } catch (e) {
@@ -659,10 +687,13 @@ function fillForm(shop, stats) {
   shopId = shop.id;
   _selectedMarketId = shop.marketId || null;
   _selectedMarketName = shop.market?.name || null;
+  shopLocationType = shop.locationType === 'CUSTOM' ? 'CUSTOM' : 'MARKET';
 
   const n = document.getElementById('shopName');   if (n) n.value = shop.name || '';
   const d = document.getElementById('shopDesc');   if (d) d.value = shop.description || '';
   const ad = document.getElementById('shopAddress'); if (ad) ad.value = shop.address || '';
+  const ln = document.getElementById('shopLocationName'); if (ln) ln.value = shop.locationName || '';
+  const lc = document.getElementById('shopLocationCity'); if (lc) lc.value = shop.locationCity || '';
   const la = document.getElementById('shopLatitude'); if (la) la.value = shop.latitude ?? '';
   const lo = document.getElementById('shopLongitude'); if (lo) lo.value = shop.longitude ?? '';
   const av = document.getElementById('shopAvatar'); if (av) av.value = shop.avatarUrl || '';
@@ -676,6 +707,7 @@ function fillForm(shop, stats) {
 
   const pvMarket = document.getElementById('pvMarket');
   if (pvMarket) pvMarket.textContent = '📍 ' + (_selectedMarketName || '—');
+  if (shopLocationType === 'CUSTOM') selectCustomLocation();
 
   const pvProd = document.getElementById('pvProdCount');
   if (pvProd) pvProd.textContent = stats?.totalProducts ?? shop._count?.products ?? 0;
@@ -765,6 +797,9 @@ async function saveShop() {
   const body = {
     name,
     description: document.getElementById('shopDesc').value.trim(),
+    locationType: shopLocationType === 'CUSTOM' ? 'CUSTOM' : 'MARKET',
+    locationName: document.getElementById('shopLocationName')?.value.trim() || null,
+    locationCity: document.getElementById('shopLocationCity')?.value.trim() || null,
     address: document.getElementById('shopAddress').value.trim() || null,
     latitude: document.getElementById('shopLatitude').value || null,
     longitude: document.getElementById('shopLongitude').value || null,
@@ -773,6 +808,10 @@ async function saveShop() {
     openingHours: document.getElementById('shopHours').value.trim() || null,
     virtualTourUrl: document.getElementById('shopTour').value.trim() || null
   };
+  if (shopLocationType === 'CUSTOM' && (!body.locationName || !body.locationCity || !body.address)) {
+    showToastLocal('Indiquez le quartier, la ville et l’adresse de votre boutique', 'error');
+    return;
+  }
   if (_selectedMarketId) body.marketId = _selectedMarketId;
 
   const btn = document.getElementById('saveBtn');

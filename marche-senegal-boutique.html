@@ -582,7 +582,7 @@
       <div class="map-body">
         <div class="map-address"></div>
         <div class="map-sub">Rue Mohamed V, Dakar Centre</div>
-        <button class="map-btn" id="btn-map" onclick="openMap()"><i class="ic" data-ic="map-pin"></i> Voir sur la carte</button>
+        <div class="map-btn" id="btn-map"><i class="ic" data-ic="map-pin"></i> Localisation enregistrée dans l’application</div>
       </div>
     </div>
 
@@ -813,12 +813,14 @@ async function loadShop(shopId) {
   // Adresse sous la carte : « Marché Sandaga — Allée 3, Stand 12 » était figé.
   const mapAddress = document.querySelector('.map-address');
   if (mapAddress) {
-    const lieu = [shop.market?.name, shop.address || shop.market?.address].filter(Boolean).join(' — ');
+    const lieu = [shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' — ');
     if (lieu) mapAddress.textContent = lieu;
     else mapAddress.style.display = 'none';
   }
   const mapSub = document.querySelector('.map-sub');
-  if (mapSub) mapSub.textContent = shop.address || shop.market?.city || 'Localisation à préciser';
+  if (mapSub) mapSub.textContent = shop.locationType === 'CUSTOM'
+    ? 'Lieu personnalisé — recherche interne par quartier et ville'
+    : (shop.address || shop.market?.city || 'Localisation à préciser');
 
   remplirInfosBoutique(shop);
 
@@ -1483,13 +1485,10 @@ function callShop() {
   window.location.href = 'tel:' + phone;
 }
 
-// ── Ouvrir Google Maps ──
+// La localisation reste interne à l’application : aucune dépendance à une
+// carte externe n’est nécessaire pour retrouver une boutique.
 function openMap() {
-  const shop = currentShop;
-  const query = shop?.latitude != null && shop?.longitude != null
-    ? `${shop.latitude},${shop.longitude}`
-    : [shop?.address, shop?.market?.name, shop?.market?.city].filter(Boolean).join(', ') || 'Marché Sandaga Dakar';
-  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query), '_blank');
+  showToast('La localisation est consultable dans Marché Sénégal.');
 }
 
 // Remplit le bloc « Infos boutique » avec les seules données réellement
@@ -1509,8 +1508,8 @@ function remplirInfosBoutique(shop) {
 
   // Adresse : celle du marché, seule adresse dont on dispose réellement
   const ligneAdresse = document.getElementById('it-adresse');
-  if (ligneAdresse && shop.market) {
-    const parts = [shop.market.name, shop.address || shop.market.address, shop.market.city].filter(Boolean);
+  if (ligneAdresse) {
+    const parts = [shop.locationName, shop.locationCity, shop.address, shop.market?.name, shop.market?.city].filter(Boolean);
     if (parts.length) {
       ligneAdresse.querySelector('.it-sub').textContent = parts.join(' · ');
       ligneAdresse.style.display = '';

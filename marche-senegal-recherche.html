@@ -206,6 +206,13 @@
     </div>
     <div class="active-chips" id="active-chips"></div>
     <div class="results-grid" id="results-grid"></div>
+    <section id="shop-results" style="margin-top:34px;display:none">
+      <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px">
+        <div><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1b6b3a;font-weight:800">Localisation interne</div><h2 style="margin:4px 0 0;font-size:1.35rem;color:#173b2a">Boutiques trouvées par lieu</h2></div>
+        <span id="shop-result-count" style="font-size:.82rem;color:#718078"></span>
+      </div>
+      <div id="shop-results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px"></div>
+    </section>
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
@@ -255,6 +262,8 @@ async function loadResults() {
     page: currentPage,
     limit: 12
   });
+
+  loadShopMatches(currentFilters.q);
 
   if (!result.success) {
     showError('results-grid', 'Erreur lors de la recherche');
@@ -333,6 +342,29 @@ async function loadResults() {
       </div>
     </div>
   `).join('');
+}
+
+async function loadShopMatches(query) {
+  const section = document.getElementById('shop-results');
+  const grid = document.getElementById('shop-results-grid');
+  if (!section || !grid || !query) return;
+  const result = await getShops({ q: query, page: 1 });
+  if (!result.success || !result.data?.length) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  const count = document.getElementById('shop-result-count');
+  if (count) count.textContent = `${result.pagination?.total || result.data.length} boutique(s)`;
+  grid.innerHTML = result.data.map(shop => {
+    const lieu = [shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ');
+    const image = urlImageSure(shop.avatarUrl || shop.bannerUrl);
+    return `<article style="background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;cursor:pointer;box-shadow:0 6px 20px rgba(23,59,42,.06)" onclick="window.location.href='marche-senegal-boutique.html?id=${encodeURIComponent(shop.id)}'">
+      <div style="height:96px;border-radius:12px;background:#eaf3ed;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px">${image ? `<img src="${escapeHtml(image)}" alt="" style="width:100%;height:100%;object-fit:cover">` : '<span style="font-size:2rem">🏪</span>'}</div>
+      <strong style="display:block;color:#173b2a">${escapeHtml(shop.name || 'Boutique')}</strong>
+      <span style="display:block;color:#718078;font-size:.8rem;margin-top:5px;line-height:1.4">${escapeHtml(lieu || 'Localisation à préciser')}</span>
+    </article>`;
+  }).join('');
 }
 
 // ── Suggestion rapide ──
