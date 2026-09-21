@@ -80,7 +80,7 @@ a{text-decoration:none;color:inherit}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
 /* Liste des conversations, côté vendeur */
-.conv-liste{display:flex;flex-direction:column;background:#fff}
+.conv-liste{display:flex;flex:1;min-height:0;overflow-y:auto;flex-direction:column;background:#fff}
 .conv-ligne{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .18s}
 .conv-ligne:hover{background:var(--gp)}
 .conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
@@ -343,6 +343,102 @@ async function afficherConversations() {
   });
 }
 
+// Boîte de réception de l'acheteur : il retrouve les réponses reçues depuis
+// son profil, même si le produit d'origine n'est plus ouvert.
+async function afficherBoiteAcheteur() {
+  document.getElementById('messages-wrap').style.display = 'none';
+  const barre = document.querySelector('.input-bar');
+  if (barre) barre.style.display = 'none';
+
+  const nomEl = document.getElementById('ch-name');
+  const avEl = document.getElementById('ch-avatar');
+  if (nomEl) nomEl.textContent = 'Mes messages';
+  if (avEl) avEl.textContent = '💬';
+
+  const liste = document.getElementById('conv-liste');
+  liste.style.display = 'flex';
+  liste.replaceChildren();
+
+  const resultat = await getBuyerConversations();
+  if (!resultat.success) {
+    const erreur = document.createElement('div');
+    erreur.className = 'conv-vide';
+    erreur.textContent = 'Impossible de charger vos messages';
+    liste.appendChild(erreur);
+    return;
+  }
+
+  const fils = resultat.data || [];
+  if (!fils.length) {
+    const vide = document.createElement('div');
+    vide.className = 'conv-vide';
+    vide.textContent = 'Aucun message pour le moment — contactez une boutique depuis un produit';
+    liste.appendChild(vide);
+    return;
+  }
+
+  fils.forEach(fil => {
+    const ligne = document.createElement('div');
+    ligne.className = 'conv-ligne';
+    const boutique = fil.boutique || {};
+
+    const avatar = document.createElement('div');
+    avatar.className = 'conv-avatar';
+    avatar.textContent = (boutique.name || 'B').charAt(0).toUpperCase();
+
+    const corps = document.createElement('div');
+    corps.className = 'conv-corps';
+    const nom = document.createElement('div');
+    nom.className = 'conv-nom';
+    nom.textContent = boutique.name || 'Boutique';
+    const extrait = document.createElement('div');
+    extrait.className = 'conv-extrait';
+    extrait.textContent = fil.dernierMessage || '';
+    corps.appendChild(nom);
+    corps.appendChild(extrait);
+
+    const droite = document.createElement('div');
+    droite.className = 'conv-droite';
+    const date = document.createElement('div');
+    date.className = 'conv-date';
+    date.textContent = formatDate(fil.date);
+    droite.appendChild(date);
+    if (fil.nonLus > 0) {
+      const pastille = document.createElement('div');
+      pastille.className = 'conv-nonlus';
+      pastille.textContent = fil.nonLus;
+      droite.appendChild(pastille);
+    }
+
+    ligne.appendChild(avatar);
+    ligne.appendChild(corps);
+    ligne.appendChild(droite);
+    ligne.onclick = () => ouvrirConversationAcheteur(fil.shopId, boutique.name);
+    liste.appendChild(ligne);
+  });
+}
+
+async function ouvrirConversationAcheteur(shopId, nomBoutique) {
+  currentShopId = shopId;
+  currentBuyerId = null;
+  document.getElementById('conv-liste').style.display = 'none';
+  document.getElementById('messages-wrap').style.display = '';
+  const barre = document.querySelector('.input-bar');
+  if (barre) barre.style.display = '';
+
+  const nomEl = document.getElementById('ch-name');
+  const avEl = document.getElementById('ch-avatar');
+  if (nomEl) nomEl.textContent = nomBoutique || 'Boutique';
+  if (avEl) avEl.textContent = (nomBoutique || 'B').charAt(0).toUpperCase();
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('shopId', shopId);
+  window.history.replaceState({}, '', url);
+
+  await loadChat(shopId, null);
+  connectSocket(shopId, currentUser?.id, currentUser?.id);
+}
+
 async function ouvrirConversation(buyerId, prenom) {
   currentBuyerId = buyerId;
   document.getElementById('conv-liste').style.display = 'none';
@@ -396,6 +492,15 @@ function retourALaListe() {
 // il quitte la page comme avant.
 function quitterOuRevenir() {
   if (estVendeur && currentBuyerId) retourALaListe();
+  else if (!estVendeur && currentUser?.role === 'BUYER' && !currentShopId) history.back();
+  else if (!estVendeur && currentUser?.role === 'BUYER' && document.getElementById('conv-liste')?.style.display === 'none' && window.location.pathname.endsWith('marche-senegal-chat.html')) {
+    currentShopId = null;
+    if (socket) { socket.disconnect(); socket = null; }
+    const url = new URL(window.location.href);
+    url.searchParams.delete('shopId');
+    window.history.replaceState({}, '', url);
+    afficherBoiteAcheteur();
+  }
   else history.back();
 }
 
@@ -491,6 +596,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.toggle('espace-vendeur', estVendeur);
 
   if (!currentShopId) {
+    if (currentUser?.role === 'BUYER') {
+      await afficherBoiteAcheteur();
+      return;
+    }
     window.location.href = 'marche-senegal-accueil.html';
     return;
   }

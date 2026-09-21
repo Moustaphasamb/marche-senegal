@@ -491,6 +491,11 @@ async function getConversations() {
   return await apiCall('/api/messages/conversations');
 }
 
+// Les conversations de l'acheteur, une par boutique.
+async function getBuyerConversations() {
+  return await apiCall('/api/messages/inbox');
+}
+
 // ────────────────────────────────
 // STATISTIQUES VENDEUR
 // ────────────────────────────────
