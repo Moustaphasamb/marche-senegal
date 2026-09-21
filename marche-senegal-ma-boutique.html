@@ -176,6 +176,8 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
           <label for="shopAddress">Localisation, adresse ou repère</label>
           <input type="text" id="shopAddress" placeholder="Ex : Allée 3, stand 12, près de l’entrée principale" maxlength="180">
           <p class="field-hint">Cette localisation sera visible par les acheteurs et utilisée dans la recherche interne.</p>
+          <button type="button" class="upload-btn" onclick="captureShopLocation()">📍 Ajouter ma localisation actuelle</button>
+          <p class="field-hint" id="shopLocationStatus" style="margin-top:8px"></p>
         </div>
         <p class="field-hint">Aucune coordonnée GPS n’est nécessaire : le quartier, la ville et ce repère suffisent.</p>
       </div>
@@ -335,6 +337,7 @@ let shopId = null;
 let _selectedMarketId = null;
 let _selectedMarketName = null;
 let shopLocationType = 'MARKET';
+let shopCoordinates = { latitude: null, longitude: null };
 const AUTRE_LIEU_MARKET_ID = '00000000-0000-0000-0000-000000000001';
 let _allMktsBoutique = [];
 
@@ -687,6 +690,7 @@ function fillForm(shop, stats) {
   const n = document.getElementById('shopName');   if (n) n.value = shop.name || '';
   const d = document.getElementById('shopDesc');   if (d) d.value = shop.description || '';
   const ad = document.getElementById('shopAddress'); if (ad) ad.value = shop.address || '';
+  shopCoordinates = { latitude: shop.latitude ?? null, longitude: shop.longitude ?? null };
   const ln = document.getElementById('shopLocationName'); if (ln) ln.value = shop.locationName || '';
   const lc = document.getElementById('shopLocationCity'); if (lc) lc.value = shop.locationCity || '';
   const av = document.getElementById('shopAvatar'); if (av) av.value = shop.avatarUrl || '';
@@ -701,6 +705,10 @@ function fillForm(shop, stats) {
   const pvMarket = document.getElementById('pvMarket');
   if (pvMarket) pvMarket.textContent = '📍 ' + (_selectedMarketName || '—');
   if (shopLocationType === 'CUSTOM') selectCustomLocation();
+  if (shopCoordinates.latitude !== null && shopCoordinates.longitude !== null) {
+    const status = document.getElementById('shopLocationStatus');
+    if (status) status.textContent = '✓ Localisation actuelle déjà enregistrée';
+  }
 
   const pvProd = document.getElementById('pvProdCount');
   if (pvProd) pvProd.textContent = stats?.totalProducts ?? shop._count?.products ?? 0;
@@ -724,6 +732,28 @@ function fillForm(shop, stats) {
   if (viewLink) viewLink.href = 'marche-senegal-boutique.html?id=' + shop.id;
 
   updatePreview();
+}
+
+function captureShopLocation() {
+  const status = document.getElementById('shopLocationStatus');
+  if (!navigator.geolocation) {
+    if (status) status.textContent = 'La localisation automatique n’est pas disponible. Renseignez l’adresse manuellement.';
+    return;
+  }
+  if (status) status.textContent = 'Autorisez la localisation de votre téléphone…';
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      shopCoordinates = {
+        latitude: Number(position.coords.latitude.toFixed(6)),
+        longitude: Number(position.coords.longitude.toFixed(6))
+      };
+      if (status) status.textContent = '✓ Localisation actuelle ajoutée';
+    },
+    () => {
+      if (status) status.textContent = 'Localisation refusée. Vous pouvez continuer avec l’adresse.';
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
 }
 
 // Un échec doit se voir et se rattraper : sans cela la page restait
@@ -777,6 +807,8 @@ async function saveShop() {
     locationName: document.getElementById('shopLocationName')?.value.trim() || null,
     locationCity: document.getElementById('shopLocationCity')?.value.trim() || null,
     address: document.getElementById('shopAddress').value.trim() || null,
+    latitude: shopCoordinates.latitude,
+    longitude: shopCoordinates.longitude,
     avatarUrl: document.getElementById('shopAvatar').value.trim() || null,
     bannerUrl: document.getElementById('shopBanner').value.trim() || null,
     openingHours: document.getElementById('shopHours').value.trim() || null,

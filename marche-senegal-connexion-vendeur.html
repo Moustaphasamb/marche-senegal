@@ -372,6 +372,8 @@
             <div class="field"><label class="fl" for="reg-location-name">Quartier ou lieu *</label><input class="fi" id="reg-location-name" placeholder="Ex : Parcelles Assainies unité 15"></div>
             <div class="field"><label class="fl" for="reg-location-city">Ville / région *</label><input class="fi" id="reg-location-city" placeholder="Ex : Dakar"></div>
             <div class="field"><label class="fl" for="reg-location-address">Localisation, adresse ou repère *</label><input class="fi" id="reg-location-address" placeholder="Ex : près de la pharmacie, villa 12…"></div>
+            <button type="button" class="market-btn" onclick="captureSellerLocation()" style="width:100%;margin-top:2px">📍 Ajouter ma localisation actuelle</button>
+            <div id="seller-location-status" style="font-size:.78rem;color:var(--muted);margin-top:8px;text-align:center"></div>
           </div>
         </div>
 
@@ -474,6 +476,7 @@
 let selectedMarketId = null;
 let selectedMarketName = '';
 let selectedLocationType = 'MARKET';
+let sellerCoordinates = { latitude: null, longitude: null };
 let regData = {};
 
 const MARKET_EMOJIS = {
@@ -847,6 +850,28 @@ function selectCustomLocation() {
   document.getElementById('custom-location-fields').style.display = 'block';
 }
 
+function captureSellerLocation() {
+  const status = document.getElementById('seller-location-status');
+  if (!navigator.geolocation) {
+    if (status) status.textContent = 'La localisation automatique n’est pas disponible. Renseignez l’adresse manuellement.';
+    return;
+  }
+  if (status) status.textContent = 'Autorisez la localisation de votre téléphone…';
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      sellerCoordinates = {
+        latitude: Number(position.coords.latitude.toFixed(6)),
+        longitude: Number(position.coords.longitude.toFixed(6))
+      };
+      if (status) status.textContent = '✓ Localisation actuelle ajoutée';
+    },
+    () => {
+      if (status) status.textContent = 'Localisation refusée. Vous pouvez continuer avec le quartier et l’adresse.';
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
+}
+
 // ── Créer le compte vendeur + boutique ──
 /* ── Pièce d'identité ──
    Le vendeur photographie sa carte ; chaque photo part vers Cloudinary et
@@ -983,6 +1008,8 @@ async function doRegister() {
     payload.locationName = locationName;
     payload.locationCity = locationCity;
     payload.address = locationAddress;
+    payload.latitude = sellerCoordinates.latitude;
+    payload.longitude = sellerCoordinates.longitude;
   }
   if (regData.email) payload.email = regData.email;
   if (regData.phone) payload.phone = regData.phone;
