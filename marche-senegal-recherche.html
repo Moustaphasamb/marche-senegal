@@ -272,7 +272,7 @@ async function loadResults() {
   });
 
   loadShopMatches(currentFilters.q, result.data || []);
-  loadMarketMatches(currentFilters.q);
+  loadMarketMatches(currentFilters.q, result.data || []);
 
   if (!result.success) {
     showError('results-grid', 'Erreur lors de la recherche');
@@ -381,15 +381,18 @@ async function loadShopMatches(query, products = []) {
   }).join('');
 }
 
-async function loadMarketMatches(query) {
+async function loadMarketMatches(query, products = []) {
   const section = document.getElementById('market-results');
   const grid = document.getElementById('market-results-grid');
   if (!section || !grid || !query) return;
   const result = await getMarkets();
   const q = query.toLowerCase();
-  const markets = (result.success ? result.data : []).filter(m =>
+  const byId = new Map();
+  products.forEach(product => { if (product.shop?.market?.id) byId.set(product.shop.market.id, product.shop.market); });
+  (result.success ? result.data : []).filter(m =>
     [m.name, m.city, m.region, m.address].filter(Boolean).some(v => v.toLowerCase().includes(q))
-  );
+  ).forEach(m => byId.set(m.id, m));
+  const markets = [...byId.values()];
   if (!markets.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   grid.innerHTML = markets.slice(0, 8).map(m => `<article style="background:#fffaf0;border:1px solid #eadbb8;border-radius:18px;padding:16px"><strong style="display:block;color:#6f4b0c">🏬 ${escapeHtml(m.name)}</strong><span style="display:block;color:#796d58;font-size:.82rem;margin-top:6px">${escapeHtml([m.city, m.region].filter(Boolean).join(' · '))}</span><span style="display:block;color:#796d58;font-size:.78rem;margin-top:4px">${m._count?.shops || 0} boutique(s) référencée(s)</span><button type="button" onclick="window.location.href='marche-senegal-marche.html?id=${encodeURIComponent(m.id)}'" style="margin-top:12px;border:0;background:#f2bf32;color:#4f3b08;border-radius:10px;padding:9px 12px;font-weight:700">Voir le marché</button></article>`).join('');
