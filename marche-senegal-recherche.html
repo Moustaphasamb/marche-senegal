@@ -162,10 +162,10 @@
     <div class="fs-section">
       <div class="fs-title">Catégorie</div>
       <div class="cb-list">
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mode & Vêtements</span></div>
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Tissu & Wax</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Artisanat</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Beauté & Soins</span></div>
+        <div class="cb-row category-filter" data-category="Mode & Vêtements" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Mode & Vêtements</span></div>
+        <div class="cb-row category-filter" data-category="Tissu & Wax" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Tissu & Wax</span></div>
+        <div class="cb-row category-filter" data-category="Artisanat" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Artisanat</span></div>
+        <div class="cb-row category-filter" data-category="Beauté & Soins" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Beauté & Soins</span></div>
       </div>
     </div>
     <div class="fs-section">
@@ -186,10 +186,10 @@
     <div class="fs-section">
       <div class="fs-title">Options</div>
       <div class="cb-list">
-        <div class="cb-row checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur vérifié ✓</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle <i class="ic" data-ic="video"></i></span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span></div>
+        <div class="cb-row option-filter checked" data-filter="verified" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur vérifié ✓</span></div>
+        <div class="cb-row option-filter" data-filter="virtualTour" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle <i class="ic" data-ic="video"></i></span></div>
+        <div class="cb-row option-filter" data-filter="promo" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span></div>
+        <div class="cb-row option-filter" data-filter="open" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Boutique ouverte</span></div>
         <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>En stock uniquement</span></div>
       </div>
     </div>
@@ -240,6 +240,7 @@
 let cartCount = 0;
 let currentFilters = {};
 let currentPage = 1;
+let currentTab = 'Tout';
 let currentProductShopCandidates = [];
 let currentSearchQuery = '';
 
@@ -351,6 +352,7 @@ async function loadResults() {
       </div>
     </div>
   `).join('');
+  applyTabVisibility();
 }
 
 async function loadShopMatches(query, products = []) {
@@ -431,6 +433,32 @@ function setSug(val) {
 function setTab(el) {
   document.querySelectorAll('.ft-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+  currentTab = el.textContent.trim();
+  if (currentTab === 'En promo') currentFilters.promo = true;
+  else delete currentFilters.promo;
+  if (currentTab === 'Nouveautés') currentFilters.sortBy = 'newest';
+  else if (currentFilters.sortBy === 'newest') delete currentFilters.sortBy;
+  currentPage = 1;
+  loadResults();
+}
+
+function applyTabVisibility() {
+  const productGrid = document.getElementById('results-grid');
+  const shops = document.getElementById('shop-results');
+  const markets = document.getElementById('market-results');
+  if (currentTab === 'Produits' || currentTab === 'En promo' || currentTab === 'Nouveautés') {
+    if (productGrid) productGrid.style.display = '';
+    if (shops) shops.style.display = 'none';
+    if (markets) markets.style.display = 'none';
+  } else if (currentTab === 'Boutiques') {
+    if (productGrid) productGrid.style.display = 'none';
+    if (markets) markets.style.display = 'none';
+  } else if (currentTab === 'Marchés') {
+    if (productGrid) productGrid.style.display = 'none';
+    if (shops) shops.style.display = 'none';
+  } else {
+    if (productGrid) productGrid.style.display = '';
+  }
 }
 
 // ── Filtre prix ──
@@ -444,6 +472,19 @@ function updatePrice(val) {
 // ── Appliquer les filtres ──
 async function applyFilters() {
   updateMarketFilter();
+  const categories = [...document.querySelectorAll('.category-filter.checked')]
+    .map(el => el.dataset.category).filter(Boolean);
+  if (categories.length) currentFilters.categoryNames = categories.join(',');
+  else delete currentFilters.categoryNames;
+
+  document.querySelectorAll('.option-filter').forEach(el => {
+    const key = el.dataset.filter;
+    if (key) {
+      if (el.classList.contains('checked')) currentFilters[key] = true;
+      else delete currentFilters[key];
+    }
+  });
+  if (currentTab === 'En promo') currentFilters.promo = true;
   currentPage = 1;
   await loadResults();
   closeSidebar();
@@ -455,6 +496,8 @@ function resetFilters() {
   const q = currentFilters.q;
   currentFilters = {};
   if (q) currentFilters.q = q;
+  currentTab = 'Tout';
+  document.querySelectorAll('.ft-tab').forEach((tab, index) => tab.classList.toggle('active', index === 0));
   document.querySelectorAll('.cb-row').forEach(cb => cb.classList.remove('checked'));
   document.querySelectorAll('.mp-item').forEach(p => p.classList.remove('sel'));
   document.querySelector('.range-slider').value = 500000;

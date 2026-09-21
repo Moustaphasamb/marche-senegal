@@ -130,12 +130,23 @@ async function getProducts(filters = {}) {
   if (filters.q)          params.append('q', filters.q);
   if (filters.marketId)   params.append('marketId', filters.marketId);
   if (filters.categoryId) params.append('categoryId', filters.categoryId);
+  if (filters.categoryNames) params.append('categoryNames', filters.categoryNames);
+  if (filters.categoryNames) params.append('categoryNames', filters.categoryNames);
   if (filters.shopId)     params.append('shopId', filters.shopId);
   if (filters.minPrice)   params.append('minPrice', filters.minPrice);
   if (filters.maxPrice)   params.append('maxPrice', filters.maxPrice);
   if (filters.sortBy)     params.append('sortBy', filters.sortBy);
+  if (filters.verified)   params.append('verified', 'true');
+  if (filters.virtualTour) params.append('virtualTour', 'true');
+  if (filters.promo)      params.append('promo', 'true');
+  if (filters.open)       params.append('open', 'true');
   if (filters.page)       params.append('page', filters.page);
   if (filters.limit)      params.append('limit', filters.limit);
+  if (filters.verified)   params.append('verified', 'true');
+  if (filters.virtualTour) params.append('virtualTour', 'true');
+  if (filters.promo)      params.append('promo', 'true');
+  if (filters.open)       params.append('open', 'true');
+  if (filters.minRating)  params.append('minRating', filters.minRating);
 
   const query = params.toString() ? `?${params.toString()}` : '';
   return await apiCall(`/api/products${query}`);
