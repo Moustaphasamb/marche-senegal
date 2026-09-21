@@ -114,7 +114,7 @@ a{text-decoration:none;color:inherit}
     <div class="ch-avatar" id="ch-avatar">?</div>
     <div class="ch-info">
       <div class="ch-name" id="ch-name">Chargement...</div>
-      <div class="ch-status"><span class="online-dot"></span>En ligne</div>
+      <div class="ch-status">Messagerie privée</div>
     </div>
   </div>
 </nav>
@@ -145,6 +145,33 @@ let estVendeur = false;
 let currentUser = null;
 let socket = null;
 let lastDate = null;
+
+function afficherErreurMessagerie(message) {
+  document.querySelector('.input-bar').style.display = 'none';
+  document.getElementById('conv-liste').style.display = 'none';
+  document.getElementById('ch-name').textContent = 'Mes messages';
+  const zone = document.getElementById('messages-wrap');
+  zone.style.display = '';
+  const texte = document.createElement('p');
+  texte.textContent = message;
+  const action = document.createElement('button');
+  action.className = 'nav-back';
+  action.textContent = isLoggedIn() ? 'Réessayer' : 'Se reconnecter';
+  action.onclick = () => {
+    if (isLoggedIn()) window.location.reload();
+    else window.location.href = currentUser?.role === 'SELLER'
+      ? 'marche-senegal-connexion-vendeur.html' : 'marche-senegal-connexion-acheteur.html';
+  };
+  zone.replaceChildren(texte, action);
+}
+
+// Une expiration de session reste expliquée dans la messagerie, sans retour
+// silencieux à l'accueil. Les autres pages conservent leur comportement.
+async function appelMessagerie(endpoint, options = {}) {
+  const result = await apiCall(endpoint, { ...options, redirectOnUnauthorized: false });
+  if (!result.success && !isLoggedIn()) afficherErreurMessagerie(result.message);
+  return result;
+}
 
 function getShopIdFromURL() {
   return new URLSearchParams(window.location.search).get('shopId');
@@ -279,7 +306,7 @@ async function afficherConversations() {
   liste.style.display = 'flex';
   liste.replaceChildren();
 
-  const resultat = await getConversations();
+  const resultat = await appelMessagerie('/api/messages/conversations');
   if (!resultat.success) {
     const erreur = document.createElement('div');
     erreur.className = 'conv-vide';
@@ -359,7 +386,7 @@ async function afficherBoiteAcheteur() {
   liste.style.display = 'flex';
   liste.replaceChildren();
 
-  const resultat = await getBuyerConversations();
+  const resultat = await appelMessagerie('/api/messages/inbox');
   if (!resultat.success) {
     const erreur = document.createElement('div');
     erreur.className = 'conv-vide';
@@ -452,7 +479,7 @@ async function ouvrirConversation(buyerId, prenom) {
   // l'en-tête figé sur « Chargement... ».
   let nom = prenom;
   if (!nom) {
-    const fils = await getConversations();
+    const fils = await appelMessagerie('/api/messages/conversations');
     const fil = (fils.data || []).find(f => f.buyerId === buyerId);
     nom = fil?.acheteur?.firstName || 'Client';
   }
@@ -505,7 +532,7 @@ function quitterOuRevenir() {
 }
 
 async function loadChat(shopId, buyerId) {
-  const result = await getChatMessages(shopId, buyerId);
+  const result = await appelMessagerie(cheminConversation(shopId, buyerId));
   if (!result.success) {
     showToast('❌ Impossible de charger les messages', 'error');
     return;
@@ -520,7 +547,7 @@ async function loadChat(shopId, buyerId) {
   }
 
   renderMessages(result.data, currentUser?.id);
-  markMessagesRead(shopId, buyerId);
+  appelMessagerie(cheminConversation(shopId, buyerId, '/read'), { method: 'PATCH' });
 }
 
 async function sendMessage() {
@@ -532,7 +559,9 @@ async function sendMessage() {
   btn.disabled = true;
   input.value = '';
 
-  const result = await sendChatMessage(currentShopId, content, currentBuyerId);
+  const result = await appelMessagerie(cheminConversation(currentShopId, currentBuyerId), {
+    method: 'POST', body: JSON.stringify({ content })
+  });
   if (!result.success) {
     showToast('❌ ' + (result.message || 'Erreur d\'envoi'), 'error');
     input.value = content;
@@ -562,7 +591,7 @@ function connectSocket(shopId, buyerId, userId) {
   socket.on('new_message', (msg) => {
     if (msg.senderId !== userId) {
       appendMessage(msg);
-      markMessagesRead(shopId, buyerId);
+      appelMessagerie(cheminConversation(shopId, buyerId, '/read'), { method: 'PATCH' });
     }
   });
 
@@ -584,13 +613,29 @@ document.getElementById('msg-input').addEventListener('input', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
+  try { currentUser = getCurrentUser(); } catch { currentUser = null; }
   if (!isLoggedIn()) {
-    window.location.href = 'marche-senegal-connexion-acheteur.html';
+    afficherErreurMessagerie('Connectez-vous pour retrouver vos conversations.');
     return;
   }
 
-  currentUser = getCurrentUser();
+  const profil = await appelMessagerie('/api/auth/me');
+  if (!profil.success || !profil.user) {
+    afficherErreurMessagerie(profil.message || 'Impossible de charger votre compte. Réessayez.');
+    return;
+  }
+  currentUser = profil.user;
   currentShopId = getShopIdFromURL();
+  if (!currentShopId && currentUser.role === 'SELLER') {
+    currentShopId = currentUser.shop?.id || null;
+    if (!currentShopId) {
+      afficherErreurMessagerie('Aucune boutique associée à votre compte. Finalisez votre inscription vendeur.');
+      return;
+    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('shopId', currentShopId);
+    window.history.replaceState({}, '', url);
+  }
   // Vendeur de CETTE boutique seulement : ailleurs, il est un client.
   estVendeur = currentUser?.role === 'SELLER' && currentUser?.shop?.id === currentShopId;
   document.body.classList.toggle('espace-vendeur', estVendeur);
@@ -600,7 +645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await afficherBoiteAcheteur();
       return;
     }
-    window.location.href = 'marche-senegal-accueil.html';
+    afficherErreurMessagerie('Ouvrez une boutique pour accéder à sa conversation.');
     return;
   }
 
