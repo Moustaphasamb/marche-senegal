@@ -207,11 +207,16 @@
     <div class="active-chips" id="active-chips"></div>
     <div class="results-grid" id="results-grid"></div>
     <section id="shop-results" style="margin-top:34px;display:none">
-      <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px">
-        <div><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1b6b3a;font-weight:800">Localisation interne</div><h2 style="margin:4px 0 0;font-size:1.35rem;color:#173b2a">Boutiques trouvées par lieu</h2></div>
-        <span id="shop-result-count" style="font-size:.82rem;color:#718078"></span>
+      <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1b6b3a;font-weight:800">Localisation interne</div><h2 id="shop-results-title" style="margin:4px 0 0;font-size:1.35rem;color:#173b2a">Boutiques trouvées par lieu</h2></div>
+        <div style="display:flex;align-items:center;gap:10px"><span id="shop-result-count" style="font-size:.82rem;color:#718078"></span><button type="button" onclick="findNearbyShops()" style="border:1px solid #b7d5c1;background:#f3faf5;color:#1b6b3a;border-radius:999px;padding:9px 13px;font-weight:700;cursor:pointer">📍 Près de moi</button></div>
       </div>
       <div id="shop-results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px"></div>
+    </section>
+    <section id="market-results" style="margin-top:28px;display:none">
+      <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#b47811;font-weight:800">Marchés correspondants</div>
+      <h2 style="margin:4px 0 14px;font-size:1.35rem;color:#173b2a">Où trouver ce produit</h2>
+      <div id="market-results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px"></div>
     </section>
     <div class="pagination" id="pagination"></div>
   </div>
@@ -235,6 +240,8 @@
 let cartCount = 0;
 let currentFilters = {};
 let currentPage = 1;
+let currentProductShopCandidates = [];
+let currentSearchQuery = '';
 
 // ── Rechercher les produits ──
 async function doSearch() {
@@ -246,6 +253,7 @@ async function doSearch() {
   document.getElementById('result-query').textContent = val;
 
   currentFilters.q = val;
+  currentSearchQuery = val;
   currentPage = 1;
   await loadResults();
 }
@@ -263,7 +271,8 @@ async function loadResults() {
     limit: 12
   });
 
-  loadShopMatches(currentFilters.q);
+  loadShopMatches(currentFilters.q, result.data || []);
+  loadMarketMatches(currentFilters.q);
 
   if (!result.success) {
     showError('results-grid', 'Erreur lors de la recherche');
@@ -344,19 +353,24 @@ async function loadResults() {
   `).join('');
 }
 
-async function loadShopMatches(query) {
+async function loadShopMatches(query, products = []) {
   const section = document.getElementById('shop-results');
   const grid = document.getElementById('shop-results-grid');
   if (!section || !grid || !query) return;
+  const byId = new Map();
+  products.forEach(product => { if (product.shop?.id) byId.set(product.shop.id, product.shop); });
   const result = await getShops({ q: query, page: 1 });
-  if (!result.success || !result.data?.length) {
+  (result.success ? result.data : []).forEach(shop => byId.set(shop.id, shop));
+  const shops = [...byId.values()];
+  currentProductShopCandidates = shops;
+  if (!shops.length) {
     section.style.display = 'none';
     return;
   }
   section.style.display = 'block';
   const count = document.getElementById('shop-result-count');
-  if (count) count.textContent = `${result.pagination?.total || result.data.length} boutique(s)`;
-  grid.innerHTML = result.data.map(shop => {
+  if (count) count.textContent = `${shops.length} boutique(s)`;
+  grid.innerHTML = shops.map(shop => {
     const lieu = [shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ');
     const image = urlImageSure(shop.avatarUrl || shop.bannerUrl);
     return `<article style="background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;cursor:pointer;box-shadow:0 6px 20px rgba(23,59,42,.06)" onclick="window.location.href='marche-senegal-boutique.html?id=${encodeURIComponent(shop.id)}'">
@@ -365,6 +379,38 @@ async function loadShopMatches(query) {
       <span style="display:block;color:#718078;font-size:.8rem;margin-top:5px;line-height:1.4">${escapeHtml(lieu || 'Localisation à préciser')}</span>
     </article>`;
   }).join('');
+}
+
+async function loadMarketMatches(query) {
+  const section = document.getElementById('market-results');
+  const grid = document.getElementById('market-results-grid');
+  if (!section || !grid || !query) return;
+  const result = await getMarkets();
+  const q = query.toLowerCase();
+  const markets = (result.success ? result.data : []).filter(m =>
+    [m.name, m.city, m.region, m.address].filter(Boolean).some(v => v.toLowerCase().includes(q))
+  );
+  if (!markets.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  grid.innerHTML = markets.slice(0, 8).map(m => `<article style="background:#fffaf0;border:1px solid #eadbb8;border-radius:18px;padding:16px"><strong style="display:block;color:#6f4b0c">🏬 ${escapeHtml(m.name)}</strong><span style="display:block;color:#796d58;font-size:.82rem;margin-top:6px">${escapeHtml([m.city, m.region].filter(Boolean).join(' · '))}</span><span style="display:block;color:#796d58;font-size:.78rem;margin-top:4px">${m._count?.shops || 0} boutique(s) référencée(s)</span><button type="button" onclick="window.location.href='marche-senegal-marche.html?id=${encodeURIComponent(m.id)}'" style="margin-top:12px;border:0;background:#f2bf32;color:#4f3b08;border-radius:10px;padding:9px 12px;font-weight:700">Voir le marché</button></article>`).join('');
+}
+
+function findNearbyShops() {
+  if (!navigator.geolocation) { toast('La localisation n’est pas disponible sur cet appareil'); return; }
+  toast('Recherche des boutiques proches…');
+  navigator.geolocation.getCurrentPosition(position => {
+    const { latitude, longitude } = position.coords;
+    const distance = shop => shop.latitude == null || shop.longitude == null
+      ? Number.POSITIVE_INFINITY
+      : Math.hypot(shop.latitude - latitude, shop.longitude - longitude);
+    const shops = [...currentProductShopCandidates].sort((a, b) => distance(a) - distance(b));
+    const section = document.getElementById('shop-results');
+    const title = document.getElementById('shop-results-title');
+    if (section) section.style.display = shops.length ? 'block' : 'none';
+    if (title) title.textContent = shops.length ? `Boutiques proches pour « ${currentSearchQuery} »` : 'Aucune boutique proche';
+    const grid = document.getElementById('shop-results-grid');
+    if (grid) grid.innerHTML = shops.map(shop => `<article style="background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;cursor:pointer" onclick="window.location.href='marche-senegal-boutique.html?id=${encodeURIComponent(shop.id)}'"><strong style="display:block;color:#173b2a">${escapeHtml(shop.name || 'Boutique')}</strong><span style="display:block;color:#718078;font-size:.8rem;margin-top:5px">${escapeHtml([shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ') || 'Localisation à préciser')}</span></article>`).join('');
+  }, () => toast('Localisation refusée. Recherchez par quartier ou par ville.'));
 }
 
 // ── Suggestion rapide ──
