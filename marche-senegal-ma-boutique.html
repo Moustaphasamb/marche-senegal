@@ -163,6 +163,22 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
         <p class="field-hint" style="margin-top:10px;">Sélectionnez le marché où se trouve votre boutique.</p>
       </div>
 
+      <!-- Localisation précise -->
+      <div class="card">
+        <h2>Localisation de la boutique</h2>
+        <div class="field">
+          <label for="shopAddress">Adresse ou repère</label>
+          <input type="text" id="shopAddress" placeholder="Ex : Allée 3, stand 12, près de l’entrée principale" maxlength="180">
+          <p class="field-hint">Cette adresse sera visible par les acheteurs.</p>
+        </div>
+        <button type="button" class="upload-btn" onclick="useMyLocation()"><i class="ic" data-ic="map-pin"></i> Utiliser ma position actuelle</button>
+        <div class="fi-row" style="margin-top:12px">
+          <div class="field"><label for="shopLatitude">Latitude <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label><input type="number" id="shopLatitude" step="any" placeholder="14.7167"></div>
+          <div class="field"><label for="shopLongitude">Longitude <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label><input type="number" id="shopLongitude" step="any" placeholder="-17.4677"></div>
+        </div>
+        <p class="field-hint">Les coordonnées permettent d’ouvrir directement l’itinéraire dans Google Maps.</p>
+      </div>
+
       <!-- Identité -->
       <div class="card">
         <h2>Identité de la boutique</h2>
@@ -646,6 +662,9 @@ function fillForm(shop, stats) {
 
   const n = document.getElementById('shopName');   if (n) n.value = shop.name || '';
   const d = document.getElementById('shopDesc');   if (d) d.value = shop.description || '';
+  const ad = document.getElementById('shopAddress'); if (ad) ad.value = shop.address || '';
+  const la = document.getElementById('shopLatitude'); if (la) la.value = shop.latitude ?? '';
+  const lo = document.getElementById('shopLongitude'); if (lo) lo.value = shop.longitude ?? '';
   const av = document.getElementById('shopAvatar'); if (av) av.value = shop.avatarUrl || '';
   const bn = document.getElementById('shopBanner'); if (bn) bn.value = shop.bannerUrl || '';
   const ho = document.getElementById('shopHours');
@@ -680,6 +699,23 @@ function fillForm(shop, stats) {
   if (viewLink) viewLink.href = 'marche-senegal-boutique.html?id=' + shop.id;
 
   updatePreview();
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) {
+    showToastLocal('La géolocalisation n’est pas disponible sur cet appareil', 'error');
+    return;
+  }
+  showToastLocal('Recherche de votre position…');
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      document.getElementById('shopLatitude').value = position.coords.latitude.toFixed(6);
+      document.getElementById('shopLongitude').value = position.coords.longitude.toFixed(6);
+      showToastLocal('Position récupérée. Enregistrez pour la publier.');
+    },
+    () => showToastLocal('Position refusée ou indisponible. Saisissez l’adresse manuellement.', 'error'),
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
 }
 
 // Un échec doit se voir et se rattraper : sans cela la page restait
@@ -729,6 +765,9 @@ async function saveShop() {
   const body = {
     name,
     description: document.getElementById('shopDesc').value.trim(),
+    address: document.getElementById('shopAddress').value.trim() || null,
+    latitude: document.getElementById('shopLatitude').value || null,
+    longitude: document.getElementById('shopLongitude').value || null,
     avatarUrl: document.getElementById('shopAvatar').value.trim() || null,
     bannerUrl: document.getElementById('shopBanner').value.trim() || null,
     openingHours: document.getElementById('shopHours').value.trim() || null,

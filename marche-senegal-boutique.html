@@ -813,10 +813,12 @@ async function loadShop(shopId) {
   // Adresse sous la carte : « Marché Sandaga — Allée 3, Stand 12 » était figé.
   const mapAddress = document.querySelector('.map-address');
   if (mapAddress) {
-    const lieu = [shop.market?.name, shop.market?.address].filter(Boolean).join(' — ');
+    const lieu = [shop.market?.name, shop.address || shop.market?.address].filter(Boolean).join(' — ');
     if (lieu) mapAddress.textContent = lieu;
     else mapAddress.style.display = 'none';
   }
+  const mapSub = document.querySelector('.map-sub');
+  if (mapSub) mapSub.textContent = shop.address || shop.market?.city || 'Localisation à préciser';
 
   remplirInfosBoutique(shop);
 
@@ -1484,7 +1486,9 @@ function callShop() {
 // ── Ouvrir Google Maps ──
 function openMap() {
   const shop = currentShop;
-  const query = shop?.address || shop?.market?.name || 'Marché Sandaga Dakar';
+  const query = shop?.latitude != null && shop?.longitude != null
+    ? `${shop.latitude},${shop.longitude}`
+    : [shop?.address, shop?.market?.name, shop?.market?.city].filter(Boolean).join(', ') || 'Marché Sandaga Dakar';
   window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query), '_blank');
 }
 
@@ -1506,7 +1510,7 @@ function remplirInfosBoutique(shop) {
   // Adresse : celle du marché, seule adresse dont on dispose réellement
   const ligneAdresse = document.getElementById('it-adresse');
   if (ligneAdresse && shop.market) {
-    const parts = [shop.market.name, shop.market.address, shop.market.city].filter(Boolean);
+    const parts = [shop.market.name, shop.address || shop.market.address, shop.market.city].filter(Boolean);
     if (parts.length) {
       ligneAdresse.querySelector('.it-sub').textContent = parts.join(' · ');
       ligneAdresse.style.display = '';
