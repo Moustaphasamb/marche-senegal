@@ -372,9 +372,9 @@
             <div class="field"><label class="fl" for="reg-location-name">Quartier ou lieu *</label><input class="fi" id="reg-location-name" placeholder="Ex : Parcelles Assainies unité 15"></div>
             <div class="field"><label class="fl" for="reg-location-city">Ville / région *</label><input class="fi" id="reg-location-city" placeholder="Ex : Dakar"></div>
             <div class="field"><label class="fl" for="reg-location-address">Localisation, adresse ou repère *</label><input class="fi" id="reg-location-address" placeholder="Ex : près de la pharmacie, villa 12…"></div>
-            <button type="button" class="market-btn" onclick="captureSellerLocation()" style="width:100%;margin-top:2px">📍 Ajouter ma localisation actuelle</button>
-            <div id="seller-location-status" style="font-size:.78rem;color:var(--muted);margin-top:8px;text-align:center"></div>
           </div>
+          <button type="button" class="market-btn" onclick="captureSellerLocation()" style="width:100%;margin-top:10px">📍 Ajouter ma localisation actuelle</button>
+          <div id="seller-location-status" style="font-size:.78rem;color:var(--muted);margin-top:8px;text-align:center"></div>
         </div>
 
         <div class="pending-box" style="margin-top:12px">
@@ -1008,6 +1008,8 @@ async function doRegister() {
     payload.locationName = locationName;
     payload.locationCity = locationCity;
     payload.address = locationAddress;
+  }
+  if (sellerCoordinates.latitude !== null && sellerCoordinates.longitude !== null) {
     payload.latitude = sellerCoordinates.latitude;
     payload.longitude = sellerCoordinates.longitude;
   }
