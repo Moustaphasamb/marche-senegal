@@ -184,6 +184,16 @@ function getBuyerIdFromURL() {
   return new URLSearchParams(window.location.search).get('buyerId');
 }
 
+function preparerMessageCommande() {
+  if (estVendeur || currentUser?.role !== 'BUYER') return;
+  const reference = new URLSearchParams(window.location.search).get('orderRef');
+  if (!reference || !/^[a-zA-Z0-9-]{1,60}$/.test(reference)) return;
+  const saisie = document.getElementById('msg-input');
+  if (!saisie || saisie.value) return;
+  saisie.value = 'Bonjour, je vous contacte au sujet de ma commande ' + reference + '. ';
+  document.getElementById('send-btn').disabled = false;
+}
+
 // ── Formater l'heure ──
 function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -667,6 +677,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   currentBuyerId = null;
   await loadChat(currentShopId, null);
+  preparerMessageCommande();
   connectSocket(currentShopId, currentUser?.id, currentUser?.id);
 });
 </script>

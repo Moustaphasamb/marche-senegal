@@ -966,7 +966,12 @@ function contactSeller(shopId) {
   }
   const targetShopId = shopId || currentOrder?.shopId;
   if (!targetShopId) return;
-  window.location.href = 'marche-senegal-chat.html?shopId=' + targetShopId;
+  const commandeBoutique = currentOrder?._isMarketOrder
+    ? currentOrder.orders?.find(order => order.shopId === targetShopId)
+    : currentOrder;
+  const params = new URLSearchParams({ shopId: targetShopId });
+  if (commandeBoutique?.orderNumber) params.set('orderRef', commandeBoutique.orderNumber);
+  window.location.href = 'marche-senegal-chat.html?' + params.toString();
 }
 
 function reportProblem() {
