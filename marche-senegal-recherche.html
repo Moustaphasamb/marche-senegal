@@ -376,11 +376,11 @@ async function loadShopMatches(query, products = []) {
   grid.innerHTML = shops.map(shop => {
     const lieu = [shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ');
     const image = urlImageSure(shop.avatarUrl || shop.bannerUrl);
-    return `<article style="background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;cursor:pointer;box-shadow:0 6px 20px rgba(23,59,42,.06)" onclick="window.location.href='marche-senegal-boutique.html?id=${encodeURIComponent(shop.id)}'">
+    return `<a href="marche-senegal-boutique.html?id=${escapeHtml(encodeURIComponent(shop.id))}" style="display:block;background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;text-decoration:none;box-shadow:0 6px 20px rgba(23,59,42,.06)">
       <div style="height:96px;border-radius:12px;background:#eaf3ed;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px">${image ? `<img src="${escapeHtml(image)}" alt="" style="width:100%;height:100%;object-fit:cover">` : '<span style="font-size:2rem">🏪</span>'}</div>
       <strong style="display:block;color:#173b2a">${escapeHtml(shop.name || 'Boutique')}</strong>
       <span style="display:block;color:#718078;font-size:.8rem;margin-top:5px;line-height:1.4">${escapeHtml(lieu || 'Localisation à préciser')}</span>
-    </article>`;
+    </a>`;
   }).join('');
   applyTabVisibility();
 }
@@ -399,7 +399,7 @@ async function loadMarketMatches(query, products = []) {
   const markets = [...byId.values()];
   if (!markets.length) { section.style.display = 'none'; applyTabVisibility(); return; }
   section.style.display = 'block';
-  grid.innerHTML = markets.slice(0, 8).map(m => `<article style="background:#fffaf0;border:1px solid #eadbb8;border-radius:18px;padding:16px"><strong style="display:block;color:#6f4b0c">🏬 ${escapeHtml(m.name)}</strong><span style="display:block;color:#796d58;font-size:.82rem;margin-top:6px">${escapeHtml([m.city, m.region].filter(Boolean).join(' · '))}</span><span style="display:block;color:#796d58;font-size:.78rem;margin-top:4px">${m._count?.shops || 0} boutique(s) référencée(s)</span><button type="button" onclick="window.location.href='marche-senegal-marche.html?id=${encodeURIComponent(m.id)}'" style="margin-top:12px;border:0;background:#f2bf32;color:#4f3b08;border-radius:10px;padding:9px 12px;font-weight:700">Voir le marché</button></article>`).join('');
+  grid.innerHTML = markets.slice(0, 8).map(m => `<article style="background:#fffaf0;border:1px solid #eadbb8;border-radius:18px;padding:16px"><strong style="display:block;color:#6f4b0c">🏬 ${escapeHtml(m.name)}</strong><span style="display:block;color:#796d58;font-size:.82rem;margin-top:6px">${escapeHtml([m.city, m.region].filter(Boolean).join(' · '))}</span><span style="display:block;color:#796d58;font-size:.78rem;margin-top:4px">${m._count?.shops || 0} boutique(s) référencée(s)</span><a href="marche-senegal-marche.html?id=${escapeHtml(encodeURIComponent(m.id))}" style="display:inline-block;text-decoration:none;margin-top:12px;border:0;background:#f2bf32;color:#4f3b08;border-radius:10px;padding:9px 12px;font-weight:700">Voir le marché</a></article>`).join('');
   applyTabVisibility();
 }
 
@@ -417,7 +417,7 @@ function findNearbyShops() {
     if (section) section.style.display = shops.length ? 'block' : 'none';
     if (title) title.textContent = shops.length ? `Boutiques proches pour « ${currentSearchQuery} »` : 'Aucune boutique proche';
     const grid = document.getElementById('shop-results-grid');
-    if (grid) grid.innerHTML = shops.map(shop => `<article style="background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px;cursor:pointer" onclick="window.location.href='marche-senegal-boutique.html?id=${encodeURIComponent(shop.id)}'"><strong style="display:block;color:#173b2a">${escapeHtml(shop.name || 'Boutique')}</strong><span style="display:block;color:#718078;font-size:.8rem;margin-top:5px">${escapeHtml([shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ') || 'Localisation à préciser')}</span></article>`).join('');
+    if (grid) grid.innerHTML = shops.map(shop => `<a href="marche-senegal-boutique.html?id=${escapeHtml(encodeURIComponent(shop.id))}" style="display:block;text-decoration:none;background:#fffdf8;border:1px solid #e7e1d6;border-radius:18px;padding:16px"><strong style="display:block;color:#173b2a">${escapeHtml(shop.name || 'Boutique')}</strong><span style="display:block;color:#718078;font-size:.8rem;margin-top:5px">${escapeHtml([shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' · ') || 'Localisation à préciser')}</span></a>`).join('');
   }, () => toast('Localisation refusée. Recherchez par quartier ou par ville.'));
 }
 

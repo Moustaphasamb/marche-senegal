@@ -478,10 +478,10 @@
       <div class="cart-section"></div>
 
       <!-- ADRESSE DE LIVRAISON -->
-      <div class="sec-title" style="margin-top:8px"><i class="ic" data-ic="map-pin"></i> Adresse de livraison</div>
+      <div class="sec-title" style="margin-top:8px"><i class="ic" data-ic="map-pin"></i> Vérifier une livraison (facultatif)</div>
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
         <div class="addr-list" id="checkout-addresses">Chargement des adresses…</div>
-        <details style="margin-top:12px">
+        <details id="checkout-add-address" style="margin-top:12px">
           <summary style="cursor:pointer;color:var(--green);font-weight:600">+ Ajouter une adresse</summary>
           <div style="display:grid;gap:8px;margin-top:12px">
             <input id="address-label" class="ps-input" placeholder="Libellé (ex. Domicile)" maxlength="60">
@@ -499,7 +499,7 @@
         </details>
       </div>
 
-      <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
+      <div id="checkout-delivery-note" style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
         <div class="ps-title"><i class="ic" data-ic="navigation"></i> Repère pour le livreur <span style="font-size:.72rem;color:var(--muted);font-weight:400">(facultatif)</span></div>
         <textarea id="delivery-note" class="ps-input" rows="3" maxlength="500" placeholder="Ex. près de la pharmacie, appeler avant d’arriver…" style="resize:vertical;padding:11px 14px;line-height:1.45"></textarea>
         <div style="font-size:.72rem;color:var(--muted);margin-top:6px">Ces instructions seront transmises au vendeur et au livreur.</div>
@@ -586,7 +586,7 @@
           </div>
         </div>
         <div id="pay-methods-empty" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.82rem;color:#8A6100;line-height:1.5">
-          <i class="ic" data-ic="hourglass"></i> Le paiement en ligne est momentanément indisponible. Réessayez dans quelques minutes.
+          <i class="ic" data-ic="hourglass"></i> Le paiement en ligne n'est pas encore disponible. Votre panier reste enregistré pour plus tard.
         </div>
 
         <div id="auth-wall" style="display:none;background:var(--gdl);border:1.5px solid rgba(230,168,23,.3);border-radius:12px;padding:16px;margin-bottom:12px">
@@ -602,7 +602,7 @@
         </button>
 
         <div class="security-row">
-          <div class="sec-badge"><i class="ic" data-ic="lock"></i> Paiement sécurisé</div>
+          <div class="sec-badge" id="payment-security-badge"><i class="ic" data-ic="lock"></i> Paiement sécurisé</div>
           <div class="sec-badge">✓ Vendeurs vérifiés</div>
           <div class="sec-badge">🇸🇳 Marchés du Sénégal</div>
         </div>
@@ -963,6 +963,18 @@ function afficherDevisLivraison(reason) {
 async function loadCheckoutAddresses() {
   const target = document.getElementById('checkout-addresses');
   if (!target) return;
+  const addAddress = document.getElementById('checkout-add-address');
+  if (!isLoggedIn()) {
+    const link = document.createElement('a');
+    link.href = 'marche-senegal-connexion-acheteur.html';
+    link.textContent = 'Connectez-vous';
+    target.replaceChildren(link, document.createTextNode(' pour vérifier si ce vendeur livre chez vous. Votre panier reste enregistré et le retrait est disponible.'));
+    if (addAddress) addAddress.style.display = 'none';
+    selectedAddressId = null;
+    refreshDeliveryQuote();
+    return;
+  }
+  if (addAddress) addAddress.style.display = '';
   try {
     const result = await getAddresses();
     if (!result?.success) throw new Error(result?.message || 'Adresses indisponibles');
@@ -1043,6 +1055,8 @@ async function loadPaymentMethods() {
 
   const visibles = cartes.filter(c => c.style.display !== 'none');
   const payBtn = document.getElementById('pay-btn');
+  const securityBadge = document.getElementById('payment-security-badge');
+  if (securityBadge) securityBadge.style.display = visibles.length ? '' : 'none';
 
   if (visibles.length === 0) {
     document.getElementById('pay-methods').style.display = 'none';
@@ -1202,6 +1216,8 @@ function removeReward() {
 
 // ── Mettre à jour le récapitulatif ──
 function updateSummary() {
+  const deliveryNote = document.getElementById('checkout-delivery-note');
+  if (deliveryNote) deliveryNote.style.display = marketDeliveryType === 'DELIVERY' ? '' : 'none';
   const items = itemsDuMarcheActif();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   // La remise vient du serveur, calculée sur la boutique du code : la calculer
