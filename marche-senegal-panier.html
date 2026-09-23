@@ -487,7 +487,13 @@
             <input id="address-label" class="ps-input" placeholder="Libellé (ex. Domicile)" maxlength="60">
             <input id="address-line" class="ps-input" placeholder="Adresse complète" maxlength="240">
             <input id="address-city" class="ps-input" placeholder="Ville" maxlength="100">
-            <input id="address-region" class="ps-input" placeholder="Région (facultatif)" maxlength="100">
+            <select id="address-region" class="ps-input" aria-label="Région de livraison">
+              <option value="">Choisissez votre région</option>
+              <option>Dakar</option><option>Diourbel</option><option>Fatick</option><option>Kaffrine</option>
+              <option>Kaolack</option><option>Kédougou</option><option>Kolda</option><option>Louga</option>
+              <option>Matam</option><option>Saint-Louis</option><option>Sédhiou</option>
+              <option>Tambacounda</option><option>Thiès</option><option>Ziguinchor</option>
+            </select>
             <button type="button" class="ps-btn" onclick="addCheckoutAddress()">Enregistrer l’adresse</button>
           </div>
         </details>
@@ -605,7 +611,7 @@
       <!-- Trust badges -->
       <div style="background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px">
         <div style="font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:10px"><i class="ic" data-ic="lock-keyhole"></i> Paiement et suivi</div>
-        <div style="font-size:.76rem;color:var(--muted);line-height:1.65">Le paiement est traité par <strong style="color:var(--text)">Wave</strong>. Votre commande est confirmée dès l'encaissement, et vous suivez son avancement depuis votre profil jusqu'à la livraison.</div>
+        <div style="font-size:.76rem;color:var(--muted);line-height:1.65">La commande sera confirmée après encaissement par un moyen de paiement disponible. Vous pourrez ensuite suivre son avancement depuis votre profil.</div>
       </div>
 
     </div>
@@ -632,7 +638,9 @@
 let cart = [];
 let promoApplied = null;
 let rewardApplied = null;
-let marketDeliveryType = 'DELIVERY';
+let marketDeliveryType = 'PICKUP';
+let deliveryQuote = null;
+let deliveryQuoteRequestId = 0;
 let selectedPayment = 'WAVE';
 let selectedAddressId = null;
 let selectedMarketId = null;
@@ -707,6 +715,9 @@ function loadCart() {
         </button>
       </div>
     `;
+    ++deliveryQuoteRequestId;
+    deliveryQuote = null;
+    marketDeliveryType = 'PICKUP';
     updateSummary();
     return;
   }
@@ -747,7 +758,7 @@ function loadCart() {
   cartSection.innerHTML = marketSelectors + `
     <div style="background:linear-gradient(135deg,#0d5c36,#16794a);color:#fff;border-radius:18px;padding:17px 18px;margin-bottom:14px;display:flex;gap:12px;align-items:center;box-shadow:0 12px 30px rgba(13,92,54,.16)">
       <div style="width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:1.25rem"><i class="ic" data-ic="shopping-bag"></i></div>
-      <div><strong style="display:block;font-size:.96rem">Panier ${escapeHtml(byMarket[selectedMarketId].name)}</strong><span style="display:block;margin-top:3px;font-size:.78rem;opacity:.86">${shopCount} boutique${shopCount > 1 ? 's' : ''}, un seul paiement et une seule livraison</span></div>
+      <div><strong style="display:block;font-size:.96rem">Panier ${escapeHtml(byMarket[selectedMarketId].name)}</strong><span style="display:block;margin-top:3px;font-size:.78rem;opacity:.86">${shopCount} boutique${shopCount > 1 ? 's' : ''} · livraison selon disponibilité</span></div>
     </div>
   ` + Object.entries(byShop).map(([shopId, group]) => `
     <div class="shop-group checkout-selected">
@@ -755,7 +766,6 @@ function loadCart() {
         <div style="display:flex;align-items:center;gap:8px;flex:1">
         <div class="sg-icon">🏪</div>
         <div class="sg-name">${escapeHtml(group.shopName)}</div></div>
-        <div class="sg-verified">✓ Vérifié</div>
       </div>
       ${group.items.map(item => `
         <div class="cart-item" data-product-id="${escapeHtml(item.productId)}">
@@ -799,19 +809,19 @@ function loadCart() {
     <div class="shop-group checkout-selected" style="border-color:rgba(13,92,54,.2)">
       <div class="sg-header"><div class="sg-icon"><i class="ic" data-ic="truck"></i></div><div class="sg-name">Réception de toute la commande</div></div>
       <div class="delivery-choice" id="market-delivery-choice">
-        <div class="dc-btn ${marketDeliveryType === 'DELIVERY' ? 'selected' : ''}" onclick="selectDelivery(this, 'livraison')">
+        <div class="dc-btn ${marketDeliveryType === 'DELIVERY' ? 'selected' : ''}" id="seller-delivery-option" onclick="selectDelivery(this, 'livraison')" aria-disabled="true">
           <div class="dc-icon">🚚</div>
           <div>
-            <div class="dc-label">Une livraison groupée</div>
-            <div class="dc-sub">1 000 FCFA pour toutes les boutiques</div>
+            <div class="dc-label">Livraison par le vendeur</div>
+            <div class="dc-sub" id="seller-delivery-sub">Choisissez une adresse pour vérifier la disponibilité</div>
           </div>
           <div class="dc-radio"></div>
         </div>
         <div class="dc-btn ${marketDeliveryType === 'PICKUP' ? 'selected' : ''}" onclick="selectDelivery(this, 'retrait')">
           <div class="dc-icon">🏪</div>
           <div>
-            <div class="dc-label">Retrait au marché</div>
-            <div class="dc-sub">Gratuit · Les vendeurs préparent séparément</div>
+            <div class="dc-label">Retrait auprès du vendeur</div>
+            <div class="dc-sub">Gratuit · Retrait auprès de chaque boutique</div>
           </div>
           <div class="dc-radio"></div>
         </div>
@@ -835,6 +845,7 @@ function loadCart() {
   };
 
   updateSummary();
+  refreshDeliveryQuote();
 }
 
 function selectMarket(id) {
@@ -880,6 +891,10 @@ function removeItem(productId) {
 
 // ── Sélectionner livraison/retrait ──
 function selectDelivery(btn, type) {
+  if (type === 'livraison' && !deliveryQuote?.available) {
+    showToast(deliveryQuote?.reason || 'Livraison indisponible : choisissez une adresse ou le retrait.');
+    return;
+  }
   const group = document.getElementById('market-delivery-choice');
   group.querySelectorAll('.dc-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -895,7 +910,54 @@ function selectAddr(card) {
   document.querySelectorAll('.addr-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   selectedAddressId = card.dataset.addressId || null;
+  refreshDeliveryQuote();
   showToast('📍 Adresse sélectionnée');
+}
+
+async function refreshDeliveryQuote() {
+  const requestId = ++deliveryQuoteRequestId;
+  deliveryQuote = null;
+  const ids = [...new Set(itemsDuMarcheActif().map(item => item.shopId).filter(Boolean))];
+  let reason = 'Choisissez une adresse pour vérifier la disponibilité';
+  if (ids.length > 1) {
+    reason = 'Livraison groupée indisponible : retrait auprès de chaque boutique';
+  } else if (!isLoggedIn()) {
+    reason = 'Connectez-vous pour vérifier la livraison';
+  } else if (selectedAddressId && ids.length === 1) {
+    reason = 'Vérification des frais de livraison…';
+    afficherDevisLivraison(reason);
+    try {
+      const result = await apiCall('/api/delivery/quote', {
+        method: 'POST', body: JSON.stringify({ shopIds: ids, addressId: selectedAddressId })
+      });
+      if (requestId !== deliveryQuoteRequestId) return;
+      deliveryQuote = result.success ? result.data : { available: false, reason: result.message || 'Livraison indisponible' };
+      reason = deliveryQuote.available
+        ? `${formatPrice(deliveryQuote.fee)} · ${deliveryQuote.daysMin} à ${deliveryQuote.daysMax} jours estimés`
+        : deliveryQuote.reason;
+    } catch (_) {
+      if (requestId !== deliveryQuoteRequestId) return;
+      reason = 'Devis indisponible. Choisissez le retrait ou réessayez.';
+    }
+  }
+  if (requestId !== deliveryQuoteRequestId) return;
+  afficherDevisLivraison(reason);
+}
+
+function afficherDevisLivraison(reason) {
+  const option = document.getElementById('seller-delivery-option');
+  const sub = document.getElementById('seller-delivery-sub');
+  if (sub) sub.textContent = reason;
+  if (option) {
+    option.setAttribute('aria-disabled', deliveryQuote?.available ? 'false' : 'true');
+    option.style.opacity = deliveryQuote?.available ? '1' : '.55';
+  }
+  if (!deliveryQuote?.available && marketDeliveryType === 'DELIVERY') {
+    marketDeliveryType = 'PICKUP';
+    option?.classList.remove('selected');
+    document.querySelector('#market-delivery-choice .dc-btn:last-child')?.classList.add('selected');
+  }
+  updateSummary();
 }
 
 async function loadCheckoutAddresses() {
@@ -903,10 +965,12 @@ async function loadCheckoutAddresses() {
   if (!target) return;
   try {
     const result = await getAddresses();
+    if (!result?.success) throw new Error(result?.message || 'Adresses indisponibles');
     const addresses = result?.data?.data || result?.data || [];
     if (!Array.isArray(addresses) || addresses.length === 0) {
       target.textContent = 'Ajoutez une adresse pour vous faire livrer. Le retrait en boutique reste disponible.';
       selectedAddressId = null;
+      refreshDeliveryQuote();
       return;
     }
     if (!addresses.some(address => address.id === selectedAddressId)) {
@@ -925,8 +989,11 @@ async function loadCheckoutAddresses() {
       card.append(label, text);
       return card;
     }));
+    refreshDeliveryQuote();
   } catch (error) {
     target.textContent = 'Impossible de charger vos adresses. Réessayez ou choisissez le retrait en boutique.';
+    selectedAddressId = null;
+    refreshDeliveryQuote();
     console.error('Chargement des adresses:', error);
   }
 }
@@ -936,9 +1003,9 @@ async function addCheckoutAddress() {
     label: document.getElementById('address-label').value.trim(),
     address: document.getElementById('address-line').value.trim(),
     city: document.getElementById('address-city').value.trim(),
-    region: document.getElementById('address-region').value.trim() || 'Dakar'
+    region: document.getElementById('address-region').value.trim()
   };
-  if (!data.label || !data.address || !data.city) { showToast('Renseignez le libellé, l’adresse et la ville'); return; }
+  if (!data.label || !data.address || !data.city || !data.region) { showToast('Renseignez le libellé, l’adresse, la ville et la région'); return; }
   try {
     const result = await createAddress(data);
     if (!result?.success) { showToast(result?.message || 'Adresse non enregistrée'); return; }
@@ -1140,8 +1207,8 @@ function updateSummary() {
   // La remise vient du serveur, calculée sur la boutique du code : la calculer
   // ici sur le panier entier annonçait plus que ce que la commande appliquait.
   const discount = (promoApplied ? promoApplied.reduction : 0) + (rewardApplied ? Math.min(rewardApplied.amount, subtotal) : 0);
-  // La livraison est facturée une seule fois pour toutes les boutiques.
-  const totalDeliveryFee = marketDeliveryType === 'PICKUP' || promoApplied?.livraisonOfferte ? 0 : 1000;
+  const totalDeliveryFee = marketDeliveryType === 'DELIVERY' && deliveryQuote?.available && !promoApplied?.livraisonOfferte
+    ? deliveryQuote.fee : 0;
   const total = subtotal + totalDeliveryFee - discount;
 
   // Lignes produits dynamiques
@@ -1233,6 +1300,10 @@ async function payNow() {
     return;
   }
   const deliveryType = marketDeliveryType;
+  if (deliveryType === 'DELIVERY' && !deliveryQuote?.available) {
+    showToast('Les frais de livraison doivent être confirmés avant de commander.');
+    return;
+  }
   if (deliveryType === 'DELIVERY' && !selectedAddressId) {
     showToast('Ajoutez ou sélectionnez une adresse, ou choisissez le retrait en boutique.');
     return;
@@ -1253,6 +1324,7 @@ async function payNow() {
           color: item.color || null
         })),
         deliveryType,
+        expectedDeliveryFee: deliveryType === 'DELIVERY' && !promoApplied?.livraisonOfferte ? deliveryQuote.fee : 0,
         addressId: deliveryType === 'DELIVERY' ? selectedAddressId : undefined,
         promoCode: promoApplied?.code || null,
         loyaltyRewardCode: rewardApplied?.code || null,

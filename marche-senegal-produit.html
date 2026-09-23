@@ -556,17 +556,13 @@ a{text-decoration:none;color:inherit}
 
     <!-- Delivery info -->
     <div class="delivery-info">
-      <div class="di-row">
+      <div class="di-row" id="product-delivery-row">
         <div class="di-icon"><i class="ic" data-ic="truck"></i></div>
-        <div><div class="di-label">Livraison Dakar — 1 000 FCFA</div><div class="di-sub">Demain avant 18h si commande avant 14h</div></div>
-      </div>
-      <div class="di-row">
-        <div class="di-icon"><i class="ic" data-ic="map"></i></div>
-        <div><div class="di-label">Livraison régions — 2 500 à 5 000 FCFA</div><div class="di-sub">2 à 4 jours ouvrés · Toutes les régions du Sénégal</div></div>
+        <div><div class="di-label" id="product-delivery-label">Livraison selon disponibilité</div><div class="di-sub" id="product-delivery-sub">Choisissez votre adresse dans le panier</div></div>
       </div>
       <div class="di-row">
         <div class="di-icon"><i class="ic" data-ic="store"></i></div>
-        <div><div class="di-label">Retrait gratuit en boutique</div><div class="di-sub">Allée 3, Stand 12 · Marché Sandaga · Disponible maintenant</div></div>
+        <div><div class="di-label">Retrait gratuit en boutique</div><div class="di-sub" id="product-pickup-sub">Lieu indiqué par le vendeur</div></div>
       </div>
     </div>
 
@@ -675,6 +671,15 @@ async function loadProduct(productId) {
 
   const prod = result.data;
   currentProduct = prod;
+  const livraisonLabel = document.getElementById('product-delivery-label');
+  const livraisonSub = document.getElementById('product-delivery-sub');
+  const retraitSub = document.getElementById('product-pickup-sub');
+  if (livraisonLabel) livraisonLabel.textContent = prod.shop?.deliveryEnabled
+    ? `Livraison par le vendeur — ${formatPrice(prod.shop.deliveryFee)}` : 'Livraison non proposée';
+  if (livraisonSub) livraisonSub.textContent = prod.shop?.deliveryEnabled
+    ? `${prod.shop.deliveryDaysMin} à ${prod.shop.deliveryDaysMax} jours estimés · régions : ${(prod.shop.deliveryRegions || []).join(', ')}`
+    : 'Retrait en boutique disponible';
+  if (retraitSub) retraitSub.textContent = [prod.shop?.address, prod.shop?.market?.name].filter(Boolean).join(' · ') || 'Lieu à confirmer avec le vendeur';
 
   // ── Mettre à jour le titre ──
   document.title = `${prod.name} — Marché Sénégal`;

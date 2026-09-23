@@ -182,6 +182,38 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
         <p class="field-hint">Aucune coordonnée GPS n’est nécessaire : le quartier, la ville et ce repère suffisent.</p>
       </div>
 
+      <!-- Livraison -->
+      <div class="card">
+        <h2>Livraison par ma boutique</h2>
+        <p class="field-hint">Proposez-la uniquement dans les régions où vous pouvez réellement livrer. Le prix et le délai seront montrés à l’acheteur avant la commande. Sans cette option, le retrait reste disponible.</p>
+        <label style="display:flex;align-items:center;gap:10px;margin:14px 0;cursor:pointer">
+          <input type="checkbox" id="sellerDeliveryEnabled" onchange="toggleSellerDelivery()">
+          Je peux organiser la livraison de mes produits
+        </label>
+        <div id="sellerDeliveryFields" style="display:none">
+          <div class="field"><label for="sellerDeliveryFee">Frais de livraison (FCFA) *</label><input type="number" id="sellerDeliveryFee" min="0" max="100000" step="1" placeholder="Ex : 2000"></div>
+          <div class="field"><label for="sellerDeliveryDaysMin">Délai minimum (jours) *</label><input type="number" id="sellerDeliveryDaysMin" min="1" max="60" step="1" placeholder="Ex : 1"></div>
+          <div class="field"><label for="sellerDeliveryDaysMax">Délai maximum (jours) *</label><input type="number" id="sellerDeliveryDaysMax" min="1" max="60" step="1" placeholder="Ex : 3"></div>
+          <p class="field-hint">Régions desservies * — sélectionnez uniquement celles où vous pouvez livrer à ce tarif.</p>
+          <div id="sellerDeliveryRegions" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0 16px">
+            <label><input type="checkbox" name="deliveryRegion" value="Dakar"> Dakar</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Diourbel"> Diourbel</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Fatick"> Fatick</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Kaffrine"> Kaffrine</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Kaolack"> Kaolack</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Kédougou"> Kédougou</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Kolda"> Kolda</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Louga"> Louga</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Matam"> Matam</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Saint-Louis"> Saint-Louis</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Sédhiou"> Sédhiou</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Tambacounda"> Tambacounda</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Thiès"> Thiès</label>
+            <label><input type="checkbox" name="deliveryRegion" value="Ziguinchor"> Ziguinchor</label>
+          </div>
+        </div>
+      </div>
+
       <!-- Identité -->
       <div class="card">
         <h2>Identité de la boutique</h2>
@@ -701,6 +733,15 @@ function fillForm(shop, stats) {
     ho.value = typeof hours === 'string' ? hours : (hours?.text || '');
   }
   const to = document.getElementById('shopTour'); if (to) to.value = shop.virtualTourUrl || '';
+  document.getElementById('sellerDeliveryEnabled').checked = shop.deliveryEnabled === true;
+  document.getElementById('sellerDeliveryFee').value = shop.deliveryFee ?? '';
+  document.getElementById('sellerDeliveryDaysMin').value = shop.deliveryDaysMin ?? '';
+  document.getElementById('sellerDeliveryDaysMax').value = shop.deliveryDaysMax ?? '';
+  const regions = new Set((shop.deliveryRegions || []).map(normaliserRegionLivraison));
+  document.querySelectorAll('input[name="deliveryRegion"]').forEach(input => {
+    input.checked = regions.has(normaliserRegionLivraison(input.value));
+  });
+  toggleSellerDelivery();
 
   const pvMarket = document.getElementById('pvMarket');
   if (pvMarket) pvMarket.textContent = '📍 ' + (_selectedMarketName || '—');
@@ -800,8 +841,28 @@ async function saveShop() {
   const name = document.getElementById('shopName').value.trim();
   if (!name) { showToastLocal('Le nom de la boutique est obligatoire', 'error'); return; }
 
+  const deliveryEnabled = document.getElementById('sellerDeliveryEnabled').checked;
+  const deliveryRegions = [...document.querySelectorAll('input[name="deliveryRegion"]:checked')].map(input => input.value);
+  const rawDeliveryFee = document.getElementById('sellerDeliveryFee').value;
+  const rawDeliveryDaysMin = document.getElementById('sellerDeliveryDaysMin').value;
+  const rawDeliveryDaysMax = document.getElementById('sellerDeliveryDaysMax').value;
+  const deliveryFee = Number(rawDeliveryFee);
+  const deliveryDaysMin = Number(rawDeliveryDaysMin);
+  const deliveryDaysMax = Number(rawDeliveryDaysMax);
+  if (deliveryEnabled && (!deliveryRegions.length || rawDeliveryFee === '' || rawDeliveryDaysMin === '' || rawDeliveryDaysMax === '' ||
+      !Number.isInteger(deliveryFee) || deliveryFee < 0 ||
+      !Number.isInteger(deliveryDaysMin) || deliveryDaysMin < 1 ||
+      !Number.isInteger(deliveryDaysMax) || deliveryDaysMax < deliveryDaysMin)) {
+    showToastLocal('Vérifiez le tarif, le délai et les régions de livraison', 'error');
+    return;
+  }
   const body = {
     name,
+    deliveryEnabled,
+    deliveryFee: deliveryEnabled ? deliveryFee : null,
+    deliveryRegions: deliveryEnabled ? deliveryRegions : [],
+    deliveryDaysMin: deliveryEnabled ? deliveryDaysMin : null,
+    deliveryDaysMax: deliveryEnabled ? deliveryDaysMax : null,
     description: document.getElementById('shopDesc').value.trim(),
     locationType: shopLocationType === 'CUSTOM' ? 'CUSTOM' : 'MARKET',
     locationName: document.getElementById('shopLocationName')?.value.trim() || null,
@@ -1057,6 +1118,15 @@ async function initVitrine(shop) {
   indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';
   zone.style.display = 'none';
   _vitrineEditable = false;
+}
+
+function normaliserRegionLivraison(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+function toggleSellerDelivery() {
+  document.getElementById('sellerDeliveryFields').style.display =
+    document.getElementById('sellerDeliveryEnabled').checked ? '' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

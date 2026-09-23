@@ -573,7 +573,7 @@
            maintenant depuis les données de la boutique, et disparaît quand
            la donnée n'existe pas. -->
       <div class="ic-row" id="ic-horaires" style="display:none"><div class="ic-icon"><i class="ic" data-ic="clock"></i></div><div><div class="ic-label">Horaires</div><div class="ic-sub" id="ic-horaires-val"></div></div></div>
-      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison</div><div class="ic-sub">1 000 FCFA — délai indiqué par le vendeur</div></div></div>
+      <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison</div><div class="ic-sub" id="ic-livraison-val">Retrait en boutique disponible</div></div></div>
       <div class="ic-row" id="ic-paiement" style="margin-bottom:0;display:none"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Moyens de paiement</div><div class="ic-sub" id="ic-paiement-val"></div></div></div>
     </div>
 
@@ -1670,8 +1670,7 @@ function blocReponseVendeur(review, nomBoutique) {
 // venaient pas du vendeur, le délai n'existait nulle part, et deux des trois
 // moyens de paiement n'encaissent pas.
 //
-// Les frais de livraison, eux, sont réels : order.routes.js les fixe à
-// 1 000 FCFA hors retrait en boutique. C'est la seule valeur conservée.
+// La livraison est affichée uniquement si le vendeur l'a configurée.
 const JOURS = { lundi: 'Lun', mardi: 'Mar', mercredi: 'Mer', jeudi: 'Jeu',
                 vendredi: 'Ven', samedi: 'Sam', dimanche: 'Dim' };
 const NOMS_PAIEMENT = { WAVE: 'Wave', ORANGE_MONEY: 'Orange Money',
@@ -1679,6 +1678,10 @@ const NOMS_PAIEMENT = { WAVE: 'Wave', ORANGE_MONEY: 'Orange Money',
                         CASH: 'Espèces à la livraison' };
 
 async function renderInfosRapides(shop) {
+  const livraison = document.getElementById('ic-livraison-val');
+  if (livraison) livraison.textContent = shop?.deliveryEnabled
+    ? `Livraison par le vendeur · ${formatPrice(shop.deliveryFee)} · ${shop.deliveryDaysMin} à ${shop.deliveryDaysMax} jours · ${(shop.deliveryRegions || []).length} région(s)`
+    : 'Retrait en boutique uniquement';
   // Horaires — affichés seulement si le vendeur les a saisis.
   const ligneHoraires = document.getElementById('ic-horaires');
   const valHoraires = document.getElementById('ic-horaires-val');
