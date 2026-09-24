@@ -413,7 +413,6 @@ body:has(.nav) .cta-section{
 
 body:has(.nav) .filter-chip,
 body:has(.nav) .region-filter,
-body:has(.nav) .prod-tabs,
 body:has(.nav) .mode-tabs,
 body:has(.nav) .markets-tabs,
 body:has(.nav) .info-tab{
@@ -423,7 +422,6 @@ body:has(.nav) .info-tab{
 }
 
 body:has(.nav) .filter-chip.active,
-body:has(.nav) .prod-tabs .active,
 body:has(.nav) .mode-tabs .active,
 body:has(.nav) .info-tab.active{
   background:var(--accent);
