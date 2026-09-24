@@ -533,10 +533,6 @@ async function loadMarket(marketId) {
   const micRegion = document.getElementById('mic-region');
   if (micRegion) micRegion.textContent = `Région de ${market.region}`;
 
-  // Mettre à jour les stats
-  const stats = document.querySelectorAll('.mhstat-n');
-  if (stats[0]) stats[0].textContent = market._count.shops;
-
   // Mettre à jour le titre de la page
   document.title = `${market.name} — Marché Sénégal`;
 
@@ -560,6 +556,11 @@ async function loadShops(marketId) {
     showError('shops-view', 'Impossible de charger les boutiques');
     return;
   }
+
+  // Le total du marché inclut aussi les boutiques non visibles. La liste
+  // publique ne renvoie que les boutiques actives : afficher ce même total.
+  const onlineStat = document.querySelector('.mhstat-n');
+  if (onlineStat) onlineStat.textContent = result.pagination?.total ?? result.data.length;
 
   const container = document.getElementById('shops-view');
 
