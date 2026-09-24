@@ -222,7 +222,7 @@ async function loadDashboard() {
   const kpi4sub = document.getElementById('kpi4-sub');
   if (kpi4sub) {
     kpi4sub.textContent = stats.aVerser > 0
-      ? 'versé à la confirmation de l\'acheteur'
+      ? 'versement à confirmer auprès de la plateforme'
       : 'rien en attente';
   }
   const kpi1sub = document.getElementById('kpi1-sub');

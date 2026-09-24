@@ -213,15 +213,16 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   body.accueil-immersif .nav-actions {gap:10px}
   body.accueil-immersif .nav-drawer {top:72px}
   body.accueil-immersif .hero {min-height:740px;padding:132px 24px 174px;justify-content:flex-start}
-  body.accueil-immersif .hero h1 {font-size:clamp(46px,12.5vw,72px);line-height:1.07;max-width:none;letter-spacing:-.05em;margin-bottom:25px}
+  body.accueil-immersif .hero-content {width:100%;min-width:0}
+  body.accueil-immersif .hero h1 {font-size:clamp(34px,9.6vw,46px);line-height:1.07;max-width:none;letter-spacing:-.05em;margin-bottom:25px}
   .accueil-immersif .hero-eyebrow {font-size:9px;letter-spacing:.14em;margin-bottom:25px}
   body.accueil-immersif .hero-desc {font-size:13px;line-height:1.8;max-width:34ch;margin-bottom:25px}
   .accueil-immersif .desktop-break {display:none}
   .accueil-immersif .hero-stage img {object-position:62% center}
   body.accueil-immersif .hero::before {background:linear-gradient(90deg,#072618d9,#07261870),linear-gradient(0deg,#09291dec,transparent 65%)}
-  .accueil-immersif .hero-search {gap:9px;padding:6px 6px 6px 12px;border-radius:9px}
+  .accueil-immersif .hero-search {width:100%;min-width:0;gap:9px;padding:6px 6px 6px 12px;border-radius:9px}
   .accueil-immersif .hero-search>.ic {font-size:17px}
-  .accueil-immersif .hero-search input {font-size:16px}
+  .accueil-immersif .hero-search input {flex:1 1 0;width:0;font-size:16px}
   body.accueil-immersif .hero-search button {padding:0 12px;font-size:11px;gap:6px;height:46px}
   .accueil-immersif .hero-search button span {display:none}
   .accueil-immersif .hero-suggestions {font-size:10px;gap:6px}

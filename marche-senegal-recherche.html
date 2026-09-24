@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Recherche — Marché Sénégal</title>
-<meta name="description" content="Recherchez parmi des milliers de produits des marchés sénégalais. Filtrez par marché, catégorie et prix."/>
+<meta name="description" content="Recherchez un produit, une boutique ou un marché au Sénégal. Filtrez les résultats par lieu, catégorie et prix."/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
@@ -129,9 +129,9 @@
   </div>
 </div>
 <div class="search-hero">
-  <div class="sh-label"><i class="ic" data-ic="search"></i> Trouvez un produit, une boutique ou un marché près de vous</div>
-  <div class="sh-title">Résultats pour "<span id="search-query">boubou wax</span>"</div>
-  <div class="sh-bar"><input type="text" id="main-search" value="boubou wax" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
+  <div class="sh-label"><i class="ic" data-ic="search"></i> Un produit en tête ? Trouvez aussi la boutique et le marché où le découvrir.</div>
+  <div class="sh-title">Que cherchez-vous ? <span id="search-query" hidden></span></div>
+  <div class="sh-bar"><input type="text" id="main-search" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
   <div class="sh-suggestions">
     <div class="sh-sug" onclick="setSug('boubou wax sandaga')"><i class="ic" data-ic="landmark"></i> boubou wax sandaga</div>
     <div class="sh-sug" onclick="setSug('bazin brodé')"><i class="ic" data-ic="spool"></i> bazin brodé</div>
@@ -169,14 +169,6 @@
       </div>
     </div>
     <div class="fs-section">
-      <div class="fs-title">Note minimale</div>
-      <div class="star-rows">
-        <div class="sr"><span class="sr-stars">★★★★★</span><div class="sr-bar"><div class="sr-fill" style="width:65%"></div></div><span class="sr-pct">65%</span></div>
-        <div class="sr"><span class="sr-stars">★★★★☆</span><div class="sr-bar"><div class="sr-fill" style="width:25%"></div></div><span class="sr-pct">25%</span></div>
-        <div class="sr"><span class="sr-stars">★★★☆☆</span><div class="sr-bar"><div class="sr-fill" style="width:8%"></div></div><span class="sr-pct">8%</span></div>
-      </div>
-    </div>
-    <div class="fs-section">
       <div class="fs-title">Marché <span class="fs-clear" onclick="clearMarkets()">Effacer</span></div>
       <input class="mp-search" id="mp-search" type="text" placeholder="Rechercher un marché…" oninput="filterMarketPills(this.value)">
       <div class="market-pills" id="market-pills">
@@ -198,7 +190,7 @@
   </aside>
   <div class="results-area">
     <div class="results-topbar">
-      <div class="rt-count"><strong id="result-count">—</strong> résultats pour "<span id="result-query">boubou wax</span>"</div>
+      <div class="rt-count"><strong id="result-count">—</strong> produits trouvés <span id="result-query"></span></div>
       <div class="rt-right">
         <select class="rt-sort" onchange="updateSort(this.value)"><option value="">Pertinence</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option><option value="rating">Mieux notés</option><option value="newest">Nouveautés</option></select>
         <div class="rt-views"><button class="rv-btn active">⊞</button><button class="rv-btn">☰</button></div>
@@ -208,14 +200,14 @@
     <div class="results-grid" id="results-grid"></div>
     <section id="shop-results" style="margin-top:34px;display:none">
       <div style="display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-        <div><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1b6b3a;font-weight:800">Localisation interne</div><h2 id="shop-results-title" style="margin:4px 0 0;font-size:1.35rem;color:#173b2a">Boutiques trouvées par lieu</h2></div>
+        <div><div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#1b6b3a;font-weight:800">Autour de votre recherche</div><h2 id="shop-results-title" style="margin:4px 0 0;font-size:1.35rem;color:#173b2a">Les boutiques à découvrir</h2></div>
         <div style="display:flex;align-items:center;gap:10px"><span id="shop-result-count" style="font-size:.82rem;color:#718078"></span><button type="button" onclick="findNearbyShops()" style="border:1px solid #b7d5c1;background:#f3faf5;color:#1b6b3a;border-radius:999px;padding:9px 13px;font-weight:700;cursor:pointer">📍 Près de moi</button></div>
       </div>
       <div id="shop-results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px"></div>
     </section>
     <section id="market-results" style="margin-top:28px;display:none">
       <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#b47811;font-weight:800">Marchés correspondants</div>
-      <h2 style="margin:4px 0 14px;font-size:1.35rem;color:#173b2a">Où trouver ce produit</h2>
+      <h2 style="margin:4px 0 14px;font-size:1.35rem;color:#173b2a">Explorez les marchés correspondants</h2>
       <div id="market-results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px"></div>
     </section>
     <div class="pagination" id="pagination"></div>
@@ -250,8 +242,12 @@ async function doSearch() {
               document.getElementById('main-search')?.value.trim();
   if (!val) { toast('Entrez un terme de recherche'); return; }
 
-  document.getElementById('search-query').textContent = val;
-  document.getElementById('result-query').textContent = val;
+  const heading = document.querySelector('.sh-title');
+  heading.firstChild.textContent = 'Résultats pour ';
+  const headingQuery = document.getElementById('search-query');
+  headingQuery.hidden = false;
+  headingQuery.textContent = `« ${val} »`;
+  document.getElementById('result-query').textContent = `pour « ${val} »`;
 
   currentFilters.q = val;
   currentSearchQuery = val;
@@ -792,8 +788,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const input = document.getElementById('hero-search') ||
                   document.getElementById('main-search');
     if (input) input.value = urlQuery;
-    document.getElementById('search-query').textContent = urlQuery;
-    document.getElementById('result-query').textContent = urlQuery;
+    const heading = document.querySelector('.sh-title');
+    heading.firstChild.textContent = 'Résultats pour ';
+    const headingQuery = document.getElementById('search-query');
+    headingQuery.hidden = false;
+    headingQuery.textContent = `« ${urlQuery} »`;
+    document.getElementById('result-query').textContent = `pour « ${urlQuery} »`;
     currentFilters.q = urlQuery;
   }
 

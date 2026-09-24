@@ -433,13 +433,11 @@ a{text-decoration:none;color:inherit}
 <div class="main">
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <div class="sb-section"><div class="sb-title">Catégorie</div><div class="sb-btns"><button class="sb-btn active" onclick="toggleSb(this)">Tout</button><button class="sb-btn" onclick="toggleSb(this)">Mode</button><button class="sb-btn" onclick="toggleSb(this)">Alimentation</button><button class="sb-btn" onclick="toggleSb(this)">Artisanat</button><button class="sb-btn" onclick="toggleSb(this)">Beauté</button><button class="sb-btn" onclick="toggleSb(this)">Maison</button></div></div>
-    <div class="sb-section"><div class="sb-title">Prix (FCFA)</div><div class="price-range"><div class="range-inputs"><input class="range-input" type="number" placeholder="Min" value="0"/><span class="range-sep">—</span><input class="range-input" type="number" placeholder="Max" id="pmax" value="100000"/></div><input type="range" class="range-slider" min="0" max="500000" value="100000" step="1000" oninput="document.getElementById('pmax').value=this.value"/><div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)"><span>0</span><span>500 000</span></div></div></div>
-    <div class="sb-section"><div class="sb-title">Type de vendeur</div><div class="cb-list"><div class="cb-item checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur Vérifié ✓</span><span class="cb-count">118</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle <i class="ic" data-ic="video"></i></span><span class="cb-count">74</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span><span class="cb-count">43</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span><span class="cb-count">89</span></div></div></div>
-    <div class="sb-section"><div class="sb-title">Note minimale</div><div class="star-filters"><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★★★</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:65%"></div></div><span class="star-label">65%</span></div><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★★☆</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:25%"></div></div><span class="star-label">25%</span></div><div class="star-row"><span style="font-size:.78rem;color:var(--gold)">★★★☆☆</span><div class="star-bar-bg"><div class="star-bar-fill" style="width:8%"></div></div><span class="star-label">8%</span></div></div></div>
-    <div class="sb-section"><div class="sb-title">Livraison</div><div class="cb-list"><div class="cb-item checked" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison disponible</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Retrait en boutique</span></div><div class="cb-item" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Livraison express</span></div></div></div>
-    <button class="sb-apply" onclick="toast('✓ Filtres appliqués');closeSidebar()">Appliquer les filtres</button>
-    <button class="sb-reset" onclick="toast('Filtres réinitialisés')">Réinitialiser</button>
+    <div class="sb-section">
+      <div class="sb-title">Une envie précise ?</div>
+      <p>Recherchez un produit, comparez les boutiques et affinez par lieu, catégorie ou prix.</p>
+      <button class="sb-apply" onclick="window.location.href='marche-senegal-recherche.html'">Lancer une recherche</button>
+    </div>
   </aside>
   <!-- CONTENT -->
   <div class="content">
@@ -459,9 +457,8 @@ a{text-decoration:none;color:inherit}
     <div id="shops-view">
       <div class="sec-hd"><div class="sec-hd-title">Boutiques du marché</div></div>
       <div class="shops-grid"></div>
-      <div class="sec-hd" style="margin-top:28px"><div class="sec-hd-title">Produits populaires dans Sandaga</div><a class="sec-hd-link">Voir tous →</a></div>
+      <div class="sec-hd" style="margin-top:28px"><div class="sec-hd-title">Produits à découvrir dans ce marché</div><a class="sec-hd-link">Voir tous →</a></div>
       <div class="prods-grid"></div>
-      <div class="pagination"><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><span class="pg-dots">...</span><button class="pg-btn">24</button><button class="pg-btn">›</button></div>
     </div>
     <!-- PRODUCTS TAB -->
     <div id="products-view" style="display:none">
@@ -478,7 +475,7 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 </div>
-<button class="filter-toggle" onclick="openSidebar()"><i class="ic" data-ic="settings"></i> Filtres</button>
+<button class="filter-toggle" onclick="openSidebar()"><i class="ic" data-ic="search"></i> Recherche</button>
 <nav class="mobile-nav">
   <div class="mn-items">
     <div class="mn-item" onclick="window.location.href='marche-senegal-accueil.html'"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></div>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Produit — Marché Sénégal</title>
-<meta name="description" content="Découvrez les produits authentiques des marchés sénégalais. Paiement Wave et Orange Money."/>
+<meta name="description" content="Consultez les détails d'un produit, repérez sa boutique et contactez le vendeur sur Marché Sénégal."/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
@@ -551,7 +551,7 @@ a{text-decoration:none;color:inherit}
       </button>
     </div>
     <button class="buy-now-btn" onclick="buyNow()">
-      <i class="ic" data-ic="zap"></i> Acheter maintenant
+      <i class="ic" data-ic="shopping-cart"></i> Ajouter et voir mon panier
     </button>
 
     <!-- Delivery info -->
@@ -568,23 +568,23 @@ a{text-decoration:none;color:inherit}
 
     <!-- Security -->
     <div class="sec-row">
-      <div class="sec-item"><i class="ic" data-ic="lock"></i> Paiement sécurisé</div>
-      <div class="sec-item"><i class="ic" data-ic="smartphone"></i> Paiement par Wave</div>
-      <div class="sec-item">✓ Vendeur vérifié</div>
+      <div class="sec-item"><i class="ic" data-ic="map-pin"></i> Localisation de la boutique</div>
+      <div class="sec-item"><i class="ic" data-ic="message-circle"></i> Échange avec le vendeur</div>
+      <div class="sec-item">Prix affiché en FCFA</div>
     </div>
 
     <!-- Seller card -->
     <div class="seller-card" onclick="window.location.href='marche-senegal-boutique.html'">
-      <div class="sc-avatar">MF</div>
+      <div class="sc-avatar">—</div>
       <div class="sc-info">
-        <div class="sc-verified">✓ Vendeur Vérifié · Sandaga</div>
-        <div class="sc-name">Mode Fatou Ndoye</div>
-        <div class="sc-market"><i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3 · Ouvert maintenant</div>
+        <div class="sc-verified">Boutique sur Marché Sénégal</div>
+        <div class="sc-name">Boutique</div>
+        <div class="sc-market"><i class="ic" data-ic="map-pin"></i> Localisation à charger</div>
         <div class="sc-stats">
-          <div><div class="sc-stat-val">4.8<i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="sc-stat-lbl">Note</div></div>
-          <div><div class="sc-stat-val">234</div><div class="sc-stat-lbl">Avis</div></div>
-          <div><div class="sc-stat-val">1 240</div><div class="sc-stat-lbl">Ventes</div></div>
-          <div><div class="sc-stat-val">48</div><div class="sc-stat-lbl">Produits</div></div>
+          <div><div class="sc-stat-val">—</div><div class="sc-stat-lbl">Note</div></div>
+          <div><div class="sc-stat-val">—</div><div class="sc-stat-lbl">Avis</div></div>
+          <div><div class="sc-stat-val">—</div><div class="sc-stat-lbl">Ventes</div></div>
+          <div><div class="sc-stat-val">—</div><div class="sc-stat-lbl">Produits</div></div>
         </div>
       </div>
       <div class="sc-arrow">›</div>
@@ -898,16 +898,19 @@ async function loadProduct(productId) {
     const scName = sellerCard.querySelector('.sc-name');
     const scMarket = sellerCard.querySelector('.sc-market');
     const scAvatar = sellerCard.querySelector('.sc-avatar');
-    const scRating = sellerCard.querySelector('.sc-stat-val');
+    const scStats = sellerCard.querySelectorAll('.sc-stat-val');
 
     if (scName) scName.textContent = prod.shop.name;
     if (scMarket) scMarket.textContent =
-      `🏛️ ${prod.shop.market?.name || ''} · Ouvert maintenant`;
+      [prod.shop.address, prod.shop.market?.name || prod.shop.locationCity].filter(Boolean).join(' · ') || 'Localisation à confirmer avec le vendeur';
     if (scAvatar) scAvatar.textContent =
       prod.shop.name.charAt(0) +
       (prod.shop.name.split(' ')[1] ? prod.shop.name.split(' ')[1].charAt(0) : '');
-    if (scRating) scRating.textContent =
+    if (scStats[0]) scStats[0].textContent =
       prod.shop.rating > 0 ? prod.shop.rating + '⭐' : 'Nouveau';
+    if (scStats[1]) scStats[1].textContent = prod.shop.totalReviews ?? '—';
+    if (scStats[2]) scStats[2].textContent = prod.shop.totalSales ?? '—';
+    if (scStats[3]) scStats[3].textContent = prod.shop._count?.products ?? '—';
   }
 
   // ── Mettre à jour le bouton mobile sticky ──

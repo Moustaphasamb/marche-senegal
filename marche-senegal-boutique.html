@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Boutique — Marché Sénégal</title>
-<meta name="description" content="Visitez les boutiques des vendeurs des marchés sénégalais. Produits authentiques, paiement Wave et Orange Money."/>
+<meta name="description" content="Découvrez les produits, l'emplacement et les informations de chaque boutique. Contactez le vendeur directement depuis Marché Sénégal."/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <style>
@@ -381,11 +381,11 @@
           <button class="sh-btn sh-btn-outline" onclick="share()"><i class="ic" data-ic="share-2"></i> Partager</button>
         </div>
         <div class="sh-stats-row">
-          <div><div class="sh-stat-n">4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="sh-stat-l">Note moyenne</div></div>
-          <div><div class="sh-stat-n">234</div><div class="sh-stat-l">Avis clients</div></div>
-          <div><div class="sh-stat-n">1 240</div><div class="sh-stat-l">Ventes totales</div></div>
-          <div><div class="sh-stat-n">48</div><div class="sh-stat-l">Produits</div></div>
-          <div><div class="sh-stat-n">2 100</div><div class="sh-stat-l">Abonnés</div></div>
+          <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Note moyenne</div></div>
+          <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Avis clients</div></div>
+          <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Ventes totales</div></div>
+          <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Produits</div></div>
+          <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Abonnés</div></div>
         </div>
       </div>
     </div>
@@ -408,7 +408,7 @@
     <div id="tab-boutique">
       <div class="visit-section">
         <div class="vs-header">
-          <div class="vs-title"><i class="ic" data-ic="store"></i> Visitez la boutique</div>
+          <div class="vs-title"><i class="ic" data-ic="store"></i> Découvrez la boutique</div>
           <select id="shopvision-scene-select" aria-label="Choisir une vue de la boutique" style="display:none;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:.78rem"></select>
         </div>
         <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
@@ -520,7 +520,7 @@
     <!-- TAB INFOS -->
     <div id="tab-infos" style="display:none">
       <div class="info-tab">
-        <p class="it-desc">Mode Fatou Ndoye est une boutique spécialisée dans les tissus wax, bazin et boubous de qualité supérieure depuis 2015. Située à l'Allée 3 du marché Sandaga, Fatou propose une sélection soigneuse de vêtements et tissus africains authentiques.</p>
+        <p class="it-desc">Découvrez l'histoire et les spécialités de cette boutique.</p>
         <!-- Ce bloc était entièrement écrit en dur : horaires, adresse « Allée 3,
              Stand 12 · Marché Sandaga », numéro factice, tarifs de livraison et
              garantie de retour. Autant d'engagements commerciaux affichés au nom
@@ -551,7 +551,7 @@
       <div class="cc-btns">
         <button class="cc-btn cc-primary" onclick="openChat()">
           <div class="cc-icon" style="background:rgba(255,255,255,.2)"><i class="ic" data-ic="message-circle"></i></div>
-          <span>Chat dans l'application</span>
+          <span>Écrire au vendeur</span>
         </button>
         <button class="cc-btn" id="btn-whatsapp" onclick="openWhatsApp()">
           <div class="cc-icon" style="background:#E8F5E9"><i class="ic" data-ic="smartphone"></i></div>
@@ -581,7 +581,7 @@
       <div class="map-visual"><i class="ic" data-ic="map"></i><div class="map-pin"><i class="ic" data-ic="map-pin"></i></div></div>
       <div class="map-body">
         <div class="map-address"></div>
-        <div class="map-sub">Rue Mohamed V, Dakar Centre</div>
+        <div class="map-sub">Emplacement communiqué par la boutique</div>
         <div class="map-btn" id="btn-map"><i class="ic" data-ic="map-pin"></i> Localisation enregistrée dans l’application</div>
       </div>
     </div>
@@ -591,13 +591,13 @@
         <div class="chat-av">MF</div>
         <div class="chat-info">
           <div class="chat-name-txt" id="chat-name-txt">Boutique</div>
-          <div class="chat-status">● En ligne · Répond en moins de 5 min</div>
+          <div class="chat-status">Messagerie de la boutique</div>
         </div>
         <button class="chat-close" onclick="closeChat()">✕</button>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="msg them">
-          <div class="msg-bubble">Assalamu aleykum ! Bienvenue dans ma boutique 😊 Comment puis-je vous aider ?</div>
+          <div class="msg-bubble">Écrivez au vendeur pour poser votre question.</div>
           <div class="msg-time">Maintenant</div>
         </div>
       </div>
@@ -1450,7 +1450,7 @@ function sendMsg() {
   const replies = [
     'Bonjour ! Je suis disponible pour vous aider 😊',
     'Oui, ce produit est disponible !',
-    'Je peux vous livrer demain. Paiement Wave ou Orange Money.',
+    'Je peux vous renseigner sur les options de retrait ou de livraison.',
     'Merci pour votre intérêt ! 🙏'
   ];
 

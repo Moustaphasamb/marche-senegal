@@ -334,7 +334,7 @@ a{text-decoration:none;color:inherit}
       <div class="pc-avatar" id="pc-avatar">FN</div>
       <div class="pc-name" id="pc-name">Fatou Ndiaye</div>
       <div class="pc-phone" id="pc-phone">+221 77 000 00 01</div>
-      <div class="pc-badge"><i class="ic" data-ic="shopping-bag"></i> Acheteur vérifié ✓</div>
+      <div class="pc-badge"><i class="ic" data-ic="shopping-bag"></i> Mon espace acheteur</div>
       <button class="pc-edit-btn" onclick="showTab('settings')"><i class="ic" data-ic="pencil"></i> Modifier le profil</button>
     </div>
 
@@ -449,23 +449,11 @@ a{text-decoration:none;color:inherit}
     <div class="content-card" id="tab-payments" style="display:none">
       <div class="cc-head">
         <div class="cc-title"><i class="ic" data-ic="credit-card"></i> Moyens de paiement</div>
-        <div class="cc-action" onclick="showToast('Ajouter...')">+ Ajouter</div>
       </div>
-      <div class="addr-list">
-        <div class="addr-card default">
-          <div class="addr-icon"><i class="ic" data-ic="smartphone"></i></div>
-          <div class="addr-info">
-            <div class="addr-label">Wave <span class="addr-default">Par défaut</span></div>
-            <div class="addr-text">+221 77 000 00 01 · Solde disponible</div>
-          </div>
-        </div>
-        <div class="addr-card">
-          <div class="addr-icon"><i class="ic" data-ic="map-pin"></i></div>
-          <div class="addr-info">
-            <div class="addr-label">Orange Money</div>
-            <div class="addr-text">+221 77 000 00 01</div>
-          </div>
-        </div>
+      <div class="empty-state">
+        <div class="es-icon"><i class="ic" data-ic="credit-card"></i></div>
+        <div class="es-title">Aucun moyen de paiement enregistré</div>
+        <div class="es-sub">Le paiement en ligne n’est pas encore disponible. Aucun compte Wave ou Orange Money n’est lié à votre profil.</div>
       </div>
     </div>
 
