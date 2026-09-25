@@ -69,20 +69,24 @@ function makeImg(images, size) {
 
 // ── Charger le dashboard principal ──
 // ── Bandeau d'état de la boutique ──
-// Affiché tant que la boutique n'est pas visible des acheteurs, avec le geste
-// exact qui débloque la situation.
+// Le statut reste visible après validation, même si le vendeur n'a pas de
+// numéro pour recevoir un SMS ou ouvre l'application plus tard.
 const LIBELLES_PIECES = { numero: 'le numéro de votre CNI', recto: 'la photo recto', verso: 'la photo verso' };
 
 function afficherBandeauValidation(shop, cni) {
   const existant = document.getElementById('bandeau-validation');
   if (existant) existant.remove();
 
-  if (!shop || shop.status === 'ACTIVE') return;
+  if (!shop) return;
 
   const manquant = (cni && cni.manquant) || [];
   let ton, titre, texte, action = null;
 
-  if (shop.status === 'SUSPENDED') {
+  if (shop.status === 'ACTIVE') {
+    ton = 'vert';
+    titre = 'Votre boutique est validée';
+    texte = 'Votre dossier a été accepté par l’administration. Vérifiez vos produits et les informations de votre boutique.';
+  } else if (shop.status === 'SUSPENDED') {
     ton = 'rouge';
     titre = 'Boutique suspendue';
     texte = 'Vos produits ne sont plus visibles. Contactez le support pour régulariser.';
@@ -104,6 +108,7 @@ function afficherBandeauValidation(shop, cni) {
 
   const bandeau = mk('div', 'bandeau-validation ' + ton);
   bandeau.id = 'bandeau-validation';
+  bandeau.setAttribute('role', 'status');
 
   const corps = mk('div', 'bv-corps');
   corps.appendChild(mk('div', 'bv-titre', titre));
