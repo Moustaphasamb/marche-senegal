@@ -177,6 +177,16 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   .hero h1{font-size:1.7rem}.hero-btns{flex-direction:column}.hero-btns .btn{justify-content:center}
   .markets-grid{grid-template-columns:repeat(3,1fr)}
 }
+/* Je cherche… */
+.jc{margin:0 0 28px;max-width:720px}
+.jc-label{display:block;font-weight:700;margin-bottom:8px}
+.jc-select{width:100%;max-width:360px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);font:inherit;background:#fff}
+.jc-resultats{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.jc-marche{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+.jc-lien{font-weight:600}
+.jc-specialiste{font-size:.72rem;font-weight:700;color:var(--green);background:#E6F4EA;border-radius:99px;padding:2px 8px}
+.jc-ville{font-size:.8rem;color:var(--muted)}
+.jc-vide,.jc-erreur{color:var(--muted);font-size:.9rem}
 </style>
 <script src="icons.js"></script>
 <link rel="preload" href="assets/banner-hero.jpg" as="image" fetchpriority="high"/>
@@ -257,6 +267,14 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
       <h2 class="section-title">Un marché à explorer,<br/><em>des boutiques à rencontrer.</em></h2>
       <p class="section-description">Choisissez un marché pour découvrir les commerçants et les produits déjà présents.</p>
     </div>
+  </div>
+  <!-- « Je cherche… » : quel marché pour quel produit. Masqué si l'API ne répond pas. -->
+  <div class="jc" id="je-cherche">
+    <label class="jc-label" for="jc-select">Je cherche…</label>
+    <select class="jc-select" id="jc-select">
+      <option value="">Choisir un produit</option>
+    </select>
+    <div class="jc-zone" id="jc-resultats" aria-live="polite"></div>
   </div>
   <!-- Seuls les marchés qui ont au moins une boutique s'affichent d'emblée.
        Les autres restent accessibles via l'annuaire, replié par défaut. -->
@@ -366,6 +384,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div class="mn-item" onclick="window.location.href='marche-senegal-profil.html'"><div class="mn-icon"><i class="ic" data-ic="user"></i></div><div class="mn-label">Profil</div></div>
   </div>
 </nav>
+<script src="guide-marche.js"></script>
 <script src="api.js"></script>
 <script>
 // ════════════════════════════════════════
@@ -555,6 +574,23 @@ const sansAccents = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, 
 // « Bakel / Bakel » n'apprend rien : quand la ville repete le nom du marche,
 // on affiche la region a la place.
 const sousTitreMarche = (nom, m) => sansAccents(m.city || '') === sansAccents(nom) ? (m.region || '') : (m.city || '');
+
+// « Je cherche… » : les catégories viennent de l'API, la liste des marchés aussi.
+async function chargerJeCherche() {
+  const bloc = document.getElementById('je-cherche');
+  const select = document.getElementById('jc-select');
+  if (!bloc || !select) return;
+  const categories = await getMarketCategories();
+  if (!categories.success || !categories.data?.length) { bloc.hidden = true; return; }
+  categories.data.forEach(c => {
+    const option = document.createElement('option');
+    option.value = c.slug;
+    option.textContent = c.libelle;
+    select.appendChild(option);
+  });
+  const chercher = creerChercheur(document, document.getElementById('jc-resultats'), getMarketsParCategorie);
+  select.addEventListener('change', () => chercher(select.value));
+}
 
 async function loadMarkets() {
   const live = document.getElementById('markets-live');
@@ -941,6 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Les quatre chargements sont indépendants : les enchaîner ne faisait que
   // retarder l'affichage des produits derrière celui des marchés.
   loadMarkets();
+  chargerJeCherche();
   loadProducts();
   loadFeaturedShops();
   loadPromosBand();

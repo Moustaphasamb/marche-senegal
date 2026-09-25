@@ -375,6 +375,19 @@ a{text-decoration:none;color:inherit}
   .prods-grid{grid-template-columns:repeat(2,1fr);gap:8px}
   .shops-grid{grid-template-columns:1fr}
 }
+/* Guide du marché */
+.guide-marche-zone{padding:24px 5vw 0}
+.guide-marche{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px;max-width:960px}
+.gm-titre{font-family:'Newsreader',serif;font-size:1.35rem;margin:0 0 10px}
+.gm-a-confirmer{display:inline-block;font-size:.75rem;color:#8A6100;background:#FFF4D6;border-radius:99px;padding:3px 10px;margin:0 0 10px}
+.gm-presentation{margin:0 0 12px;line-height:1.55}
+.gm-categories{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0 0 12px}
+.gm-cat{font-size:.78rem;padding:4px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--border)}
+.gm-specialite{background:#E6F4EA;color:var(--green);border-color:transparent;font-weight:600}
+.gm-ligne{margin:0 0 8px;font-size:.9rem;line-height:1.5}
+.gm-carte{display:inline-block;margin:6px 0 10px;font-weight:600;color:var(--green)}
+.gm-sources{font-size:.72rem;color:var(--muted);margin:6px 0 0;overflow-wrap:anywhere}
+@media(max-width:600px){.guide-marche-zone{padding:16px 16px 0}.guide-marche{padding:16px}}
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
@@ -422,6 +435,8 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 </section>
+<!-- Guide du marché : rempli par guide-marche.js, masqué pour un marché sans fiche -->
+<div class="guide-marche-zone" id="guide-marche" hidden></div>
 <!-- MARKETS BAR -->
 <div class="markets-bar">
   <span class="mb-label">Marchés :</span>
@@ -544,6 +559,15 @@ async function loadMarket(marketId) {
   });
   const fil = document.querySelector('.breadcrumb .bc-current');
   if (fil) fil.textContent = market.name;
+
+  // Guide du marché : absent pour un marché sans fiche, la page reste celle d'avant.
+  const zoneGuide = document.getElementById('guide-marche');
+  if (zoneGuide) {
+    const categories = await getMarketCategories();
+    const bloc = construireGuide(document, market, libellesParSlug(categories.success ? categories.data : []));
+    zoneGuide.replaceChildren(...(bloc ? [bloc] : []));
+    zoneGuide.hidden = !bloc;
+  }
 }
 
 // ── Charger les boutiques du marché ──
@@ -922,6 +946,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 </script>
+<script src="guide-marche.js"></script>
 <script src="api.js"></script>
 </body>
 </html>
