@@ -46,51 +46,98 @@
     return a;
   }
 
+  // Une icône par catégorie, prise dans le jeu d'icônes du site (icons.js).
+  const ICONES_CATEGORIES = {
+    'legumes-fruits': 'apple', poisson: 'fish', viande: 'beef', 'cereales-epicerie': 'wheat',
+    epices: 'flame', 'tissus-couture': 'spool', 'vetements-chaussures': 'shirt', friperie: 'refresh-cw',
+    artisanat: 'palette', bijoux: 'crown', cosmetiques: 'flower-2', electronique: 'smartphone',
+    electromenager: 'zap', quincaillerie: 'wrench', 'pieces-auto': 'settings', meubles: 'armchair',
+    ustensiles: 'amphora', betail: 'paw-print'
+  };
+
+  function icone(doc, nom) {
+    const i = doc.createElement('i');
+    i.className = 'ic';
+    i.setAttribute('data-ic', nom);
+    i.setAttribute('aria-hidden', 'true');
+    return i;
+  }
+
   function construireGuide(doc, marche, libelles) {
     if (!aUnGuide(marche)) return null;
 
     const bloc = el(doc, 'section', 'guide-marche');
     bloc.setAttribute('aria-labelledby', 'guide-marche-titre');
+
+    const entete = el(doc, 'div', 'gm-entete');
     const titre = el(doc, 'h2', 'gm-titre', 'Découvrir ce marché');
     titre.id = 'guide-marche-titre';
-    bloc.appendChild(titre);
-
+    entete.appendChild(titre);
     if (marche.fiabilite === 'A_VERIFIER') {
-      bloc.appendChild(el(doc, 'p', 'gm-a-confirmer', 'Informations à confirmer'));
+      entete.appendChild(el(doc, 'span', 'gm-a-confirmer', 'Informations à confirmer'));
     }
-    if (marche.description) bloc.appendChild(el(doc, 'p', 'gm-presentation', marche.description));
+    bloc.appendChild(entete);
+
+    const corps = el(doc, 'div', 'gm-corps');
+
+    // Colonne principale : ce qu'est le marché et ce qu'on y trouve.
+    const principal = el(doc, 'div', 'gm-principal');
+    if (marche.description) principal.appendChild(el(doc, 'p', 'gm-presentation', marche.description));
 
     const specialites = marche.specialites || [];
     const etiquettes = (marche.categories || [])
-      .map(slug => ({ libelle: (libelles || {})[slug] || slug, specialite: specialites.includes(slug) }))
+      .map(slug => ({ slug, libelle: (libelles || {})[slug] || slug, specialite: specialites.includes(slug) }))
       .sort((a, b) => Number(b.specialite) - Number(a.specialite));
     if (etiquettes.length) {
+      principal.appendChild(el(doc, 'h3', 'gm-sous-titre', "Ce qu'on y trouve"));
       const liste = el(doc, 'ul', 'gm-categories');
       etiquettes.forEach(t => {
-        const item = el(doc, 'li', t.specialite ? 'gm-cat gm-specialite' : 'gm-cat', t.libelle);
+        const item = el(doc, 'li', t.specialite ? 'gm-cat gm-specialite' : 'gm-cat');
+        item.appendChild(icone(doc, ICONES_CATEGORIES[t.slug] || 'tag'));
+        item.appendChild(doc.createTextNode(t.libelle));
         if (t.specialite) item.title = 'Spécialité du marché';
         liste.appendChild(item);
       });
-      bloc.appendChild(liste);
+      principal.appendChild(liste);
     }
+    corps.appendChild(principal);
 
-    [['Artisans et métiers', marche.artisans], ['Bon à savoir', marche.conseils], ['Horaires', marche.horaires]]
-      .forEach(([nom, valeur]) => {
-        if (!valeur) return;
-        const ligne = el(doc, 'p', 'gm-ligne');
-        ligne.appendChild(el(doc, 'strong', null, nom + ' : '));
-        ligne.appendChild(doc.createTextNode(valeur));
-        bloc.appendChild(ligne);
-      });
-
+    // Colonne pratique : ce qu'il faut savoir avant d'y aller.
+    const infos = [
+      ['clock', 'Horaires', marche.horaires],
+      ['lightbulb', 'Bon à savoir', marche.conseils],
+      ['users', 'Artisans et métiers', marche.artisans],
+      ['map-pin', 'Adresse', marche.address]
+    ].filter(([, , valeur]) => valeur);
     const carte = lienCarte(marche);
-    if (carte) bloc.appendChild(lienExterne(doc, 'gm-carte', 'Voir sur la carte', carte));
+    if (infos.length || carte) {
+      const pratique = el(doc, 'aside', 'gm-pratique');
+      infos.forEach(([nomIcone, nom, valeur]) => {
+        const info = el(doc, 'div', 'gm-info');
+        const pastille = el(doc, 'span', 'gm-info-icone');
+        pastille.appendChild(icone(doc, nomIcone));
+        info.appendChild(pastille);
+        const texte = el(doc, 'div', 'gm-info-corps');
+        texte.appendChild(el(doc, 'div', 'gm-info-titre', nom));
+        texte.appendChild(el(doc, 'div', 'gm-info-texte', valeur));
+        info.appendChild(texte);
+        pratique.appendChild(info);
+      });
+      if (carte) {
+        const bouton = lienExterne(doc, 'gm-carte', undefined, carte);
+        bouton.appendChild(icone(doc, 'map'));
+        bouton.appendChild(doc.createTextNode('Voir sur la carte'));
+        pratique.appendChild(bouton);
+      }
+      corps.appendChild(pratique);
+    }
+    bloc.appendChild(corps);
 
     const sources = sourcesSures(marche.sources);
     if (sources.length) {
       const ligne = el(doc, 'p', 'gm-sources', 'Sources : ');
       sources.forEach((s, i) => {
-        if (i) ligne.appendChild(doc.createTextNode(', '));
+        if (i) ligne.appendChild(doc.createTextNode(' · '));
         ligne.appendChild(lienExterne(doc, null, s.titre, s.url));
       });
       bloc.appendChild(ligne);

@@ -375,19 +375,34 @@ a{text-decoration:none;color:inherit}
   .prods-grid{grid-template-columns:repeat(2,1fr);gap:8px}
   .shops-grid{grid-template-columns:1fr}
 }
-/* Guide du marché */
-.guide-marche-zone{padding:24px 5vw 0}
-.guide-marche{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px;max-width:960px}
-.gm-titre{font-family:'Newsreader',serif;font-size:1.35rem;margin:0 0 10px}
-.gm-a-confirmer{display:inline-block;font-size:.75rem;color:#8A6100;background:#FFF4D6;border-radius:99px;padding:3px 10px;margin:0 0 10px}
-.gm-presentation{margin:0 0 12px;line-height:1.55}
-.gm-categories{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0 0 12px}
-.gm-cat{font-size:.78rem;padding:4px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--border)}
-.gm-specialite{background:#E6F4EA;color:var(--green);border-color:transparent;font-weight:600}
-.gm-ligne{margin:0 0 8px;font-size:.9rem;line-height:1.5}
-.gm-carte{display:inline-block;margin:6px 0 10px;font-weight:600;color:var(--green)}
-.gm-sources{font-size:.72rem;color:var(--muted);margin:6px 0 0;overflow-wrap:anywhere}
-@media(max-width:600px){.guide-marche-zone{padding:16px 16px 0}.guide-marche{padding:16px}}
+/* Guide du marché — la carte remonte sur le bas de la bannière */
+.guide-marche-zone{position:relative;z-index:2;margin:-56px var(--ms-gutter,5vw) 0}
+.guide-marche-zone + .markets-bar{margin-top:28px}
+.guide-marche{position:relative;overflow:hidden;background:#FFFDF7;border:1px solid var(--border);border-radius:22px;padding:30px 34px 22px;box-shadow:0 22px 50px -26px rgba(13,31,23,.45)}
+.guide-marche::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.gm-entete{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.gm-titre{font-family:'Newsreader',serif;font-size:clamp(1.5rem,2.4vw,2rem);font-weight:700;color:var(--dark);margin:0;letter-spacing:-.01em}
+.gm-a-confirmer{font-size:.72rem;font-weight:700;color:#8A6100;background:var(--gdl);border:1px solid #F1D48A;border-radius:99px;padding:4px 11px}
+.gm-corps{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:34px;align-items:start}
+.gm-presentation{font-family:'Newsreader',serif;font-size:clamp(1.12rem,1.5vw,1.32rem);line-height:1.55;color:var(--dark);margin:0 0 22px}
+.gm-sous-titre{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.gm-categories{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0}
+.gm-cat{display:inline-flex;align-items:center;gap:7px;font-size:.84rem;font-weight:600;color:var(--dark);padding:8px 14px;border-radius:99px;background:#fff;border:1px solid var(--border)}
+.gm-cat .ic{color:var(--green);font-size:1rem}
+.gm-specialite{background:var(--green);color:#fff;border-color:var(--green)}
+.gm-specialite .ic{color:var(--gold)}
+.gm-specialite::after{content:'★';color:var(--gold);font-size:.8rem}
+.gm-pratique{background:var(--gdl);border:1px solid #F3E2B5;border-radius:18px;padding:18px 18px 16px;display:grid;gap:14px}
+.gm-info{display:flex;gap:12px;align-items:flex-start}
+.gm-info-icone{flex:none;width:34px;height:34px;border-radius:10px;background:#fff;display:grid;place-items:center;color:var(--green);font-size:1.05rem;box-shadow:0 1px 2px rgba(13,31,23,.08)}
+.gm-info-titre{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8A6100;margin-bottom:2px}
+.gm-info-texte{font-size:.9rem;line-height:1.45;color:var(--dark)}
+.gm-carte{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding:11px 16px;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.gm-carte:hover{transform:translateY(-1px);box-shadow:0 10px 22px -12px rgba(27,107,58,.9)}
+.gm-sources{margin:22px 0 0;padding-top:14px;border-top:1px dashed var(--border);font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
+.gm-sources a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+@media(max-width:860px){.gm-corps{grid-template-columns:1fr;gap:22px}}
+@media(max-width:600px){.guide-marche-zone{margin:-32px 14px 0}.guide-marche{padding:22px 18px 18px;border-radius:18px}}
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
