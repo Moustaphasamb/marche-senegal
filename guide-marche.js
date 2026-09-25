@@ -76,12 +76,14 @@
     if (marche.fiabilite === 'A_VERIFIER') {
       entete.appendChild(el(doc, 'span', 'gm-a-confirmer', 'Informations à confirmer'));
     }
-    bloc.appendChild(entete);
 
     const corps = el(doc, 'div', 'gm-corps');
 
     // Colonne principale : ce qu'est le marché et ce qu'on y trouve.
+    // Le titre vit dans cette colonne : l'encadré pratique monte à sa hauteur
+    // au lieu de laisser un vide sous les catégories.
     const principal = el(doc, 'div', 'gm-principal');
+    principal.appendChild(entete);
     if (marche.description) principal.appendChild(el(doc, 'p', 'gm-presentation', marche.description));
 
     const specialites = marche.specialites || [];
