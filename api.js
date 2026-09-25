@@ -118,6 +118,16 @@ async function getMarket(id) {
   return await apiCall(`/api/markets/${id}`);
 }
 
+// Ce qu'on peut chercher dans un marché (légumes, tissus…).
+async function getMarketCategories() {
+  return await apiCall('/api/markets/categories');
+}
+
+// Les marchés où l'on trouve une catégorie, spécialistes d'abord.
+async function getMarketsParCategorie(slug) {
+  return await apiCall(`/api/markets?categorie=${encodeURIComponent(slug)}`);
+}
+
 // ────────────────────────────────
 // PRODUITS
 // ────────────────────────────────
