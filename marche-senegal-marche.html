@@ -871,7 +871,7 @@ async function loadMarketsBar() {
   if (!chipsEl) return;
 
   chipsEl.innerHTML = result.data.map(m => {
-    const shortName = m.name.replace(/^Marché\s+/i, '');
+    const shortName = nomCourtMarche(m.name);
     const emoji = getMktEmoji(m.name);
     const isActive = m.id === currentMarketId;
     return `<button class="mb-chip${isActive ? ' active' : ''}"

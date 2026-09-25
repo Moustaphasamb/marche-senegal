@@ -726,7 +726,7 @@ async function loadFeaturedShops() {
   grid.innerHTML = result.data.slice(0, 3).map((shop, i) => {
     const initials = (shop.name || '??').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const color = colors[i % colors.length];
-    const marketName = shop.market?.name?.replace(/^Marché\s+/i, '') || '';
+    const marketName = nomCourtMarche(shop.market?.name);
     const city = shop.market?.city || '';
     return `
     <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html?id=${shop.id}'">

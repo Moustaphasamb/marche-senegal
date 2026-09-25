@@ -604,7 +604,7 @@ function _renderFiltered(markets) {
     grid.appendChild(lbl);
 
     list.forEach(market => {
-      const shortName = market.name.replace(/^Marché\s+/i, '');
+      const shortName = nomCourtMarche(market.name);
       const emoji = MARKET_EMOJIS[shortName] || '🏪';
 
       const btn = document.createElement('button');

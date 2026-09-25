@@ -569,8 +569,9 @@ function injecterStyleCredit() {
 
 // « Marché de Bakel » doit s'afficher « Bakel », pas « de Bakel » : on retire le
 // mot Marché ET la preposition qui suit, sans toucher aux noms composes tels
-// que « Marché Central de Diourbel ».
-const nomCourtMarche = n => (n || '').replace(/^Marché\s+(?:de\s+la\s+|de\s+|du\s+|des\s+|d')?/i, '');
+// que « Marché Central de Diourbel ». « Marché au poisson de Yoff » devient
+// « Poisson de Yoff » : un nom court ne commence jamais par « au » ni en minuscule.
+const nomCourtMarche = n => { const c = (n || '').replace(/^Marché\s+(?:de\s+la\s+|de\s+|du\s+|des\s+|d')?/i, '').replace(/^(?:central\s+)?aux?\s+/i, ''); return c.charAt(0).toUpperCase() + c.slice(1); };
 
 // Applique une image de fond à une section sombre (hero, en-tête de marché).
 // Le voile foncé fait partie du background-image plutôt que d'un ::before,

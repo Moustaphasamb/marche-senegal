@@ -554,7 +554,7 @@ function _renderMarketPills(markets) {
     return;
   }
   container.innerHTML = markets.map(m => {
-    const shortName = m.name.replace(/^Marché\s+/i, '');
+    const shortName = nomCourtMarche(m.name);
     const emoji = getMktEmojiSearch(m.name);
     return `<div class="mp-item" data-market-id="${m.id}" onclick="toggleMarket(this)">
       <span class="mp-emoji">${emoji}</span>
