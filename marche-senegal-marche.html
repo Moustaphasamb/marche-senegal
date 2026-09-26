@@ -737,7 +737,7 @@ async function loadMarketProducts(marketId) {
                 </div>`
               : ''
             }
-            <div class="prod-wish" onclick="wish(event,'${prod.id}')">🤍</div>
+            <div class="prod-wish" data-fav-id="${prod.id}" onclick="wish(event,'${prod.id}')">🤍</div>
           </div>
           <div class="prod-body">
             <div class="prod-market-tag">🏛️ ${escapeHtml(prod.shop.market.name)}</div>
@@ -767,6 +767,7 @@ async function loadMarketProducts(marketId) {
       `).join('')}
     </div>
   `;
+  marquerFavoris(container);
 }
 
 // ── Ajout au panier depuis les cartes venues de l'API ──
@@ -838,6 +839,7 @@ function addToCart(event, productId, productName, price) {
 async function wish(event, productId) {
   event.stopPropagation();
   if (!isLoggedIn()) { showToast('Connectez-vous pour ajouter aux favoris'); return; }
+  if (getCurrentUser()?.role !== 'BUYER') { showToast('Les favoris sont réservés aux comptes acheteurs'); return; }
   const btn = event.target;
   const adding = btn.textContent === '🤍';
   btn.textContent = adding ? '❤️' : '🤍';
@@ -847,7 +849,21 @@ async function wish(event, productId) {
     showToast(adding ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
   } else {
     btn.textContent = adding ? '🤍' : '❤️';
+    showToast('❌ ' + (result.message || 'Action impossible, réessayez'));
   }
+}
+
+// ── Afficher les cœurs déjà en favori ──
+// Les cartes naissent toutes à 🤍 : sans cette lecture, un produit déjà en
+// favori paraît ne pas l'être, et l'acheteur croit que son clic s'est perdu.
+async function marquerFavoris(racine) {
+  if (!racine || !isLoggedIn() || getCurrentUser()?.role !== 'BUYER') return;
+  const result = await getFavorites();
+  if (!result.success) return;
+  const ids = new Set(result.data.map(fav => fav.productId));
+  racine.querySelectorAll('[data-fav-id]').forEach(coeur => {
+    if (ids.has(coeur.dataset.favId)) coeur.textContent = '❤️';
+  });
 }
 
 // ── Emojis des marchés ──
