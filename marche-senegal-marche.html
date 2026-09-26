@@ -375,35 +375,51 @@ a{text-decoration:none;color:inherit}
   .prods-grid{grid-template-columns:repeat(2,1fr);gap:8px}
   .shops-grid{grid-template-columns:1fr}
 }
-/* Guide du marché — la carte remonte sur le bas de la bannière */
-.guide-marche-zone{position:relative;z-index:2;margin:-56px var(--ms-gutter,5vw) 0}
+/* Guide du marché — une barre de verre dépoli posée sur le bas de la bannière :
+   une phrase et « En savoir plus ». Le détail s'ouvre dans un panneau de verre
+   qui flotte au-dessus de la page et se referme quand on fait défiler. */
+.guide-marche-zone{position:relative;z-index:150;margin:-48px var(--ms-gutter,5vw) 0}
 .guide-marche-zone + .markets-bar{margin-top:28px}
 .market-hero:has(+ .guide-marche-zone:not([hidden])) .banner-credit{bottom:auto;top:12px}
-.guide-marche{position:relative;overflow:hidden;background:#FFFDF7;border:1px solid var(--border);border-radius:22px;padding:30px 34px 22px;box-shadow:0 22px 50px -26px rgba(13,31,23,.45)}
-.guide-marche::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
-.gm-entete{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.gm-titre{font-family:'Newsreader',serif;font-size:clamp(1.5rem,2.4vw,2rem);font-weight:700;color:var(--dark);margin:0;letter-spacing:-.01em}
+.guide-marche{position:relative;--verre:rgba(255,253,247,.66);--verre-fort:rgba(255,253,247,.8);--liseré:rgba(255,255,255,.7)}
+.gm-barre{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;padding:16px 16px 16px 24px;border-radius:20px;background:linear-gradient(120deg,var(--verre-fort),var(--verre));-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border:1px solid var(--liseré);box-shadow:0 20px 44px -24px rgba(13,31,23,.55),inset 0 1px 0 rgba(255,255,255,.8)}
+.gm-barre::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.gm-presentation{flex:1;min-width:0;font-family:'Newsreader',serif;font-size:clamp(1.02rem,1.4vw,1.2rem);line-height:1.45;color:var(--dark);margin:0}
+.gm-plus{flex:none;display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border:0;border-radius:99px;background:linear-gradient(135deg,var(--green),#12512B);color:#fff;font:inherit;font-size:.88rem;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 10px 22px -12px rgba(27,107,58,.9);transition:transform .15s,box-shadow .15s}
+.gm-plus:hover{transform:translateY(-1px);box-shadow:0 14px 26px -12px rgba(27,107,58,.95)}
+.gm-plus:focus-visible,.gm-fermer:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.gm-chevron{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.gm-ouvert .gm-chevron{transform:translateY(2px) rotate(-135deg)}
+.gm-panneau{position:absolute;top:calc(100% + 10px);left:0;right:0;max-height:max(280px,min(680px,calc(100dvh - 240px)));overflow:auto;overscroll-behavior:contain;padding:24px 30px 20px;border-radius:22px;background:linear-gradient(160deg,var(--verre-fort),var(--verre));-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border:1px solid var(--liseré);box-shadow:0 34px 70px -30px rgba(13,31,23,.6),inset 0 1px 0 rgba(255,255,255,.85);transform-origin:top center}
+.gm-panneau:not([hidden]){animation:gm-apparait .22s ease-out}
+@keyframes gm-apparait{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.gm-panneau:not([hidden]){animation:none}.gm-chevron,.gm-plus{transition:none}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.guide-marche{--verre:rgba(255,253,247,.96);--verre-fort:#FFFDF7}}
+.gm-entete{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.gm-titre{font-family:'Newsreader',serif;font-size:clamp(1.35rem,2.2vw,1.8rem);font-weight:700;color:var(--dark);margin:0;letter-spacing:-.01em}
 .gm-a-confirmer{font-size:.72rem;font-weight:700;color:#8A6100;background:var(--gdl);border:1px solid #F1D48A;border-radius:99px;padding:4px 11px}
-.gm-corps{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:34px;align-items:start}
-.gm-presentation{font-family:'Newsreader',serif;font-size:clamp(1.12rem,1.5vw,1.32rem);line-height:1.55;color:var(--dark);margin:0 0 22px}
+.gm-fermer{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;border:1px solid rgba(13,31,23,.1);background:rgba(255,255,255,.6);color:var(--dark);font-size:1.4rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+.gm-fermer:hover{background:#fff}
+.gm-corps{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,1fr);gap:28px;align-items:start}
 .gm-sous-titre{font-size:.9rem;font-weight:700;color:var(--dark);margin:0 0 10px}
 .gm-categories{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0}
-.gm-cat{display:inline-flex;align-items:center;gap:7px;font-size:.84rem;font-weight:600;color:var(--dark);padding:8px 14px;border-radius:99px;background:#fff;border:1px solid var(--border)}
+.gm-cat{display:inline-flex;align-items:center;gap:7px;font-size:.84rem;font-weight:600;color:var(--dark);padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.72);border:1px solid rgba(13,31,23,.1)}
 .gm-cat .ic{color:var(--green);font-size:1rem}
 .gm-specialite{background:var(--green);color:#fff;border-color:var(--green)}
 .gm-specialite .ic{color:var(--gold)}
 .gm-specialite::after{content:'★';color:var(--gold);font-size:.8rem}
-.gm-pratique{background:var(--gdl);border:1px solid #F3E2B5;border-radius:18px;padding:18px 18px 16px;display:grid;gap:14px}
+.gm-pratique{background:rgba(253,243,214,.6);border:1px solid rgba(241,212,138,.6);border-radius:18px;padding:16px 16px 14px;display:grid;gap:13px}
 .gm-info{display:flex;gap:12px;align-items:flex-start}
-.gm-info-icone{flex:none;width:34px;height:34px;border-radius:10px;background:#fff;display:grid;place-items:center;color:var(--green);font-size:1.05rem;box-shadow:0 1px 2px rgba(13,31,23,.08)}
+.gm-info-icone{flex:none;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.85);display:grid;place-items:center;color:var(--green);font-size:1.05rem;box-shadow:0 1px 2px rgba(13,31,23,.08)}
 .gm-info-titre{font-size:.82rem;font-weight:700;color:#7A5500;margin-bottom:1px}
 .gm-info-texte{font-size:.9rem;line-height:1.45;color:var(--dark)}
+.gm-ligne{display:block}
 .gm-carte{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding:11px 16px;border-radius:12px;background:var(--green);color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;transition:transform .15s,box-shadow .15s}
 .gm-carte:hover{transform:translateY(-1px);box-shadow:0 10px 22px -12px rgba(27,107,58,.9)}
-.gm-sources{margin:22px 0 0;padding-top:14px;border-top:1px dashed var(--border);font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
+.gm-sources{margin:20px 0 0;padding-top:12px;border-top:1px dashed rgba(13,31,23,.15);font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
 .gm-sources a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
-@media(max-width:860px){.gm-corps{grid-template-columns:1fr;gap:22px}}
-@media(max-width:600px){.guide-marche-zone{margin:-32px 14px 0}.guide-marche{padding:22px 18px 18px;border-radius:18px}.gm-categories{gap:6px}.gm-cat{font-size:.78rem;padding:6px 11px;gap:6px}}
+@media(max-width:860px){.gm-corps{grid-template-columns:1fr;gap:20px}}
+@media(max-width:600px){.guide-marche-zone{margin:-32px 14px 0}.gm-barre{flex-wrap:wrap;gap:12px;padding:16px 16px 14px 18px;border-radius:18px}.gm-plus{padding:9px 16px}.gm-presentation{flex-basis:100%;font-size:1.02rem}.gm-panneau{padding:18px 16px 16px;border-radius:18px;max-height:max(260px,calc(100dvh - 370px))}.gm-categories{gap:6px}.gm-cat{font-size:.78rem;padding:6px 11px;gap:6px}}
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
@@ -583,6 +599,7 @@ async function loadMarket(marketId) {
     const bloc = construireGuide(document, market, libellesParSlug(categories.success ? categories.data : []));
     zoneGuide.replaceChildren(...(bloc ? [bloc] : []));
     zoneGuide.hidden = !bloc;
+    if (bloc) surveillerGuide(window, document, bloc);
   }
 }
 

@@ -63,28 +63,57 @@
     return i;
   }
 
+  // « 8 h – 20 h ; fermé le dimanche » : le point-virgule se retrouvait seul en
+  // début de ligne sur téléphone. Chaque morceau devient sa propre ligne.
+  function lignesInfo(valeur) {
+    return String(valeur).split(/\s*;\s*/).filter(Boolean)
+      .map((morceau, i) => (i ? morceau.charAt(0).toUpperCase() + morceau.slice(1) : morceau));
+  }
+
+  // Le guide s'ouvre replié : une phrase et « En savoir plus ». Le détail vit
+  // dans un panneau qui flotte au-dessus de la page, pour que l'ouvrir ou le
+  // fermer ne déplace jamais la liste des boutiques sous le doigt.
   function construireGuide(doc, marche, libelles) {
     if (!aUnGuide(marche)) return null;
 
     const bloc = el(doc, 'section', 'guide-marche');
-    bloc.setAttribute('aria-labelledby', 'guide-marche-titre');
+    bloc.setAttribute('aria-label', 'Présentation du marché');
+
+    const barre = el(doc, 'div', 'gm-barre');
+    barre.appendChild(el(doc, 'p', 'gm-presentation',
+      marche.description || 'Découvrez ce qu’on trouve dans ce marché.'));
+    const bouton = el(doc, 'button', 'gm-plus');
+    bouton.type = 'button';
+    bouton.setAttribute('aria-expanded', 'false');
+    bouton.setAttribute('aria-controls', 'guide-marche-panneau');
+    bouton.appendChild(doc.createTextNode('En savoir plus'));
+    bouton.appendChild(el(doc, 'span', 'gm-chevron'));
+    barre.appendChild(bouton);
+    bloc.appendChild(barre);
+
+    const panneau = el(doc, 'div', 'gm-panneau');
+    panneau.id = 'guide-marche-panneau';
+    panneau.hidden = true;
 
     const entete = el(doc, 'div', 'gm-entete');
     const titre = el(doc, 'h2', 'gm-titre', 'Découvrir ce marché');
     titre.id = 'guide-marche-titre';
+    panneau.setAttribute('aria-labelledby', titre.id);
     entete.appendChild(titre);
     if (marche.fiabilite === 'A_VERIFIER') {
       entete.appendChild(el(doc, 'span', 'gm-a-confirmer', 'Informations à confirmer'));
     }
+    const fermer = el(doc, 'button', 'gm-fermer');
+    fermer.type = 'button';
+    fermer.setAttribute('aria-label', 'Fermer la présentation');
+    fermer.textContent = '×';
+    entete.appendChild(fermer);
+    panneau.appendChild(entete);
 
     const corps = el(doc, 'div', 'gm-corps');
 
-    // Colonne principale : ce qu'est le marché et ce qu'on y trouve.
-    // Le titre vit dans cette colonne : l'encadré pratique monte à sa hauteur
-    // au lieu de laisser un vide sous les catégories.
+    // Colonne principale : ce qu'on y trouve.
     const principal = el(doc, 'div', 'gm-principal');
-    principal.appendChild(entete);
-    if (marche.description) principal.appendChild(el(doc, 'p', 'gm-presentation', marche.description));
 
     const specialites = marche.specialites || [];
     const etiquettes = (marche.categories || [])
@@ -121,7 +150,9 @@
         info.appendChild(pastille);
         const texte = el(doc, 'div', 'gm-info-corps');
         texte.appendChild(el(doc, 'div', 'gm-info-titre', nom));
-        texte.appendChild(el(doc, 'div', 'gm-info-texte', valeur));
+        const contenu = el(doc, 'div', 'gm-info-texte');
+        lignesInfo(valeur).forEach(ligne => contenu.appendChild(el(doc, 'span', 'gm-ligne', ligne)));
+        texte.appendChild(contenu);
         info.appendChild(texte);
         pratique.appendChild(info);
       });
@@ -133,7 +164,7 @@
       }
       corps.appendChild(pratique);
     }
-    bloc.appendChild(corps);
+    panneau.appendChild(corps);
 
     const sources = sourcesSures(marche.sources);
     if (sources.length) {
@@ -142,9 +173,56 @@
         if (i) ligne.appendChild(doc.createTextNode(' · '));
         ligne.appendChild(lienExterne(doc, null, s.titre, s.url));
       });
-      bloc.appendChild(ligne);
+      panneau.appendChild(ligne);
     }
+    bloc.appendChild(panneau);
+
+    function basculer(ouvrir) {
+      panneau.hidden = !ouvrir;
+      bouton.setAttribute('aria-expanded', String(ouvrir));
+      bloc.className = ouvrir ? 'guide-marche gm-ouvert' : 'guide-marche';
+    }
+    bouton.addEventListener('click', () => basculer(panneau.hidden));
+    fermer.addEventListener('click', () => { basculer(false); bouton.focus(); });
+    bloc.guide = { bouton, estOuvert: () => !panneau.hidden, fermer: () => basculer(false) };
     return bloc;
+  }
+
+  // Le visiteur a lu, il reprend sa recherche : le panneau se referme dès qu'il
+  // fait défiler la page, touche ailleurs ou appuie sur Échap.
+  // À l'ouverture, la page remonte le guide juste sous le menu : sur téléphone,
+  // le panneau dépasserait sinon le bas de l'écran, et le visiteur devrait
+  // faire défiler — ce qui le refermerait aussitôt.
+  const SEUIL_DEFILEMENT = 48;
+  function surveillerGuide(fenetre, doc, bloc) {
+    if (!bloc || !bloc.guide) return;
+    const { bouton, estOuvert, fermer } = bloc.guide;
+    let depart = 0;
+    let automatique = false;
+    bouton.addEventListener('click', () => {
+      depart = fenetre.scrollY;
+      if (!estOuvert() || !fenetre.scrollTo || !bloc.getBoundingClientRect) return;
+      const menu = doc.querySelector && doc.querySelector('.nav');
+      const marge = (menu ? menu.getBoundingClientRect().height : 0) + 12;
+      depart = Math.max(0, Math.round(fenetre.scrollY + bloc.getBoundingClientRect().top - marge));
+      automatique = true;
+      const sobre = fenetre.matchMedia && fenetre.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      fenetre.scrollTo({ top: depart, behavior: sobre ? 'auto' : 'smooth' });
+      if (fenetre.setTimeout) fenetre.setTimeout(() => { automatique = false; }, 1000);
+    });
+    fenetre.addEventListener('scroll', () => {
+      if (automatique) {
+        if (Math.abs(fenetre.scrollY - depart) < 2) automatique = false;
+        return;
+      }
+      if (estOuvert() && Math.abs(fenetre.scrollY - depart) > SEUIL_DEFILEMENT) fermer();
+    }, { passive: true });
+    doc.addEventListener('pointerdown', e => {
+      if (estOuvert() && !bloc.contains(e.target)) fermer();
+    });
+    doc.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && estOuvert()) { fermer(); bouton.focus(); }
+    });
   }
 
   function construireResultats(doc, marches, slug) {
@@ -182,7 +260,7 @@
     };
   }
 
-  const exporte = { aUnGuide, lienCarte, sourcesSures, libellesParSlug, construireGuide, construireResultats, creerChercheur };
+  const exporte = { aUnGuide, lienCarte, sourcesSures, libellesParSlug, lignesInfo, construireGuide, surveillerGuide, construireResultats, creerChercheur };
   if (typeof module !== 'undefined' && module.exports) module.exports = exporte;
   else Object.assign(racine, exporte);
 })(typeof window !== 'undefined' ? window : this);
