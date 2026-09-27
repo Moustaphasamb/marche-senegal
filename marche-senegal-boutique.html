@@ -86,18 +86,6 @@
 .tab.active{background:var(--green);color:#fff}
 
 /* ═══════ VIDEO ═══════ */
-.visit-section{margin-bottom:26px}
-.vitrine-pastille{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-size:.74rem;font-weight:700;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;transition:transform .15s}
-.vitrine-pastille:hover{transform:translate(-50%,-50%) scale(1.15)}
-.vitrine-fiche{position:fixed;left:0;right:0;bottom:0;background:#fff;border-radius:16px 16px 0 0;padding:18px;box-shadow:0 -4px 24px rgba(0,0,0,.2);z-index:320;max-width:520px;margin:0 auto}
-.vitrine-fiche-haut{display:flex;gap:12px;align-items:center}
-.vitrine-fiche img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0}
-.vitrine-fiche-nom{font-weight:600;color:var(--dark)}
-.vitrine-fiche-prix{color:var(--green);font-weight:700;font-size:1.05rem}
-.vitrine-fiche-actions{display:flex;gap:8px;margin-top:14px}
-.vitrine-fiche-actions button{flex:1;padding:10px;border-radius:99px;font-size:.86rem;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid var(--border);background:#fff}
-.vitrine-fiche-actions .principal{background:var(--green);border-color:var(--green);color:#fff}
-.vitrine-indispo{color:var(--red);font-size:.8rem;margin-top:6px}
 .vs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .vs-title{font-size:.96rem;font-weight:600;color:var(--dark)}
 .vs-badge{display:inline-flex;align-items:center;gap:5px;background:var(--rp);color:var(--red);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px}
@@ -308,6 +296,7 @@
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
+<link rel="stylesheet" href="boutique-visite.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="ms-design page-boutique">
@@ -321,12 +310,12 @@
     <span class="nav-logo-text">Marché Sénégal</span>
   </a>
   <div class="nav-search">
-    <input type="text" placeholder="Rechercher dans Mode Fatou..."/>
+    <input type="text" placeholder="Rechercher un produit..."/>
     <button class="nav-search-btn"><i class="ic" data-ic="search"></i> Rechercher</button>
   </div>
   <div class="nav-actions">
-    <button class="nav-btn nav-btn-login" onclick="toast('Connexion...')">Se connecter</button>
-    <button class="nav-cart" onclick="toast('Panier...')">
+    <button class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
       <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
@@ -342,7 +331,7 @@
     <button class="nav-search-btn"><i class="ic" data-ic="search"></i></button>
   </div>
   <div class="nav-drawer-row">
-    <button class="nav-btn" style="flex:1;justify-content:center" onclick="toast('Connexion...')">Se connecter</button>
+    <button class="nav-btn" style="flex:1;justify-content:center" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button>
   </div>
 </div>
 
@@ -352,9 +341,9 @@
   <span class="bc-sep">›</span>
   <a href="marche-senegal-marche.html" class="bc-link">Marchés</a>
   <span class="bc-sep">›</span>
-  <a href="marche-senegal-marche.html" class="bc-link">Sandaga</a>
+  <a href="marche-senegal-marche.html" class="bc-link" id="bc-market"></a>
   <span class="bc-sep">›</span>
-  <span class="bc-current">Mode Fatou Ndoye</span>
+  <span class="bc-current" id="bc-shop"></span>
 </div>
 
 <!-- ═══════ SHOP HERO ═══════ -->
@@ -366,14 +355,11 @@
   <div class="sh-banner"></div>
   <div class="sh-info">
     <div class="sh-avatar-row">
-      <div class="sh-avatar">MF</div>
+      <div class="sh-avatar"></div>
       <div class="sh-meta">
         <div class="sh-verified" style="display:none"></div>
         <div class="sh-name"></div>
         <div class="sh-location">
-          <span class="sh-loc-chip"><i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3</span>
-          <span class="sh-loc-chip"><i class="ic" data-ic="map-pin"></i> Dakar Centre</span>
-          <span class="sh-loc-chip" style="background:rgba(76,175,80,.2);border-color:rgba(76,175,80,.3);color:#4CAF50">● Ouverte maintenant</span>
         </div>
         <div class="sh-actions">
           <button class="sh-btn sh-btn-primary" onclick="openChat()"><i class="ic" data-ic="message-circle"></i> Contacter</button>
@@ -392,101 +378,69 @@
   </div>
 </div>
 
+<!-- ═══════ VISITE DE LA BOUTIQUE (boutique-visite-ui.js) ═══════ -->
+<div class="bv-wrap">
+<section class="bv" id="bv" aria-label="Visite de la boutique" hidden>
+  <div class="bv-grid" id="bv-grid">
+    <nav class="bv-rayons" aria-label="Rayons de la boutique"><h2>Rayons</h2><div id="bv-rayons-list"></div></nav>
+    <div class="bv-stage" id="bv-stage" aria-label="Photo de la boutique, faire glisser pour regarder autour">
+      <div class="bv-scene" id="bv-scene"><img id="bv-img" alt=""></div>
+      <div class="bv-bubble" id="bv-bubble" aria-hidden="true"><b></b><span></span></div>
+      <div class="bv-pad" role="group" aria-label="Se déplacer dans la boutique">
+        <button type="button" class="bv-arrow bv-up" id="bv-fwd" aria-label="Avancer vers la vue suivante">▲</button>
+        <button type="button" class="bv-arrow bv-left" id="bv-left" aria-label="Regarder à gauche">◀</button>
+        <button type="button" class="bv-arrow bv-right" id="bv-right" aria-label="Regarder à droite">▶</button>
+        <button type="button" class="bv-arrow bv-down" id="bv-back" aria-label="Reculer vers la vue précédente">▼</button>
+      </div>
+      <div class="bv-plan" id="bv-plan" hidden><h3>Plan de la boutique</h3><div class="bv-plan-rooms" id="bv-plan-rooms"></div></div>
+      <div class="bv-bar">
+        <button type="button" class="bv-tool" id="bv-plan-btn" aria-expanded="false" aria-controls="bv-plan">🗺️ <span>Plan de la boutique</span></button>
+        <div class="bv-where" id="bv-where"><b></b><small>Glissez pour regarder · touchez un point</small></div>
+      </div>
+      <p class="bv-fail" id="bv-fail" hidden>La photo de la boutique n'a pas pu être chargée. <button type="button" id="bv-retry">↻ Réessayer</button></p>
+    </div>
+    <aside class="bv-side">
+      <div class="bv-sheet" id="bv-sheet" hidden aria-live="polite"></div>
+      <div class="bv-cart">
+        <h2><span>Mon panier <small id="bv-cart-n"></small></span><button type="button" id="bv-clear" hidden>Vider</button></h2>
+        <div class="bv-lines" id="bv-lines"></div>
+        <div class="bv-sum"><span>Sous-total</span><span id="bv-subtotal"></span></div>
+        <a class="bv-btn bv-primary bv-go" href="marche-senegal-panier.html">Commander</a>
+        <ul class="bv-terms" id="bv-terms"></ul>
+      </div>
+    </aside>
+  </div>
+  <section class="bv-products" id="bv-products" aria-label="Produits de la boutique">
+    <div class="bv-p-head">
+      <h2>Produits de la boutique</h2>
+      <div class="bv-tabs" id="bv-tabs" role="group" aria-label="Filtrer les produits">
+        <button type="button" data-t="tous" aria-pressed="true">Tous</button>
+        <button type="button" data-t="nouveautes" aria-pressed="false">Nouveautés</button>
+        <button type="button" data-t="promos" aria-pressed="false">Promotions</button>
+      </div>
+    </div>
+    <div class="bv-cards" id="bv-products-grid"></div>
+  </section>
+  <div class="bv-cartbar" id="bv-cartbar" hidden>
+    <div><small id="bv-cb-n"></small><b id="bv-cb-t"></b></div>
+    <a class="bv-btn" href="marche-senegal-panier.html">Voir le panier</a>
+  </div>
+</section>
+<!-- /bv -->
+</div>
+
 <!-- ═══════ MAIN ═══════ -->
 <div class="main">
 
   <!-- LEFT -->
   <div id="left-col">
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('boutique',this)"><i class="ic" data-ic="store"></i> Boutique</div>
-      <div class="tab" onclick="switchTab('produits',this)"><i class="ic" data-ic="package"></i> Produits</div>
-      <div class="tab" onclick="switchTab('avis',this)"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Avis</div>
+      <div class="tab active" onclick="switchTab('avis',this)"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Avis</div>
       <div class="tab" onclick="switchTab('infos',this)"><i class="ic" data-ic="info"></i> Infos</div>
     </div>
 
-    <!-- TAB BOUTIQUE -->
-    <div id="tab-boutique">
-      <div class="visit-section">
-        <div class="vs-header">
-          <div class="vs-title"><i class="ic" data-ic="store"></i> Découvrez la boutique</div>
-          <select id="shopvision-scene-select" aria-label="Choisir une vue de la boutique" style="display:none;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:.78rem"></select>
-        </div>
-        <div id="vitrine-box" style="position:relative;overflow:hidden;border-radius:12px;background:var(--bg);touch-action:none">
-          <div id="vitrine-scene" style="position:relative;will-change:transform">
-            <img id="vitrine-img" alt="Photo de la boutique" style="width:100%;display:block">
-          </div>
-        </div>
-        <div class="vp-hint" id="vitrine-hint"><i class="ic" data-ic="pin"></i> Appuyez sur un point pour voir le produit</div>
-      </div>
-
-      <div class="prod-section">
-        <div class="sec-hd">
-          <div class="sec-title">Produits vedettes</div>
-          <span class="sec-link" onclick="switchTab('produits',document.querySelectorAll('.tab')[1])">Voir tout →</span>
-        </div>
-        <div class="pf-row">
-          <button class="pf active" onclick="filterP('all',this)">Tout</button>
-          <button class="pf" onclick="filterP('wax',this)">Tissu wax</button>
-          <button class="pf" onclick="filterP('boubou',this)">Boubou</button>
-          <button class="pf" onclick="filterP('bazin',this)">Bazin</button>
-          <button class="pf" onclick="filterP('promo',this)"><i class="ic" data-ic="flame"></i> Promo</button>
-        </div>
-        <div class="prods-grid">
-          <div class="prod-card" data-cat="boubou promo">
-            <div class="pc-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="pc-badge">-15%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Boubou wax tissé main — L</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (89)</div><div class="pc-footer"><div><span class="pc-price">15 300 FCFA</span><span class="pc-old">18 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-          <div class="prod-card" data-cat="bazin">
-            <div class="pc-img" style="background:#FFF8E7"><i class="ic" data-ic="spool"></i><div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Bazin brodé cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 5.0 (42)</div><div class="pc-footer"><div><span class="pc-price">25 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-          <div class="prod-card" data-cat="wax">
-            <div class="pc-img" style="background:#FDE8E6"><i class="ic" data-ic="shirt"></i><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Robe wax africaine brodée</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (67)</div><div class="pc-footer"><div><span class="pc-price">9 500 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-          <div class="prod-card" data-cat="wax promo">
-            <div class="pc-img" style="background:#E8F5EC"><i class="ic" data-ic="palette"></i><div class="pc-badge">-10%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Tissu wax hollandais 6 yards</div><div class="pc-rating"><span class="pc-stars">★★★★☆</span> 4.7 (112)</div><div class="pc-footer"><div><span class="pc-price">4 050 FCFA</span><span class="pc-old">4 500</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-          <div class="prod-card" data-cat="boubou promo">
-            <div class="pc-img" style="background:#F0EAF8"><i class="ic" data-ic="shirt"></i><div class="pc-badge">-20%</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Ensemble 3 pièces femme cérémonie</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.9 (33)</div><div class="pc-footer"><div><span class="pc-price">28 000 FCFA</span><span class="pc-old">35 000</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-          <div class="prod-card" data-cat="bazin">
-            <div class="pc-img" style="background:#FDF3DC"><i class="ic" data-ic="shirt"></i><div class="pc-badge new">Nouveau</div><div class="pc-wish" onclick="wish(event)"><i class="ic" data-ic="heart"></i></div></div>
-            <div class="pc-body"><div class="pc-name">Kaftan bazin riche homme brodé</div><div class="pc-rating"><span class="pc-stars">★★★★★</span> 4.8 (28)</div><div class="pc-footer"><div><span class="pc-price">22 000 FCFA</span></div><button class="add-btn" onclick="addCart(event)">+</button></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB PRODUITS -->
-    <div id="tab-produits" style="display:none">
-      <div class="sec-hd" style="margin-bottom:14px">
-        <div class="sec-title" id="tab-produits-title">Tous les produits</div>
-      </div>
-      <div class="pf-row">
-        <button class="pf active" onclick="filterAllProds('all',this)">Tout</button>
-        <button class="pf" onclick="filterAllProds('boubou',this)">Boubou</button>
-        <button class="pf" onclick="filterAllProds('bazin',this)">Bazin</button>
-        <button class="pf" onclick="filterAllProds('wax',this)">Tissu wax</button>
-        <button class="pf" onclick="filterAllProds('promo',this)"><i class="ic" data-ic="flame"></i> Promo</button>
-      </div>
-      <div class="prods-grid" id="tab-produits-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
-          <div style="font-size:2rem;margin-bottom:10px"><i class="ic" data-ic="hourglass"></i></div>
-          <div>Chargement des produits…</div>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:16px">
-        <button id="btn-voir-plus" class="nav-btn" style="display:none;margin:0 auto" onclick="loadMoreProds()">
-          Voir plus de produits <span id="voir-plus-count"></span>
-        </button>
-      </div>
-    </div>
-
     <!-- TAB AVIS -->
-    <div id="tab-avis" style="display:none">
+    <div id="tab-avis">
       <div class="rating-summary">
         <div class="rs-big"><div class="rs-num"></div><div class="rs-stars"></div><div class="rs-count"></div></div>
         <div class="rs-bars">
@@ -628,6 +582,8 @@
 </nav>
 
 <script src="api.js"></script>
+<script src="boutique-visite.js"></script>
+<script src="boutique-visite-ui.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE BOUTIQUE — Données dynamiques
@@ -635,7 +591,7 @@
 
 let cartCount = 0;
 let currentShop = null;
-let currentTab = 'boutique';
+let currentTab = 'avis';
 
 // ── Récupérer l'ID de la boutique depuis l'URL ──
 function getShopIdFromURL() {
@@ -693,6 +649,40 @@ async function chargerPromotionsBoutique(shopId) {
   }
 
   carte.style.display = '';
+}
+
+// Visite de la boutique : photos publiées, rayons, fiche et panier (boutique-visite-ui.js).
+async function demarrerVisite(shop) {
+  let scenes = [];
+  try {
+    const r = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
+    if (r.success && Array.isArray(r.data)) scenes = r.data;
+  } catch { /* sans photos, la page reste utilisable */ }
+  let favoris = new Set();
+  try {
+    if (isLoggedIn() && getCurrentUser()?.role === 'BUYER') {
+      const f = await getFavorites();
+      if (f.success) favoris = new Set((f.data || []).map(x => x.productId).filter(Boolean));
+    }
+  } catch { /* les coeurs restent vides */ }
+  let stockage = null;
+  try { stockage = window.localStorage; } catch { /* panier indisponible */ }
+  BoutiqueVisite.monter({
+    shop, scenes, favoris, stockage,
+    notifier: showToast,
+    surPanierChange: updateCartCount,
+    basculerFavori: async (id, actif) => {
+      if (!isLoggedIn()) {
+        showToast('Connectez-vous pour ajouter aux favoris');
+        setTimeout(() => { window.location.href = 'marche-senegal-connexion-acheteur.html'; }, 900);
+        return null;
+      }
+      const r = actif ? await removeFavorite(id) : await addFavorite(id);
+      if (!r.success) { showToast(r.message || 'Favori non enregistré', 'error'); return null; }
+      showToast(actif ? 'Retiré des favoris' : '❤️ Ajouté aux favoris');
+      return !actif;
+    }
+  });
 }
 
 async function loadShop(shopId) {
@@ -794,13 +784,11 @@ async function loadShop(shopId) {
 
   // L'onglet annonçait « Avis (234) » alors que le hero affichait 0 juste
   // au-dessus : le nombre était écrit en dur.
-  const avisTab = document.querySelectorAll('.tab')[2];
+  const avisTab = document.querySelector(".tab[onclick*=\"'avis'\"]");
   if (avisTab) avisTab.textContent = '⭐ Avis (' + (shop.totalReviews || 0) + ')';
 
-  // Visite virtuelle : la section montrait une vidéo de 2:34 inexistante et des
-  // produits cliquables écrits en dur, qu'un acheteur pouvait mettre au panier
-  // alors qu'ils n'appartenaient pas à cette boutique.
-  afficherVitrine(shop);
+  // Visite de la boutique : photos publiées, rayons, fiche, panier et produits.
+  demarrerVisite(shop);
 
   // La description rédigée par le vendeur dans « Ma boutique » n'était jamais
   // lue : toutes les boutiques affichaient le texte de Mode Fatou Ndoye.
@@ -831,464 +819,13 @@ async function loadShop(shopId) {
       bcLinks[2].textContent = shop.market.name;
       bcLinks[2].href = 'marche-senegal-marche.html?id=' + shop.market.id;
     }
+  } else {
+    const bcMarket = document.getElementById('bc-market');
+    if (bcMarket) bcMarket.textContent = 'Boutiques';
   }
-
-  // Charger les produits
-  loadShopProducts(shop);
 
   // Charger les avis
   loadShopReviews(shop);
-}
-
-// ── Construire une carte produit (DOM pur — pas d'innerHTML) ──
-function buildProdCard(prod) {
-  const card = document.createElement('div');
-  card.className = 'prod-card';
-  card.dataset.cat = (prod.category?.name || '').toLowerCase();
-  card.addEventListener('click', () => {
-    window.location.href = 'marche-senegal-produit.html?id=' + prod.id;
-  });
-
-  const imgDiv = document.createElement('div');
-  imgDiv.className = 'pc-img';
-  imgDiv.style.background = '#F0EAF8';
-
-  if (prod.images?.length > 0) {
-    const img = document.createElement('img');
-    img.src = prod.images[0];
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover';
-    imgDiv.appendChild(img);
-  } else {
-    imgDiv.append('👗');
-  }
-
-  if (prod.originalPrice) {
-    const badge = document.createElement('div');
-    badge.className = 'pc-badge';
-    badge.textContent = '-' + Math.round((1 - prod.price / prod.originalPrice) * 100) + '%';
-    imgDiv.appendChild(badge);
-  }
-
-  const wishBtn = document.createElement('div');
-  wishBtn.className = 'pc-wish';
-  wishBtn.textContent = '🤍';
-  wishBtn.addEventListener('click', (e) => wish(e, prod.id));
-  imgDiv.appendChild(wishBtn);
-
-  const body = document.createElement('div');
-  body.className = 'pc-body';
-
-  const name = document.createElement('div');
-  name.className = 'pc-name';
-  name.textContent = prod.name;
-
-  const ratingDiv = document.createElement('div');
-  ratingDiv.className = 'pc-rating';
-  const stars = document.createElement('span');
-  stars.className = 'pc-stars';
-  stars.textContent = '★★★★★';
-  ratingDiv.appendChild(stars);
-  ratingDiv.append(' ' + (prod.rating || 0) + ' (' + (prod.totalReviews || 0) + ')');
-
-  const footer = document.createElement('div');
-  footer.className = 'pc-footer';
-
-  const priceWrap = document.createElement('div');
-  const priceSpan = document.createElement('span');
-  priceSpan.className = 'pc-price';
-  priceSpan.textContent = formatPrice(prod.price);
-  priceWrap.appendChild(priceSpan);
-  if (prod.originalPrice) {
-    const oldSpan = document.createElement('span');
-    oldSpan.className = 'pc-old';
-    oldSpan.textContent = formatPrice(prod.originalPrice);
-    priceWrap.appendChild(oldSpan);
-  }
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'add-btn';
-  addBtn.textContent = '+';
-  addBtn.addEventListener('click', e => addCart(e, prod.id, prod.name, prod.price));
-
-  footer.appendChild(priceWrap);
-  footer.appendChild(addBtn);
-  body.appendChild(name);
-  body.appendChild(ratingDiv);
-  body.appendChild(footer);
-  card.appendChild(imgDiv);
-  card.appendChild(body);
-  return card;
-}
-
-// Les boutons de filtre étaient figés sur « Tissu wax / Boubou / Bazin / Promo »,
-// les rayons d'une boutique de mode. Ils sont maintenant construits à partir des
-// catégories réellement présentes dans la boutique, et disparaissent s'il n'y a
-// rien à filtrer.
-function construireFiltresCategories(produits) {
-  const categories = [...new Set(
-    produits.map(p => p.category?.name).filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b, 'fr'));
-
-  document.querySelectorAll('.pf-row').forEach(barre => {
-    const dansOngletProduits = barre.closest('#tab-produits');
-    const filtrer = dansOngletProduits ? 'filterAllProds' : 'filterP';
-
-    // Moins de deux catégories : un filtre n'apporte rien
-    if (categories.length < 2) { barre.style.display = 'none'; return; }
-
-    barre.style.display = '';
-    barre.replaceChildren();
-
-    const ajouter = (libelle, valeur, actif) => {
-      const b = document.createElement('button');
-      b.className = 'pf' + (actif ? ' active' : '');
-      b.textContent = libelle;
-      b.onclick = () => window[filtrer](valeur, b);
-      barre.appendChild(b);
-    };
-
-    ajouter('Tout', 'all', true);
-    categories.forEach(c => ajouter(c, c.toLowerCase(), false));
-  });
-}
-
-// ── La vitrine cliquable ──
-// La photo de la boutique et les points que le vendeur y a posés.
-let _vitrinePoints = [], _shopvisionScenes = [];
-
-async function afficherVitrine(shop) {
-  const section = document.querySelector('.visit-section');
-  const boite = document.getElementById('vitrine-box');
-  const image = document.getElementById('vitrine-img');
-  const conseil = document.getElementById('vitrine-hint');
-  if (!section || !boite || !image) return;
-
-  section.style.display = '';
-  try {
-    const scenesResult = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
-    if (scenesResult.success && Array.isArray(scenesResult.data) && scenesResult.data.length) {
-      _shopvisionScenes = scenesResult.data;
-      const select = document.getElementById('shopvision-scene-select');
-      select.style.display = '';
-      select.replaceChildren(..._shopvisionScenes.map((scene, i) => new Option(scene.title || 'Vue ' + (i + 1), scene.id)));
-      select.onchange = () => afficherVitrineScene(_shopvisionScenes.find(scene => scene.id === select.value));
-      await afficherVitrineScene(_shopvisionScenes[0]);
-      return;
-    }
-  } catch { /* la vitrine historique reste le secours public */ }
-  if (!shop.showcaseUrl) { section.style.display = 'none'; return; }
-  _vitrinePoints = shop.showcaseHotspots || [];
-
-  // On ne vide jamais la boîte : l'image et, à la tâche 7, la scène de zoom
-  // doivent survivre pour qu'un nouvel essai ait quelque chose à recharger.
-  document.getElementById('vitrine-echec')?.remove();
-
-  image.onerror = () => {
-    image.style.display = 'none';
-    if (conseil) conseil.style.display = 'none';
-
-    const echec = document.createElement('div');
-    echec.id = 'vitrine-echec';
-    echec.style.cssText = 'padding:30px;text-align:center;color:var(--muted)';
-    echec.textContent = 'La photo de la boutique n\'a pas pu être chargée.';
-
-    const reessayer = document.createElement('button');
-    reessayer.textContent = '↻ Réessayer';
-    reessayer.style.cssText = 'display:block;margin:12px auto 0;padding:8px 18px;border-radius:99px;' +
-      'border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:600;cursor:pointer;font-family:inherit';
-    reessayer.onclick = () => {
-      echec.remove();
-      image.style.display = '';
-      afficherVitrine(shop);
-    };
-    echec.appendChild(reessayer);
-
-    boite.appendChild(echec);
-  };
-  image.onload = () => { dessinerPastilles(); activerZoomVitrine(); };
-  image.src = shop.showcaseUrl;
-
-  // Sans point, la photo vaut déjà comme vitrine : on la montre sans consigne.
-  if (conseil) conseil.style.display = _vitrinePoints.length ? '' : 'none';
-}
-
-async function afficherVitrineScene(scene) {
-  if (!scene) return;
-  const shop = window.currentShop || {};
-  _vitrinePoints = (scene.hotspots || []).map(point => ({ ...point, x: Number(point.x) * 100, y: Number(point.y) * 100 }));
-  const image = document.getElementById('vitrine-img');
-  image.onload = () => { dessinerPastilles(); activerZoomVitrine(); };
-  image.src = scene.imageUrl;
-  const conseil = document.getElementById('vitrine-hint');
-  if (conseil) conseil.style.display = _vitrinePoints.length ? '' : 'none';
-}
-
-function dessinerPastilles() {
-  const boite = document.getElementById('vitrine-scene');
-  boite.querySelectorAll('.vitrine-pastille').forEach(e => e.remove());
-
-  _vitrinePoints.forEach((point, i) => {
-    const pastille = document.createElement('div');
-    pastille.className = 'vitrine-pastille';
-    pastille.style.left = point.x + '%';
-    pastille.style.top = point.y + '%';
-    pastille.textContent = String(i + 1);
-    pastille.onclick = (e) => { e.stopPropagation(); ouvrirFicheVitrine(point); };
-    boite.appendChild(pastille);
-  });
-
-  appliquerTransformationVitrine();
-}
-
-function ouvrirFicheVitrine(point) {
-  fermerFicheVitrine();
-  const produit = point.product;
-  if (!produit) return;
-
-  const disponible = produit.status === 'ACTIVE' && produit.stock > 0;
-
-  const fiche = document.createElement('div');
-  fiche.className = 'vitrine-fiche';
-  fiche.id = 'vitrine-fiche';
-
-  const haut = document.createElement('div');
-  haut.className = 'vitrine-fiche-haut';
-
-  if (produit.images && produit.images.length) {
-    const img = document.createElement('img');
-    img.src = produit.images[0];
-    img.alt = '';
-    haut.appendChild(img);
-  }
-
-  const infos = document.createElement('div');
-  const nom = document.createElement('div');
-  nom.className = 'vitrine-fiche-nom';
-  nom.textContent = produit.name;
-  const prix = document.createElement('div');
-  prix.className = 'vitrine-fiche-prix';
-  prix.textContent = formatPrice(produit.price);
-  infos.append(nom, prix);
-
-  if (!disponible) {
-    const alerte = document.createElement('div');
-    alerte.className = 'vitrine-indispo';
-    alerte.textContent = produit.stock === 0 ? 'Rupture de stock' : 'Produit indisponible';
-    infos.appendChild(alerte);
-  }
-
-  haut.appendChild(infos);
-  fiche.appendChild(haut);
-
-  const actions = document.createElement('div');
-  actions.className = 'vitrine-fiche-actions';
-
-  const voir = document.createElement('button');
-  voir.textContent = 'Voir le produit';
-  voir.onclick = () => { window.location.href = 'marche-senegal-produit.html?id=' + produit.id; };
-  actions.appendChild(voir);
-
-  if (disponible) {
-    const ajouter = document.createElement('button');
-    ajouter.className = 'principal';
-    ajouter.textContent = 'Ajouter au panier';
-    ajouter.onclick = () => { window.location.href = 'marche-senegal-produit.html?id=' + produit.id; };
-    actions.appendChild(ajouter);
-  }
-
-  const fermer = document.createElement('button');
-  fermer.textContent = 'Fermer';
-  fermer.onclick = fermerFicheVitrine;
-  actions.appendChild(fermer);
-
-  fiche.appendChild(actions);
-  document.body.appendChild(fiche);
-
-  document.addEventListener('keydown', fermerFicheSurEchap);
-}
-
-function fermerFicheSurEchap(e) {
-  if (e.key === 'Escape') fermerFicheVitrine();
-}
-
-function fermerFicheVitrine() {
-  document.getElementById('vitrine-fiche')?.remove();
-  document.removeEventListener('keydown', fermerFicheSurEchap);
-}
-
-/* ── Zoom de la vitrine ──
-   Une transformation CSS sur un conteneur intérieur : l'image et les
-   pastilles bougent ensemble, les positions en pourcentage restent valables.
-   Les pastilles compensent l'échelle pour garder une taille constante et
-   rester cliquables au zoom maximal. */
-const VITRINE_ZOOM_MIN = 1;
-const VITRINE_ZOOM_MAX = 4;
-let _vitrineEchelle = 1;
-let _vitrineX = 0;
-let _vitrineY = 0;
-// Empêche de reposer wheel/dblclick/touch/souris/resize à chaque rechargement
-// réussi de la photo (ex. après un échec puis « Réessayer »).
-let _vitrineZoomActive = false;
-
-function appliquerTransformationVitrine() {
-  const scene = document.getElementById('vitrine-scene');
-  if (!scene) return;
-
-  const boite = document.getElementById('vitrine-box');
-  const largeur = boite.clientWidth;
-  const hauteur = boite.clientHeight;
-
-  // On empêche de sortir de l'image : au-delà du cadre, on recolle au bord.
-  const debordementX = Math.max(0, (largeur * _vitrineEchelle - largeur) / 2);
-  const debordementY = Math.max(0, (hauteur * _vitrineEchelle - hauteur) / 2);
-  _vitrineX = Math.min(debordementX, Math.max(-debordementX, _vitrineX));
-  _vitrineY = Math.min(debordementY, Math.max(-debordementY, _vitrineY));
-
-  scene.style.transform =
-    'translate(' + _vitrineX + 'px,' + _vitrineY + 'px) scale(' + _vitrineEchelle + ')';
-
-  scene.querySelectorAll('.vitrine-pastille').forEach(p => {
-    p.style.transform = 'translate(-50%,-50%) scale(' + (1 / _vitrineEchelle) + ')';
-  });
-}
-
-function reglerZoomVitrine(nouvelleEchelle) {
-  _vitrineEchelle = Math.min(VITRINE_ZOOM_MAX, Math.max(VITRINE_ZOOM_MIN, nouvelleEchelle));
-  if (_vitrineEchelle === 1) { _vitrineX = 0; _vitrineY = 0; }
-  appliquerTransformationVitrine();
-}
-
-function activerZoomVitrine() {
-  const boite = document.getElementById('vitrine-box');
-  const scene = document.getElementById('vitrine-scene');
-  if (!boite || !scene) return;
-
-  // Une photo (re)chargée repart toujours de la vue d'ensemble, même si les
-  // écouteurs eux sont déjà posés depuis un appel précédent.
-  _vitrineEchelle = 1;
-  _vitrineX = 0;
-  _vitrineY = 0;
-  appliquerTransformationVitrine();
-
-  if (_vitrineZoomActive) return;
-  _vitrineZoomActive = true;
-
-  scene.style.transformOrigin = 'center center';
-  scene.style.transition = 'transform .08s linear';
-
-  boite.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    reglerZoomVitrine(_vitrineEchelle * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
-  }, { passive: false });
-
-  boite.addEventListener('dblclick', () => reglerZoomVitrine(1));
-
-  let depart = null;
-  let distanceDepart = null;
-  let echelleDepart = 1;
-
-  const distanceEntre = (touches) => Math.hypot(
-    touches[0].clientX - touches[1].clientX,
-    touches[0].clientY - touches[1].clientY
-  );
-
-  boite.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      distanceDepart = distanceEntre(e.touches);
-      echelleDepart = _vitrineEchelle;
-    } else if (e.touches.length === 1 && _vitrineEchelle > 1) {
-      depart = { x: e.touches[0].clientX - _vitrineX, y: e.touches[0].clientY - _vitrineY };
-    }
-  }, { passive: true });
-
-  boite.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2 && distanceDepart) {
-      e.preventDefault();
-      reglerZoomVitrine(echelleDepart * (distanceEntre(e.touches) / distanceDepart));
-    } else if (e.touches.length === 1 && depart) {
-      e.preventDefault();
-      _vitrineX = e.touches[0].clientX - depart.x;
-      _vitrineY = e.touches[0].clientY - depart.y;
-      appliquerTransformationVitrine();
-    }
-  }, { passive: false });
-
-  boite.addEventListener('touchend', () => { depart = null; distanceDepart = null; });
-
-  // À la souris : glisser pour se déplacer une fois zoomé.
-  let souris = null;
-  boite.addEventListener('mousedown', (e) => {
-    if (_vitrineEchelle > 1) { souris = { x: e.clientX - _vitrineX, y: e.clientY - _vitrineY }; e.preventDefault(); }
-  });
-  window.addEventListener('mousemove', (e) => {
-    if (!souris) return;
-    _vitrineX = e.clientX - souris.x;
-    _vitrineY = e.clientY - souris.y;
-    appliquerTransformationVitrine();
-  });
-  window.addEventListener('mouseup', () => { souris = null; });
-
-  window.addEventListener('resize', appliquerTransformationVitrine);
-}
-
-// ── Charger les produits de la boutique ──
-function loadShopProducts(shop) {
-  const featuredGrid = document.querySelector('#tab-boutique .prods-grid');
-  const allGrid = document.getElementById('tab-produits-grid');
-  const allTitle = document.getElementById('tab-produits-title');
-
-  const count = shop.products?.length || 0;
-
-  // Mettre à jour le label de l'onglet et le titre
-  const prodTab = document.querySelectorAll('.tab')[1];
-  if (prodTab) prodTab.textContent = '📦 Produits (' + count + ')';
-  if (allTitle) allTitle.textContent = 'Tous les produits (' + count + ')';
-
-  construireFiltresCategories(shop.products || []);
-
-  const emptyNode = () => {
-    const w = document.createElement('div');
-    w.style.cssText = 'grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)';
-    const icon = document.createElement('div');
-    icon.style.cssText = 'font-size:2.5rem;margin-bottom:12px';
-    icon.textContent = '📦';
-    const txt = document.createElement('div');
-    txt.textContent = 'Aucun produit dans cette boutique';
-    w.appendChild(icon);
-    w.appendChild(txt);
-    return w;
-  };
-
-  if (!count) {
-    if (featuredGrid) { featuredGrid.replaceChildren(emptyNode()); }
-    if (allGrid) { allGrid.replaceChildren(emptyNode()); }
-    return;
-  }
-
-  // Stocker pour la pagination
-  allProductsData = shop.products;
-  prodsPage = 0;
-
-  const firstPage = shop.products.slice(0, PRODS_PER_PAGE);
-  const remaining = shop.products.length - PRODS_PER_PAGE;
-
-  if (featuredGrid) {
-    featuredGrid.replaceChildren(...shop.products.slice(0, 6).map(p => buildProdCard(p)));
-  }
-  if (allGrid) {
-    allGrid.replaceChildren(...firstPage.map(p => buildProdCard(p)));
-  }
-
-  const btn = document.getElementById('btn-voir-plus');
-  if (btn) {
-    if (remaining > 0) {
-      btn.style.display = 'inline-flex';
-      const countEl = document.getElementById('voir-plus-count');
-      if (countEl) countEl.textContent = '(' + remaining + ' restants)';
-    } else {
-      btn.style.display = 'none';
-    }
-  }
 }
 
 // ── Mettre à jour le résumé de notation (barres de pourcentage) ──
@@ -1347,53 +884,11 @@ function switchTab(tab, el) {
   if (el) el.classList.add('active');
   currentTab = tab;
 
-  const tabs = ['boutique', 'produits', 'avis', 'infos'];
+  const tabs = ['avis', 'infos'];
   tabs.forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (el) el.style.display = t === tab ? '' : 'none';
   });
-}
-
-// ── Ajouter au panier ──
-function addCart(event, productId, productName, price) {
-  event.stopPropagation();
-
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existing = cart.find(i => i.productId === productId);
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({
-      productId,
-      name: productName,
-      price,
-      quantity: 1,
-      shopId: currentShop?.id,
-      shopName: currentShop?.name
-    });
-  }
-
-  localStorage.setItem('cart', JSON.stringify(cart));
-  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
-  document.getElementById('cart-count').textContent = cartCount;
-  showToast('✓ ' + productName + ' ajouté au panier');
-}
-
-// ── Ajouter/Retirer des favoris ──
-async function wish(event, productId) {
-  event.stopPropagation();
-  if (!isLoggedIn()) { showToast('Connectez-vous pour ajouter aux favoris'); return; }
-  const btn = event.target;
-  const adding = btn.textContent === '🤍';
-  btn.textContent = adding ? '❤️' : '🤍';
-  if (!productId) return;
-  const result = adding ? await addFavorite(productId) : await removeFavorite(productId);
-  if (result.success) {
-    showToast(adding ? '❤️ Ajouté aux favoris' : 'Retiré des favoris');
-  } else {
-    btn.textContent = adding ? '🤍' : '❤️';
-  }
 }
 
 // ── Suivre la boutique ──
@@ -1541,29 +1036,6 @@ function startPromoCountdown() {
     setTimeout(tick, 1000);
   }
   tick();
-}
-
-// ── Pagination produits ──
-let allProductsData = [];
-let prodsPage = 0;
-const PRODS_PER_PAGE = 12;
-
-function loadMoreProds() {
-  prodsPage++;
-  const grid = document.getElementById('tab-produits-grid');
-  const btn = document.getElementById('btn-voir-plus');
-  const start = prodsPage * PRODS_PER_PAGE;
-  const slice = allProductsData.slice(start, start + PRODS_PER_PAGE);
-
-  slice.forEach(prod => grid.appendChild(buildProdCard(prod)));
-
-  const remaining = allProductsData.length - (start + PRODS_PER_PAGE);
-  if (remaining <= 0) {
-    if (btn) btn.style.display = 'none';
-  } else {
-    const countEl = document.getElementById('voir-plus-count');
-    if (countEl) countEl.textContent = '(' + remaining + ' restants)';
-  }
 }
 
 // ── Évaluations étoiles interactives ──
@@ -1782,64 +1254,6 @@ async function submitReview() {
     showToast('❌ ' + (result.message || 'Erreur'), 'error');
   }
   if (btn) { btn.textContent = 'Publier mon avis'; btn.disabled = false; }
-}
-
-// ── Ajouter au panier depuis les tags vidéo ──
-function addToCart2(productName, price) {
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existing = cart.find(i => i.name === productName);
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({
-      productId: 'video_' + Date.now(),
-      name: productName,
-      price,
-      quantity: 1,
-      shopId: currentShop?.id,
-      shopName: currentShop?.name
-    });
-  }
-  localStorage.setItem('cart', JSON.stringify(cart));
-  cartCount = cart.reduce((sum, i) => sum + i.quantity, 0);
-  document.getElementById('cart-count').textContent = cartCount;
-  showToast('✓ ' + productName + ' ajouté au panier');
-}
-
-// ── Lecture de la visite virtuelle ──
-function playVideo() {
-  const overlay = document.getElementById('vp-overlay');
-  const dur = document.getElementById('vp-dur');
-  if (overlay) {
-    overlay.style.background = 'rgba(0,0,0,.55)';
-    while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
-    const lbl = document.createElement('div');
-    lbl.style.cssText = 'color:#fff;font-size:.88rem;font-weight:600;padding:10px 18px;background:rgba(0,0,0,.5);border-radius:99px';
-    lbl.textContent = '▶ Lecture en cours…';
-    overlay.appendChild(lbl);
-  }
-  if (dur) dur.textContent = '▶ En lecture';
-  showToast('▶ Visite virtuelle en cours de lecture');
-}
-
-// ── Filtrer les produits vedettes (onglet Boutique) ──
-function filterP(cat, el) {
-  document.querySelectorAll('#tab-boutique .pf').forEach(b => b.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.querySelectorAll('#tab-boutique .prod-card').forEach(card => {
-    const cardCat = card.dataset.cat || '';
-    card.style.display = (cat === 'all' || cardCat.includes(cat)) ? '' : 'none';
-  });
-}
-
-// ── Filtrer tous les produits (onglet Produits) ──
-function filterAllProds(cat, el) {
-  document.querySelectorAll('#tab-produits .pf').forEach(b => b.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.querySelectorAll('#tab-produits-grid .prod-card').forEach(card => {
-    const cardCat = card.dataset.cat || '';
-    card.style.display = (cat === 'all' || cardCat.includes(cat)) ? '' : 'none';
-  });
 }
 
 // ── Hamburger ──

@@ -159,3 +159,7 @@
   .bv-cartbar .bv-btn{background:var(--bv-gold);border-color:var(--bv-gold);color:var(--bv-dark)}
 }
 @media (prefers-reduced-motion:reduce){.bv-spot::after{animation:none}.bv-sheet{transition:none}}
+
+/* Conteneur dans la page boutique : mêmes largeur et marges que .main */
+.bv-wrap{max-width:1280px;margin:0 auto;padding:24px 5vw 0}
+@media (max-width:600px){.bv-wrap{padding:16px 4vw 0}}
