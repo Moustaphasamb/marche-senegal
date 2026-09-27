@@ -97,7 +97,7 @@ test('ajouter ne depasse jamais le stock et ne modifie pas le tableau recu', () 
   const shop = { id: 'b1', name: 'Awa' };
   const r1 = C.ajouterAuPanier([], produits[1], shop);
   assert.equal(r1.ajoute, true);
-  assert.deepEqual(r1.cart, [{ productId: 'p2', name: 'Oud', price: 12000, quantity: 1, shopId: 'b1', shopName: 'Awa' }]);
+  assert.deepEqual(r1.cart, [{ productId: 'p2', name: 'Oud', price: 12000, quantity: 1, image: null, shopId: 'b1', shopName: 'Awa', marketId: null, marketName: null }]);
   const r2 = C.ajouterAuPanier(r1.cart, produits[1], shop);
   const r3 = C.ajouterAuPanier(r2.cart, produits[1], shop);
   assert.equal(r2.cart[0].quantity, 2);
@@ -109,15 +109,15 @@ test('ajouter ne depasse jamais le stock et ne modifie pas le tableau recu', () 
 
 test('changer la quantite respecte le stock et retire la ligne a zero', () => {
   const cart = [{ productId: 'p2', quantity: 2, shopId: 'b1' }];
-  assert.equal(C.changerQuantite(cart, 'p2', 1, 2)[0].quantity, 2);
-  assert.deepEqual(C.changerQuantite(cart, 'p2', -2, 2), []);
-  assert.equal(C.changerQuantite(cart, 'p2', 1, Infinity)[0].quantity, 3);
+  assert.equal(C.changerQuantite(cart, 0, 1, 2)[0].quantity, 2);
+  assert.deepEqual(C.changerQuantite(cart, 0, -2, 2), []);
+  assert.equal(C.changerQuantite(cart, 0, 1, Infinity)[0].quantity, 3);
 });
 
 test('vider ne retire que la boutique courante', () => {
   const cart = [{ productId: 'a', shopId: 'b1' }, { productId: 'b', shopId: 'b2' }];
   assert.deepEqual(C.viderBoutique(cart, 'b1'), [{ productId: 'b', shopId: 'b2' }]);
-  assert.deepEqual(C.retirer(cart, 'b'), [{ productId: 'a', shopId: 'b1' }]);
+  assert.deepEqual(C.retirer(cart, 1), [{ productId: 'a', shopId: 'b1' }]);
 });
 
 test('conditions : livraison seulement si le vendeur l a fixee', () => {
@@ -159,4 +159,22 @@ test('l ancienne vitrine devient une photo unique quand il n y a pas de photos S
   assert.deepEqual(C.sceneVitrine({ showcaseUrl: null, showcaseHotspots: [] }), []);
   assert.deepEqual(C.sceneVitrine({ showcaseUrl: 'javascript:alert(1)' }), []);
   assert.deepEqual(C.sceneVitrine({}), []);
+});
+
+test('meme produit en deux tailles : chaque ligne se modifie seule', () => {
+  const cart = [
+    { productId: 'p2', size: '38', quantity: 1, shopId: 'b1' },
+    { productId: 'p2', size: '39', quantity: 1, shopId: 'b1' }
+  ];
+  assert.deepEqual(C.changerQuantite(cart, 1, 1, 9).map(l => l.quantity), [1, 2]);
+  assert.deepEqual(C.retirer(cart, 1).map(l => l.size), ['38']);
+  const r = C.ajouterAuPanier(cart, { ...produits[1], stock: 9 }, { id: 'b1', name: 'Awa' });
+  assert.deepEqual(r.cart.map(l => [l.size || null, l.quantity]), [['38', 1], ['39', 1], [null, 1]]);
+});
+
+test('la ligne ajoutee porte image et marche, comme depuis la fiche produit', () => {
+  const r = C.ajouterAuPanier([], produits[0], { id: 'b1', name: 'Awa', market: { id: 'm1', name: 'Sandaga' } });
+  assert.equal(r.cart[0].image, 'https://ex.test/1.jpg');
+  assert.equal(r.cart[0].marketId, 'm1');
+  assert.equal(r.cart[0].marketName, 'Sandaga');
 });

@@ -201,3 +201,18 @@ test('fiche deja fixee a l ecran (telephone sans photo) : pas de defilement', ()
   assert.equal(q('#bv-sheet').classList.contains('bv-open'), true);
   assert.equal(vues.length, 0);
 });
+
+test('deux tailles du meme produit : + et corbeille visent la bonne ligne, taille affichee', () => {
+  const shop = boutique();
+  shop.products[0].stock = 9;
+  const cart = [
+    { productId: 'p1', name: 'Huile', price: 4500, quantity: 1, size: '38', shopId: 'b1' },
+    { productId: 'p1', name: 'Huile', price: 4500, quantity: 1, size: '39', shopId: 'b1' }
+  ];
+  const { q, qa, panier } = monter({ scenes: [], shop, cart });
+  assert.match(qa('#bv-lines .bv-line .bv-t')[1].textContent, /39/);
+  qa('#bv-lines .bv-line')[1].querySelector('button[aria-label="Ajouter un"]').click();
+  assert.deepEqual(panier().map(l => l.quantity), [1, 2]);
+  qa('#bv-lines .bv-line')[0].querySelector('.bv-del').click();
+  assert.deepEqual(panier().map(l => l.size), ['39']);
+});

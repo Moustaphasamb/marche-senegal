@@ -92,17 +92,26 @@
       if (!pb.lignes.length) lignes.appendChild(el('p', 'bv-empty', 'Votre panier est vide.'));
       for (const l of pb.lignes) {
         const p = index.get(l.productId);
+        // La ligne est visée par sa position ; si le panier a changé entre-temps
+        // (autre onglet), on redessine au lieu de modifier une autre ligne.
+        const pos = c.indexOf(l);
+        const agir = f => {
+          const cur = lireCart() || [];
+          if (!cur[pos] || cur[pos].productId !== l.productId) { dessinerPanier(); return; }
+          maj(f(cur));
+        };
         const max = p ? (Number(p.stock) || 0) : Infinity;
         const row = el('div', 'bv-line');
-        const t = el('div', 'bv-t', l.name);
+        const choix = [l.size, l.color].filter(Boolean).join(' · ');
+        const t = el('div', 'bv-t', choix ? l.name + ' (' + choix + ')' : l.name);
         t.appendChild(el('small', null, C.fcfa(l.price)));
         const del = bouton('bv-del', 'Retirer ' + l.name + ' du panier');
         del.appendChild(icone('corbeille'));
-        del.onclick = () => maj(C.retirer(lireCart() || [], l.productId));
+        del.onclick = () => agir(cur => C.retirer(cur, pos));
         const q = el('div', 'bv-qty');
         const moins = bouton(null, 'Retirer un', '−'), plus = bouton(null, 'Ajouter un', '+');
-        moins.onclick = () => maj(C.changerQuantite(lireCart() || [], l.productId, -1, max));
-        plus.onclick = () => maj(C.changerQuantite(lireCart() || [], l.productId, 1, max));
+        moins.onclick = () => agir(cur => C.changerQuantite(cur, pos, -1, max));
+        plus.onclick = () => agir(cur => C.changerQuantite(cur, pos, 1, max));
         plus.disabled = l.quantity >= max;
         q.append(moins, el('span', null, String(l.quantity)), plus);
         row.append(vignette('bv-thumb', p), t, del, q);

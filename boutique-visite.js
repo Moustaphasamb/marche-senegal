@@ -102,22 +102,31 @@
   function ajouterAuPanier(cart, produit, shop) {
     const stock = Number(produit.stock) || 0;
     const copie = (Array.isArray(cart) ? cart : []).map(l => ({ ...l }));
-    const ligne = copie.find(l => l.productId === produit.id);
+    // Une ligne avec taille ou couleur vient de la fiche complète : elle reste à part.
+    const ligne = copie.find(l => l.productId === produit.id && !l.size && !l.color);
     if ((ligne ? ligne.quantity : 0) >= stock) return { cart: copie, ajoute: false };
     if (ligne) {
       ligne.quantity += 1;
       if (!ligne.shopId) Object.assign(ligne, { shopId: shop.id, shopName: shop.name });
-    } else copie.push({ productId: produit.id, name: produit.name, price: produit.price, quantity: 1, shopId: shop.id, shopName: shop.name });
+    } else copie.push({
+      productId: produit.id, name: produit.name, price: produit.price, quantity: 1,
+      image: (Array.isArray(produit.images) ? produit.images : []).find(urlImageSure) || null,
+      shopId: shop.id, shopName: shop.name,
+      marketId: (shop.market && shop.market.id) || shop.marketId || null,
+      marketName: (shop.market && shop.market.name) || null
+    });
     return { cart: copie, ajoute: true };
   }
 
-  function changerQuantite(cart, productId, delta, stockMax) {
+  // Une ligne est désignée par sa position : le même produit peut figurer deux fois
+  // (deux tailles), et le chercher par productId modifiait le premier exemplaire.
+  function changerQuantite(cart, index, delta, stockMax) {
     return cart
-      .map(l => l.productId !== productId ? { ...l } : { ...l, quantity: Math.max(0, Math.min(l.quantity + delta, stockMax)) })
+      .map((l, i) => i !== index ? { ...l } : { ...l, quantity: Math.max(0, Math.min(l.quantity + delta, stockMax)) })
       .filter(l => l.quantity > 0);
   }
 
-  const retirer = (cart, productId) => cart.filter(l => l.productId !== productId);
+  const retirer = (cart, index) => cart.filter((_, i) => i !== index);
   const viderBoutique = (cart, shopId, idsProduits) => cart.filter(l => !estDeLaBoutique(l, shopId, idsProduits));
 
   // Ancienne vitrine (une photo, points en pourcentage) : sert de photo unique tant que la
