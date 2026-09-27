@@ -1383,7 +1383,14 @@ async function payNow() {
       return;
     }
 
-    // Wave réel → redirection vers Wave Checkout
+    // PayTech → page de paiement PayTech (Wave, Orange Money, Free Money)
+    if (initData.payment_url) {
+      showToast('Redirection vers la page de paiement...');
+      setTimeout(() => { window.location.href = initData.payment_url; }, 600);
+      return;
+    }
+
+    // Wave direct → redirection vers Wave Checkout
     if (initData.wave_launch_url) {
       showToast('Redirection vers Wave...');
       setTimeout(() => { window.location.href = initData.wave_launch_url; }, 600);
@@ -1612,6 +1619,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Retour d'erreur Wave
   if (new URLSearchParams(location.search).get('wave_error') === '1') {
     setTimeout(() => showToast('❌ Paiement Wave annulé ou échoué. Réessayez.'), 500);
+  }
+  if (new URLSearchParams(location.search).get('paiement_annule') === '1') {
+    setTimeout(() => showToast('❌ Paiement annulé ou échoué. Réessayez.'), 500);
   }
 });
 </script>
