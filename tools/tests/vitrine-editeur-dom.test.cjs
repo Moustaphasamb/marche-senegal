@@ -27,11 +27,13 @@ function serveur(init = {}) {
   const ok = data => Promise.resolve({ success: true, data: copie(data) });
   const api = {
     ouvrir: () => { appels.push(['ouvrir']); return ok({ scenes: etat.scenes, rayons: [PARFUM, VISAGE], rayonOrder: etat.rayonOrder, vitrine: etat.vitrine && !etat.scenes.length }); },
-    catalogue: () => (init.catalogueEchoue ? Promise.resolve({ success: false, message: 'Erreur de connexion au serveur' }) : ok(init.produits || PRODUITS)),
-    creerVue: v => { appels.push(['creerVue', copie(v)]); const s = vue('n' + (++n), { title: v.title, imageUrl: v.imageUrl }); etat.scenes.push(s); return ok(s); },
+    catalogue: () => (init.catalogueEchoue ? Promise.resolve({ success: false, reseau: true, message: 'Erreur de connexion au serveur' }) : ok(init.produits || PRODUITS)),
+    creerVue: v => { appels.push(['creerVue', copie(v)]); if (init.creerEchoue) { init.creerEchoue -= 1; return Promise.resolve({ success: false, reseau: true, message: 'Erreur de connexion au serveur' }); } const s = vue('n' + (++n), { title: v.title, imageUrl: v.imageUrl }); etat.scenes.push(s); return ok(s); },
     enregistrerVue: v => {
       appels.push(['enregistrerVue', copie(v)]);
-      if (init.refusEnregistrement) return Promise.resolve({ success: false, message: 'Scène introuvable' });
+      const rang = appels.filter(a => a[0] === 'enregistrerVue').length;
+      if ((init.echecsEnregistrement || []).includes(rang)) return Promise.resolve({ success: false, reseau: true, message: 'Erreur de connexion au serveur' });
+      if (init.refusEnregistrement) return Promise.resolve({ success: false, message: init.messageRefus || 'Scène introuvable' });
       if (init.bloquer) return init.bloquer.then(() => { etat.scenes = etat.scenes.map(s => (s.id === v.id ? copie(v) : s)); return ok(v); });
       etat.scenes = etat.scenes.map(s => (s.id === v.id ? copie(v) : s)); return ok(v);
     },
@@ -41,13 +43,14 @@ function serveur(init = {}) {
     reprendreVitrine: () => { appels.push(['reprendreVitrine']); const s = vue('vit', { title: 'Vitrine' }); etat.scenes = [s]; return ok(s); },
     publier: () => {
       appels.push(['publier']);
+      if (init.bloquerPublication) return init.bloquerPublication.then(() => ok({ scenes: etat.scenes, rayonOrder: etat.rayonOrder }));
       if (init.refusPublication) return Promise.resolve({ success: false, message: 'Refus', data: { problemes: [{ code: 'produit_inactif', message: '« Vue a » : un point vise un produit qui n’est plus en vente.' }] } });
       return ok({ scenes: etat.scenes, rayonOrder: etat.rayonOrder });
     },
     abandonner: () => { appels.push(['abandonner']); etat.scenes = []; return ok({ abandonne: true }); },
     envoyerPhoto: f => {
       appels.push(['envoyerPhoto', f.name]);
-      if (init.envoiEchoue) { init.envoiEchoue -= 1; return Promise.resolve({ success: false, message: 'Erreur de connexion au serveur' }); }
+      if (init.envoiEchoue) { init.envoiEchoue -= 1; return Promise.resolve({ success: false, reseau: true, message: 'Erreur de connexion au serveur' }); }
       return Promise.resolve({ success: true, url: 'https://ex.test/' + f.name });
     }
   };
@@ -403,4 +406,86 @@ test('relecture : un problème de l étape 4 mène à la photo concernée', asyn
   await t.attendre();
   assert.equal(t.ctl.etat.etape, 2);
   assert.equal(t.ctl.etat.courante, 1);
+});
+
+
+test('finitions : les raisons du refus du serveur disparaissent après un enregistrement réussi', async () => {
+  const t = await monter({ scenes: [vue('a')], refusPublication: true });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.ok(t.qa('.ve-checks li.ve-ko').length > 0);
+  t.ctl.allerA(1);
+  const titre = t.q('.ve-view input');
+  titre.value = 'Entrée';
+  titre.dispatchEvent(new t.w.Event('change'));
+  await t.attendre(); await t.attendre();
+  t.ctl.allerA(4);
+  assert.equal(t.qa('.ve-checks li.ve-ko').length, 0);
+});
+
+test('finitions : un point hors vente est annoncé en toutes lettres, pas seulement en couleur', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p2', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(2);
+  assert.match(t.q('.ve-point').getAttribute('aria-label'), /hors vente/);
+  t.q('.ve-point').click();
+  await t.attendre();
+  assert.match(t.q('#ve-panel').textContent, /n’est plus en vente/);
+});
+
+test('finitions : un refus du serveur contenant le mot « connexion » est un refus, pas une coupure', async () => {
+  const t = await monter({ scenes: [vue('a')], refusEnregistrement: true, messageRefus: 'Reconnexion requise pour cette boutique' });
+  const titre = t.q('.ve-view input');
+  titre.value = 'Entrée';
+  titre.dispatchEvent(new t.w.Event('change'));
+  for (let i = 0; i < 4; i++) await t.attendre();
+  assert.equal(t.appels.filter(a => a[0] === 'ouvrir').length, 2);
+  assert.equal(t.q('#ve-status button'), null);
+});
+
+test('finitions : réessayer après l échec de création ne renvoie pas la photo', async () => {
+  const t = await monter({ creerEchoue: 1 });
+  await choisirFichier(t, '#ve-file', 'entree.jpg');
+  t.q('#ve-status button').click();
+  for (let i = 0; i < 5; i++) await t.attendre();
+  assert.equal(t.appels.filter(a => a[0] === 'envoyerPhoto').length, 1);
+  assert.equal(t.appels.filter(a => a[0] === 'creerVue').length, 2);
+  assert.equal(t.qa('.ve-view').length, 1);
+});
+
+test('finitions : réessayer une étiquette déplacée termine le déplacement', async () => {
+  const t = await monter({ scenes: [vue('a', { labels: [{ categoryId: 'c-parfum', x: 0.1, y: 0.1 }] }), vue('b')], echecsEnregistrement: [2] });
+  t.ctl.allerA(3);
+  t.qa('.ve-rayon')[0].querySelector('button.ve-btn').click();
+  await t.attendre();
+  t.qa('.ve-tab')[1].click();
+  await t.attendre();
+  await toucherPhoto(t, 40, 60);
+  for (let i = 0; i < 6; i++) await t.attendre();
+  t.q('#ve-status button').click();
+  for (let i = 0; i < 5; i++) await t.attendre();
+  assert.equal(t.ctl.etat.mode, null);
+  assert.deepEqual(t.etat.scenes.map(s => s.labels.length), [0, 1]);
+});
+
+test('finitions : pendant la publication, le statut le dit', async () => {
+  let liberer;
+  const t = await monter({ scenes: [vue('a')], bloquerPublication: new Promise(r => { liberer = r; }) });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  await t.attendre(); await t.attendre();
+  assert.match(t.q('#ve-status').textContent, /Publication en cours/);
+  liberer();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.match(t.q('#ve-status').textContent, /en ligne/);
+});
+
+test('finitions : après une action, le focus revient sur le titre de l étape', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(2);
+  const point = t.q('.ve-point');
+  point.focus();
+  point.click();
+  await t.attendre();
+  assert.equal(t.w.document.activeElement, t.q('#ve-panel h2'));
 });

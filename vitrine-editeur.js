@@ -106,25 +106,32 @@
   }
 
   // Chaque action de l'éditeur et sa route serveur (plan 1).
+  // apiCall ne lève jamais : une coupure réseau (ou une réponse illisible) revient avec
+  // ce message exact. On la marque « reseau » pour que l'écran propose de réessayer,
+  // sans confondre avec un refus du serveur qui contiendrait le mot « connexion ».
+  const RESEAU = 'Erreur de connexion au serveur';
+  const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
+
   function creerApi({ apiCall, envoyerFichier }) {
+    const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
     const scene = id => base + '/scenes/' + encodeURIComponent(id);
     return {
-      ouvrir: () => apiCall(base + '/draft'),
-      catalogue: () => apiCall('/api/shops/products'),
-      creerVue: v => apiCall(base + '/scenes', avec('POST', { title: v.title, imageUrl: v.imageUrl, hotspots: [] })),
-      enregistrerVue: v => apiCall(scene(v.id), avec('PUT', {
+      ouvrir: () => appel(base + '/draft'),
+      catalogue: () => appel('/api/shops/products'),
+      creerVue: v => appel(base + '/scenes', avec('POST', { title: v.title, imageUrl: v.imageUrl, hotspots: [] })),
+      enregistrerVue: v => appel(scene(v.id), avec('PUT', {
         title: v.title, imageUrl: v.imageUrl,
         hotspots: (v.hotspots || []).map(point), labels: (v.labels || []).map(etiquette)
       })),
-      supprimerVue: id => apiCall(scene(id), { method: 'DELETE' }),
-      ordonnerVues: ids => apiCall(base + '/scenes-order', avec('PUT', { ids })),
-      ordonnerRayons: ids => apiCall(base + '/rayons', avec('PUT', { ids })),
-      reprendreVitrine: () => apiCall(base + '/import-vitrine', { method: 'POST' }),
-      publier: () => apiCall(base + '/publish', { method: 'POST' }),
-      abandonner: () => apiCall(base + '/draft', { method: 'DELETE' }),
-      envoyerPhoto: fichier => envoyerFichier(fichier)
+      supprimerVue: id => appel(scene(id), { method: 'DELETE' }),
+      ordonnerVues: ids => appel(base + '/scenes-order', avec('PUT', { ids })),
+      ordonnerRayons: ids => appel(base + '/rayons', avec('PUT', { ids })),
+      reprendreVitrine: () => appel(base + '/import-vitrine', { method: 'POST' }),
+      publier: () => appel(base + '/publish', { method: 'POST' }),
+      abandonner: () => appel(base + '/draft', { method: 'DELETE' }),
+      envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier))
     };
   }
 

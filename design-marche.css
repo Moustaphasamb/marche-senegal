@@ -17,7 +17,7 @@ body.ms-design.espace-vendeur {--bg:#f9f6ed;--white:#fffdf7;--border:#e5dcc7}
 .ms-design :is(button,a,[tabindex]):focus-visible {outline:3px solid var(--gold);outline-offset:4px}
 .ms-design .ms-skip {position:fixed;top:8px;left:12px;z-index:1100;padding:12px 20px;background:#fffdf7;color:#173b2a;border:2px solid #173b2a;border-radius:8px;transform:translateY(-160%)}
 .ms-design .ms-skip:focus {transform:translateY(0)}
-.ms-design:not(.accueil-immersif) :is(.page-title,.ph-title,.form-title,.section-title,.sec-hd-title,.oh-title,.cc-title,.sv-heading h1) {font-family:var(--font-display);font-weight:400;letter-spacing:-.035em;line-height:1.1;text-wrap:balance}
+.ms-design:not(.accueil-immersif) :is(.page-title,.ph-title,.form-title,.section-title,.sec-hd-title,.oh-title,.cc-title) {font-family:var(--font-display);font-weight:400;letter-spacing:-.035em;line-height:1.1;text-wrap:balance}
 .ms-design:not(.accueil-immersif) :is(.page-title,.ph-title) {font-size:clamp(30px,3.1vw,46px)}
 .ms-design:not(.accueil-immersif) :is(.section-title,.sec-hd-title,.cc-title) {font-size:clamp(24px,2.3vw,32px)}
 .ms-design:not(.accueil-immersif) :is(.page-header,.ph) {margin-bottom:28px;gap:16px}
@@ -43,7 +43,7 @@ body.ms-design:not(.accueil-immersif) :is(.prod-card,.rc,.shop-card,.profile-car
 .ms-design:not(.accueil-immersif) :is(.prod-old-price,.prod-old,.rc-old) {display:block;white-space:nowrap;margin:3px 0 0}
 .ms-design:not(.accueil-immersif) :is(.prod-footer,.rc-footer) {gap:8px;flex-wrap:wrap}
 .ms-design:not(.accueil-immersif) :is(.prod-cart-btn,.rc-add,.prod-add) {min-height:40px;min-width:40px;flex-shrink:0}
-.ms-design:not(.accueil-immersif) :is(.btn-primary,.btn-secondary,.btn-outline,.btn-save,.save-btn,.submit-btn,.publish-btn,.add-btn,.checkout-btn,.ph-btn,.sh-btn,.apply-btn,.sb-apply,.wb-btn,.sv-primary,.sv-secondary) {min-height:46px;border-radius:8px;line-height:1.4}
+.ms-design:not(.accueil-immersif) :is(.btn-primary,.btn-secondary,.btn-outline,.btn-save,.save-btn,.submit-btn,.publish-btn,.add-btn,.checkout-btn,.ph-btn,.sh-btn,.apply-btn,.sb-apply,.wb-btn) {min-height:46px;border-radius:8px;line-height:1.4}
 .ms-design:not(.accueil-immersif) :is(.form-input,.form-select,.fi,.fi-input,.fi-select,.input-field,.field-input) {min-height:48px;border-radius:8px;background:var(--white);font-size:15px;border-width:1px}
 .ms-design:not(.accueil-immersif) textarea {line-height:1.65}
 .ms-design:not(.accueil-immersif) :is(.tabs,.filter-tabs,.orders-tabs) {border-color:var(--border)}
@@ -118,8 +118,6 @@ body.ms-design.page-connexion-admin {background:radial-gradient(ellipse at top l
 .ms-design:is(.espace-vendeur,.page-admin) :is(.table-wrap,.table-scroll) {overflow-x:auto;max-width:100%;overscroll-behavior-inline:contain}
 .ms-design.page-admin .card-title {font-family:var(--font-display);font-size:24px;font-weight:400}
 .ms-design.page-admin .sb-logo-text {color:#fffdf7}
-.ms-design.page-shopvision .sv-canvas-card {border-radius:16px;border-color:var(--border);box-shadow:var(--shadow)}
-.ms-design.page-shopvision .sv-heading h1 {font-size:clamp(34px,3.8vw,54px)}
 .ms-design .ms-menu-lines {display:block;width:18px;height:2px;background:currentColor;box-shadow:0 -5px currentColor,0 5px currentColor;border-radius:2px}
 .ms-design.page-modifier-produit .st-logo {color:#f4c542;font-family:var(--font-ui);font-size:17px;font-weight:700}
 .ms-design.page-modifier-produit .page>div {min-width:0}
@@ -216,8 +214,6 @@ body.ms-design.page-chat {height:100dvh;background:#eeefe5}
   .ms-design.page-panier .main {grid-template-columns:minmax(0,1fr)}
   .ms-design.page-panier :is(.cart-section,.summary-card) {min-width:0}
   .ms-design.page-panier .sec-title {font-size:26px}
-  .ms-design.page-shopvision .sv-canvas-toolbar {flex-wrap:wrap;padding:12px;gap:12px}
-  .ms-design.page-shopvision .sv-zoom {margin-left:auto}
 }
 /* Navigation mobile flottante : plus lisible, plus tactile, moins générique. */
 @media(max-width:900px) {

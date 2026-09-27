@@ -656,10 +656,11 @@ async function chargerPromotionsBoutique(shopId) {
 // seulement si le brouillon est bien celui de cette boutique.
 async function brouillonAApercevoir(shop) {
   if (new URLSearchParams(location.search).get('apercu') !== 'brouillon') return null;
-  if (!isLoggedIn() || getCurrentUser()?.role !== 'SELLER') return null;
+  if (!isLoggedIn() || String(getCurrentUser()?.role || '').toUpperCase() !== 'SELLER') return null;
   try {
-    const d = await apiCall('/api/shops/me/shopvision/draft');
-    if (!d.success || !d.data || d.data.shopId !== shop.id) return null;
+    // lecture=1 : lire le brouillon ouvert, ne jamais en ouvrir un en regardant l'aperçu.
+    const d = await apiCall('/api/shops/me/shopvision/draft?lecture=1');
+    if (!d.success || !d.data || d.data.shopId !== shop.id || !d.data.ouvert) return null;
     const scenes = Array.isArray(d.data.scenes) ? d.data.scenes : [];
     if (scenes.some(s => s.shopId !== shop.id)) return null;
     return { scenes, rayonOrder: Array.isArray(d.data.rayonOrder) ? d.data.rayonOrder : [] };

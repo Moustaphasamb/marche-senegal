@@ -255,7 +255,7 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
       <!-- Ma vitrine : une photo de la boutique, des points vers les produits -->
       <div class="card">
         <h2>Ma vitrine</h2>
-        <a href="marche-senegal-shopvision.html" class="upload-btn" style="display:inline-flex;align-items:center;gap:8px;margin:10px 0"><i class="ic" data-ic="camera"></i> Ouvrir le studio ShopVision <i class="ic" data-ic="arrow-up-right"></i></a>
+        <a href="marche-senegal-shopvision.html" class="upload-btn" style="display:inline-flex;align-items:center;gap:8px;margin:10px 0"><i class="ic" data-ic="camera"></i> Ouvrir Ma vitrine <i class="ic" data-ic="arrow-up-right"></i></a>
         <p class="field-hint" style="margin-bottom:12px">
           Prenez votre boutique en mode panoramique, puis reliez vos produits à la photo.
           Vos clients pourront cliquer dessus.
@@ -1109,10 +1109,10 @@ async function enregistrerVitrine() {
 async function initVitrine(shop) {
   const indispo = document.getElementById('vitrineIndispo');
   const zone = document.getElementById('vitrineZone');
-  const texte = document.createTextNode('Pour ajouter ou modifier une photo et ses produits cliquables, utilisez le studio ShopVision. ');
+  const texte = document.createTextNode('Pour ajouter ou modifier vos photos et leurs produits cliquables, utilisez « Ma vitrine ». ');
   const lien = document.createElement('a');
   lien.href = 'marche-senegal-shopvision.html';
-  lien.textContent = 'Ouvrir le studio';
+  lien.textContent = 'Ouvrir Ma vitrine';
   lien.style.cssText = 'color:var(--green);font-weight:600';
   indispo.replaceChildren(texte, lien);
   indispo.style.cssText = 'display:block;color:var(--muted);font-size:.85rem';

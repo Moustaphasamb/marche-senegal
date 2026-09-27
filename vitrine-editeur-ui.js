@@ -65,23 +65,25 @@
     // Une action : appel au serveur, puis mise à jour de l'écran. Sans réseau, on garde
     // l'écran et on propose de réessayer ; en cas de refus, le serveur fait foi et on
     // recharge le brouillon.
-    async function agir(appel, succes) {
+    async function agir(appel, succes, textes = {}) {
       if (e.occupe) { statut('Patientez : un enregistrement est en cours.'); return null; }
       e.occupe = true;
-      statut('Enregistrement…');
+      statut(textes.enCours || 'Enregistrement…');
       rendre();
       let r;
-      try { r = await appel(); } catch { r = { success: false, message: 'Erreur de connexion au serveur' }; }
+      try { r = await appel(); } catch { r = { success: false, reseau: true, message: 'Erreur de connexion au serveur' }; }
       e.occupe = false;
       if (r && r.success) {
+        // Une correction enregistrée rend caduques les raisons d'un refus précédent.
+        e.problemes = [];
         succes(r);
-        statut('Enregistré · pas encore publié');
+        statut(textes.fait || 'Enregistré · pas encore publié');
         rendre();
         return r;
       }
       const message = (r && r.message) || 'Non enregistré';
-      if (/connexion/i.test(message)) {
-        statut('Non enregistré · ' + message, true, () => agir(appel, succes));
+      if (r && r.reseau) {
+        statut('Non enregistré · ' + message, true, () => agir(appel, succes, textes));
         rendre();
         return r;
       }
@@ -106,9 +108,17 @@
         b.disabled = e.occupe || (n > 1 && !e.vues.length);
       });
       const panneau = $('ve-panel');
+      // Le panneau est reconstruit : si le focus y était, il revient sur le titre de l'étape
+      // au lieu de se perdre (lecteur d'écran, clavier).
+      const focusDedans = panneau.contains(doc.activeElement);
       panneau.replaceChildren();
       panneau.setAttribute('aria-busy', String(e.occupe));
       ({ 1: etapePhotos, 2: etapeProduits, 3: etapeRayons, 4: etapePublier })[e.etape](panneau);
+      const titre = panneau.querySelector('h2');
+      if (titre) {
+        titre.tabIndex = -1;
+        if (focusDedans) titre.focus({ preventScroll: true });
+      }
     }
 
     function navigation(p, precedent, suivant, actif = true) {
@@ -185,10 +195,16 @@
     async function ajouterPhoto(fichier) {
       const refus = C.verifierFichier(fichier);
       if (refus) { statut(refus, true); return; }
+      // L'adresse de la photo envoyée est gardée : « Réessayer » après une coupure ne la
+      // renvoie pas une seconde fois.
+      let url = null;
       await agir(async () => {
-        const envoi = await api.envoyerPhoto(fichier);
-        if (!envoi || !envoi.success) return envoi;
-        return api.creerVue({ title: 'Photo ' + (e.vues.length + 1), imageUrl: envoi.url });
+        if (!url) {
+          const envoi = await api.envoyerPhoto(fichier);
+          if (!envoi || !envoi.success) return envoi;
+          url = envoi.url;
+        }
+        return api.creerVue({ title: 'Photo ' + (e.vues.length + 1), imageUrl: url });
       }, r => { e.vues = [...e.vues, r.data]; });
     }
     for (const id of ['ve-file', 've-camera']) {
@@ -267,7 +283,8 @@
       });
       (vue.hotspots || []).forEach((pt, i) => {
         const pr = produit(pt.productId);
-        const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name : 'produit retiré'));
+        const horsVente = e.catalogueOk && pr && pr.status !== 'ACTIVE';
+        const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name + (horsVente ? ' (hors vente)' : '') : 'produit retiré'));
         if (e.catalogueOk && (!pr || pr.status !== 'ACTIVE')) b.classList.add('ve-warn');
         placer(b, pt);
         b.onclick = () => { e.choix = null; e.mode = { type: 'point', index: i }; rendre(); };
@@ -337,6 +354,7 @@
       if (!pt) return carte;
       const pr = produit(pt.productId);
       carte.appendChild(el('p', null, 'Point ' + (i + 1) + ' : ' + (pr ? pr.name : 'produit retiré de votre catalogue')));
+      if (e.catalogueOk && pr && pr.status !== 'ACTIVE') carte.appendChild(el('p', 've-help ve-strong', 'Ce produit n’est plus en vente : retirez ce point ou remettez le produit en vente.'));
       if (e.mode.type === 'deplacer') carte.appendChild(el('p', 've-help ve-strong', 'Touchez la photo à la nouvelle place.'));
       const deplacerB = bouton('ve-btn', 'Déplacer');
       deplacerB.onclick = () => { e.mode = { type: 'deplacer', index: i }; rendre(); };
@@ -424,6 +442,8 @@
         const r = await agir(() => enregistrerVue(vue), res => {
           const i = e.vues.findIndex(v => v.id === id);
           if (i !== -1) e.vues[i] = res.data;
+          // Dernière photo enregistrée (y compris via « Réessayer ») : le déplacement est fini.
+          if (id === modifiees[modifiees.length - 1]) e.mode = null;
         });
         if (!r || !r.success) return;
       }
@@ -463,7 +483,7 @@
       publier.onclick = async () => {
         if (!await confirmer('Publier ? Vos photos, points, étiquettes et l’ordre des rayons remplaceront la version en ligne.')) return;
         e.problemes = [];
-        const r = await agir(() => api.publier(), () => {});
+        const r = await agir(() => api.publier(), () => {}, { enCours: 'Publication en cours…', fait: 'Publication réussie' });
         if (r && r.success) await charger('Votre vitrine est en ligne. Vous pouvez continuer à la modifier : rien ne change pour vos clients avant la prochaine publication.');
       };
       const abandon = bouton('ve-link ve-danger', 'Abandonner mes changements');

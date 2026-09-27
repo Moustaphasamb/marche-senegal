@@ -45,19 +45,10 @@ body.espace-vendeur .welcome-bar {
   background: linear-gradient(135deg,#30280f,#66501b);
 }
 body.espace-vendeur .welcome-bar :is(.wb-greeting,.wb-market) { color: #e7dabc; }
-body.espace-vendeur.sv-page {
-  --sv-accent: #785507;
-  --sv-ink: #352f20;
-  --sv-muted: #74684d;
-  --sv-line: #e6dcc1;
-  --sv-paper: #fffdf7;
-}
-body.espace-vendeur .sv-topbar { background: #fff6d9; }
-body.espace-vendeur .sv-heading h1 { color: #352f20; }
 body.espace-vendeur :is(.sb-avatar,.tb-profile-av) {
   background: var(--seller-accent); color: var(--seller-accent-ink);
 }
-body.espace-vendeur :is(.wb-btn-primary,.sv-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
+body.espace-vendeur :is(.wb-btn-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
   .sh-btn-primary,.save-btn,.publish-btn,.add-btn,.btn-save,.st-btn-green,
   .submit-btn,.tb-search-btn,.send-btn) {
   background: var(--seller-accent);
@@ -65,7 +56,7 @@ body.espace-vendeur :is(.wb-btn-primary,.sv-primary,.btn-primary,.btn-add,.btn-c
   color: var(--seller-accent-ink);
   box-shadow: 0 4px 12px rgba(122,90,10,.12);
 }
-body.espace-vendeur :is(.wb-btn-primary,.sv-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
+body.espace-vendeur :is(.wb-btn-primary,.btn-primary,.btn-add,.btn-create,.ph-btn-primary,
   .sh-btn-primary,.save-btn,.publish-btn,.add-btn,.btn-save,.st-btn-green,
   .submit-btn,.tb-search-btn,.send-btn):hover:not(:disabled) {
   background: #e9b82d; border-color: #e9b82d; color: #302407;

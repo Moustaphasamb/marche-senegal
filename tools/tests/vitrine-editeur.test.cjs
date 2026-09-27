@@ -113,3 +113,12 @@ test('chaque action appelle sa route serveur', async () => {
   ]);
   assert.deepEqual(await api.envoyerPhoto({ name: 'x.jpg' }), { success: true, url: 'https://ex.test/x.jpg' });
 });
+
+
+test('finitions : seule une vraie coupure réseau est marquée comme telle', async () => {
+  const reponses = [{ success: false, message: 'Erreur de connexion au serveur' }, { success: false, message: 'Reconnexion requise' }];
+  const api = E.creerApi({ apiCall: async () => reponses.shift(), envoyerFichier: async () => ({ success: false, message: 'Erreur de connexion au serveur' }) });
+  assert.equal((await api.ouvrir()).reseau, true);
+  assert.equal((await api.ouvrir()).reseau, undefined);
+  assert.equal((await api.envoyerPhoto({})).reseau, true);
+});

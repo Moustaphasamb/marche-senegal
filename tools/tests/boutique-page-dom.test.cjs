@@ -25,11 +25,11 @@ async function charger({ scenes = [], extra = {}, brouillon = null, adresse = '?
   w.getShopPromotions = async () => ({ success: true, data: [] });
   w.getShopReviews = async () => ({ success: true, data: [] });
   w.isLoggedIn = () => vendeur;
-  w.getCurrentUser = () => (vendeur ? { id: 'u1', role: 'SELLER' } : null);
+  w.getCurrentUser = () => (vendeur ? { id: 'u1', role: vendeur === 'minuscules' ? 'seller' : 'SELLER' } : null);
   const demandes = [];
   w.apiCall = async url => {
     demandes.push(url);
-    if (url === '/api/shops/me/shopvision/draft') return brouillon ? { success: true, data: brouillon } : { success: false };
+    if (url.startsWith('/api/shops/me/shopvision/draft')) return brouillon ? { success: true, data: brouillon } : { success: false };
     return url.endsWith('/shopvision/scenes') ? { success: true, data: scenes } : { success: true, data: [] };
   };
   w.applyBanner = () => {};
@@ -95,7 +95,7 @@ test('aperçu du brouillon : le vendeur de la boutique voit ses vues non publié
   const { q, demandes } = await charger({
     adresse: '?id=b1&apercu=brouillon', vendeur: true,
     scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
-    brouillon: { shopId: 'b1', scenes: [vueBrouillon], rayonOrder: [] }
+    brouillon: { shopId: 'b1', ouvert: true, scenes: [vueBrouillon], rayonOrder: [] }
   });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/brouillon.jpg');
   assert.ok(!demandes.some(u => u.endsWith('/b1/shopvision/scenes')));
@@ -115,7 +115,7 @@ test('aperçu demandé sans être vendeur : aucun appel au brouillon', async () 
     adresse: '?id=b1&apercu=brouillon', vendeur: false,
     scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }]
   });
-  assert.ok(!demandes.includes('/api/shops/me/shopvision/draft'));
+  assert.ok(!demandes.some(u => u.startsWith('/api/shops/me/shopvision/draft')));
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
 });
 
@@ -127,4 +127,23 @@ test('relecture : aperçu d un brouillon vide appartenant à une autre boutique,
     brouillon: { shopId: 'autre', scenes: [], rayonOrder: ['c-x'] }
   });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
+});
+
+
+test('finitions : l aperçu lit le brouillon sans l ouvrir, et montre la version publiée s il n y en a pas', async () => {
+  const { q, demandes } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: true,
+    scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
+    brouillon: { shopId: 'b1', ouvert: false }
+  });
+  assert.ok(demandes.includes('/api/shops/me/shopvision/draft?lecture=1'));
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
+});
+
+test('finitions : un rôle vendeur écrit en minuscules ouvre aussi l aperçu', async () => {
+  const { q } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: 'minuscules',
+    brouillon: { shopId: 'b1', ouvert: true, scenes: [vueBrouillon], rayonOrder: [] }
+  });
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/brouillon.jpg');
 });
