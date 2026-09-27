@@ -410,7 +410,39 @@
       e.mode = null;
       rendre();
     }
-    function etapePublier(p) { p.appendChild(el('h2', null, '4. Vérifier et publier')); navigation(p, { n: 3, texte: 'Rayons' }, null); }
+    // ── Étape 4 : vérifier et publier ──
+    function etapePublier(p) {
+      p.appendChild(el('h2', null, '4. Vérifier et publier'));
+      p.appendChild(el('p', 've-help', 'Tant que vous n’avez pas publié, vos clients voient l’ancienne version de votre vitrine.'));
+      const bilan = C.controles({ boutiqueActive: o.boutique && o.boutique.status === 'ACTIVE', vues: e.vues, produits: e.produits });
+      const liste = el('ul', 've-checks');
+      for (const l of bilan.lignes) liste.appendChild(el('li', l.ok ? 've-ok' : 've-ko', (l.ok ? '✓ ' : '✗ ') + l.texte));
+      for (const pb of e.problemes) liste.appendChild(el('li', 've-ko', '✗ ' + pb.message));
+      p.appendChild(liste);
+      const actions = el('div', 've-add');
+      const apercu = el('a', 've-btn', 'Voir l’aperçu comme un client ↗');
+      apercu.href = o.lienApercu;
+      apercu.target = '_blank';
+      apercu.rel = 'noopener';
+      const publier = bouton('ve-btn ve-primary', 'Publier ma boutique');
+      publier.disabled = !bilan.pret || e.occupe;
+      publier.onclick = async () => {
+        if (!await confirmer('Publier ? Vos photos, points, étiquettes et l’ordre des rayons remplaceront la version en ligne.')) return;
+        e.problemes = [];
+        const r = await agir(() => api.publier(), () => {});
+        if (r && r.success) await charger('Votre vitrine est en ligne. Vous pouvez continuer à la modifier : rien ne change pour vos clients avant la prochaine publication.');
+      };
+      const abandon = bouton('ve-link ve-danger', 'Abandonner mes changements');
+      abandon.disabled = e.occupe;
+      abandon.onclick = async () => {
+        if (!await confirmer('Abandonner toutes les modifications non publiées ? La version en ligne est conservée.')) return;
+        const r = await agir(() => api.abandonner(), () => {});
+        if (r && r.success) { e.etape = 1; e.problemes = []; await charger('Modifications abandonnées : vous repartez de la version en ligne.'); }
+      };
+      actions.append(apercu, publier, abandon);
+      p.appendChild(actions);
+      navigation(p, { n: 3, texte: 'Rayons' }, null);
+    }
 
     return { charger, etat: e, allerA };
   }

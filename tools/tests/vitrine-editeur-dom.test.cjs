@@ -279,3 +279,66 @@ test('étape 3 : retirer une étiquette', async () => {
   await t.attendre(); await t.attendre();
   assert.deepEqual(t.appels.at(-1)[1].labels, []);
 });
+test('étape 4 : liste de contrôle, aperçu et publication', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(4);
+  assert.ok(t.qa('.ve-checks li').every(li => li.classList.contains('ve-ok')));
+  const apercu = t.qa('#ve-panel a').find(a => /aperçu/i.test(a.textContent));
+  assert.equal(apercu.getAttribute('href'), 'marche-senegal-boutique.html?id=b1&apercu=brouillon');
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.equal(t.confirmations.length, 1);
+  assert.ok(t.appels.some(a => a[0] === 'publier'));
+  assert.match(t.q('#ve-status').textContent, /en ligne/);
+});
+
+test('étape 4 : un point sur un produit hors vente bloque la publication', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p2', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(4);
+  assert.ok(t.qa('.ve-checks li.ve-ko').some(li => /plus en vente/.test(li.textContent)));
+  assert.equal(t.bouton('Publier ma boutique').disabled, true);
+});
+
+test('étape 4 : une boutique pas encore validée ne publie pas', async () => {
+  const t = await monter({ scenes: [vue('a')], statut: 'PENDING' });
+  t.ctl.allerA(4);
+  assert.equal(t.bouton('Publier ma boutique').disabled, true);
+});
+
+test('étape 4 : un refus du serveur affiche ses raisons', async () => {
+  const t = await monter({ scenes: [vue('a')], refusPublication: true });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.ok(t.qa('.ve-checks li.ve-ko').some(li => /plus en vente/.test(li.textContent)));
+  assert.ok(t.q('#ve-status').classList.contains('ve-error'));
+});
+
+test('étape 4 : abandonner ramène à la version en ligne, après confirmation', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(4);
+  t.bouton('Abandonner mes changements').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.ok(t.appels.some(a => a[0] === 'abandonner'));
+  assert.equal(t.ctl.etat.etape, 1);
+  assert.match(t.q('#ve-status').textContent, /abandonnées/);
+});
+
+test('étape 4 : sans confirmation, rien n est publié', async () => {
+  const t = await monter({ scenes: [vue('a')], refuserConfirmation: true });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 4; i++) await t.attendre();
+  assert.ok(!t.appels.some(a => a[0] === 'publier'));
+});
+
+test('un refus du serveur recharge le brouillon (le serveur fait foi)', async () => {
+  const t = await monter({ scenes: [vue('a')], refusEnregistrement: true });
+  const titre = t.q('.ve-view input');
+  titre.value = 'Nouveau nom';
+  titre.dispatchEvent(new t.w.Event('change'));
+  for (let i = 0; i < 4; i++) await t.attendre();
+  assert.equal(t.appels.filter(a => a[0] === 'ouvrir').length, 2);
+  assert.equal(t.q('.ve-view input').value, 'Vue a');
+  assert.match(t.q('#ve-status').textContent, /Scène introuvable/);
+});
