@@ -659,7 +659,7 @@ async function brouillonAApercevoir(shop) {
   if (!isLoggedIn() || getCurrentUser()?.role !== 'SELLER') return null;
   try {
     const d = await apiCall('/api/shops/me/shopvision/draft');
-    if (!d.success || !d.data) return null;
+    if (!d.success || !d.data || d.data.shopId !== shop.id) return null;
     const scenes = Array.isArray(d.data.scenes) ? d.data.scenes : [];
     if (scenes.some(s => s.shopId !== shop.id)) return null;
     return { scenes, rayonOrder: Array.isArray(d.data.rayonOrder) ? d.data.rayonOrder : [] };

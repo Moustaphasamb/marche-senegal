@@ -97,9 +97,9 @@
     ];
     for (const v of vues) {
       const horsVente = (v.hotspots || []).filter(p => !idsEnVente.has(p.productId)).length;
-      if (horsVente) lignes.push({ ok: false, sceneId: v.id, texte: `« ${v.title} » : ${horsVente} point${s(horsVente)} vise${horsVente > 1 ? 'nt' : ''} un produit qui n’est plus en vente.` });
+      if (horsVente) lignes.push({ ok: false, sceneId: v.id, etape: 2, texte: `« ${v.title} » : ${horsVente} point${s(horsVente)} vise${horsVente > 1 ? 'nt' : ''} un produit qui n’est plus en vente.` });
       for (const l of v.labels || []) {
-        if (!rayonsEnVente.has(l.categoryId)) lignes.push({ ok: false, sceneId: v.id, texte: `« ${v.title} » : une étiquette vise un rayon sans produit en vente.` });
+        if (!rayonsEnVente.has(l.categoryId)) lignes.push({ ok: false, sceneId: v.id, etape: 3, texte: `« ${v.title} » : une étiquette vise un rayon sans produit en vente.` });
       }
     }
     return { pret: lignes.every(l => l.ok), lignes };

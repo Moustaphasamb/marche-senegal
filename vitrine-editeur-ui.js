@@ -24,7 +24,12 @@
 
     // choix : position touchée en attente d'un produit (étape 2).
     // mode : { type: 'point' | 'deplacer', index } (étape 2) ou { type: 'etiquette', categoryId } (étape 3).
-    const e = { etape: 1, vues: [], rayons: [], ordre: [], vitrine: false, produits: [], courante: 0, choix: null, mode: null, occupe: false, problemes: [] };
+    const e = { etape: 1, vues: [], rayons: [], ordre: [], vitrine: false, produits: [], catalogueOk: false, courante: 0, choix: null, mode: null, occupe: false, problemes: [] };
+
+    // Une étiquette dont le rayon n'a plus de produit ferait refuser tout l'enregistrement
+    // de la photo par le serveur : elle n'est pas envoyée (l'étape 3 la montre à retirer).
+    const nettoyer = vue => ({ ...vue, labels: (vue.labels || []).filter(l => e.rayons.some(r => r.id === l.categoryId)) });
+    const enregistrerVue = vue => api.enregistrerVue(nettoyer(vue));
 
     function statut(texte, erreur, reessayer) {
       const s = $('ve-status');
@@ -47,10 +52,12 @@
       e.rayons = d.data.rayons || [];
       e.ordre = d.data.rayonOrder || [];
       e.vitrine = !!d.data.vitrine;
-      if (c && c.success) e.produits = c.data || [];
+      e.catalogueOk = !!(c && c.success);
+      if (e.catalogueOk) e.produits = c.data || [];
       e.courante = Math.min(e.courante, Math.max(0, e.vues.length - 1));
       if (!e.vues.length) e.etape = 1;
       statut(message || 'Brouillon enregistré sur le serveur · pas encore publié');
+      if (!e.catalogueOk) statut('Votre catalogue n’a pas pu être chargé : ' + ((c && c.message) || 'réessayez.'), true, () => charger(message));
       rendre();
       return true;
     }
@@ -59,7 +66,7 @@
     // l'écran et on propose de réessayer ; en cas de refus, le serveur fait foi et on
     // recharge le brouillon.
     async function agir(appel, succes) {
-      if (e.occupe) return null;
+      if (e.occupe) { statut('Patientez : un enregistrement est en cours.'); return null; }
       e.occupe = true;
       statut('Enregistrement…');
       rendre();
@@ -134,11 +141,12 @@
         const titre = el('input', 've-title');
         titre.value = v.title;
         titre.maxLength = 120;
+        titre.disabled = e.occupe;
         titre.setAttribute('aria-label', 'Nom de la photo ' + (i + 1));
         titre.onchange = () => {
           const t = titre.value.trim();
           if (!t) { titre.value = v.title; statut('Donnez un nom à cette photo.', true); return; }
-          agir(() => api.enregistrerVue({ ...v, title: t }), r => { e.vues[i] = r.data; });
+          agir(() => enregistrerVue({ ...v, title: t }), r => { e.vues[i] = r.data; });
         };
         const ordonner = sens => {
           const nouvelles = C.deplacer(e.vues, i, sens);
@@ -232,7 +240,7 @@
     const produit = id => e.produits.find(x => x.id === id);
 
     function enregistrer(vue) {
-      return agir(() => api.enregistrerVue(vue), r => {
+      return agir(() => enregistrerVue(vue), r => {
         const i = e.vues.findIndex(x => x.id === vue.id);
         if (i !== -1) e.vues[i] = r.data;
         e.choix = null;
@@ -260,7 +268,7 @@
       (vue.hotspots || []).forEach((pt, i) => {
         const pr = produit(pt.productId);
         const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name : 'produit retiré'));
-        if (!pr || pr.status !== 'ACTIVE') b.classList.add('ve-warn');
+        if (e.catalogueOk && (!pr || pr.status !== 'ACTIVE')) b.classList.add('ve-warn');
         placer(b, pt);
         b.onclick = () => { e.choix = null; e.mode = { type: 'point', index: i }; rendre(); };
         cadre.appendChild(b);
@@ -284,7 +292,7 @@
       const actualiser = bouton('ve-link', 'Actualiser mon catalogue');
       actualiser.onclick = async () => {
         const c = await api.catalogue();
-        if (c && c.success) { e.produits = c.data || []; statut('Catalogue actualisé'); rendre(); }
+        if (c && c.success) { e.produits = c.data || []; e.catalogueOk = true; statut('Catalogue actualisé'); rendre(); }
         else statut((c && c.message) || 'Catalogue indisponible', true);
       };
       liens.append(creer, actualiser);
@@ -374,6 +382,18 @@
         li.appendChild(el('small', null, vueLieu ? 'Étiquette sur « ' + vueLieu.title + ' »' : 'Sans étiquette'));
         liste.appendChild(li);
       });
+      // Étiquettes dont le rayon n'a plus de produit : montrées ici pour pouvoir les retirer.
+      const connus = new Set(e.rayons.map(r => r.id));
+      for (const v of e.vues) {
+        for (const l of (v.labels || []).filter(x => !connus.has(x.categoryId))) {
+          const li = el('li', 've-rayon');
+          li.appendChild(el('span', 've-rname', 'Rayon supprimé'));
+          const retirer = bouton('ve-link', 'Retirer');
+          retirer.onclick = () => enregistrerEtiquettes(C.retirerEtiquette(e.vues, l.categoryId));
+          li.append(retirer, el('small', null, 'Étiquette sur « ' + v.title + ' » : ce rayon n’a plus de produit.'));
+          liste.appendChild(li);
+        }
+      }
       p.appendChild(liste);
       if (e.mode && e.mode.type === 'etiquette') {
         const r = e.rayons.find(x => x.id === e.mode.categoryId);
@@ -401,7 +421,7 @@
     async function enregistrerEtiquettes({ vues, modifiees }) {
       for (const id of modifiees) {
         const vue = vues.find(v => v.id === id);
-        const r = await agir(() => api.enregistrerVue(vue), res => {
+        const r = await agir(() => enregistrerVue(vue), res => {
           const i = e.vues.findIndex(v => v.id === id);
           if (i !== -1) e.vues[i] = res.data;
         });
@@ -414,10 +434,24 @@
     function etapePublier(p) {
       p.appendChild(el('h2', null, '4. Vérifier et publier'));
       p.appendChild(el('p', 've-help', 'Tant que vous n’avez pas publié, vos clients voient l’ancienne version de votre vitrine.'));
-      const bilan = C.controles({ boutiqueActive: o.boutique && o.boutique.status === 'ACTIVE', vues: e.vues, produits: e.produits });
+      // Sans catalogue, les contrôles des produits seraient faux : la publication attend.
+      const bilan = e.catalogueOk
+        ? C.controles({ boutiqueActive: o.boutique && o.boutique.status === 'ACTIVE', vues: e.vues, produits: e.produits })
+        : { pret: false, lignes: [{ ok: false, texte: 'Votre catalogue n’a pas pu être chargé : réessayez avant de publier.' }] };
       const liste = el('ul', 've-checks');
-      for (const l of bilan.lignes) liste.appendChild(el('li', l.ok ? 've-ok' : 've-ko', (l.ok ? '✓ ' : '✗ ') + l.texte));
-      for (const pb of e.problemes) liste.appendChild(el('li', 've-ko', '✗ ' + pb.message));
+      // Chaque problème lié à une photo mène à l'étape où le corriger.
+      const ligne = (ok, texte, sceneId, etape) => {
+        const li = el('li', ok ? 've-ok' : 've-ko', (ok ? '✓ ' : '✗ ') + texte);
+        const i = sceneId ? e.vues.findIndex(v => v.id === sceneId) : -1;
+        if (i !== -1) {
+          const b = bouton('ve-link', 'Corriger');
+          b.onclick = () => { allerA(etape); e.courante = i; rendre(); };
+          li.appendChild(b);
+        }
+        liste.appendChild(li);
+      };
+      for (const l of bilan.lignes) ligne(l.ok, l.texte, l.sceneId, l.etape || 2);
+      for (const pb of e.problemes) ligne(false, pb.message, pb.sceneId, /^rayon/.test(pb.code || '') ? 3 : 2);
       p.appendChild(liste);
       const actions = el('div', 've-add');
       const apercu = el('a', 've-btn', 'Voir l’aperçu comme un client ↗');

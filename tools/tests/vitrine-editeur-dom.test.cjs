@@ -27,11 +27,12 @@ function serveur(init = {}) {
   const ok = data => Promise.resolve({ success: true, data: copie(data) });
   const api = {
     ouvrir: () => { appels.push(['ouvrir']); return ok({ scenes: etat.scenes, rayons: [PARFUM, VISAGE], rayonOrder: etat.rayonOrder, vitrine: etat.vitrine && !etat.scenes.length }); },
-    catalogue: () => ok(init.produits || PRODUITS),
+    catalogue: () => (init.catalogueEchoue ? Promise.resolve({ success: false, message: 'Erreur de connexion au serveur' }) : ok(init.produits || PRODUITS)),
     creerVue: v => { appels.push(['creerVue', copie(v)]); const s = vue('n' + (++n), { title: v.title, imageUrl: v.imageUrl }); etat.scenes.push(s); return ok(s); },
     enregistrerVue: v => {
       appels.push(['enregistrerVue', copie(v)]);
       if (init.refusEnregistrement) return Promise.resolve({ success: false, message: 'Scène introuvable' });
+      if (init.bloquer) return init.bloquer.then(() => { etat.scenes = etat.scenes.map(s => (s.id === v.id ? copie(v) : s)); return ok(v); });
       etat.scenes = etat.scenes.map(s => (s.id === v.id ? copie(v) : s)); return ok(v);
     },
     supprimerVue: id => { appels.push(['supprimerVue', id]); etat.scenes = etat.scenes.filter(s => s.id !== id); return ok({ id }); },
@@ -341,4 +342,65 @@ test('un refus du serveur recharge le brouillon (le serveur fait foi)', async ()
   assert.equal(t.appels.filter(a => a[0] === 'ouvrir').length, 2);
   assert.equal(t.q('.ve-view input').value, 'Vue a');
   assert.match(t.q('#ve-status').textContent, /Scène introuvable/);
+});
+
+
+test('relecture : une étiquette dont le rayon a disparu n empêche pas d enregistrer la photo', async () => {
+  const t = await monter({ scenes: [vue('a', { labels: [{ categoryId: 'c-disparu', x: 0.1, y: 0.1 }, { categoryId: 'c-parfum', x: 0.2, y: 0.2 }] })] });
+  const titre = t.q('.ve-view input');
+  titre.value = 'Entrée';
+  titre.dispatchEvent(new t.w.Event('change'));
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].labels.map(l => l.categoryId), ['c-parfum']);
+});
+
+test('relecture : étape 3, une étiquette de rayon supprimé est listée et peut être retirée', async () => {
+  const t = await monter({ scenes: [vue('a', { labels: [{ categoryId: 'c-disparu', x: 0.1, y: 0.1 }] })] });
+  t.ctl.allerA(3);
+  const ligne = t.qa('.ve-rayon').find(li => /Rayon supprimé/.test(li.textContent));
+  assert.ok(ligne, 'étiquette orpheline listée');
+  [...ligne.querySelectorAll('button')].find(b => b.textContent === 'Retirer').click();
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].labels, []);
+});
+
+test('relecture : pendant un enregistrement, les noms sont figés et le vendeur est prévenu', async () => {
+  let liberer;
+  const bloquer = new Promise(r => { liberer = r; });
+  const t = await monter({ scenes: [vue('a'), vue('b')], bloquer });
+  const premier = t.qa('.ve-view input')[0];
+  premier.value = 'Entrée';
+  premier.dispatchEvent(new t.w.Event('change'));
+  await t.attendre();
+  const second = t.qa('.ve-view input')[1];
+  assert.equal(second.disabled, true);
+  second.value = 'Fond';
+  second.dispatchEvent(new t.w.Event('change'));
+  await t.attendre();
+  assert.match(t.q('#ve-status').textContent, /Patientez/);
+  liberer();
+  for (let i = 0; i < 5; i++) await t.attendre();
+  assert.equal(t.qa('.ve-view input')[1].disabled, false);
+  assert.equal(t.appels.filter(a => a[0] === 'enregistrerVue').length, 1);
+});
+
+test('relecture : catalogue indisponible, aucun point marqué retiré, publication suspendue, réessai proposé', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })], catalogueEchoue: true });
+  assert.match(t.q('#ve-status').textContent, /catalogue/i);
+  assert.ok(t.q('#ve-status button'), 'bouton Réessayer');
+  t.ctl.allerA(2);
+  assert.ok(!t.q('.ve-point').classList.contains('ve-warn'));
+  t.ctl.allerA(4);
+  assert.equal(t.bouton('Publier ma boutique').disabled, true);
+  assert.ok(t.qa('.ve-checks li.ve-ko').some(li => /catalogue/i.test(li.textContent)));
+  assert.ok(!t.qa('.ve-checks li').some(li => /plus en vente/.test(li.textContent)));
+});
+
+test('relecture : un problème de l étape 4 mène à la photo concernée', async () => {
+  const t = await monter({ scenes: [vue('a'), vue('b', { hotspots: [{ productId: 'p2', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(4);
+  t.bouton('Corriger').click();
+  await t.attendre();
+  assert.equal(t.ctl.etat.etape, 2);
+  assert.equal(t.ctl.etat.courante, 1);
 });

@@ -95,7 +95,7 @@ test('aperçu du brouillon : le vendeur de la boutique voit ses vues non publié
   const { q, demandes } = await charger({
     adresse: '?id=b1&apercu=brouillon', vendeur: true,
     scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
-    brouillon: { scenes: [vueBrouillon], rayonOrder: [] }
+    brouillon: { shopId: 'b1', scenes: [vueBrouillon], rayonOrder: [] }
   });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/brouillon.jpg');
   assert.ok(!demandes.some(u => u.endsWith('/b1/shopvision/scenes')));
@@ -105,7 +105,7 @@ test('aperçu du brouillon d une autre boutique : la version publiée est montr�
   const { q } = await charger({
     adresse: '?id=b1&apercu=brouillon', vendeur: true,
     scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
-    brouillon: { scenes: [{ ...vueBrouillon, shopId: 'autre' }], rayonOrder: [] }
+    brouillon: { shopId: 'autre', scenes: [{ ...vueBrouillon, shopId: 'autre' }], rayonOrder: [] }
   });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
 });
@@ -116,5 +116,15 @@ test('aperçu demandé sans être vendeur : aucun appel au brouillon', async () 
     scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }]
   });
   assert.ok(!demandes.includes('/api/shops/me/shopvision/draft'));
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
+});
+
+
+test('relecture : aperçu d un brouillon vide appartenant à une autre boutique, la version publiée est montrée', async () => {
+  const { q } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: true,
+    scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
+    brouillon: { shopId: 'autre', scenes: [], rayonOrder: ['c-x'] }
+  });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
 });
