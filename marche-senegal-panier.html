@@ -768,7 +768,7 @@ function loadCart() {
         <div class="sg-name">${escapeHtml(group.shopName)}</div></div>
       </div>
       ${group.items.map(item => `
-        <div class="cart-item" data-product-id="${escapeHtml(item.productId)}">
+        <div class="cart-item" data-product-id="${escapeHtml(item.productId)}" data-cart-index="${cart.indexOf(item)}">
           <div class="ci-img" style="background:#F0EAF8">
             ${item.image
               ? `<img src="${escapeHtml(imageURL(item.image))}"
@@ -840,8 +840,8 @@ function loadCart() {
     const productRow = event.target.closest('.cart-item');
     const marketButton = event.target.closest('[data-market-select]');
     if (marketButton) selectMarket(marketButton.dataset.marketSelect);
-    else if (productRow && event.target.closest('[data-qty-delta]')) changeQty(productRow.dataset.productId, Number(event.target.closest('[data-qty-delta]').dataset.qtyDelta));
-    else if (productRow && event.target.closest('[data-remove-item]')) removeItem(productRow.dataset.productId);
+    else if (productRow && event.target.closest('[data-qty-delta]')) changeQty(Number(productRow.dataset.cartIndex), Number(event.target.closest('[data-qty-delta]').dataset.qtyDelta));
+    else if (productRow && event.target.closest('[data-remove-item]')) removeItem(Number(productRow.dataset.cartIndex));
   };
 
   updateSummary();
@@ -866,12 +866,15 @@ function imageURL(value) {
 }
 
 // ── Changer la quantité ──
-function changeQty(productId, delta) {
-  const item = cart.find(i => i.productId === productId);
+// Une ligne désigne son article par sa position dans le panier : le même
+// produit peut y figurer deux fois (deux tailles, ou un panier par marché), et
+// le chercher par productId modifiait le premier exemplaire, parfois invisible.
+function changeQty(index, delta) {
+  const item = cart[index];
   if (!item) return;
 
   item.quantity = Math.max(1, item.quantity + delta);
-  const qtyNode = document.getElementById('qty-' + CSS.escape(productId));
+  const qtyNode = document.querySelector(`.cart-item[data-cart-index="${index}"] .qty-num`);
   if (qtyNode) qtyNode.textContent = item.quantity;
 
   localStorage.setItem('cart', JSON.stringify(cart));
@@ -881,8 +884,9 @@ function changeQty(productId, delta) {
 }
 
 // ── Supprimer un article ──
-function removeItem(productId) {
-  cart = cart.filter(i => i.productId !== productId);
+function removeItem(index) {
+  if (!cart[index]) return;
+  cart.splice(index, 1);
   localStorage.setItem('cart', JSON.stringify(cart));
   loadCart();
   revaliderPromo();
@@ -1383,7 +1387,14 @@ async function payNow() {
       return;
     }
 
-    // Wave réel → redirection vers Wave Checkout
+    // PayTech → page de paiement PayTech (Wave, Orange Money, Free Money)
+    if (initData.payment_url) {
+      showToast('Redirection vers la page de paiement...');
+      setTimeout(() => { window.location.href = initData.payment_url; }, 600);
+      return;
+    }
+
+    // Wave direct → redirection vers Wave Checkout
     if (initData.wave_launch_url) {
       showToast('Redirection vers Wave...');
       setTimeout(() => { window.location.href = initData.wave_launch_url; }, 600);
@@ -1612,6 +1623,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Retour d'erreur Wave
   if (new URLSearchParams(location.search).get('wave_error') === '1') {
     setTimeout(() => showToast('❌ Paiement Wave annulé ou échoué. Réessayez.'), 500);
+  }
+  if (new URLSearchParams(location.search).get('paiement_annule') === '1') {
+    setTimeout(() => showToast('❌ Paiement annulé ou échoué. Réessayez.'), 500);
   }
 });
 </script>

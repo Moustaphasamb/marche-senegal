@@ -1071,8 +1071,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   else await loadOrder(orderId);
 
   // Retour depuis Wave Checkout — attendre la confirmation webhook puis afficher succès
-  if (params.get('wave_ok') === '1') {
-    showToast('✅ Paiement Wave reçu ! Confirmation en cours...');
+  if (params.get('wave_ok') === '1' || params.get('paiement_ok') === '1') {
+    showToast('✅ Paiement reçu ! Confirmation en cours...');
     if (marketOrderId) pollMarketWavePayment(marketOrderId, 0);
     else pollWavePayment(orderId, 0);
   }
