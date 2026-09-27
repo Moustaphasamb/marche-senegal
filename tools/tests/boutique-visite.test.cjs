@@ -144,3 +144,19 @@ test('un produit a tailles ou couleurs demande un choix', () => {
   assert.equal(C.aDesVariantes({ sizes: [], colors: [] }), false);
   assert.equal(C.aDesVariantes({}), false);
 });
+
+test('l ancienne vitrine devient une photo unique quand il n y a pas de photos ShopVision', () => {
+  const shop = { showcaseUrl: 'https://ex.test/v.jpg', showcaseHotspots: [
+    { id: 'v1', productId: 'p1', x: 79.7, y: 51.8, product: { id: 'p1', name: 'Arabe', price: 99000, stock: 18, status: 'ACTIVE', images: [] } },
+    { id: 'v2', productId: 'p2', x: 140, y: 20 },
+    { id: 'v3', productId: 'p3', x: 'a', y: 20 }
+  ] };
+  const s = C.sceneVitrine(shop);
+  assert.equal(s.length, 1);
+  assert.equal(s[0].imageUrl, 'https://ex.test/v.jpg');
+  assert.deepEqual(s[0].hotspots.map(h => [h.productId, h.x, h.y]), [['p1', 0.797, 0.518]]);
+  assert.equal(s[0].hotspots[0].product.name, 'Arabe');
+  assert.deepEqual(C.sceneVitrine({ showcaseUrl: null, showcaseHotspots: [] }), []);
+  assert.deepEqual(C.sceneVitrine({ showcaseUrl: 'javascript:alert(1)' }), []);
+  assert.deepEqual(C.sceneVitrine({}), []);
+});

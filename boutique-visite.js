@@ -120,6 +120,17 @@
   const retirer = (cart, productId) => cart.filter(l => l.productId !== productId);
   const viderBoutique = (cart, shopId, idsProduits) => cart.filter(l => !estDeLaBoutique(l, shopId, idsProduits));
 
+  // Ancienne vitrine (une photo, points en pourcentage) : sert de photo unique tant que la
+  // boutique n'a rien publié avec ShopVision.
+  function sceneVitrine(shop) {
+    if (!shop || !urlImageSure(shop.showcaseUrl)) return [];
+    const dansLaPhoto = v => typeof v === 'number' && v >= 0 && v <= 100;
+    const hotspots = (shop.showcaseHotspots || [])
+      .filter(h => h && h.productId && dansLaPhoto(h.x) && dansLaPhoto(h.y))
+      .map(h => ({ id: h.id, productId: h.productId, x: Number((h.x / 100).toFixed(4)), y: Number((h.y / 100).toFixed(4)), product: h.product }));
+    return [{ id: 'vitrine', title: 'Vitrine', imageUrl: shop.showcaseUrl, hotspots }];
+  }
+
   // Taille ou couleur à choisir avant l'ajout (une chaussure sans pointure ne se livre pas).
   const aDesVariantes = p => !!p && ((Array.isArray(p.sizes) && p.sizes.length > 0) || (Array.isArray(p.colors) && p.colors.length > 0));
 
@@ -137,7 +148,7 @@
   const api = {
     fcfa, urlImageSure, enPromo, construireRayons, indexProduits, pointsVisibles, sceneDuRayon,
     etatStock, filtrerProduits, badge, panierBoutique, ajouterAuPanier, changerQuantite,
-    retirer, viderBoutique, aDesVariantes, lignesConditions
+    retirer, viderBoutique, aDesVariantes, sceneVitrine, lignesConditions
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BoutiqueVisiteCore = api;

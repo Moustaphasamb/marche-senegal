@@ -658,6 +658,7 @@ async function demarrerVisite(shop) {
     const r = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
     if (r.success && Array.isArray(r.data)) scenes = r.data;
   } catch { /* sans photos, la page reste utilisable */ }
+  if (!scenes.length) scenes = BoutiqueVisiteCore.sceneVitrine(shop);
   let favoris = new Set();
   try {
     if (isLoggedIn() && getCurrentUser()?.role === 'BUYER') {

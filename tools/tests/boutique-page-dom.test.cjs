@@ -16,12 +16,12 @@ const shop = {
   products: [{ id: 'p1', name: 'Huile de baobab', price: 4500, stock: 5, status: 'ACTIVE', images: [], category: { id: 'c1', name: 'Soins visage', emoji: '🧴' }, createdAt: '2026-09-20T00:00:00Z', totalReviews: 0 }]
 };
 
-async function charger({ scenes = [] } = {}) {
+async function charger({ scenes = [], extra = {} } = {}) {
   const dom = new JSDOM(html, { url: 'http://localhost:5500/marche-senegal-boutique.html?id=b1', runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window;
   w.eval(lire('api.js'));
   w.fetch = async () => { throw new Error('réseau interdit dans ce test'); };
-  w.getShop = async () => ({ success: true, data: structuredClone(shop) });
+  w.getShop = async () => ({ success: true, data: structuredClone({ ...shop, ...extra }) });
   w.getShopPromotions = async () => ({ success: true, data: [] });
   w.getShopReviews = async () => ({ success: true, data: [] });
   w.apiCall = async url => url.endsWith('/shopvision/scenes') ? { success: true, data: scenes } : { success: true, data: [] };
@@ -68,4 +68,16 @@ test('les boutons Se connecter et panier menent aux vraies pages', () => {
   assert.ok(html.includes(`onclick="window.location.href='marche-senegal-panier.html'"`));
   assert.ok(!html.includes(`toast('Connexion...')`));
   assert.ok(!html.includes(`toast('Panier...')`));
+});
+
+test('sans photos ShopVision, l ancienne vitrine du vendeur reste affichee', async () => {
+  const { q, qa } = await charger({ extra: { showcaseUrl: 'https://ex.test/vitrine.jpg', showcaseHotspots: [{ id: 'v1', productId: 'p1', x: 50, y: 40 }] } });
+  assert.equal(q('#bv-stage').hidden, false);
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/vitrine.jpg');
+  assert.equal(qa('.bv-spot').length, 1);
+});
+
+test('les photos ShopVision passent avant l ancienne vitrine', async () => {
+  const { q } = await charger({ scenes: [{ id: 's1', title: 'Entrée', imageUrl: 'https://ex.test/a.jpg', hotspots: [] }], extra: { showcaseUrl: 'https://ex.test/vitrine.jpg' } });
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/a.jpg');
 });
