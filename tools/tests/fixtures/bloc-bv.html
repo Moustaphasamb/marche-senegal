@@ -1,0 +1,46 @@
+<section class="bv" id="bv" aria-label="Visite de la boutique" hidden>
+  <div class="bv-grid" id="bv-grid">
+    <nav class="bv-rayons" aria-label="Rayons de la boutique"><h2>Rayons</h2><div id="bv-rayons-list"></div></nav>
+    <div class="bv-stage" id="bv-stage" aria-label="Photo de la boutique, faire glisser pour regarder autour">
+      <div class="bv-scene" id="bv-scene"><img id="bv-img" alt=""></div>
+      <div class="bv-bubble" id="bv-bubble" aria-hidden="true"><b></b><span></span></div>
+      <div class="bv-pad" role="group" aria-label="Se déplacer dans la boutique">
+        <button type="button" class="bv-arrow bv-up" id="bv-fwd" aria-label="Avancer vers la vue suivante">▲</button>
+        <button type="button" class="bv-arrow bv-left" id="bv-left" aria-label="Regarder à gauche">◀</button>
+        <button type="button" class="bv-arrow bv-right" id="bv-right" aria-label="Regarder à droite">▶</button>
+        <button type="button" class="bv-arrow bv-down" id="bv-back" aria-label="Reculer vers la vue précédente">▼</button>
+      </div>
+      <div class="bv-plan" id="bv-plan" hidden><h3>Plan de la boutique</h3><div class="bv-plan-rooms" id="bv-plan-rooms"></div></div>
+      <div class="bv-bar">
+        <button type="button" class="bv-tool" id="bv-plan-btn" aria-expanded="false" aria-controls="bv-plan">🗺️ <span>Plan de la boutique</span></button>
+        <div class="bv-where" id="bv-where"><b></b><small>Glissez pour regarder · touchez un point</small></div>
+      </div>
+      <p class="bv-fail" id="bv-fail" hidden>La photo de la boutique n'a pas pu être chargée. <button type="button" id="bv-retry">↻ Réessayer</button></p>
+    </div>
+    <aside class="bv-side">
+      <div class="bv-sheet" id="bv-sheet" hidden aria-live="polite"></div>
+      <div class="bv-cart">
+        <h2><span>Mon panier <small id="bv-cart-n"></small></span><button type="button" id="bv-clear" hidden>Vider</button></h2>
+        <div class="bv-lines" id="bv-lines"></div>
+        <div class="bv-sum"><span>Sous-total</span><span id="bv-subtotal"></span></div>
+        <a class="bv-btn bv-primary bv-go" href="marche-senegal-panier.html">Commander</a>
+        <ul class="bv-terms" id="bv-terms"></ul>
+      </div>
+    </aside>
+  </div>
+  <section class="bv-products" id="bv-products" aria-label="Produits de la boutique">
+    <div class="bv-p-head">
+      <h2>Produits de la boutique</h2>
+      <div class="bv-tabs" id="bv-tabs" role="group" aria-label="Filtrer les produits">
+        <button type="button" data-t="tous" aria-pressed="true">Tous</button>
+        <button type="button" data-t="nouveautes" aria-pressed="false">Nouveautés</button>
+        <button type="button" data-t="promos" aria-pressed="false">Promotions</button>
+      </div>
+    </div>
+    <div class="bv-cards" id="bv-products-grid"></div>
+  </section>
+  <div class="bv-cartbar" id="bv-cartbar" hidden>
+    <div><small id="bv-cb-n"></small><b id="bv-cb-t"></b></div>
+    <a class="bv-btn" href="marche-senegal-panier.html">Voir le panier</a>
+  </div>
+</section>
