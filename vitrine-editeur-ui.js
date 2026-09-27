@@ -339,7 +339,77 @@
       carte.append(deplacerB, retirer, fermer);
       return carte;
     }
-    function etapeRayons(p) { p.appendChild(el('h2', null, '3. Vos rayons')); navigation(p, { n: 2, texte: 'Produits' }, { n: 4, texte: 'Vérifier et publier' }); }
+    // ── Étape 3 : rayons ──
+    function etapeRayons(p) {
+      p.appendChild(el('h2', null, '3. Vos rayons'));
+      p.appendChild(el('p', 've-help', 'Choisissez l’ordre des rayons dans votre boutique. Vous pouvez aussi poser leur nom sur une photo : l’acheteur le touche pour voir le rayon.'));
+      const rayons = C.rayonsOrdonnes(e.rayons, e.ordre);
+      if (!rayons.length) p.appendChild(el('p', 've-help', 'Vos rayons apparaîtront quand vos produits auront une catégorie.'));
+      const liste = el('ol', 've-rayons');
+      rayons.forEach((r, i) => {
+        const li = el('li', 've-rayon');
+        li.appendChild(el('span', 've-rname', (r.emoji ? r.emoji + ' ' : '') + r.name));
+        const lieu = C.etiquetteDe(e.vues, r.id);
+        const vueLieu = lieu && e.vues.find(v => v.id === lieu.sceneId);
+        const ordonner = sens => {
+          const ids = C.deplacer(rayons, i, sens).map(x => x.id);
+          agir(() => api.ordonnerRayons(ids), () => { e.ordre = ids; });
+        };
+        const haut = bouton('ve-icon', '↑', 'Monter ' + r.name);
+        haut.disabled = i === 0 || e.occupe;
+        haut.onclick = () => ordonner(-1);
+        const bas = bouton('ve-icon', '↓', 'Descendre ' + r.name);
+        bas.disabled = i === rayons.length - 1 || e.occupe;
+        bas.onclick = () => ordonner(1);
+        const poser = bouton('ve-btn', vueLieu ? 'Déplacer l’étiquette' : 'Poser l’étiquette');
+        poser.disabled = !e.vues.length || e.occupe;
+        poser.setAttribute('aria-pressed', String(!!e.mode && e.mode.categoryId === r.id));
+        poser.onclick = () => { e.mode = { type: 'etiquette', categoryId: r.id }; rendre(); };
+        li.append(haut, bas, poser);
+        if (vueLieu) {
+          const retirer = bouton('ve-link', 'Retirer');
+          retirer.onclick = () => enregistrerEtiquettes(C.retirerEtiquette(e.vues, r.id));
+          li.appendChild(retirer);
+        }
+        li.appendChild(el('small', null, vueLieu ? 'Étiquette sur « ' + vueLieu.title + ' »' : 'Sans étiquette'));
+        liste.appendChild(li);
+      });
+      p.appendChild(liste);
+      if (e.mode && e.mode.type === 'etiquette') {
+        const r = e.rayons.find(x => x.id === e.mode.categoryId);
+        p.appendChild(el('p', 've-help ve-strong', 'Choisissez la photo, puis touchez l’endroit où poser « ' + (r ? r.name : 'ce rayon') + ' ».'));
+      }
+      selecteurVues(p);
+      const vue = e.vues[e.courante];
+      if (vue) {
+        const cadre = photo(p, vue, pos => {
+          if (!e.mode || e.mode.type !== 'etiquette') { statut('Choisissez d’abord un rayon, puis « Poser l’étiquette ».'); return; }
+          enregistrerEtiquettes(C.poserEtiquette(e.vues, vue.id, e.mode.categoryId, pos));
+        });
+        for (const l of vue.labels || []) {
+          const r = e.rayons.find(x => x.id === l.categoryId);
+          const t = el('span', 've-label', (r ? r.name : 'Rayon') + ' · Voir le rayon →');
+          placer(t, l);
+          cadre.appendChild(t);
+        }
+      }
+      navigation(p, { n: 2, texte: 'Produits' }, { n: 4, texte: 'Vérifier et publier' });
+    }
+
+    // Poser une étiquette peut toucher deux photos : celle qui la perd d'abord,
+    // puis celle qui la reçoit (jamais deux étiquettes du même rayon).
+    async function enregistrerEtiquettes({ vues, modifiees }) {
+      for (const id of modifiees) {
+        const vue = vues.find(v => v.id === id);
+        const r = await agir(() => api.enregistrerVue(vue), res => {
+          const i = e.vues.findIndex(v => v.id === id);
+          if (i !== -1) e.vues[i] = res.data;
+        });
+        if (!r || !r.success) return;
+      }
+      e.mode = null;
+      rendre();
+    }
     function etapePublier(p) { p.appendChild(el('h2', null, '4. Vérifier et publier')); navigation(p, { n: 3, texte: 'Rayons' }, null); }
 
     return { charger, etat: e, allerA };

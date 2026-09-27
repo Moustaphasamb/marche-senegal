@@ -229,3 +229,53 @@ test('étape 2 : plusieurs photos, on change de photo par les onglets', async ()
   assert.equal(t.qa('.ve-point').length, 1);
   assert.equal(t.q('.ve-photo img').getAttribute('src'), 'https://ex.test/b.jpg');
 });
+test('étape 3 : les rayons suivent l ordre choisi et se réordonnent', async () => {
+  const t = await monter({ scenes: [vue('a')], rayonOrder: ['c-visage'] });
+  t.ctl.allerA(3);
+  assert.deepEqual(t.qa('.ve-rname').map(x => x.textContent), ['🧴 Soins visage', '🌸 Parfums']);
+  t.qa('.ve-rayon')[0].querySelector('button[aria-label^="Descendre"]').click();
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1), ['ordonnerRayons', ['c-parfum', 'c-visage']]);
+  assert.deepEqual(t.qa('.ve-rname').map(x => x.textContent), ['🌸 Parfums', '🧴 Soins visage']);
+});
+
+test('étape 3 : poser une étiquette de rayon sur la photo', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(3);
+  t.qa('.ve-rayon')[0].querySelector('button.ve-btn').click();
+  await t.attendre();
+  await toucherPhoto(t, 100, 50);
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].labels, [{ categoryId: 'c-parfum', x: 0.5, y: 0.5 }]);
+  assert.match(t.q('.ve-label').textContent, /Parfums · Voir le rayon/);
+  assert.match(t.qa('.ve-rayon')[0].textContent, /Étiquette sur « Vue a »/);
+});
+
+test('étape 3 : déplacer une étiquette vers une autre photo enregistre d abord la photo qui la perd', async () => {
+  const t = await monter({ scenes: [vue('a', { labels: [{ categoryId: 'c-parfum', x: 0.1, y: 0.1 }] }), vue('b')] });
+  t.ctl.allerA(3);
+  t.qa('.ve-rayon')[0].querySelector('button.ve-btn').click();
+  await t.attendre();
+  t.qa('.ve-tab')[1].click();
+  await t.attendre();
+  await toucherPhoto(t, 40, 60);
+  for (let i = 0; i < 6; i++) await t.attendre();
+  const enregistrements = t.appels.filter(a => a[0] === 'enregistrerVue');
+  assert.deepEqual(enregistrements.map(a => [a[1].id, a[1].labels.length]), [['a', 0], ['b', 1]]);
+});
+
+test('étape 3 : toucher la photo sans rayon choisi n enregistre rien', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(3);
+  await toucherPhoto(t, 100, 50);
+  assert.equal(t.appels.length, 1);
+  assert.match(t.q('#ve-status').textContent, /Choisissez d’abord un rayon/);
+});
+
+test('étape 3 : retirer une étiquette', async () => {
+  const t = await monter({ scenes: [vue('a', { labels: [{ categoryId: 'c-visage', x: 0.1, y: 0.1 }] })] });
+  t.ctl.allerA(3);
+  [...t.qa('.ve-rayon')[1].querySelectorAll('button')].find(b => b.textContent === 'Retirer').click();
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].labels, []);
+});
