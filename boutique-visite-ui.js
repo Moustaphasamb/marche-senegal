@@ -295,7 +295,9 @@
 
     // La fiche est en haut de la visite : un produit touché en bas de la grille l'ouvrirait hors de l'écran.
     function montrerFiche() {
-      const cible = $('bv-sheet').closest('.bv-side') || $('bv-sheet');
+      const sh = $('bv-sheet');
+      if (root.getComputedStyle && root.getComputedStyle(sh).position === 'fixed') return;
+      const cible = sh.closest('.bv-side') || sh;
       if (typeof cible.scrollIntoView === 'function') cible.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 

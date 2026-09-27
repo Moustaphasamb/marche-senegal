@@ -191,3 +191,13 @@ test('toucher un produit de la grille ramene la fiche a l ecran', () => {
   assert.equal(q('#bv-sheet h3').textContent, 'Oud vert');
   assert.equal(vues.length, 1);
 });
+
+test('fiche deja fixee a l ecran (telephone sans photo) : pas de defilement', () => {
+  const { w, q, qa } = monter({ scenes: [] });
+  const vues = [];
+  w.Element.prototype.scrollIntoView = function () { vues.push(this); };
+  q('#bv-sheet').style.position = 'fixed';
+  qa('.bv-card .bv-img')[1].click();
+  assert.equal(q('#bv-sheet').classList.contains('bv-open'), true);
+  assert.equal(vues.length, 0);
+});
