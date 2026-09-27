@@ -160,3 +160,34 @@ test('photo en echec : message et reessayer', () => {
   q('#bv-retry').click();
   assert.equal(q('#bv-fail').hidden, true);
 });
+
+test('un article ajoute depuis l accueil (sans shopId) apparait dans le panier et se vide', () => {
+  const { q, qa, panier } = monter({ cart: [{ productId: 'p1', name: 'Huile', price: 4500, quantity: 1 }, { productId: 'z', price: 100, quantity: 1, shopId: 'b9' }] });
+  assert.equal(qa('#bv-lines .bv-line').length, 1);
+  assert.equal(q('#bv-cart-n').textContent, '1 article');
+  q('#bv-clear').click();
+  assert.deepEqual(panier().map(l => l.productId), ['z']);
+});
+
+test('produit a taille : ni la fiche ni la grille n ajoutent sans choix', () => {
+  const shop = boutique();
+  shop.products[0].sizes = ['38', '39'];
+  const { q, qa, panier, notes } = monter({ scenes: [], shop });
+  qa('.bv-mini')[0].click();
+  assert.deepEqual(panier(), []);
+  assert.equal(q('#bv-sheet').hidden, false);
+  const choisir = q('#bv-sheet a.bv-add');
+  assert.ok(choisir, 'le bouton de la fiche mene au choix');
+  assert.match(choisir.textContent, /Choisir/);
+  assert.equal(choisir.getAttribute('href'), 'marche-senegal-produit.html?id=p1');
+  assert.equal(notes.length, 0);
+});
+
+test('toucher un produit de la grille ramene la fiche a l ecran', () => {
+  const { w, q, qa } = monter({ scenes: [] });
+  const vues = [];
+  w.Element.prototype.scrollIntoView = function (opts) { vues.push([this.id || this.className, opts]); };
+  qa('.bv-card .bv-img')[1].click();
+  assert.equal(q('#bv-sheet h3').textContent, 'Oud vert');
+  assert.equal(vues.length, 1);
+});

@@ -45,6 +45,7 @@
     const produits = (shop.products || []).filter(p => p.status === 'ACTIVE');
     const scenes = (o.scenes || []).filter(s => s && C.urlImageSure(s.imageUrl));
     const index = C.indexProduits(produits, scenes);
+    const idsBoutique = new Set(index.keys());
     const rayons = C.construireRayons(produits);
     const favoris = o.favoris || new Set();
     const etat = { scene: 0, rayon: 'all', onglet: 'tous', courant: null, pan: 0 };
@@ -70,6 +71,7 @@
     }
     function ajouter(id) {
       const p = index.get(id), c = lireCart();
+      if (p && C.aDesVariantes(p)) { ouvrirProduit(id, true); montrerFiche(); return; }
       if (!p || c === null) { notifier('Panier indisponible sur cet appareil', 'error'); return; }
       const r = C.ajouterAuPanier(c, p, shop);
       if (!r.ajoute) { notifier('Stock atteint pour ' + p.name, 'error'); return; }
@@ -86,7 +88,7 @@
         $('bv-clear').hidden = true; $('bv-cartbar').hidden = true; $('bv-subtotal').textContent = '—';
         return;
       }
-      const pb = C.panierBoutique(c, shop.id);
+      const pb = C.panierBoutique(c, shop.id, idsBoutique);
       if (!pb.lignes.length) lignes.appendChild(el('p', 'bv-empty', 'Votre panier est vide.'));
       for (const l of pb.lignes) {
         const p = index.get(l.productId);
@@ -115,7 +117,7 @@
       $('bv-cartbar').hidden = !pb.articles;
       if (typeof o.surPanierChange === 'function') o.surPanierChange();
     }
-    $('bv-clear').onclick = () => maj(C.viderBoutique(lireCart() || [], shop.id));
+    $('bv-clear').onclick = () => maj(C.viderBoutique(lireCart() || [], shop.id, idsBoutique));
     const terms = $('bv-terms');
     terms.replaceChildren();
     for (const t of C.lignesConditions(shop)) { const li = el('li'); li.append(el('span', null, t.label), el('b', null, t.valeur)); terms.appendChild(li); }
@@ -266,7 +268,7 @@
       const prix = el('div', 'bv-price', C.fcfa(p.price));
       if (C.enPromo(p)) prix.appendChild(el('s', null, C.fcfa(p.originalPrice)));
       corps.appendChild(prix);
-      // Le panier ne retient pas de variante : on informe, le choix se fait sur la fiche complète.
+      // Le panier de la visite ne retient pas de variante : le choix se fait sur la fiche complète.
       for (const [nom, valeurs] of [['Tailles', p.sizes], ['Couleurs', p.colors]]) {
         if (Array.isArray(valeurs) && valeurs.length) corps.appendChild(el('p', 'bv-variants', nom + ' : ' + valeurs.join(', ')));
       }
@@ -275,14 +277,26 @@
       const lien = el('a', 'bv-more', 'Voir la fiche complète →');
       lien.href = 'marche-senegal-produit.html?id=' + encodeURIComponent(id);
       corps.appendChild(lien);
-      const add = bouton('bv-btn bv-primary bv-add');
-      add.appendChild(icone('panier'));
-      add.append(st.code === 'out' ? 'Indisponible' : 'Ajouter au panier');
-      add.disabled = st.code === 'out';
-      add.onclick = () => { ajouter(id); sh.classList.remove('bv-open'); };
+      let add;
+      if (C.aDesVariantes(p) && st.code !== 'out') {
+        add = el('a', 'bv-btn bv-primary bv-add', 'Choisir ' + (Array.isArray(p.sizes) && p.sizes.length ? 'la taille' : 'la couleur') + ' →');
+        add.href = lien.getAttribute('href');
+      } else {
+        add = bouton('bv-btn bv-primary bv-add');
+        add.appendChild(icone('panier'));
+        add.append(st.code === 'out' ? 'Indisponible' : 'Ajouter au panier');
+        add.disabled = st.code === 'out';
+        add.onclick = () => { ajouter(id); sh.classList.remove('bv-open'); };
+      }
       sh.append(fermer, fav, vignette('bv-pic', p), corps, add);
       sh.hidden = false;
       if (parUtilisateur) sh.classList.add('bv-open');
+    }
+
+    // La fiche est en haut de la visite : un produit touché en bas de la grille l'ouvrirait hors de l'écran.
+    function montrerFiche() {
+      const cible = $('bv-sheet').closest('.bv-side') || $('bv-sheet');
+      if (typeof cible.scrollIntoView === 'function') cible.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
 
     // ── Grille ──
@@ -297,8 +311,9 @@
         img.tabIndex = 0;
         img.setAttribute('role', 'button');
         img.setAttribute('aria-label', 'Voir ' + p.name);
-        img.onclick = () => ouvrirProduit(p.id, true);
-        img.onkeydown = e => { if (e.key === 'Enter') ouvrirProduit(p.id, true); };
+        const voir = () => { ouvrirProduit(p.id, true); montrerFiche(); };
+        img.onclick = voir;
+        img.onkeydown = e => { if (e.key === 'Enter') voir(); };
         const bd = C.badge(p, maintenant);
         if (bd) img.appendChild(el('span', 'bv-flag bv-flag-' + bd.code, bd.texte));
         const coeur = bouton('bv-heart', 'Ajouter ' + p.name + ' aux favoris');

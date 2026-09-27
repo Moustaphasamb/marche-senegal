@@ -126,3 +126,21 @@ test('conditions : livraison seulement si le vendeur l a fixee', () => {
   assert.deepEqual(C.lignesConditions({ deliveryEnabled: true, deliveryFee: 1500, deliveryDaysMin: 1, deliveryDaysMax: 2 }), [{ label: 'Livraison · 1 à 2 jours', valeur: '1 500 FCFA' }]);
   assert.deepEqual(C.lignesConditions({ deliveryEnabled: true, deliveryFee: 0, deliveryDaysMin: 1, deliveryDaysMax: 1 }), [{ label: 'Livraison · 1 jour', valeur: 'Gratuite' }]);
 });
+
+test('une ligne sans shopId (ajoutee depuis l accueil) compte pour sa boutique et se vide avec elle', () => {
+  const ids = new Set(['p1']);
+  const cart = [{ productId: 'p1', price: 4500, quantity: 1, shopId: null }, { productId: 'z', price: 100, quantity: 1 }];
+  assert.deepEqual(C.panierBoutique(cart, 'b1', ids).articles, 1);
+  assert.deepEqual(C.viderBoutique(cart, 'b1', ids), [{ productId: 'z', price: 100, quantity: 1 }]);
+  const r = C.ajouterAuPanier(cart, produits[0], { id: 'b1', name: 'Awa' });
+  assert.equal(r.cart[0].quantity, 2);
+  assert.equal(r.cart[0].shopId, 'b1');
+  assert.equal(r.cart[0].shopName, 'Awa');
+});
+
+test('un produit a tailles ou couleurs demande un choix', () => {
+  assert.equal(C.aDesVariantes({ sizes: ['38'] }), true);
+  assert.equal(C.aDesVariantes({ colors: ['Rouge'] }), true);
+  assert.equal(C.aDesVariantes({ sizes: [], colors: [] }), false);
+  assert.equal(C.aDesVariantes({}), false);
+});

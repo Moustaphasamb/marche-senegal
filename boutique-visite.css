@@ -60,7 +60,7 @@
 .bv-fail{position:absolute;inset:0;margin:0;display:grid;place-content:center;gap:10px;text-align:center;color:#fff;background:#20271f;padding:24px}
 .bv-fail button{border:1.5px solid #fff;background:none;border-radius:99px;padding:8px 18px;font-weight:700;color:#fff}
 
-.bv-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.bv-side{display:flex;flex-direction:column;gap:14px;min-width:0;scroll-margin-top:calc(var(--nav-h, 80px) + 12px)}
 .bv-sheet,.bv-cart{background:var(--bv-white);border:1px solid var(--bv-border);border-radius:var(--bv-r);padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .bv-sheet{position:relative}
 .bv-close,.bv-fav{position:absolute;right:10px;border:0;background:var(--bv-bg);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;z-index:1;color:var(--bv-muted)}

@@ -82,8 +82,16 @@
     return null;
   }
 
-  function panierBoutique(cart, shopId) {
-    const lignes = (Array.isArray(cart) ? cart : []).filter(l => l && l.shopId === shopId && l.quantity > 0);
+  // L'accueil et la recherche n'enregistrent pas la boutique de l'article : une ligne
+  // sans shopId appartient à la boutique qui vend ce produit (idsProduits).
+  function estDeLaBoutique(l, shopId, idsProduits) {
+    if (!l) return false;
+    if (l.shopId) return l.shopId === shopId;
+    return !!idsProduits && idsProduits.has(l.productId);
+  }
+
+  function panierBoutique(cart, shopId, idsProduits) {
+    const lignes = (Array.isArray(cart) ? cart : []).filter(l => estDeLaBoutique(l, shopId, idsProduits) && l.quantity > 0);
     return {
       lignes,
       articles: lignes.reduce((a, l) => a + l.quantity, 0),
@@ -96,8 +104,10 @@
     const copie = (Array.isArray(cart) ? cart : []).map(l => ({ ...l }));
     const ligne = copie.find(l => l.productId === produit.id);
     if ((ligne ? ligne.quantity : 0) >= stock) return { cart: copie, ajoute: false };
-    if (ligne) ligne.quantity += 1;
-    else copie.push({ productId: produit.id, name: produit.name, price: produit.price, quantity: 1, shopId: shop.id, shopName: shop.name });
+    if (ligne) {
+      ligne.quantity += 1;
+      if (!ligne.shopId) Object.assign(ligne, { shopId: shop.id, shopName: shop.name });
+    } else copie.push({ productId: produit.id, name: produit.name, price: produit.price, quantity: 1, shopId: shop.id, shopName: shop.name });
     return { cart: copie, ajoute: true };
   }
 
@@ -108,7 +118,10 @@
   }
 
   const retirer = (cart, productId) => cart.filter(l => l.productId !== productId);
-  const viderBoutique = (cart, shopId) => cart.filter(l => l.shopId !== shopId);
+  const viderBoutique = (cart, shopId, idsProduits) => cart.filter(l => !estDeLaBoutique(l, shopId, idsProduits));
+
+  // Taille ou couleur à choisir avant l'ajout (une chaussure sans pointure ne se livre pas).
+  const aDesVariantes = p => !!p && ((Array.isArray(p.sizes) && p.sizes.length > 0) || (Array.isArray(p.colors) && p.colors.length > 0));
 
   function lignesConditions(shop) {
     const lignes = [];
@@ -124,7 +137,7 @@
   const api = {
     fcfa, urlImageSure, enPromo, construireRayons, indexProduits, pointsVisibles, sceneDuRayon,
     etatStock, filtrerProduits, badge, panierBoutique, ajouterAuPanier, changerQuantite,
-    retirer, viderBoutique, lignesConditions
+    retirer, viderBoutique, aDesVariantes, lignesConditions
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BoutiqueVisiteCore = api;
