@@ -35,8 +35,9 @@
 .ve-tabs{display:flex;gap:6px;overflow-x:auto;margin:8px 0;scrollbar-width:none}
 .ve-tab{flex:none;border:1px solid var(--ve-border);background:var(--ve-white);border-radius:99px;padding:6px 12px;font-size:13px}
 .ve-tab[aria-pressed=true]{background:var(--ve-dark);border-color:var(--ve-dark);color:#fff}
-.ve-photo{position:relative;border-radius:12px;overflow:hidden;background:#20271f;margin:8px 0;cursor:crosshair;touch-action:manipulation}
-.ve-photo img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+/* Le cadre épouse exactement l'image : les points, en % du cadre, tombent au bon endroit. */
+.ve-photo{position:relative;width:fit-content;max-width:100%;border-radius:12px;overflow:hidden;background:#20271f;margin:8px auto;cursor:crosshair;touch-action:manipulation}
+.ve-photo img{display:block;width:auto;max-width:100%;height:auto;max-height:70vh;user-select:none;-webkit-user-drag:none}
 .ve-point{position:absolute;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:var(--ve-green);color:#fff;font-weight:800;font-size:13px;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 .ve-point.ve-warn{background:var(--ve-red)}
 .ve-cible{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:3px dashed var(--ve-gold);pointer-events:none}
@@ -52,6 +53,13 @@
 .ve-ko{color:var(--ve-red);font-weight:600}
 .ve-access{background:var(--ve-white);border:1px solid var(--ve-border);border-radius:var(--ve-r);padding:20px}
 .ve-access[hidden],.ve[hidden]{display:none}
+/* Barre latérale vendeur (240 px, fixe) sur ordinateur ; repliée derrière le bouton menu sur téléphone */
+.ve-topbar,.ve-main{margin-left:var(--sidebar-w,240px)}
+.ve-menu{display:none}
+@media (max-width:768px){
+  .ve-topbar,.ve-main{margin-left:0}
+  .ve-menu{display:inline-grid;place-items:center}
+}
 @media (max-width:480px){
   .ve-main{padding:12px}
   .ve-panel{padding:12px}
