@@ -216,3 +216,21 @@ test('deux tailles du meme produit : + et corbeille visent la bonne ligne, taill
   qa('#bv-lines .bv-line')[0].querySelector('.bv-del').click();
   assert.deepEqual(panier().map(l => l.size), ['39']);
 });
+
+test('une étiquette de rayon sur la photo filtre la grille sur ce rayon', () => {
+  const scenes = [{ id: 's1', title: 'Entrée', imageUrl: 'https://ex.test/a.jpg',
+    hotspots: [{ id: 'h1', productId: 'p1', x: .5, y: .4 }],
+    labels: [{ id: 'l1', categoryId: 'c-parfum', x: .2, y: .3 }, { id: 'l2', categoryId: 'c-absent', x: .3, y: .3 }, { id: 'l3', categoryId: 'c-visage', x: 4, y: .3 }] }];
+  const { q, qa } = monter({ scenes });
+  assert.equal(qa('.bv-label').length, 1);
+  assert.match(q('.bv-label').textContent, /Parfums · Voir le rayon/);
+  assert.equal(q('.bv-label').style.left, '20%');
+  q('.bv-label').click();
+  assert.deepEqual(qa('.bv-card .bv-name').map(e => e.textContent), ['Oud vert']);
+  assert.equal(qa('.bv-rayon')[1].getAttribute('aria-current'), 'true');
+});
+
+test('l ordre des rayons de la boutique est respecté', () => {
+  const { qa } = monter({ shop: boutique({ rayonOrder: ['c-visage'] }) });
+  assert.deepEqual(qa('.bv-rayon .bv-rlabel').map(e => e.textContent), ['Toute la boutique', 'Soins visage', 'Parfums']);
+});

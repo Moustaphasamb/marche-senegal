@@ -16,22 +16,29 @@ const shop = {
   products: [{ id: 'p1', name: 'Huile de baobab', price: 4500, stock: 5, status: 'ACTIVE', images: [], category: { id: 'c1', name: 'Soins visage', emoji: '🧴' }, createdAt: '2026-09-20T00:00:00Z', totalReviews: 0 }]
 };
 
-async function charger({ scenes = [], extra = {} } = {}) {
-  const dom = new JSDOM(html, { url: 'http://localhost:5500/marche-senegal-boutique.html?id=b1', runScripts: 'outside-only', pretendToBeVisual: true });
+async function charger({ scenes = [], extra = {}, brouillon = null, adresse = '?id=b1', vendeur = false } = {}) {
+  const dom = new JSDOM(html, { url: 'http://localhost:5500/marche-senegal-boutique.html' + adresse, runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window;
   w.eval(lire('api.js'));
   w.fetch = async () => { throw new Error('réseau interdit dans ce test'); };
   w.getShop = async () => ({ success: true, data: structuredClone({ ...shop, ...extra }) });
   w.getShopPromotions = async () => ({ success: true, data: [] });
   w.getShopReviews = async () => ({ success: true, data: [] });
-  w.apiCall = async url => url.endsWith('/shopvision/scenes') ? { success: true, data: scenes } : { success: true, data: [] };
+  w.isLoggedIn = () => vendeur;
+  w.getCurrentUser = () => (vendeur ? { id: 'u1', role: 'SELLER' } : null);
+  const demandes = [];
+  w.apiCall = async url => {
+    demandes.push(url);
+    if (url === '/api/shops/me/shopvision/draft') return brouillon ? { success: true, data: brouillon } : { success: false };
+    return url.endsWith('/shopvision/scenes') ? { success: true, data: scenes } : { success: true, data: [] };
+  };
   w.applyBanner = () => {};
   w.eval(lire('boutique-visite.js'));
   w.eval(lire('boutique-visite-ui.js'));
   for (const s of w.document.querySelectorAll('script:not([src])')) w.eval(s.textContent);
   w.document.dispatchEvent(new w.Event('DOMContentLoaded'));
   await tick();
-  return { w, q: s => w.document.querySelector(s), qa: s => [...w.document.querySelectorAll(s)] };
+  return { w, demandes, q: s => w.document.querySelector(s), qa: s => [...w.document.querySelectorAll(s)] };
 }
 
 test('la page monte la visite avec les produits de la boutique', async () => {
@@ -80,4 +87,34 @@ test('sans photos ShopVision, l ancienne vitrine du vendeur reste affichee', asy
 test('les photos ShopVision passent avant l ancienne vitrine', async () => {
   const { q } = await charger({ scenes: [{ id: 's1', title: 'Entrée', imageUrl: 'https://ex.test/a.jpg', hotspots: [] }], extra: { showcaseUrl: 'https://ex.test/vitrine.jpg' } });
   assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/a.jpg');
+});
+
+const vueBrouillon = { id: 'd1', shopId: 'b1', title: 'Brouillon', imageUrl: 'https://ex.test/brouillon.jpg', hotspots: [], labels: [] };
+
+test('aperçu du brouillon : le vendeur de la boutique voit ses vues non publiées', async () => {
+  const { q, demandes } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: true,
+    scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
+    brouillon: { scenes: [vueBrouillon], rayonOrder: [] }
+  });
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/brouillon.jpg');
+  assert.ok(!demandes.some(u => u.endsWith('/b1/shopvision/scenes')));
+});
+
+test('aperçu du brouillon d une autre boutique : la version publiée est montrée', async () => {
+  const { q } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: true,
+    scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }],
+    brouillon: { scenes: [{ ...vueBrouillon, shopId: 'autre' }], rayonOrder: [] }
+  });
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
+});
+
+test('aperçu demandé sans être vendeur : aucun appel au brouillon', async () => {
+  const { q, demandes } = await charger({
+    adresse: '?id=b1&apercu=brouillon', vendeur: false,
+    scenes: [{ id: 's1', title: 'En ligne', imageUrl: 'https://ex.test/en-ligne.jpg', hotspots: [] }]
+  });
+  assert.ok(!demandes.includes('/api/shops/me/shopvision/draft'));
+  assert.equal(q('#bv-img').getAttribute('src'), 'https://ex.test/en-ligne.jpg');
 });

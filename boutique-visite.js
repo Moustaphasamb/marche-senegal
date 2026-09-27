@@ -18,7 +18,9 @@
     return Number.isFinite(t) && t <= maintenant && maintenant - t < 30 * JOUR;
   }
 
-  function construireRayons(produits) {
+  // ordre : identifiants de catégories choisis par le vendeur (éditeur de vitrine) ;
+  // les rayons absents de la liste suivent, par ordre alphabétique.
+  function construireRayons(produits, ordre) {
     const parId = new Map();
     for (const p of produits) {
       const c = p.category;
@@ -27,7 +29,9 @@
       r.count += 1;
       parId.set(c.id, r);
     }
-    const rayons = [...parId.values()].sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+    const rang = new Map((Array.isArray(ordre) ? ordre : []).map((id, i) => [id, i]));
+    const place = r => (rang.has(r.id) ? rang.get(r.id) : Infinity);
+    const rayons = [...parId.values()].sort((a, b) => (place(a) !== place(b) ? place(a) - place(b) : a.label.localeCompare(b.label, 'fr')));
     return [{ id: 'all', label: 'Toute la boutique', emoji: '', count: produits.length }, ...rayons];
   }
 

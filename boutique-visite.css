@@ -34,6 +34,8 @@
 .bv-scene{position:absolute;top:0;left:0;height:100%;aspect-ratio:16/9;min-width:100%;will-change:transform}
 .bv-scene img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .bv-spot{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,253,247,.94);display:grid;place-items:center;box-shadow:0 3px 12px rgba(0,0,0,.3);padding:0}
+.bv-label{position:absolute;transform:translate(-50%,-50%);border:0;border-radius:99px;background:rgba(23,59,42,.9);color:#fff !important;font-size:12.5px;font-weight:700;padding:7px 12px;white-space:nowrap;box-shadow:0 3px 12px rgba(0,0,0,.3);z-index:2}
+.bv-label:hover{background:var(--bv-green)}
 .bv-spot::before{content:"";width:13px;height:13px;border-radius:50%;background:var(--bv-green)}
 .bv-spot::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(255,253,247,.8);animation:bv-pulse 2.4s ease-out infinite}
 .bv-spot[aria-pressed="true"]::before{background:var(--bv-gold)}

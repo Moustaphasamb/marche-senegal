@@ -46,7 +46,7 @@
     const scenes = (o.scenes || []).filter(s => s && C.urlImageSure(s.imageUrl));
     const index = C.indexProduits(produits, scenes);
     const idsBoutique = new Set(index.keys());
-    const rayons = C.construireRayons(produits);
+    const rayons = C.construireRayons(produits, shop.rayonOrder);
     const favoris = o.favoris || new Set();
     const etat = { scene: 0, rayon: 'all', onglet: 'tous', courant: null, pan: 0 };
 
@@ -203,7 +203,7 @@
       img.hidden = false;
       img.alt = s.title ? 'Photo de la boutique : ' + s.title : 'Photo de la boutique';
       img.src = s.imageUrl;
-      sc.querySelectorAll('.bv-spot').forEach(e => e.remove());
+      sc.querySelectorAll('.bv-spot,.bv-label').forEach(e => e.remove());
       for (const h of C.pointsVisibles(s, index)) {
         const p = index.get(h.productId);
         const b = bouton('bv-spot', p.name);
@@ -214,6 +214,17 @@
         b.onmouseenter = b.onfocus = () => bulle(b, p);
         b.onmouseleave = b.onblur = cacherBulle;
         b.onclick = e => { e.stopPropagation(); ouvrirProduit(p.id, true); };
+        sc.appendChild(b);
+      }
+      // Étiquettes de rayon posées par le vendeur : les toucher filtre ce rayon.
+      const dansLaPhoto = v => typeof v === 'number' && v >= 0 && v <= 1;
+      for (const l of s.labels || []) {
+        const r = rayons.find(x => x.id === l.categoryId);
+        if (!r || !dansLaPhoto(l.x) || !dansLaPhoto(l.y)) continue;
+        const b = bouton('bv-label', 'Voir le rayon ' + r.label, (r.emoji ? r.emoji + ' ' : '') + r.label + ' · Voir le rayon →');
+        b.style.left = l.x * 100 + '%';
+        b.style.top = l.y * 100 + '%';
+        b.onclick = ev => { ev.stopPropagation(); choisirRayon(r.id); };
         sc.appendChild(b);
       }
       const titre = s.title || 'Vue ' + (etat.scene + 1);

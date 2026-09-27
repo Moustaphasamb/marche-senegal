@@ -652,12 +652,33 @@ async function chargerPromotionsBoutique(shopId) {
 }
 
 // Visite de la boutique : photos publiées, rayons, fiche et panier (boutique-visite-ui.js).
+// Aperçu ouvert depuis l'éditeur de vitrine : seulement pour un vendeur connecté, et
+// seulement si le brouillon est bien celui de cette boutique.
+async function brouillonAApercevoir(shop) {
+  if (new URLSearchParams(location.search).get('apercu') !== 'brouillon') return null;
+  if (!isLoggedIn() || getCurrentUser()?.role !== 'SELLER') return null;
+  try {
+    const d = await apiCall('/api/shops/me/shopvision/draft');
+    if (!d.success || !d.data) return null;
+    const scenes = Array.isArray(d.data.scenes) ? d.data.scenes : [];
+    if (scenes.some(s => s.shopId !== shop.id)) return null;
+    return { scenes, rayonOrder: Array.isArray(d.data.rayonOrder) ? d.data.rayonOrder : [] };
+  } catch { return null; }
+}
+
 async function demarrerVisite(shop) {
   let scenes = [];
-  try {
-    const r = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
-    if (r.success && Array.isArray(r.data)) scenes = r.data;
-  } catch { /* sans photos, la page reste utilisable */ }
+  const brouillon = await brouillonAApercevoir(shop);
+  if (brouillon) {
+    scenes = brouillon.scenes;
+    shop.rayonOrder = brouillon.rayonOrder;
+    showToast('Aperçu de votre brouillon · pas encore publié');
+  } else {
+    try {
+      const r = await apiCall('/api/shops/' + encodeURIComponent(shop.id) + '/shopvision/scenes');
+      if (r.success && Array.isArray(r.data)) scenes = r.data;
+    } catch { /* sans photos, la page reste utilisable */ }
+  }
   if (!scenes.length) scenes = BoutiqueVisiteCore.sceneVitrine(shop);
   let favoris = new Set();
   try {

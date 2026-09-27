@@ -178,3 +178,11 @@ test('la ligne ajoutee porte image et marche, comme depuis la fiche produit', ()
   assert.equal(r.cart[0].marketId, 'm1');
   assert.equal(r.cart[0].marketName, 'Sandaga');
 });
+
+test('les rayons suivent l ordre choisi par le vendeur, puis l ordre alphabétique', () => {
+  const r = C.construireRayons(produits, ['c-parfum']);
+  assert.deepEqual(r.map(x => x.id), ['all', 'c-parfum', 'c-visage']);
+  assert.deepEqual(C.construireRayons(produits, ['inconnu']).map(x => x.id), ['all', 'c-parfum', 'c-visage']);
+  const visageDabord = C.construireRayons(produits, ['c-visage', 'c-parfum']);
+  assert.deepEqual(visageDabord.map(x => x.id), ['all', 'c-visage', 'c-parfum']);
+});
