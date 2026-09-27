@@ -161,3 +161,71 @@ test('huit photos : les boutons d ajout sont désactivés', async () => {
   assert.equal(t.bouton('Ajouter une photo').disabled, true);
   assert.equal(t.bouton('Prendre une photo').disabled, true);
 });
+// Toucher la photo à une position donnée (la photo mesure 200 × 100 dans le test).
+async function toucherPhoto(t, x, y) {
+  const img = t.q('.ve-photo img');
+  img.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+  img.dispatchEvent(new t.w.MouseEvent('click', { bubbles: true, clientX: x, clientY: y }));
+  await t.attendre();
+}
+
+test('étape 2 : toucher la photo puis choisir le produit crée un point', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(2);
+  await toucherPhoto(t, 50, 25);
+  assert.ok(t.q('.ve-choice'), 'le choix du produit est proposé');
+  assert.ok(t.q('.ve-cible'));
+  t.qa('.ve-product').find(b => b.textContent === 'Huile de baobab').click();
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].hotspots, [{ productId: 'p1', x: 0.25, y: 0.25 }]);
+  assert.equal(t.qa('.ve-point').length, 1);
+  assert.equal(t.q('.ve-choice'), null);
+});
+
+test('étape 2 : la recherche filtre, un nom piégé reste du texte', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(2);
+  await toucherPhoto(t, 10, 10);
+  const recherche = t.q('.ve-search');
+  recherche.value = 'crème';
+  recherche.dispatchEvent(new t.w.Event('input'));
+  assert.deepEqual(t.qa('.ve-product').map(b => b.textContent), ['Crème hibiscus (hors vente)']);
+  recherche.value = '';
+  recherche.dispatchEvent(new t.w.Event('input'));
+  assert.equal(t.w.pirate, undefined);
+  assert.equal(t.q('.ve-products img'), null);
+});
+
+test('étape 2 : toucher un point ne crée pas de point, on peut le déplacer puis le retirer', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(2);
+  t.q('.ve-point').click();
+  await t.attendre();
+  assert.equal(t.q('.ve-choice'), null);
+  t.bouton('Déplacer').click();
+  await toucherPhoto(t, 20, 80);
+  await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].hotspots, [{ productId: 'p1', x: 0.1, y: 0.8 }]);
+  t.q('.ve-point').click();
+  await t.attendre();
+  t.bouton('Retirer').click();
+  await t.attendre(); await t.attendre();
+  assert.deepEqual(t.appels.at(-1)[1].hotspots, []);
+});
+
+test('étape 2 : un point sur un produit hors vente est signalé, le compteur indique les produits non placés', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p2', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(2);
+  assert.ok(t.q('.ve-point').classList.contains('ve-warn'));
+  assert.match(t.q('#ve-panel').textContent, /2 produits en vente pas encore placés/);
+});
+
+test('étape 2 : plusieurs photos, on change de photo par les onglets', async () => {
+  const t = await monter({ scenes: [vue('a'), vue('b', { hotspots: [{ productId: 'p1', x: 0.1, y: 0.1 }] })] });
+  t.ctl.allerA(2);
+  assert.equal(t.qa('.ve-point').length, 0);
+  t.qa('.ve-tab')[1].click();
+  await t.attendre();
+  assert.equal(t.qa('.ve-point').length, 1);
+  assert.equal(t.q('.ve-photo img').getAttribute('src'), 'https://ex.test/b.jpg');
+});

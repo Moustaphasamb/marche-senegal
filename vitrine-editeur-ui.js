@@ -192,7 +192,153 @@
     }
 
     // ── Étapes 2 à 4 : complétées par les tâches suivantes ──
-    function etapeProduits(p) { p.appendChild(el('h2', null, '2. Placez vos produits')); navigation(p, { n: 1, texte: 'Photos' }, { n: 3, texte: 'Mes rayons' }); }
+    // ── Outils communs aux étapes 2 et 3 ──
+    function selecteurVues(p) {
+      if (e.vues.length < 2) return;
+      const tabs = el('div', 've-tabs');
+      tabs.setAttribute('role', 'group');
+      tabs.setAttribute('aria-label', 'Choisir la photo');
+      e.vues.forEach((v, i) => {
+        const b = bouton('ve-tab', v.title);
+        b.setAttribute('aria-pressed', String(i === e.courante));
+        b.onclick = () => {
+          e.courante = i;
+          e.choix = null;
+          if (e.mode && e.mode.type !== 'etiquette') e.mode = null;
+          rendre();
+        };
+        tabs.appendChild(b);
+      });
+      p.appendChild(tabs);
+    }
+
+    // Photo de la vue ; toucher(pos) reçoit la position en fraction. Un toucher sur
+    // un bouton posé sur la photo (point, étiquette) n'est pas un toucher de photo.
+    function photo(p, vue, toucher) {
+      const cadre = el('div', 've-photo');
+      const img = el('img');
+      img.src = vue.imageUrl;
+      img.alt = 'Photo : ' + vue.title;
+      cadre.appendChild(img);
+      cadre.onclick = ev => {
+        if (e.occupe || (ev.target.closest && ev.target.closest('button'))) return;
+        const pos = C.positionDansPhoto(img.getBoundingClientRect(), ev.clientX, ev.clientY);
+        if (pos) toucher(pos);
+      };
+      p.appendChild(cadre);
+      return cadre;
+    }
+    const placer = (noeud, pos) => { noeud.style.left = pos.x * 100 + '%'; noeud.style.top = pos.y * 100 + '%'; };
+    const produit = id => e.produits.find(x => x.id === id);
+
+    function enregistrer(vue) {
+      return agir(() => api.enregistrerVue(vue), r => {
+        const i = e.vues.findIndex(x => x.id === vue.id);
+        if (i !== -1) e.vues[i] = r.data;
+        e.choix = null;
+        e.mode = null;
+      });
+    }
+
+    // ── Étape 2 : produits ──
+    function etapeProduits(p) {
+      p.appendChild(el('h2', null, '2. Placez vos produits'));
+      p.appendChild(el('p', 've-help', 'Touchez un article sur la photo, puis choisissez-le dans votre catalogue. Le prix et le stock viennent de la fiche du produit.'));
+      selecteurVues(p);
+      const vue = e.vues[e.courante];
+      if (!vue) { navigation(p, { n: 1, texte: 'Photos' }, null); return; }
+      const cadre = photo(p, vue, pos => {
+        if (e.mode && e.mode.type === 'deplacer') {
+          const pt = vue.hotspots[e.mode.index];
+          if (pt) enregistrer(C.remplacerPoint(vue, e.mode.index, { ...pt, ...pos }));
+          return;
+        }
+        e.mode = null;
+        e.choix = pos;
+        rendre();
+      });
+      (vue.hotspots || []).forEach((pt, i) => {
+        const pr = produit(pt.productId);
+        const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name : 'produit retiré'));
+        if (!pr || pr.status !== 'ACTIVE') b.classList.add('ve-warn');
+        placer(b, pt);
+        b.onclick = () => { e.choix = null; e.mode = { type: 'point', index: i }; rendre(); };
+        cadre.appendChild(b);
+      });
+      if (e.choix) {
+        const cible = el('span', 've-cible');
+        placer(cible, e.choix);
+        cadre.appendChild(cible);
+        p.appendChild(choixProduit(vue));
+      }
+      if (e.mode && (e.mode.type === 'point' || e.mode.type === 'deplacer')) p.appendChild(actionsPoint(vue, e.mode.index));
+      const restants = C.produitsNonPlaces(e.vues, e.produits).length;
+      p.appendChild(el('p', 've-help', restants
+        ? `${restants} produit${restants > 1 ? 's' : ''} en vente pas encore placé${restants > 1 ? 's' : ''} (facultatif).`
+        : 'Tous vos produits en vente sont placés.'));
+      const liens = el('div', 've-add');
+      const creer = el('a', 've-link', 'Créer un produit ↗');
+      creer.href = 'marche-senegal-ajout-produit.html';
+      creer.target = '_blank';
+      creer.rel = 'noopener';
+      const actualiser = bouton('ve-link', 'Actualiser mon catalogue');
+      actualiser.onclick = async () => {
+        const c = await api.catalogue();
+        if (c && c.success) { e.produits = c.data || []; statut('Catalogue actualisé'); rendre(); }
+        else statut((c && c.message) || 'Catalogue indisponible', true);
+      };
+      liens.append(creer, actualiser);
+      p.appendChild(liens);
+      navigation(p, { n: 1, texte: 'Photos' }, { n: 3, texte: 'Mes rayons' });
+    }
+
+    function choixProduit(vue) {
+      const carte = el('div', 've-card ve-choice');
+      carte.appendChild(el('h3', null, 'Quel produit est ici ?'));
+      const recherche = el('input', 've-search');
+      recherche.type = 'search';
+      recherche.placeholder = 'Nom du produit…';
+      recherche.setAttribute('aria-label', 'Rechercher un produit');
+      const liste = el('div', 've-products');
+      const remplir = () => {
+        liste.replaceChildren();
+        const q = recherche.value.trim().toLocaleLowerCase('fr');
+        const trouves = e.produits.filter(x => x.status !== 'DELETED' && (!q || x.name.toLocaleLowerCase('fr').includes(q)));
+        if (!trouves.length) liste.appendChild(el('p', 've-help', e.produits.length ? 'Aucun produit ne correspond.' : 'Votre catalogue est vide : créez d’abord un produit.'));
+        for (const x of trouves.slice(0, 30)) {
+          const b = bouton('ve-product', x.name + (x.status === 'ACTIVE' ? '' : ' (hors vente)'));
+          b.onclick = () => {
+            const nouvelle = C.ajouterPoint(vue, { productId: x.id, x: e.choix.x, y: e.choix.y });
+            if (!nouvelle) { statut(`${C.MAX_POINTS} points au maximum sur une photo.`, true); return; }
+            enregistrer(nouvelle);
+          };
+          liste.appendChild(b);
+        }
+      };
+      recherche.oninput = remplir;
+      remplir();
+      const annuler = bouton('ve-link', 'Annuler');
+      annuler.onclick = () => { e.choix = null; rendre(); };
+      carte.append(recherche, liste, annuler);
+      return carte;
+    }
+
+    function actionsPoint(vue, i) {
+      const carte = el('div', 've-card');
+      const pt = (vue.hotspots || [])[i];
+      if (!pt) return carte;
+      const pr = produit(pt.productId);
+      carte.appendChild(el('p', null, 'Point ' + (i + 1) + ' : ' + (pr ? pr.name : 'produit retiré de votre catalogue')));
+      if (e.mode.type === 'deplacer') carte.appendChild(el('p', 've-help ve-strong', 'Touchez la photo à la nouvelle place.'));
+      const deplacerB = bouton('ve-btn', 'Déplacer');
+      deplacerB.onclick = () => { e.mode = { type: 'deplacer', index: i }; rendre(); };
+      const retirer = bouton('ve-btn ve-danger', 'Retirer');
+      retirer.onclick = () => enregistrer(C.retirerPoint(vue, i));
+      const fermer = bouton('ve-link', 'Fermer');
+      fermer.onclick = () => { e.mode = null; rendre(); };
+      carte.append(deplacerB, retirer, fermer);
+      return carte;
+    }
     function etapeRayons(p) { p.appendChild(el('h2', null, '3. Vos rayons')); navigation(p, { n: 2, texte: 'Produits' }, { n: 4, texte: 'Vérifier et publier' }); }
     function etapePublier(p) { p.appendChild(el('h2', null, '4. Vérifier et publier')); navigation(p, { n: 3, texte: 'Rayons' }, null); }
 
