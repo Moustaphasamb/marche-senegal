@@ -596,7 +596,8 @@ let currentTab = 'avis';
 // ── Récupérer l'ID de la boutique depuis l'URL ──
 function getShopIdFromURL() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('id');
+  // Ouverte par /marches/<slug> (ou /boutiques/, /produits/), la page reçoit l'identifiant du serveur.
+  return params.get('id') || (window.__MS_PAGE__ && window.__MS_PAGE__.id) || null;
 }
 
 // ── Charger la boutique ──

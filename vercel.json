@@ -9,5 +9,28 @@
         }
       ]
     }
+  ],
+  "functions": {
+    "api/page.js": {
+      "includeFiles": "marche-senegal-{marche,boutique,produit}.html"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/marches/:cle",
+      "destination": "/api/page?type=marche&cle=:cle"
+    },
+    {
+      "source": "/boutiques/:cle",
+      "destination": "/api/page?type=boutique&cle=:cle"
+    },
+    {
+      "source": "/produits/:cle",
+      "destination": "/api/page?type=produit&cle=:cle"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
   ]
 }

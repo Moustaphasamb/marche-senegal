@@ -658,7 +658,8 @@ function toast(msg) { showToast(msg); }
 // ── Récupérer l'ID du produit depuis l'URL ──
 function getProductIdFromURL() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('id');
+  // Ouverte par /marches/<slug> (ou /boutiques/, /produits/), la page reçoit l'identifiant du serveur.
+  return params.get('id') || (window.__MS_PAGE__ && window.__MS_PAGE__.id) || null;
 }
 
 // ── Charger le produit ──
