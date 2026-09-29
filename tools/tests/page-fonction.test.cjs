@@ -50,6 +50,34 @@ test('introuvable : 404 noindex', async () => {
   assert.equal(res.statusCode, 404);
   assert.match(res.corps, /noindex/);
   assert.match(res.corps, /<head><base href="\/">/);
+  // Sans identifiant, la page afficherait le premier marché venu au lieu de dire « introuvable ».
+  assert.ok(res.corps.includes('window.__MS_PAGE__={"type":"marche","id":"inconnu"}'));
+});
+
+test('produit retiré, boutique suspendue, marché inactif : 404 noindex, page affichée comme avant', async () => {
+  const cas = [
+    ['produit', PRODUIT_ID, { id: PRODUIT_ID, name: 'P', price: 1, status: 'INACTIVE' }],
+    ['produit', PRODUIT_ID, { id: PRODUIT_ID, name: 'P', price: 1, status: 'ACTIVE', shop: { id: 's', name: 'S', status: 'SUSPENDED' } }],
+    ['boutique', BOUTIQUE_ID, { id: BOUTIQUE_ID, name: 'B', status: 'SUSPENDED', products: [] }],
+    ['marche', 'sandaga', { id: 'm1', slug: 'sandaga', name: 'M', city: 'Dakar', isActive: false, shops: [] }]
+  ];
+  for (const [type, cle, data] of cas) {
+    api({ statut: 200, corps: { success: true, data } });
+    const res = reponse();
+    await handler({ query: { type, cle } }, res);
+    assert.equal(res.statusCode, 404, `${type} ${JSON.stringify(data)}`);
+    assert.match(res.corps, /noindex/);
+    assert.doesNotMatch(res.corps, /data-ssr|canonical/);
+    // Le vrai identifiant, pas le slug : la page peut charger boutiques et produits.
+    assert.ok(res.corps.includes(`"id":"${data.id}"`));
+  }
+});
+
+test('produit actif d une boutique active : publié', async () => {
+  api({ statut: 200, corps: { success: true, data: { id: PRODUIT_ID, name: 'P', price: 1, status: 'ACTIVE', shop: { id: 's', name: 'S' } } } });
+  const res = reponse();
+  await handler({ query: { type: 'produit', cle: PRODUIT_ID } }, res);
+  assert.equal(res.statusCode, 200);
 });
 
 test('API en panne : page d origine servie, cache court', async () => {
@@ -81,6 +109,8 @@ test('clés piégées : 404 sans appel réseau', async () => {
     await handler({ query: { type, cle } }, res);
     assert.equal(res.statusCode, 404, `${type}/${cle}`);
     assert.match(res.corps, /noindex/);
+    // Jamais la clé piégée dans la page ; une page connue reçoit un identifiant qui n'existe pas.
+    if (type !== 'inconnu') assert.ok(res.corps.includes(`{"type":"${type}","id":"introuvable"}`), `${type}/${cle}`);
   }
   assert.deepEqual(appels, []);
 });

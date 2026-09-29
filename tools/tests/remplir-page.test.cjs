@@ -74,12 +74,23 @@ test('produit épuisé : OutOfStock', () => {
   assert.equal(jsonLd(html).offers.availability, 'https://schema.org/OutOfStock');
 });
 
-test('boutique hors marché sans description : rien de vide ni de nul', () => {
-  const html = remplirPage(MODELE, 'boutique', { id: 's2', name: 'Chez Awa', locationType: 'OTHER',
-    locationName: 'Parcelles', locationCity: 'Dakar', market: null, products: [] });
+// Forme réelle d'une boutique « Autre lieu » : rattachée au pseudo-marché du même nom.
+const AUTRE_LIEU = { id: '00000000-0000-0000-0000-000000000001', slug: null, name: 'Autre lieu', city: 'Hors marché' };
+
+test('boutique hors marché sans description : son quartier, jamais « Autre lieu »', () => {
+  const html = remplirPage(MODELE, 'boutique', { id: 's2', name: 'Chez Awa', locationType: 'CUSTOM',
+    locationName: 'Parcelles', locationCity: 'Dakar', market: AUTRE_LIEU, products: [] });
   assert.match(html, /<title>Chez Awa — Parcelles, Dakar — Marché Sénégal<\/title>/);
-  assert.doesNotMatch(texte(html), /undefined|null|href="\/marches\//);
+  assert.doesNotMatch(texte(html), /undefined|null|href="\/marches\/|Autre lieu|Hors marché/);
   assert.match(html, /<meta name="description" content="Chez Awa, Parcelles, Dakar/);
+  assert.equal(jsonLd(html).address.addressLocality, 'Dakar');
+});
+
+test('produit d une boutique hors marché : vendu à son quartier', () => {
+  const html = remplirPage(MODELE, 'produit', { ...PRODUIT, shop: { id: 's2', name: 'Chez Awa', locationType: 'CUSTOM',
+    locationName: 'Parcelles', locationCity: 'Dakar', market: AUTRE_LIEU } });
+  assert.match(html, /Vendu par <a href="\/boutiques\/s2">Chez Awa<\/a>, Parcelles, Dakar/);
+  assert.doesNotMatch(texte(html), /Autre lieu|Hors marché/);
 });
 
 test('marché sans description ni boutique : description de repli', () => {

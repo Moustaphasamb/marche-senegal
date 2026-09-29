@@ -15,6 +15,13 @@ const PAGES = {
   boutique: { fichier: 'marche-senegal-boutique.html', route: 'shops', cle: UUID },
   produit: { fichier: 'marche-senegal-produit.html', route: 'products', cle: UUID }
 };
+// Un produit retiré, une boutique suspendue ou un marché fermé ne doivent pas être indexés.
+function publiable(type, d) {
+  if (type === 'marche') return d.isActive !== false;
+  if (type === 'boutique') return !d.status || d.status === 'ACTIVE';
+  return (!d.status || d.status === 'ACTIVE') && !(d.shop && d.shop.status && d.shop.status !== 'ACTIVE');
+}
+
 const CACHE_LONG = 'public, s-maxage=600, stale-while-revalidate=86400';
 const PAGE_VIDE = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/><title>Page introuvable</title></head><body></body></html>';
 
@@ -37,14 +44,18 @@ async function handler(req, res) {
   const { type, cle } = req.query || {};
   const page = Object.prototype.hasOwnProperty.call(PAGES, type) ? PAGES[type] : null;
   if (!page || typeof cle !== 'string' || !page.cle.test(cle)) {
-    const modele = page ? dependances.lireModele(page.fichier) : PAGE_VIDE;
-    return envoyer(res, 404, marquerIntrouvable(modele), 'public, s-maxage=600');
+    // La page reçoit un identifiant qui n'existe pas : elle dit « introuvable » au lieu d'afficher le premier venu.
+    if (!page) return envoyer(res, 404, marquerIntrouvable(PAGE_VIDE), 'public, s-maxage=600');
+    return envoyer(res, 404, marquerIntrouvable(dependances.lireModele(page.fichier), { type, id: 'introuvable' }), 'public, s-maxage=600');
   }
   const modele = dependances.lireModele(page.fichier);
   try {
     const { statut, corps } = await dependances.appelerApi(`/${page.route}/${cle}`);
-    if (statut === 404) return envoyer(res, 404, marquerIntrouvable(modele), 'public, s-maxage=600');
+    if (statut === 404) return envoyer(res, 404, marquerIntrouvable(modele, { type, id: cle }), 'public, s-maxage=600');
     if (statut !== 200 || !corps || !corps.data) throw new Error(`API ${statut}`);
+    if (!publiable(type, corps.data)) {
+      return envoyer(res, 404, marquerIntrouvable(modele, { type, id: corps.data.id || cle }), 'public, s-maxage=600');
+    }
     return envoyer(res, 200, remplirPage(modele, type, corps.data), CACHE_LONG);
   } catch (erreur) {
     console.error('[page]', type, cle, erreur.message);

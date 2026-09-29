@@ -31,8 +31,11 @@ function urlPropre(type, d) {
   return null;
 }
 
+// Une boutique « Autre lieu » (CUSTOM) est rattachée au pseudo-marché du même nom : son vrai lieu est son quartier.
+const dansUnMarche = b => Boolean(b.market) && b.locationType !== 'CUSTOM';
+
 function lieuBoutique(b) {
-  return b.market ? joindre([b.market.name, b.market.city]) : joindre([b.locationName, b.locationCity]);
+  return dansUnMarche(b) ? joindre([b.market.name, b.market.city]) : joindre([b.locationName, b.locationCity]);
 }
 
 function decrireMarche(d) {
@@ -64,7 +67,7 @@ function decrireMarche(d) {
 function decrireBoutique(d) {
   const lieu = lieuBoutique(d);
   const image = absolue(d.bannerUrl || d.avatarUrl);
-  const ville = d.market ? d.market.city : d.locationCity;
+  const ville = dansUnMarche(d) ? d.market.city : d.locationCity;
   return {
     titre: joindre([d.name, lieu, MARQUE], ' — '),
     description: resume(d.description) || `${joindre([d.name, lieu])} : produits et contact du vendeur sur ${MARQUE}.`,
@@ -76,7 +79,7 @@ function decrireBoutique(d) {
     },
     corps: [
       `<h1>${echapper(d.name)}</h1>`,
-      lieu ? `<p>${d.market && d.market.slug
+      lieu ? `<p>${dansUnMarche(d) && d.market.slug
         ? `<a href="/marches/${echapper(d.market.slug)}">${echapper(lieu)}</a>` : echapper(lieu)}</p>` : '',
       d.description ? `<p>${echapper(d.description)}</p>` : '',
       (d.products || []).length ? `<h2>Produits</h2><ul>${d.products.map(p =>
@@ -87,7 +90,7 @@ function decrireBoutique(d) {
 
 function decrireProduit(d) {
   const boutique = d.shop || {};
-  const marche = boutique.market ? joindre([boutique.market.name, boutique.market.city]) : '';
+  const marche = lieuBoutique(boutique);
   const image = absolue((d.images || [])[0]);
   return {
     titre: `${d.name} — ${fcfa(d.price)} — ${MARQUE}`,
@@ -151,8 +154,8 @@ function remplirPage(modele, type, donnees) {
     .replace(/<\/body>/i, () => `${bloc}</body>`);
 }
 
-function marquerIntrouvable(modele) {
-  return preparerModele(modele, null).replace(/<\/head>/i, () => '<meta name="robots" content="noindex"></head>');
+function marquerIntrouvable(modele, page = null) {
+  return preparerModele(modele, page).replace(/<\/head>/i, () => '<meta name="robots" content="noindex"></head>');
 }
 
 module.exports = { SITE, echapper, urlPropre, preparerModele, remplirPage, marquerIntrouvable };
