@@ -10,6 +10,16 @@ Le site est en français. Les prix sont affichés en francs CFA (FCFA). La créa
 - [Les marchés](https://marche-senegal-zeta.vercel.app/marche-senegal-marche.html) : les marchés du Sénégal référencés, par ville et par région
 - [Recherche de produits](https://marche-senegal-zeta.vercel.app/marche-senegal-recherche.html) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
 
+## Marchés
+
+Chaque marché, boutique et produit a une adresse lisible sans JavaScript (`/marches/<nom>`, `/boutiques/<id>`, `/produits/<id>`) ; la liste complète est dans le [sitemap](https://marche-senegal-zeta.vercel.app/sitemap.xml).
+
+- [Marché Sandaga](https://marche-senegal-zeta.vercel.app/marches/sandaga) : Dakar, Plateau
+- [Marché Kermel](https://marche-senegal-zeta.vercel.app/marches/kermel) : Dakar, Plateau
+- [Marché Tilène](https://marche-senegal-zeta.vercel.app/marches/tilene) : Dakar, Médina
+- [Marché HLM](https://marche-senegal-zeta.vercel.app/marches/hlm-5) : Dakar
+- [Marché Colobane](https://marche-senegal-zeta.vercel.app/marches/colobane) : Dakar
+
 ## Comment ça marche pour un acheteur
 
 1. Chercher un produit par mot-clé ou choisir un marché.
