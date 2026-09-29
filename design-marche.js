@@ -35,7 +35,9 @@
       if (!main.id) main.id = 'ms-main';
       main.setAttribute('tabindex', '-1');
       const skip = document.createElement('a');
-      skip.className = 'ms-skip'; skip.href = '#' + main.id;
+      skip.className = 'ms-skip';
+      // Adresse complète : sous <base href="/"> (pages /marches/…), « #ms-main » seul mènerait à l'accueil.
+      skip.href = location.pathname + location.search + '#' + main.id;
       skip.textContent = 'Aller au contenu'; document.body.prepend(skip);
     }
     // Existing click handlers remain the single source of behavior.
