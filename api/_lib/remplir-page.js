@@ -48,8 +48,8 @@ function decrireMarche(d, extras = {}) {
     titre: `${joindre([d.name, d.city])} — ${MARQUE}`,
     description: resume(d.description) || `Boutiques et produits du ${d.name} à ${d.city}, sur ${MARQUE}.`,
     image: absolue(d.imageUrl),
-    // Sans présentation, la page reste utile à partager mais trop mince pour un moteur.
-    noindex: !d.description,
+    // Sans slug (ex. « Autre lieu » ouvert par son identifiant), pas d'adresse propre à proposer aux moteurs.
+    noindex: !d.slug,
     ld: [{
       '@context': 'https://schema.org', '@type': 'Place', name: d.name, description: d.description || undefined,
       address: { '@type': 'PostalAddress', streetAddress: d.address || undefined, addressLocality: d.city || undefined,

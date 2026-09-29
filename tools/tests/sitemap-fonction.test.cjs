@@ -20,10 +20,10 @@ test('liste pages fixes, marchés avec slug, boutiques, produits', async () => {
   await handler({}, res);
   assert.equal(res.statusCode, 200);
   assert.equal(res.entetes['content-type'], 'application/xml; charset=utf-8');
-  for (const u of ['/marche-senegal-accueil.html', '/marches/sandaga', '/boutiques/s1', '/produits/p1']) {
+  for (const u of ['/marche-senegal-accueil.html', '/marches/sandaga', '/marches/bakel', '/boutiques/s1', '/produits/p1']) {
     assert.ok(res.corps.includes(`<loc>https://marche-senegal-zeta.vercel.app${u}</loc>`), u);
   }
-  assert.doesNotMatch(res.corps, /m2|bakel/);
+  assert.doesNotMatch(res.corps, /m2/);
   assert.match(res.corps, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
 });
 

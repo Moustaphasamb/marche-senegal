@@ -141,8 +141,13 @@ test('marché : FAQ lisible et balisage FAQPage identique', () => {
   assert.match(bloc, /<h3>Quels sont les horaires du Marché Sandaga \?<\/h3><p>8 h – 20 h<\/p>/);
 });
 
-test('marché sans description : page servie mais non indexée', () => {
+test('marché réel sans description : indexé quand même (décision de Moustapha)', () => {
   const html = remplirPage(MODELE, 'marche', { id: 'm9', slug: 'bakel', name: 'Marché de Bakel', city: 'Bakel', region: 'Tambacounda', shops: [] });
+  assert.doesNotMatch(html, /noindex/);
+  assert.ok(html.includes('<link rel="canonical" href="https://marche-senegal-zeta.vercel.app/marches/bakel">'));
+});
+
+test('marché sans slug (Autre lieu ouvert par son identifiant) : non indexé', () => {
+  const html = remplirPage(MODELE, 'marche', { id: '00000000-0000-0000-0000-000000000001', slug: null, name: 'Autre lieu', city: 'Hors marché', shops: [] });
   assert.match(html, /<meta name="robots" content="noindex">/);
-  assert.doesNotMatch(remplirPage(MODELE, 'marche', MARCHE), /noindex/);
 });
