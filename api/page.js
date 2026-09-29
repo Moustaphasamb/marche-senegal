@@ -1,12 +1,12 @@
 // Sert /marches/:slug, /boutiques/:id et /produits/:id (réécritures dans
 // vercel.json) : la page HTML habituelle, remplie avec les données de l'API
 // pour les lecteurs qui n'exécutent pas le JavaScript. En cas de panne de
-// l'API, la page d'origine part telle quelle et fonctionne comme avant.
+// l'API, la page part sans données et se remplit dans le navigateur, comme avant.
 'use strict';
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { remplirPage, marquerIntrouvable } = require('./_lib/remplir-page.js');
+const { preparerModele, remplirPage, marquerIntrouvable } = require('./_lib/remplir-page.js');
 
 const API = 'https://marche-senegal-backend-production.up.railway.app/api';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -48,7 +48,7 @@ async function handler(req, res) {
     return envoyer(res, 200, remplirPage(modele, type, corps.data), CACHE_LONG);
   } catch (erreur) {
     console.error('[page]', type, cle, erreur.message);
-    return envoyer(res, 200, modele, 'public, s-maxage=60');
+    return envoyer(res, 200, preparerModele(modele, { type, id: cle }), 'public, s-maxage=60');
   }
 }
 

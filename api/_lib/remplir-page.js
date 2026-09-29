@@ -118,6 +118,14 @@ const DESCRIPTEURS = { marche: decrireMarche, boutique: decrireBoutique, produit
 // Du JSON placé dans <script> : un « < » encodé empêche un texte vendeur de refermer la balise.
 const jsonDansScript = valeur => JSON.stringify(valeur).replace(/</g, '\\u003c');
 
+// Servie sous /marches/… ou /boutiques/…, la page doit charger ses styles et
+// scripts depuis la racine et connaître son identifiant, même sans données.
+function preparerModele(modele, page) {
+  return modele
+    .replace(/<head>/i, () => '<head><base href="/">')
+    .replace(/<\/head>/i, () => (page ? `<script>window.__MS_PAGE__=${jsonDansScript(page)}</script></head>` : '</head>'));
+}
+
 function remplirPage(modele, type, donnees) {
   const info = DESCRIPTEURS[type](donnees);
   const canonique = urlPropre(type, donnees);
@@ -129,16 +137,14 @@ function remplirPage(modele, type, donnees) {
     `<meta property="og:description" content="${echapper(info.description)}">`,
     canonique ? `<meta property="og:url" content="${echapper(canonique)}">` : '',
     info.image ? `<meta property="og:image" content="${echapper(info.image)}">` : '',
-    `<script type="application/ld+json">${jsonDansScript(info.ld)}</script>`,
-    `<script>window.__MS_PAGE__=${jsonDansScript({ type, id: donnees.id })}</script>`
+    `<script type="application/ld+json">${jsonDansScript(info.ld)}</script>`
   ].join('');
   // Le visiteur voit le rendu habituel de la page : ce bloc ne sert qu'aux lecteurs sans JavaScript.
   const bloc = `<section data-ssr>${info.corps.join('')}</section>` +
     '<script>document.querySelector("[data-ssr]").remove()</script>';
 
   // Fonctions de remplacement : un « $ » dans un texte vendeur ne doit pas être lu comme motif.
-  return modele
-    .replace(/<head>/i, () => '<head><base href="/">')
+  return preparerModele(modele, { type, id: donnees.id })
     .replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${echapper(info.titre)}</title>`)
     .replace(/<meta name="description"[^>]*>/i, () => `<meta name="description" content="${echapper(info.description)}"/>`)
     .replace(/<\/head>/i, () => `${entete}</head>`)
@@ -146,7 +152,7 @@ function remplirPage(modele, type, donnees) {
 }
 
 function marquerIntrouvable(modele) {
-  return modele.replace(/<\/head>/i, () => '<meta name="robots" content="noindex"></head>');
+  return preparerModele(modele, null).replace(/<\/head>/i, () => '<meta name="robots" content="noindex"></head>');
 }
 
-module.exports = { SITE, echapper, urlPropre, remplirPage, marquerIntrouvable };
+module.exports = { SITE, echapper, urlPropre, preparerModele, remplirPage, marquerIntrouvable };

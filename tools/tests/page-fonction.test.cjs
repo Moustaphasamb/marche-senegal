@@ -49,6 +49,7 @@ test('introuvable : 404 noindex', async () => {
   await handler({ query: { type: 'marche', cle: 'inconnu' } }, res);
   assert.equal(res.statusCode, 404);
   assert.match(res.corps, /noindex/);
+  assert.match(res.corps, /<head><base href="\/">/);
 });
 
 test('API en panne : page d origine servie, cache court', async () => {
@@ -56,7 +57,10 @@ test('API en panne : page d origine servie, cache court', async () => {
   const res = reponse();
   await handler({ query: { type: 'produit', cle: PRODUIT_ID } }, res);
   assert.equal(res.statusCode, 200);
-  assert.equal(res.corps, MODELE);
+  // Sans données, mais la page doit rester utilisable sous /produits/… : styles à la racine, identifiant connu.
+  assert.match(res.corps, /<head><base href="\/">/);
+  assert.ok(res.corps.includes(`window.__MS_PAGE__={"type":"produit","id":"${PRODUIT_ID}"}`));
+  assert.doesNotMatch(res.corps, /data-ssr|noindex/);
   assert.equal(res.entetes['cache-control'], 'public, s-maxage=60');
 });
 
@@ -65,7 +69,7 @@ test('API en erreur 500 : page d origine servie', async () => {
   const res = reponse();
   await handler({ query: { type: 'marche', cle: 'sandaga' } }, res);
   assert.equal(res.statusCode, 200);
-  assert.equal(res.corps, MODELE);
+  assert.match(res.corps, /<head><base href="\/">/);
 });
 
 test('clés piégées : 404 sans appel réseau', async () => {
