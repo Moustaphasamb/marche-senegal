@@ -1,7 +1,34 @@
 /* Progressive enhancement only: no accounts, API calls or commerce state. */
 (() => {
   'use strict';
+  const brandLogo = 'assets/logo-msn-2026.png';
+  function enhanceBrand(root) {
+    root.querySelectorAll('.nav-logo > .flag, .nav-logo > .brand-mark, .left-logo > .flag, .card-logo > .flag, .sb-logo > .flag, .st-logo > .flag, .footer-logo > .flag').forEach(oldMark => {
+      const mark = document.createElement('span');
+      mark.className = 'ms-brand-mark';
+      mark.setAttribute('aria-hidden', 'true');
+      oldMark.replaceWith(mark);
+    });
+  }
+  function installFavicon() {
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 256;
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      const side = Math.min(image.width, image.height) * 0.72;
+      context.drawImage(image, (image.width - side) / 2, (image.height - side) / 2, side, side, 0, 0, 256, 256);
+      let icon = document.querySelector('link[rel="icon"]');
+      if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.append(icon); }
+      icon.type = 'image/png';
+      icon.href = canvas.toDataURL('image/png');
+    };
+    image.src = brandLogo;
+  }
   function init() {
+    enhanceBrand(document);
+    installFavicon();
     if (document.body.classList.contains('accueil-immersif')) return;
     const main = document.querySelector('main,.main,.search-hero,.page-wrap,.page,.messages-wrap,.form-box');
     if (main && !document.querySelector('.ms-skip')) {
@@ -37,7 +64,7 @@
     new MutationObserver(records => {
       if (pending || !records.some(r => r.addedNodes.length)) return;
       pending = true;
-      requestAnimationFrame(() => { pending = false; enhance(document); });
+      requestAnimationFrame(() => { pending = false; enhance(document); enhanceBrand(document); });
     }).observe(document.body, {childList:true,subtree:true});
     const drawer = document.getElementById('nav-drawer');
     const trigger = document.getElementById('nav-hamburger');

@@ -11,6 +11,9 @@ body.ms-design:not(.accueil-immersif) {
 body.ms-design:not(.espace-vendeur):not(.accueil-immersif) {--green:#1c6845;--gl:#155639;--gp:#e9efe3;--g2:#c8d8bf;--dark:#173b2a;--text:#293a2d;--muted:#66715f;--gold:#c49b35}
 body.ms-design.espace-vendeur {--bg:#f9f6ed;--white:#fffdf7;--border:#e5dcc7}
 .ms-design *,.ms-design *::before,.ms-design *::after {box-sizing:border-box}
+.ms-brand-mark{display:inline-block;flex:0 0 40px;width:40px;height:40px;border-radius:9px;background:#fffdf7 url('assets/logo-msn-2026.png') center/140% no-repeat;vertical-align:middle}
+.sb-logo .ms-brand-mark{flex-basis:36px;width:36px;height:36px;border-radius:8px}
+.footer-logo .ms-brand-mark{flex-basis:40px}
 .ms-design :is(button,input,select,textarea) {font-family:inherit}
 .ms-design :is(main,.main,.page,.page-wrap,.content,.results-area,.profile-content) {min-width:0}
 .ms-design :is(img,video) {max-width:100%}
