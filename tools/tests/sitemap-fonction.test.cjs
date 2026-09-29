@@ -9,7 +9,7 @@ function reponse() {
     setHeader(k, v) { this.entetes[k.toLowerCase()] = v; }, end(c) { this.corps = c; } };
 }
 const DONNEES = {
-  '/markets': [{ id: 'm1', slug: 'sandaga' }, { id: 'm2', slug: null }],
+  '/markets': [{ id: 'm1', slug: 'sandaga', description: 'x' }, { id: 'm2', slug: null, description: 'x' }, { id: 'm3', slug: 'bakel', description: null }],
   '/shops?limit=500': [{ id: 's1' }],
   '/products?limit=500': [{ id: 'p1' }]
 };
@@ -23,7 +23,7 @@ test('liste pages fixes, marchés avec slug, boutiques, produits', async () => {
   for (const u of ['/marche-senegal-accueil.html', '/marches/sandaga', '/boutiques/s1', '/produits/p1']) {
     assert.ok(res.corps.includes(`<loc>https://marche-senegal-zeta.vercel.app${u}</loc>`), u);
   }
-  assert.doesNotMatch(res.corps, /m2/);
+  assert.doesNotMatch(res.corps, /m2|bakel/);
   assert.match(res.corps, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
 });
 

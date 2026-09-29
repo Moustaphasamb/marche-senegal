@@ -378,6 +378,12 @@ a{text-decoration:none;color:inherit}
 /* Guide du marché — une barre de verre dépoli posée sur le bas de la bannière :
    une phrase et « En savoir plus ». Le détail s'ouvre dans un panneau de verre
    qui flotte au-dessus de la page et se referme quand on fait défiler. */
+.faq-marche-zone{margin:8px var(--ms-gutter,5vw) 120px;max-width:820px}
+.faq-titre{font-family:'Newsreader',serif;font-size:1.5rem;font-weight:800;color:var(--text);margin:0 0 14px}
+.faq-item{border:1px solid var(--border);border-radius:14px;background:#FFFDF7;margin-bottom:10px}
+.faq-item summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--text);list-style-position:inside}
+.faq-item summary:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:14px}
+.faq-item p{margin:0;padding:0 18px 16px;color:var(--muted);line-height:1.6}
 .guide-marche-zone{position:relative;z-index:150;margin:-48px var(--ms-gutter,5vw) 0}
 .guide-marche-zone + .markets-bar{margin-top:28px}
 .market-hero:has(+ .guide-marche-zone:not([hidden])) .banner-credit{bottom:auto;top:12px}
@@ -522,6 +528,8 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 </div>
+<!-- Questions fréquentes : faq-marche.js, à partir de la fiche -->
+<div class="faq-marche-zone" id="faq-marche" hidden></div>
 <button class="filter-toggle" onclick="openSidebar()"><i class="ic" data-ic="search"></i> Recherche</button>
 <nav class="mobile-nav">
   <div class="mn-items">
@@ -594,13 +602,22 @@ async function loadMarket(marketId) {
   if (fil) fil.textContent = market.name;
 
   // Guide du marché : absent pour un marché sans fiche, la page reste celle d'avant.
+  const categories = await getMarketCategories();
+  const libelles = libellesParSlug(categories.success ? categories.data : []);
   const zoneGuide = document.getElementById('guide-marche');
   if (zoneGuide) {
-    const categories = await getMarketCategories();
-    const bloc = construireGuide(document, market, libellesParSlug(categories.success ? categories.data : []));
+    const bloc = construireGuide(document, market, libelles);
     zoneGuide.replaceChildren(...(bloc ? [bloc] : []));
     zoneGuide.hidden = !bloc;
     if (bloc) surveillerGuide(window, document, bloc);
+  }
+
+  // Questions fréquentes : le même texte que celui servi aux robots par api/page.js.
+  const zoneFaq = document.getElementById('faq-marche');
+  if (zoneFaq) {
+    const faq = construireFaq(document, questionsMarche(market, libelles));
+    zoneFaq.replaceChildren(...(faq ? [faq] : []));
+    zoneFaq.hidden = !faq;
   }
 }
 
@@ -1004,6 +1021,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 <script src="guide-marche.js"></script>
+<script src="faq-marche.js"></script>
 <script src="api.js"></script>
 </body>
 </html>

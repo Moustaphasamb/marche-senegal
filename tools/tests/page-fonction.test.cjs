@@ -26,7 +26,7 @@ test('marché par slug : page remplie, cache long', async () => {
   const res = reponse();
   await handler({ query: { type: 'marche', cle: 'sandaga' } }, res);
   assert.equal(res.statusCode, 200);
-  assert.deepEqual(appels, ['/markets/sandaga']);
+  assert.deepEqual(appels.sort(), ['/markets/categories', '/markets/sandaga']);
   assert.match(res.corps, /<title>Marché Sandaga, Dakar/);
   assert.equal(res.entetes['cache-control'], 'public, s-maxage=600, stale-while-revalidate=86400');
   assert.equal(res.entetes['content-type'], 'text/html; charset=utf-8');
@@ -113,4 +113,14 @@ test('clés piégées : 404 sans appel réseau', async () => {
     if (type !== 'inconnu') assert.ok(res.corps.includes(`{"type":"${type}","id":"introuvable"}`), `${type}/${cle}`);
   }
   assert.deepEqual(appels, []);
+});
+
+test('libellés des catégories indisponibles : la page marché sort quand même', async () => {
+  handler.dependances.appelerApi = async c => (c === '/markets/categories' ? { statut: 500, corps: {} }
+    : { statut: 200, corps: { success: true, data: { id: 'm1', slug: 'sandaga', name: 'Marché Sandaga', city: 'Dakar', description: 'x', categories: ['tissus'], shops: [] } } });
+  const res = reponse();
+  await handler({ query: { type: 'marche', cle: 'sandaga' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.match(res.corps, /FAQPage/);
+  assert.doesNotMatch(res.corps, /Que trouve-t-on/);
 });

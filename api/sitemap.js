@@ -28,7 +28,8 @@ async function handler(req, res) {
     // Les id et slugs sont des UUID ou [a-z0-9-] : rien à échapper en XML.
     const urls = [
       ...FIXES.map(u => SITE + u),
-      ...marches.map(m => urlPropre('marche', m)),
+      // Un marché sans présentation est servi en noindex : inutile de le proposer à Google.
+      ...marches.filter(m => m.description).map(m => urlPropre('marche', m)),
       ...boutiques.map(b => urlPropre('boutique', b)),
       ...produits.map(p => urlPropre('produit', p))
     ].filter(Boolean);

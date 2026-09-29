@@ -128,3 +128,21 @@ test('echapper', () => {
   assert.equal(echapper(`<a href="x">'&`), '&lt;a href=&quot;x&quot;&gt;&#39;&amp;');
   assert.equal(echapper(null), '');
 });
+
+test('marché : FAQ lisible et balisage FAQPage identique', () => {
+  const html = remplirPage(MODELE, 'marche', MARCHE, { libelles: {} });
+  const lds = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1]));
+  const faq = lds.find(l => l['@type'] === 'FAQPage');
+  assert.ok(faq, 'FAQPage absent');
+  assert.equal(faq.mainEntity[0].name, 'Où se trouve le Marché Sandaga ?');
+  assert.equal(faq.mainEntity[0].acceptedAnswer.text, 'Plateau, Dakar (région de Dakar).');
+  const bloc = html.match(/<section data-ssr>[\s\S]*?<\/section>/)[0];
+  assert.match(bloc, /<h2>Questions fréquentes<\/h2>/);
+  assert.match(bloc, /<h3>Quels sont les horaires du Marché Sandaga \?<\/h3><p>8 h – 20 h<\/p>/);
+});
+
+test('marché sans description : page servie mais non indexée', () => {
+  const html = remplirPage(MODELE, 'marche', { id: 'm9', slug: 'bakel', name: 'Marché de Bakel', city: 'Bakel', region: 'Tambacounda', shops: [] });
+  assert.match(html, /<meta name="robots" content="noindex">/);
+  assert.doesNotMatch(remplirPage(MODELE, 'marche', MARCHE), /noindex/);
+});

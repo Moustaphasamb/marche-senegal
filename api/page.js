@@ -33,6 +33,17 @@ const dependances = {
   }
 };
 
+// Libellés des catégories pour la FAQ d'un marché ; sans eux, la question « Que trouve-t-on » est omise.
+async function libellesCategories() {
+  try {
+    const { statut, corps } = await dependances.appelerApi('/markets/categories');
+    const liste = statut === 200 && corps && Array.isArray(corps.data) ? corps.data : [];
+    return Object.fromEntries(liste.map(c => [c.slug, c.libelle]));
+  } catch (erreur) {
+    return {};
+  }
+}
+
 function envoyer(res, statut, html, cache) {
   res.statusCode = statut;
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -56,7 +67,8 @@ async function handler(req, res) {
     if (!publiable(type, corps.data)) {
       return envoyer(res, 404, marquerIntrouvable(modele, { type, id: corps.data.id || cle }), 'public, s-maxage=600');
     }
-    return envoyer(res, 200, remplirPage(modele, type, corps.data), CACHE_LONG);
+    const extras = type === 'marche' ? { libelles: await libellesCategories() } : {};
+    return envoyer(res, 200, remplirPage(modele, type, corps.data, extras), CACHE_LONG);
   } catch (erreur) {
     console.error('[page]', type, cle, erreur.message);
     return envoyer(res, 200, preparerModele(modele, { type, id: cle }), 'public, s-maxage=60');

@@ -4,6 +4,8 @@
 // (tools/tests/remplir-page.test.cjs).
 'use strict';
 
+const { questionsMarche } = require('../../faq-marche.js');
+
 const SITE = 'https://marche-senegal-zeta.vercel.app';
 const MARQUE = 'Marché Sénégal';
 
@@ -38,19 +40,26 @@ function lieuBoutique(b) {
   return dansUnMarche(b) ? joindre([b.market.name, b.market.city]) : joindre([b.locationName, b.locationCity]);
 }
 
-function decrireMarche(d) {
+function decrireMarche(d, extras = {}) {
+  const faq = questionsMarche(d, extras.libelles || {});
   const geo = arrondi(d.latitude) !== null && arrondi(d.longitude) !== null
     ? { '@type': 'GeoCoordinates', latitude: arrondi(d.latitude), longitude: arrondi(d.longitude) } : undefined;
   return {
     titre: `${joindre([d.name, d.city])} — ${MARQUE}`,
     description: resume(d.description) || `Boutiques et produits du ${d.name} à ${d.city}, sur ${MARQUE}.`,
     image: absolue(d.imageUrl),
-    ld: {
+    // Sans présentation, la page reste utile à partager mais trop mince pour un moteur.
+    noindex: !d.description,
+    ld: [{
       '@context': 'https://schema.org', '@type': 'Place', name: d.name, description: d.description || undefined,
       address: { '@type': 'PostalAddress', streetAddress: d.address || undefined, addressLocality: d.city || undefined,
         addressRegion: d.region || undefined, addressCountry: 'SN' },
       geo, url: urlPropre('marche', d) || undefined
-    },
+    }, {
+      '@context': 'https://schema.org', '@type': 'FAQPage',
+      mainEntity: faq.map(q => ({ '@type': 'Question', name: q.question,
+        acceptedAnswer: { '@type': 'Answer', text: q.reponse } }))
+    }],
     corps: [
       `<h1>${echapper(d.name)}</h1>`,
       `<p>${echapper(joindre([d.city, d.region]))}</p>`,
@@ -59,7 +68,9 @@ function decrireMarche(d) {
       d.horaires ? `<p>Horaires : ${echapper(d.horaires)}</p>` : '',
       d.conseils ? `<p>Conseils : ${echapper(d.conseils)}</p>` : '',
       (d.shops || []).length ? `<h2>Boutiques</h2><ul>${d.shops.map(s =>
-        `<li><a href="/boutiques/${echapper(s.id)}">${echapper(s.name)}</a></li>`).join('')}</ul>` : ''
+        `<li><a href="/boutiques/${echapper(s.id)}">${echapper(s.name)}</a></li>`).join('')}</ul>` : '',
+      faq.length ? `<h2>Questions fréquentes</h2>${faq.map(q =>
+        `<h3>${echapper(q.question)}</h3><p>${echapper(q.reponse)}</p>`).join('')}` : ''
     ]
   };
 }
@@ -129,8 +140,8 @@ function preparerModele(modele, page) {
     .replace(/<\/head>/i, () => (page ? `<script>window.__MS_PAGE__=${jsonDansScript(page)}</script></head>` : '</head>'));
 }
 
-function remplirPage(modele, type, donnees) {
-  const info = DESCRIPTEURS[type](donnees);
+function remplirPage(modele, type, donnees, extras = {}) {
+  const info = DESCRIPTEURS[type](donnees, extras);
   const canonique = urlPropre(type, donnees);
   const entete = [
     canonique ? `<link rel="canonical" href="${echapper(canonique)}">` : '',
@@ -140,7 +151,8 @@ function remplirPage(modele, type, donnees) {
     `<meta property="og:description" content="${echapper(info.description)}">`,
     canonique ? `<meta property="og:url" content="${echapper(canonique)}">` : '',
     info.image ? `<meta property="og:image" content="${echapper(info.image)}">` : '',
-    `<script type="application/ld+json">${jsonDansScript(info.ld)}</script>`
+    ...[].concat(info.ld).map(ld => `<script type="application/ld+json">${jsonDansScript(ld)}</script>`),
+    info.noindex ? '<meta name="robots" content="noindex">' : ''
   ].join('');
   // Le visiteur voit le rendu habituel de la page : ce bloc ne sert qu'aux lecteurs sans JavaScript.
   const bloc = `<section data-ssr>${info.corps.join('')}</section>` +

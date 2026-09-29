@@ -28,20 +28,23 @@ async function chargerMarche(page, { marcheConnu = true } = {}) {
   const appels = [];
   w.getMarket = async id => {
     appels.push(['getMarket', id]);
-    return marcheConnu ? { success: true, data: { id: UUID, slug: 'sandaga', name: 'Marché Sandaga', city: 'Dakar', shops: [] } }
+    return marcheConnu ? { success: true, data: { id: UUID, slug: 'sandaga', name: 'Marché Sandaga', city: 'Dakar', region: 'Dakar',
+      horaires: '8 h – 20 h', categories: ['tissus'], specialites: ['tissus'], shops: [{ id: 's1' }] } }
       : { success: false, message: 'Marché introuvable' };
   };
   w.getMarkets = async () => ({ success: true, data: [{ id: 'autre-lieu', name: 'Autre lieu', city: 'Hors marché' }] });
   w.getShops = async o => { appels.push(['getShops', o.marketId]); return { success: true, data: [] }; };
   w.getProducts = async o => { appels.push(['getProducts', o.marketId]); return { success: true, data: [] }; };
-  w.getMarketCategories = async () => ({ success: true, data: [] });
+  w.getMarketCategories = async () => ({ success: true, data: [{ slug: 'tissus', libelle: 'Tissus et pagnes' }] });
   w.getFavorites = async () => ({ success: true, data: [] });
   w.isLoggedIn = () => false;
   w.applyBanner = () => {};
   w.eval(lire('guide-marche.js'));
+  w.eval(lire('faq-marche.js'));
   for (const s of w.document.querySelectorAll('script:not([src])')) w.eval(s.textContent);
   w.document.dispatchEvent(new w.Event('DOMContentLoaded'));
   await tick(); await tick();
+  appels.document = w.document;
   return appels;
 }
 
@@ -79,4 +82,18 @@ test('les modèles ne portent plus de marché, boutique ou prix d exemple', () =
       assert.ok(!b.includes(exemple), `${f} contient encore « ${exemple} »`);
     }
   }
+});
+
+test('la page marché montre ses questions fréquentes, en accordéons', async () => {
+  const { document: doc } = await chargerMarche({ type: 'marche', id: UUID });
+  const zone = doc.getElementById('faq-marche');
+  assert.equal(zone.hidden, false);
+  const questions = [...zone.querySelectorAll('summary')].map(s => s.textContent);
+  assert.deepEqual(questions.slice(0, 3), ['Où se trouve le Marché Sandaga ?', 'Quels sont les horaires du Marché Sandaga ?', 'Que trouve-t-on au Marché Sandaga ?']);
+  assert.match(zone.textContent, /Oui : 1 boutique de ce marché vend/);
+});
+
+test('marché introuvable : pas de questions fréquentes', async () => {
+  const { document: doc } = await chargerMarche({ type: 'marche', id: 'nexistepas' }, { marcheConnu: false });
+  assert.equal(doc.getElementById('faq-marche').hidden, true);
 });
