@@ -30,7 +30,8 @@ test('réponses tirées de la fiche, spécialités d abord', () => {
   assert.equal(reponse(SANDAGA, 'Où'), 'Plateau, Dakar (région de Dakar).');
   assert.equal(reponse(SANDAGA, 'Quels sont'), 'Environ 8 h – 20 h.');
   assert.equal(reponse(SANDAGA, 'Que trouve'), 'Surtout : tissus et pagnes. On y trouve aussi : bijoux.');
-  assert.match(reponse(SANDAGA, 'Peut-on'), /^Oui : 1 boutique de ce marché vend sur Marché Sénégal/);
+  assert.equal(reponse(SANDAGA, 'Peut-on'),
+    'Oui : 1 boutique de ce marché vend sur Marché Sénégal. On peut voir ses produits, écrire au vendeur et commander.');
 });
 
 test('fiche vide : seulement ce qui est sûr, rien d inventé', () => {
@@ -45,7 +46,8 @@ test('fiche vide : seulement ce qui est sûr, rien d inventé', () => {
 });
 
 test('plusieurs boutiques : pluriel', () => {
-  assert.match(reponse({ ...SANDAGA, shops: [{}, {}, {}] }, 'Peut-on'), /^Oui : 3 boutiques de ce marché vendent/);
+  assert.equal(reponse({ ...SANDAGA, shops: [{}, {}, {}] }, 'Peut-on'),
+    'Oui : 3 boutiques de ce marché vendent sur Marché Sénégal. On peut voir leurs produits, écrire aux vendeurs et commander.');
 });
 
 test('catégorie sans libellé connu : question omise plutôt qu un code', () => {

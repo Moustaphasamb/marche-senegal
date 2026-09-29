@@ -52,8 +52,9 @@
       {
         question: `Peut-on acheter en ligne ${n.au} ?`,
         reponse: boutiques
-          ? `Oui : ${boutiques} boutique${boutiques > 1 ? 's' : ''} de ce marché ${boutiques > 1 ? 'vendent' : 'vend'} sur ${MARQUE}. `
-            + 'On peut voir leurs produits, écrire au vendeur et commander.'
+          ? (boutiques > 1
+            ? `Oui : ${boutiques} boutiques de ce marché vendent sur ${MARQUE}. On peut voir leurs produits, écrire aux vendeurs et commander.`
+            : `Oui : 1 boutique de ce marché vend sur ${MARQUE}. On peut voir ses produits, écrire au vendeur et commander.`)
           : `Pas encore : aucune boutique de ce marché n'est en ligne sur ${MARQUE} pour le moment.`
       },
       {
