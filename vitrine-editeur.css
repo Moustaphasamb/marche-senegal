@@ -65,3 +65,9 @@
   .ve-panel{padding:12px}
   .ve-steps button{font-size:12px;padding:8px 4px}
 }
+/* Photo 360° : le cadre a une taille fixe, la vue tourne dedans (vue-360.css). */
+.ve-photo.ve-360{width:100%;aspect-ratio:16/10;max-height:70vh;cursor:default}
+.ve-photo.ve-360 .ve-point,.ve-photo.ve-360 .ve-cible,.ve-photo.ve-360 .ve-label{z-index:1}
+.ve-view .v360-badge{flex:none}
+.ve-360-aide summary{cursor:pointer;font-weight:700}
+@media (max-width:600px){.ve-photo.ve-360{aspect-ratio:4/5}}

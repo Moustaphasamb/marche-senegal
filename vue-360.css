@@ -1,0 +1,15 @@
+/* Vue 360° (vue-360.js) : page boutique et éditeur de vitrine. */
+.v360{position:absolute;inset:0;overflow:hidden;background:#20271f;user-select:none}
+.v360-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+.v360-canvas:focus-visible{box-shadow:inset 0 0 0 3px #e0b447}
+.v360.v360-glisse .v360-canvas{cursor:grabbing}
+.v360-points{position:absolute;inset:0;pointer-events:none}
+.v360-points > *{pointer-events:auto}
+.v360-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;max-width:80%;padding:10px 16px;border-radius:12px;background:rgba(13,31,23,.82);color:#fff;font-size:14px;text-align:center;pointer-events:none}
+.v360-tools{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:8px;z-index:3}
+.v360-tool{width:44px;height:44px;border:0;border-radius:12px;background:rgba(255,253,247,.94);color:#0d1f17;font-size:20px;font-weight:700;line-height:1;display:grid;place-items:center;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer;padding:0}
+.v360-tool:focus-visible{outline:3px solid #e0b447;outline-offset:2px}
+.v360-tool[aria-pressed="true"]{background:#1f7a4d;color:#fff}
+.v360:fullscreen{background:#000}
+.v360-badge{display:inline-flex;align-items:center;border-radius:99px;background:#1f7a4d;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;letter-spacing:.02em}
+@media (max-width:600px){.v360-tools{right:8px;top:auto;bottom:70px;transform:none}}

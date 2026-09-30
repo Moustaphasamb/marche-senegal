@@ -166,7 +166,7 @@
     function appliquer() {
       etat.pan = Math.min(0, Math.max(-maxPan(), etat.pan));
       $('bv-scene').style.transform = `translateX(${etat.pan}px)`;
-      $('bv-left').hidden = $('bv-right').hidden = maxPan() === 0;
+      $('bv-left').hidden = $('bv-right').hidden = !en360 && maxPan() === 0;
     }
     function centrer() { etat.pan = -maxPan() / 2; appliquer(); }
     function regarder(dx) {
@@ -195,26 +195,18 @@
         box.appendChild(b);
       });
     }
-    function allerScene(i) {
-      if (!scenes.length) return;
-      etat.scene = (i + scenes.length) % scenes.length;
-      const s = scenes[etat.scene], sc = $('bv-scene'), img = $('bv-img');
-      $('bv-fail').hidden = true;
-      img.hidden = false;
-      img.alt = s.title ? 'Photo de la boutique : ' + s.title : 'Photo de la boutique';
-      img.src = s.imageUrl;
-      sc.querySelectorAll('.bv-spot,.bv-label').forEach(e => e.remove());
+    // Points produits et étiquettes de rayon d'une photo, positions en fraction (0-1).
+    function pointsDeLaScene(s) {
+      const liste = [];
       for (const h of C.pointsVisibles(s, index)) {
         const p = index.get(h.productId);
         const b = bouton('bv-spot', p.name);
-        b.style.left = h.x * 100 + '%';
-        b.style.top = h.y * 100 + '%';
         b.dataset.p = p.id;
         b.setAttribute('aria-pressed', String(p.id === etat.courant));
         b.onmouseenter = b.onfocus = () => bulle(b, p);
         b.onmouseleave = b.onblur = cacherBulle;
         b.onclick = e => { e.stopPropagation(); ouvrirProduit(p.id, true); };
-        sc.appendChild(b);
+        liste.push({ x: h.x, y: h.y, noeud: b });
       }
       // Étiquettes de rayon posées par le vendeur : les toucher filtre ce rayon.
       const dansLaPhoto = v => typeof v === 'number' && v >= 0 && v <= 1;
@@ -222,26 +214,77 @@
         const r = rayons.find(x => x.id === l.categoryId);
         if (!r || !dansLaPhoto(l.x) || !dansLaPhoto(l.y)) continue;
         const b = bouton('bv-label', 'Voir le rayon ' + r.label, (r.emoji ? r.emoji + ' ' : '') + r.label + ' · Voir le rayon →');
-        b.style.left = l.x * 100 + '%';
-        b.style.top = l.y * 100 + '%';
         b.onclick = ev => { ev.stopPropagation(); choisirRayon(r.id); };
-        sc.appendChild(b);
+        liste.push({ x: l.x, y: l.y, noeud: b });
       }
-      const titre = s.title || 'Vue ' + (etat.scene + 1);
-      $('bv-where').querySelector('b').textContent = scenes.length > 1 ? `${titre} · ${etat.scene + 1}/${scenes.length}` : titre;
+      return liste;
+    }
+
+    // Photo 360° (deux fois plus large que haute) : la boutique tourne sous le doigt.
+    // Sans WebGL ou si elle ne charge pas, la photo s'affiche à plat comme les autres.
+    let v360 = null, en360 = false;
+    const AIDE = { plat: 'Glissez pour regarder · touchez un point', rond: 'Glissez pour tourner à 360° · touchez un produit' };
+    function modeScene(rond) {
+      en360 = rond;
+      $('bv-scene').hidden = rond;
+      if (v360) v360.racine.hidden = !rond;
+      $('bv-stage').classList.toggle('bv-360', rond);
+      const aide = $('bv-where').querySelector('small');
+      if (aide) aide.textContent = rond ? AIDE.rond : AIDE.plat;
+    }
+    function afficherPlat(s) {
+      modeScene(false);
+      if (v360) v360.points([]);
+      const sc = $('bv-scene'), img = $('bv-img');
+      img.hidden = false;
+      img.alt = s.title ? 'Photo de la boutique : ' + s.title : 'Photo de la boutique';
+      img.src = s.imageUrl;
+      sc.querySelectorAll('.bv-spot,.bv-label').forEach(e => e.remove());
+      for (const pt of pointsDeLaScene(s)) {
+        pt.noeud.style.left = pt.x * 100 + '%';
+        pt.noeud.style.top = pt.y * 100 + '%';
+        sc.appendChild(pt.noeud);
+      }
+      centrer();
+    }
+    function afficher360(s, n) {
+      if (!v360) {
+        v360 = root.Vue360.creer({ libelle: 'Vue 360° de ' + (s.title || shop.name), auto: true });
+        if (!v360) return false;
+        $('bv-stage').insertBefore(v360.racine, $('bv-scene').nextSibling);
+      }
+      $('bv-scene').querySelectorAll('.bv-spot,.bv-label').forEach(e => e.remove());
+      modeScene(true);
+      v360.points(pointsDeLaScene(s));
+      v360.charger(s.imageUrl).catch(() => { if (etat.scene === n) afficherPlat(s); });
+      return true;
+    }
+
+    function allerScene(i) {
+      if (!scenes.length) return;
+      etat.scene = (i + scenes.length) % scenes.length;
+      const n = etat.scene, s = scenes[n];
+      $('bv-fail').hidden = true;
+      const titre = s.title || 'Vue ' + (n + 1);
+      $('bv-where').querySelector('b').textContent = scenes.length > 1 ? `${titre} · ${n + 1}/${scenes.length}` : titre;
       $('bv-fwd').hidden = $('bv-back').hidden = $('bv-plan-btn').hidden = scenes.length < 2;
       if (scenes.length < 2) $('bv-plan').hidden = true;
       dessinerPlan();
       cacherBulle();
-      centrer();
+      // La vignette dit si la photo est une 360° avant de télécharger la photo entière.
+      if (!root.Vue360) { afficherPlat(s); return; }
+      root.Vue360.detecter(s.imageUrl).then(rond => {
+        if (etat.scene !== n) return;
+        if (!(rond && afficher360(s, n))) afficherPlat(s);
+      });
     }
     $('bv-img').onerror = () => { $('bv-img').hidden = true; $('bv-fail').hidden = false; };
     $('bv-img').onload = centrer;
     $('bv-retry').onclick = () => allerScene(etat.scene);
     $('bv-fwd').onclick = () => allerScene(etat.scene + 1);
     $('bv-back').onclick = () => allerScene(etat.scene - 1);
-    $('bv-left').onclick = () => regarder(260);
-    $('bv-right').onclick = () => regarder(-260);
+    $('bv-left').onclick = () => (en360 ? v360.tourner(-45) : regarder(260));
+    $('bv-right').onclick = () => (en360 ? v360.tourner(45) : regarder(-260));
     $('bv-plan-btn').onclick = () => {
       const p = $('bv-plan');
       p.hidden = !p.hidden;
@@ -252,6 +295,7 @@
       let x0 = null, p0 = 0;
       st.addEventListener('pointerdown', e => {
         if (e.target.closest('button,.bv-plan')) return;
+        if (en360) { cacherBulle(); return; }
         x0 = e.clientX; p0 = etat.pan;
         if (st.setPointerCapture) st.setPointerCapture(e.pointerId);
         st.classList.add('bv-dragging');

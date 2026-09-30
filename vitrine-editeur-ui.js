@@ -132,6 +132,14 @@
     function etapePhotos(p) {
       p.appendChild(el('h2', null, '1. Les photos de votre boutique'));
       p.appendChild(el('p', 've-help', `Commencez par une vue d’ensemble, puis un rayon ou un mur. Téléphone stable, bonne lumière, sans client reconnaissable ni document privé. Jusqu’à ${C.MAX_VUES} photos.`));
+      const conseil = el('details', 've-card ve-360-aide');
+      conseil.appendChild(el('summary', null, 'Montrer toute ma boutique en 360°'));
+      for (const t of [
+        'Une photo 360° fait le tour complet de la boutique : le client tourne à gauche, à droite, en haut et en bas.',
+        'Prenez-la avec une caméra 360° (Insta360, Ricoh Theta…) ou une application de photo sphérique, placée au milieu de la boutique, à hauteur des yeux.',
+        'Envoyez l’image telle que l’appareil la donne : deux fois plus large que haute. Elle est reconnue toute seule et marquée 360°.'
+      ]) conseil.appendChild(el('p', 've-help', t));
+      p.appendChild(conseil);
       if (e.vitrine && !e.vues.length) {
         const carte = el('div', 've-card');
         carte.appendChild(el('p', null, 'Votre boutique a déjà une photo de vitrine. Reprenez-la comme première photo, avec ses points.'));
@@ -174,7 +182,9 @@
           if (!await confirmer('Supprimer la photo « ' + v.title + ' » et ses points ? Votre vitrine en ligne ne change pas avant la publication.')) return;
           agir(() => api.supprimerVue(v.id), () => { e.vues = e.vues.filter(x => x.id !== v.id); });
         };
+        verifierRonde(v.imageUrl);
         li.append(img, titre, haut, bas, suppr);
+        if (estRonde(v.imageUrl)) img.after(el('span', 'v360-badge', '360°'));
         liste.appendChild(li);
       });
       p.appendChild(liste);
@@ -236,9 +246,50 @@
       p.appendChild(tabs);
     }
 
+    // Photo 360° : le vendeur tourne dans sa boutique et touche l'article. Un lecteur par
+    // photo, gardé entre deux affichages pour ne pas perdre l'angle de vue.
+    const rondes = new Map(), lecteurs = new Map();
+    const estRonde = url => rondes.get(url) === true;
+    // La vignette dit si la photo est une 360° ; l'écran est redessiné quand c'en est une.
+    function verifierRonde(url) {
+      if (!root.Vue360 || rondes.has(url)) return;
+      rondes.set(url, false);
+      root.Vue360.detecter(url).then(r => { rondes.set(url, r); if (r) rendre(); });
+    }
+    function lecteur360(vue) {
+      let l = lecteurs.get(vue.id);
+      if (l && l.url === vue.imageUrl) return l;
+      if (l) l.v.detruire();
+      l = { url: vue.imageUrl, toucher: null };
+      l.v = root.Vue360.creer({ libelle: 'Photo 360° : ' + vue.title, surToucher: pos => { if (!e.occupe && l.toucher) l.toucher(pos); } });
+      if (!l.v) { rondes.set(vue.imageUrl, false); return null; }
+      l.v.charger(vue.imageUrl).catch(() => statut('La photo 360° n’a pas pu être chargée : vérifiez votre connexion.', true));
+      lecteurs.set(vue.id, l);
+      return l;
+    }
+    // Place un point ou une étiquette sur la photo, à plat ou dans la vue 360°.
+    function poser(cadre, noeud, pos) {
+      if (!cadre.v360) { placer(noeud, pos); cadre.appendChild(noeud); return; }
+      cadre.v360Points.push({ x: pos.x, y: pos.y, noeud });
+      cadre.v360.points(cadre.v360Points);
+    }
+
     // Photo de la vue ; toucher(pos) reçoit la position en fraction. Un toucher sur
     // un bouton posé sur la photo (point, étiquette) n'est pas un toucher de photo.
     function photo(p, vue, toucher) {
+      verifierRonde(vue.imageUrl);
+      const l = estRonde(vue.imageUrl) ? lecteur360(vue) : null;
+      if (l) {
+        const cadre = el('div', 've-photo ve-360');
+        l.toucher = toucher;
+        cadre.v360 = l.v;
+        cadre.v360Points = [];
+        l.v.points([]);
+        cadre.appendChild(l.v.racine);
+        p.appendChild(cadre);
+        p.appendChild(el('p', 've-help', 'Photo 360° : glissez pour tourner dans votre boutique, puis touchez un article.'));
+        return cadre;
+      }
       const cadre = el('div', 've-photo');
       const img = el('img');
       img.src = vue.imageUrl;
@@ -286,14 +337,12 @@
         const horsVente = e.catalogueOk && pr && pr.status !== 'ACTIVE';
         const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name + (horsVente ? ' (hors vente)' : '') : 'produit retiré'));
         if (e.catalogueOk && (!pr || pr.status !== 'ACTIVE')) b.classList.add('ve-warn');
-        placer(b, pt);
         b.onclick = () => { e.choix = null; e.mode = { type: 'point', index: i }; rendre(); };
-        cadre.appendChild(b);
+        poser(cadre, b, pt);
       });
       if (e.choix) {
         const cible = el('span', 've-cible');
-        placer(cible, e.choix);
-        cadre.appendChild(cible);
+        poser(cadre, cible, e.choix);
         p.appendChild(choixProduit(vue));
       }
       if (e.mode && (e.mode.type === 'point' || e.mode.type === 'deplacer')) p.appendChild(actionsPoint(vue, e.mode.index));
@@ -427,8 +476,7 @@
         for (const l of vue.labels || []) {
           const r = e.rayons.find(x => x.id === l.categoryId);
           const t = el('span', 've-label', (r ? r.name : 'Rayon') + ' · Voir le rayon →');
-          placer(t, l);
-          cadre.appendChild(t);
+          poser(cadre, t, l);
         }
       }
       navigation(p, { n: 2, texte: 'Produits' }, { n: 4, texte: 'Vérifier et publier' });

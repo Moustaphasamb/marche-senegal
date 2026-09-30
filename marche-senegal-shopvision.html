@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="identite-vendeur.css"/>
   <link rel="stylesheet" href="design-marche.css"/>
+  <link rel="stylesheet" href="vue-360.css"/>
   <link rel="stylesheet" href="vitrine-editeur.css"/>
   <script src="design-marche.js" defer></script>
 </head>
@@ -47,6 +48,7 @@
   <script src="api.js"></script>
   <script src="marche-senegal-menu-vendeur.js"></script>
   <script src="vitrine-editeur.js"></script>
+  <script src="vue-360.js"></script>
   <script src="vitrine-editeur-ui.js"></script>
   <script>
   // Accès vendeur, puis l'assistant (vitrine-editeur-ui.js). Chaque action est
@@ -67,6 +69,12 @@
 
     async function envoyerPhotoVitrine(fichier) {
       const corps = new FormData();
+      // Une photo 360° garde 4 096 px de large sur le serveur : à 2 400, elle serait floue une fois déroulée.
+      try {
+        const image = await createImageBitmap(fichier);
+        if (Vue360.estPanorama(image.width, image.height)) corps.append('vue', '360');
+        image.close();
+      } catch { /* image illisible ici : le serveur tranchera */ }
       corps.append('image', fichier);
       try {
         const reponse = await fetch(API_URL + '/api/upload/showcase', {
