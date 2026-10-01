@@ -107,6 +107,16 @@
       }
     }
 
+    // Photos déjà dans la vitrine : version réduite à 1 600 px servie par Cloudinary.
+    async function telechargerPhotos(adresses) {
+      return Promise.all(adresses.map(async (adresse, i) => {
+        const reponse = await fetch(Vue360.urlTaille(adresse, 1600));
+        if (!reponse.ok) throw new Error('Photo inaccessible');
+        const blob = await reponse.blob();
+        return new File([blob], 'photo-' + String(i + 1).padStart(2, '0') + '.jpg', { type: blob.type || 'image/jpeg' });
+      }));
+    }
+
     async function envoyerSerie360(fichiers) {
       const corps = new FormData();
       for (const [i, f] of fichiers.entries()) corps.append('photos', await alleger(f), 'photo-' + String(i + 1).padStart(2, '0') + '.jpg');
@@ -141,7 +151,7 @@
       $('publicShopLink').hidden = false;
       $('ve').hidden = false;
       const editeur = VitrineEditeur.monter({
-        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360 }),
+        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         confirmer: async message => window.confirm(message)

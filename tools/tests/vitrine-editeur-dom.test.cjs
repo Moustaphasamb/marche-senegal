@@ -550,3 +550,62 @@ test('coupure après l’assemblage : « Réessayer » crée la vue sans tout r�
   assert.equal(assemblages, 1);
   assert.equal(t.qa('.ve-view').length, 1);
 });
+
+// ── Étape 1 : choix 360° / photo simple, assemblage des photos déjà là, aperçu ──
+const sixVues = () => [1, 2, 3, 4, 5, 6].map(k => vue('v' + k, { title: 'Photo ' + k }));
+
+test('étape 1 : deux choix côte à côte, 360° conseillé, chaque photo étiquetée', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  const cartes = t.qa('.ve-choix .ve-choix-carte');
+  assert.equal(cartes.length, 2);
+  assert.match(cartes[0].textContent, /Vue 360° de ma boutique/);
+  assert.match(cartes[0].textContent, /Conseillé/);
+  assert.match(cartes[1].textContent, /photo d’un rayon ou d’un mur/);
+  assert.equal(t.q('.ve-view .ve-genre').textContent, 'Photo simple');
+});
+
+test('six photos ajoutées une par une : on propose de les assembler en 360°', async () => {
+  const t = await monter({ scenes: sixVues() });
+  assert.match(t.q('.ve-assembler h3').textContent, /Vos 6 photos font le tour/);
+  const peu = await monter({ scenes: sixVues().slice(0, 5) });
+  assert.equal(peu.q('.ve-assembler'), null, 'moins de 6 : rien à assembler');
+});
+
+test('assembler : photos dans l’ordre de la liste, vue 360° créée, photos séparées retirées sur accord', async () => {
+  const t = await monter({ scenes: sixVues() });
+  const recues = [];
+  t.api.assemblerVues = async adresses => { recues.push(Array.from(adresses)); return { success: true, url: 'https://ex.test/tour-360.jpg' }; };
+  t.bouton('Assembler ces photos en 360°').click();
+  for (let i = 0; i < 12; i++) await t.attendre();
+  assert.deepEqual(recues, [[1, 2, 3, 4, 5, 6].map(k => 'https://ex.test/v' + k + '.jpg')]);
+  assert.ok(t.appels.some(a => a[0] === 'creerVue' && a[1].title === 'Vue 360°' && a[1].imageUrl === 'https://ex.test/tour-360.jpg'));
+  assert.match(t.confirmations.at(-1), /Retirer les 6 photos séparées/);
+  assert.equal(t.appels.filter(a => a[0] === 'supprimerVue').length, 6);
+  assert.deepEqual(t.qa('.ve-view .ve-title').map(i => i.value), ['Vue 360°']);
+});
+
+test('assembler sans retirer : les photos séparées restent si le vendeur refuse', async () => {
+  const t = await monter({ scenes: sixVues(), refuserConfirmation: true });
+  t.api.assemblerVues = async () => ({ success: true, url: 'https://ex.test/tour-360.jpg' });
+  t.bouton('Assembler ces photos en 360°').click();
+  for (let i = 0; i < 12; i++) await t.attendre();
+  assert.equal(t.appels.filter(a => a[0] === 'supprimerVue').length, 0);
+  assert.equal(t.qa('.ve-view').length, 7);
+});
+
+test('une vue 360° s’affiche en aperçu à l’étape 1, et la vignette touchée devient l’aperçu', async () => {
+  const t = await monter({ scenes: [vue('a', { imageUrl: 'https://ex.test/a-360.jpg' }), vue('b', { imageUrl: 'https://ex.test/b-360.jpg' })] });
+  t.w.Vue360 = {
+    detecter: url => Promise.resolve(url.includes('360')),
+    creer: o => { const racine = t.w.document.createElement('div'); racine.className = 'v360'; racine.dataset.vue = o.libelle; return { racine, points: () => {}, charger: () => Promise.resolve() }; }
+  };
+  t.q('#ve-steps button[data-etape="1"]').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.match(t.q('#ve-panel').textContent, /Aperçu : tournez dans votre boutique/);
+  assert.equal(t.qa('.ve-view .v360-badge').length, 2);
+  assert.equal(t.q('#ve-panel .v360').dataset.vue, 'Photo 360° : Vue b', 'la dernière vue 360° par défaut');
+  t.qa('.ve-vignette')[0].click();
+  for (let i = 0; i < 3; i++) await t.attendre();
+  assert.equal(t.q('#ve-panel .v360').dataset.vue, 'Photo 360° : Vue a');
+  assert.ok(t.qa('.ve-view')[0].classList.contains('ve-actif'));
+});

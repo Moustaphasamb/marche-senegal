@@ -131,7 +131,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier, envoyerSerie }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -151,7 +151,13 @@
       publier: () => appel(base + '/publish', { method: 'POST' }),
       abandonner: () => appel(base + '/draft', { method: 'DELETE' }),
       envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
-      assembler360: async fichiers => marquer(await envoyerSerie(fichiers))
+      assembler360: async fichiers => marquer(await envoyerSerie(fichiers)),
+      // Photos déjà envoyées une par une : on les retélécharge pour les assembler.
+      assemblerVues: async adresses => {
+        let fichiers;
+        try { fichiers = await telechargerPhotos(adresses); } catch { return { success: false, message: RESEAU, reseau: true }; }
+        return marquer(await envoyerSerie(fichiers));
+      }
     };
   }
 
