@@ -155,3 +155,29 @@ test('l’assemblage 360° passe par l’envoi de série, une coupure est marqu�
   assert.deepEqual(recus, [6]);
   assert.equal(r.reseau, true);
 });
+
+// ── Zone d'un produit (partie 2a) ──
+test('un point garde sa zone en passant par l’éditeur', () => {
+  const v = E.ajouterPoint(vue('a'), { productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3, autre: 'x' });
+  assert.deepEqual(v.hotspots, [{ productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3 }]);
+  const simple = E.ajouterPoint(vue('a'), { productId: 'p1', x: 0.4, y: 0.5 });
+  assert.deepEqual(simple.hotspots, [{ productId: 'p1', x: 0.4, y: 0.5 }]);
+});
+
+test('zone tracée sur une photo à plat : centre et taille en fractions, bornés', () => {
+  const rect = { left: 0, top: 0, width: 200, height: 100 };
+  assert.deepEqual(E.zoneDansPhoto(rect, 20, 10, 60, 50), { x: 0.2, y: 0.3, w: 0.2, h: 0.4 });
+  // Tracé de droite à gauche et de bas en haut : même zone.
+  assert.deepEqual(E.zoneDansPhoto(rect, 60, 50, 20, 10), { x: 0.2, y: 0.3, w: 0.2, h: 0.4 });
+  // Dépasse le bord : coupé à la photo.
+  assert.deepEqual(E.zoneDansPhoto(rect, 180, 80, 260, 140), { x: 0.95, y: 0.9, w: 0.1, h: 0.2 });
+  // Trop petit : c'est un toucher, pas une zone.
+  assert.equal(E.zoneDansPhoto(rect, 50, 50, 52, 51), null);
+});
+
+test('l’enregistrement envoie la zone au serveur', async () => {
+  const envoyes = [];
+  const api = E.creerApi({ apiCall: async (url, o) => { envoyes.push(JSON.parse(o.body)); return { success: true }; }, envoyerFichier: async () => ({}) });
+  await api.enregistrerVue({ id: 'a', title: 'A', imageUrl: 'https://ex.test/a.jpg', hotspots: [{ productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3, id: 'h1' }], labels: [] });
+  assert.deepEqual(envoyes[0].hotspots, [{ productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3 }]);
+});

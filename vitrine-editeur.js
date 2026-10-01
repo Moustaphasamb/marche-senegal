@@ -56,7 +56,23 @@
     return rayons.slice().sort((a, b) => (place(a) !== place(b) ? place(a) - place(b) : a.name.localeCompare(b.name, 'fr')));
   }
 
-  const point = p => ({ productId: p.productId, x: p.x, y: p.y });
+  // Un point peut porter la zone de son produit (largeur w, hauteur h en fractions).
+  const nombre = v => typeof v === 'number' && Number.isFinite(v);
+  const point = p => (nombre(p.w) && nombre(p.h)
+    ? { productId: p.productId, x: p.x, y: p.y, w: p.w, h: p.h }
+    : { productId: p.productId, x: p.x, y: p.y });
+
+  // Rectangle tracé au doigt ou à la souris sur une photo à plat -> zone (centre et taille),
+  // coupée au bord de la photo. Moins de 2 % de côté : c'était un toucher, pas une zone.
+  function zoneDansPhoto(rect, x0, y0, x1, y1) {
+    if (!rect || !(rect.width > 0) || !(rect.height > 0)) return null;
+    const fx = v => borne((v - rect.left) / rect.width);
+    const fy = v => borne((v - rect.top) / rect.height);
+    const g = Math.min(fx(x0), fx(x1)), d = Math.max(fx(x0), fx(x1));
+    const h = Math.min(fy(y0), fy(y1)), b = Math.max(fy(y0), fy(y1));
+    if (d - g < 0.02 || b - h < 0.02) return null;
+    return { x: arrondi((g + d) / 2), y: arrondi((h + b) / 2), w: arrondi(d - g), h: arrondi(b - h) };
+  }
   const etiquette = l => ({ categoryId: l.categoryId, x: l.x, y: l.y });
 
   function ajouterPoint(vue, p) {
@@ -162,7 +178,7 @@
   }
 
   const api = {
-    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
+    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, zoneDansPhoto, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
     produitsNonPlaces, controles, creerApi
   };

@@ -112,3 +112,23 @@ test('si la photo 360° ne charge pas, la photo à plat prend le relais', async 
   assert.equal(q('#bv-scene').hidden, false);
   assert.equal(q('.v360').hidden, true);
 });
+
+// ── Partie 2a : zone d'un produit côté acheteur ──
+test('une zone de produit couvre l’article : à plat en pourcentage, en 360° avec sa taille', async () => {
+  const zones = [{ id: 's1', title: 'Rayon', imageUrl: 'https://ex.test/plat.jpg', hotspots: [{ id: 'h1', productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3 }] }];
+  const dom = new JSDOM('<!doctype html><body>' + bloc + '</body>', { url: 'http://localhost:5500/', runScripts: 'outside-only' });
+  const w = dom.window;
+  w.eval(lire('boutique-visite.js'));
+  w.eval(lire('boutique-visite-ui.js'));
+  w.BoutiqueVisite.monter({ shop, scenes: zones, favoris: new w.Set(), stockage: w.localStorage, notifier: () => {}, basculerFavori: async () => null });
+  const z = w.document.querySelector('#bv-scene .bv-spot.bv-zone');
+  assert.ok(z, 'zone dessinée');
+  assert.equal(z.style.width, '20%');
+  assert.equal(z.style.height, '30%');
+  z.click();
+  assert.equal(w.document.querySelector('#bv-sheet h3').textContent, 'Oud');
+  // En 360° : le moteur reçoit la taille de la zone.
+  const { lecteur } = monter();
+  await attendre();
+  assert.ok(lecteur.points.every(p => p.w === undefined), 'les points simples restent des points');
+});

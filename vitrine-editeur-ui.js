@@ -381,8 +381,12 @@
       let l = lecteurs.get(vue.id);
       if (l && l.url === vue.imageUrl) return l;
       if (l) l.v.detruire();
-      l = { url: vue.imageUrl, toucher: null };
-      l.v = root.Vue360.creer({ libelle: 'Photo 360° : ' + vue.title, surToucher: pos => { if (!e.occupe && l.toucher) l.toucher(pos); } });
+      l = { url: vue.imageUrl, toucher: null, tracer: null, trace: false };
+      l.v = root.Vue360.creer({
+        libelle: 'Photo 360° : ' + vue.title,
+        surToucher: pos => { if (!e.occupe && l.toucher) l.toucher(pos); },
+        surTrace: zone => { if (!e.occupe && l.tracer) l.tracer(zone); }
+      });
       if (!l.v) { rondes.set(vue.imageUrl, false); return null; }
       l.v.charger(vue.imageUrl).catch(() => statut('La photo 360° n’a pas pu être chargée : vérifiez votre connexion.', true));
       lecteurs.set(vue.id, l);
@@ -391,24 +395,37 @@
     // Place un point ou une étiquette sur la photo, à plat ou dans la vue 360°.
     function poser(cadre, noeud, pos) {
       if (!cadre.v360) { placer(noeud, pos); cadre.appendChild(noeud); return; }
-      cadre.v360Points.push({ x: pos.x, y: pos.y, noeud });
+      cadre.v360Points.push({ x: pos.x, y: pos.y, w: pos.w, h: pos.h, noeud });
       cadre.v360.points(cadre.v360Points);
     }
 
     // Photo de la vue ; toucher(pos) reçoit la position en fraction. Un toucher sur
     // un bouton posé sur la photo (point, étiquette) n'est pas un toucher de photo.
-    function photo(p, vue, toucher, aide) {
+    // tracer(zone), facultatif : le vendeur entoure un article (étape 2) au lieu de le toucher.
+    function photo(p, vue, toucher, aide, tracer) {
       verifierRonde(vue.imageUrl);
       const l = estRonde(vue.imageUrl) && root.Vue360 ? lecteur360(vue) : null;
       if (l) {
         const cadre = el('div', 've-photo ve-360');
         l.toucher = toucher;
+        l.tracer = tracer || null;
+        if (!tracer && l.trace) { l.trace = false; l.v.tracer(false); }
         cadre.v360 = l.v;
         cadre.v360Points = [];
         l.v.points([]);
         cadre.appendChild(l.v.racine);
+        if (tracer) {
+          // Dans la vue 360°, glisser fait tourner : un bouton passe en mode « entourer ».
+          const b = bouton('ve-btn ve-entourer', l.trace ? '✓ Entourer un produit' : '⬚ Entourer un produit');
+          b.setAttribute('aria-pressed', String(l.trace));
+          b.onclick = () => { l.trace = !l.trace; l.v.tracer(l.trace); rendre(); };
+          p.appendChild(b);
+        }
         p.appendChild(cadre);
-        p.appendChild(el('p', 've-help', aide || 'Photo 360° : glissez pour tourner dans votre boutique, puis touchez un article.'));
+        p.appendChild(el('p', 've-help', aide || (tracer
+          ? (l.trace ? 'Glissez sur l’article pour l’entourer. Touchez « Entourer un produit » de nouveau pour tourner dans la boutique.'
+            : 'Glissez pour tourner dans votre boutique. Pour un article : « Entourer un produit », ou touchez-le simplement.')
+          : 'Photo 360° : glissez pour tourner dans votre boutique, puis touchez un article.')));
         return cadre;
       }
       const cadre = el('div', 've-photo');
@@ -416,7 +433,34 @@
       img.src = vue.imageUrl;
       img.alt = 'Photo : ' + vue.title;
       cadre.appendChild(img);
+      if (tracer) {
+        // Glisser sur la photo trace la zone de l'article ; un toucher simple reste un point.
+        cadre.classList.add('ve-tracable');
+        let depart = null, cadreTrace = null;
+        cadre.addEventListener('pointerdown', ev => {
+          if (e.occupe || (ev.target.closest && ev.target.closest('button'))) return;
+          depart = { x: ev.clientX, y: ev.clientY };
+        });
+        cadre.addEventListener('pointermove', ev => {
+          if (!depart) return;
+          if (!cadreTrace && Math.hypot(ev.clientX - depart.x, ev.clientY - depart.y) < 8) return;
+          if (!cadreTrace) { cadreTrace = el('span', 've-trace'); cadre.appendChild(cadreTrace); }
+          const z = C.zoneDansPhoto(img.getBoundingClientRect(), depart.x, depart.y, ev.clientX, ev.clientY);
+          if (z) placer(cadreTrace, z);
+        });
+        const fin = ev => {
+          if (!depart) return;
+          const z = cadreTrace ? C.zoneDansPhoto(img.getBoundingClientRect(), depart.x, depart.y, ev.clientX, ev.clientY) : null;
+          // Le clic qui suit le tracé arrive souvent sur la photo redessinée : on l'ignore.
+          if (cadreTrace) { cadreTrace.remove(); cadreTrace = null; finDeTrace = Date.now(); }
+          depart = null;
+          if (z && ev.type === 'pointerup') tracer(z);
+        };
+        cadre.addEventListener('pointerup', fin);
+        cadre.addEventListener('pointercancel', fin);
+      }
       cadre.onclick = ev => {
+        if (Date.now() - finDeTrace < 500) return;
         if (e.occupe || (ev.target.closest && ev.target.closest('button'))) return;
         const pos = C.positionDansPhoto(img.getBoundingClientRect(), ev.clientX, ev.clientY);
         if (pos) toucher(pos);
@@ -424,7 +468,14 @@
       p.appendChild(cadre);
       return cadre;
     }
-    const placer = (noeud, pos) => { noeud.style.left = pos.x * 100 + '%'; noeud.style.top = pos.y * 100 + '%'; };
+    // Point ou zone d'un produit (w, h) posé sur une photo à plat.
+    const placer = (noeud, pos) => {
+      noeud.style.left = pos.x * 100 + '%';
+      noeud.style.top = pos.y * 100 + '%';
+      if (typeof pos.w === 'number' && typeof pos.h === 'number') { noeud.style.width = pos.w * 100 + '%'; noeud.style.height = pos.h * 100 + '%'; }
+    };
+    let finDeTrace = 0;
+    const estZone = pt => typeof pt.w === 'number' && typeof pt.h === 'number' && pt.w > 0 && pt.h > 0;
     const produit = id => e.produits.find(x => x.id === id);
 
     function enregistrer(vue) {
@@ -439,11 +490,12 @@
     // ── Étape 2 : produits ──
     function etapeProduits(p) {
       p.appendChild(el('h2', null, '2. Placez vos produits'));
-      p.appendChild(el('p', 've-help', 'Touchez un article sur la photo, puis choisissez-le dans votre catalogue. Le prix et le stock viennent de la fiche du produit.'));
+      p.appendChild(el('p', 've-help', 'Entourez un article en glissant dessus (ou touchez-le simplement), puis choisissez-le dans votre catalogue. Le client pourra toucher l’article n’importe où dans la zone. Le prix et le stock viennent de la fiche du produit.'));
       selecteurVues(p);
       const vue = e.vues[e.courante];
       if (!vue) { navigation(p, { n: 1, texte: 'Photos' }, null); return; }
-      const cadre = photo(p, vue, pos => {
+      // Toucher ou entourer : même suite. En mode « déplacer », la zone tracée remplace l'ancienne.
+      const choisir = pos => {
         if (e.mode && e.mode.type === 'deplacer') {
           const pt = vue.hotspots[e.mode.index];
           if (pt) enregistrer(C.remplacerPoint(vue, e.mode.index, { ...pt, ...pos }));
@@ -452,17 +504,19 @@
         e.mode = null;
         e.choix = pos;
         rendre();
-      });
+      };
+      const cadre = photo(p, vue, choisir, null, choisir);
       (vue.hotspots || []).forEach((pt, i) => {
         const pr = produit(pt.productId);
         const horsVente = e.catalogueOk && pr && pr.status !== 'ACTIVE';
-        const b = bouton('ve-point', String(i + 1), 'Point ' + (i + 1) + ' : ' + (pr ? pr.name + (horsVente ? ' (hors vente)' : '') : 'produit retiré'));
+        const b = bouton('ve-point', String(i + 1), (estZone(pt) ? 'Zone ' : 'Point ') + (i + 1) + ' : ' + (pr ? pr.name + (horsVente ? ' (hors vente)' : '') : 'produit retiré'));
+        if (estZone(pt)) b.classList.add('ve-zone');
         if (e.catalogueOk && (!pr || pr.status !== 'ACTIVE')) b.classList.add('ve-warn');
         b.onclick = () => { e.choix = null; e.mode = { type: 'point', index: i }; rendre(); };
         poser(cadre, b, pt);
       });
       if (e.choix) {
-        const cible = el('span', 've-cible');
+        const cible = el('span', estZone(e.choix) ? 've-cible ve-cible-zone' : 've-cible');
         poser(cadre, cible, e.choix);
         p.appendChild(choixProduit(vue));
       }
@@ -503,7 +557,7 @@
         for (const x of trouves.slice(0, 30)) {
           const b = bouton('ve-product', x.name + (x.status === 'ACTIVE' ? '' : ' (hors vente)'));
           b.onclick = () => {
-            const nouvelle = C.ajouterPoint(vue, { productId: x.id, x: e.choix.x, y: e.choix.y });
+            const nouvelle = C.ajouterPoint(vue, { ...e.choix, productId: x.id });
             if (!nouvelle) { statut(`${C.MAX_POINTS} points au maximum sur une photo.`, true); return; }
             enregistrer(nouvelle);
           };

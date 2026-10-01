@@ -98,3 +98,33 @@ test('écart d’angle ramené entre -180 et 180 (capteurs qui passent le nord)'
   assert.equal(V.ecartAngle(10, 350), 20);
   assert.equal(V.ecartAngle(350, 10), -20);
 });
+
+// ── Zone d'un produit dans la vue 360° (partie 2a) ──
+test('une zone tracée droit devant donne une zone centrée sur la photo', () => {
+  const vue = { yaw: 0, pitch: 0, fov: 60, aspect: 1 };
+  const z = V.zoneDepuisEcran(0.4, 0.4, 0.6, 0.6, vue);
+  proche(z.x, 0.5); proche(z.y, 0.5);
+  assert.ok(z.w > 0.02 && z.w < 0.1, 'largeur ' + z.w);
+  assert.ok(z.h > 0.04 && z.h < 0.2, 'hauteur ' + z.h);
+});
+
+test('une zone à cheval sur l’arrière de la photo garde une petite largeur', () => {
+  const vue = { yaw: 180, pitch: 0, fov: 60, aspect: 1 };
+  const z = V.zoneDepuisEcran(0.45, 0.45, 0.55, 0.55, vue);
+  assert.ok(z.w < 0.1, 'largeur ' + z.w);
+  assert.ok(z.x < 0.02 || z.x > 0.98, 'centre derrière ' + z.x);
+});
+
+test('aller-retour : la zone projetée retombe sur le rectangle tracé', () => {
+  const vue = { yaw: 37, pitch: -12, fov: 70, aspect: 1.5 };
+  const z = V.zoneDepuisEcran(0.3, 0.35, 0.5, 0.6, vue);
+  const r = V.projeterZone(z, vue);
+  assert.equal(r.devant, true);
+  proche(r.px, 0.4, 0.02); proche(r.py, 0.475, 0.02);
+  proche(r.pw, 0.2, 0.03); proche(r.ph, 0.25, 0.03);
+});
+
+test('une zone derrière le client n’est pas visible', () => {
+  const r = V.projeterZone({ x: 0, y: 0.5, w: 0.05, h: 0.1 }, { yaw: 0, pitch: 0, fov: 70, aspect: 1 });
+  assert.equal(r.devant, false);
+});

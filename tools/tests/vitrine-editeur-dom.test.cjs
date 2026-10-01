@@ -609,3 +609,41 @@ test('une vue 360° s’affiche en aperçu à l’étape 1, et la vignette touch
   assert.equal(t.q('#ve-panel .v360').dataset.vue, 'Photo 360° : Vue a');
   assert.ok(t.qa('.ve-view')[0].classList.contains('ve-actif'));
 });
+
+// ── Partie 2a : entourer un article sur une photo à plat ──
+function glisser(t, cadre, de, a) {
+  const ev = (type, x, y) => cadre.dispatchEvent(new t.w.MouseEvent(type, { bubbles: true, clientX: x, clientY: y }));
+  ev('pointerdown', de[0], de[1]);
+  ev('pointermove', (de[0] + a[0]) / 2, (de[1] + a[1]) / 2);
+  ev('pointermove', a[0], a[1]);
+  ev('pointerup', a[0], a[1]);
+  ev('click', a[0], a[1]);
+}
+
+test('entourer un article puis le choisir : la zone est enregistrée avec le produit', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.q('#ve-steps button[data-etape="2"]').click();
+  await t.attendre();
+  const cadre = t.q('.ve-photo');
+  t.q('.ve-photo img').getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+  glisser(t, cadre, [20, 10], [60, 50]);
+  await t.attendre();
+  assert.ok(t.q('.ve-cible.ve-cible-zone'), 'la zone tracée est montrée');
+  t.qa('.ve-product')[0].click();
+  for (let i = 0; i < 5; i++) await t.attendre();
+  const envoi = t.appels.filter(a => a[0] === 'enregistrerVue').at(-1)[1];
+  assert.deepEqual(JSON.parse(JSON.stringify(envoi.hotspots)), [{ productId: envoi.hotspots[0].productId, x: 0.2, y: 0.3, w: 0.2, h: 0.4 }]);
+  assert.ok(t.q('.ve-point.ve-zone'), 'la zone est dessinée sur la photo');
+  assert.match(t.q('.ve-point.ve-zone').getAttribute('aria-label'), /^Zone 1/);
+});
+
+test('un toucher simple pose toujours un point, sans zone', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.q('#ve-steps button[data-etape="2"]').click();
+  await t.attendre();
+  t.q('.ve-photo img').getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+  t.q('.ve-photo').dispatchEvent(new t.w.MouseEvent('click', { bubbles: true, clientX: 100, clientY: 50 }));
+  await t.attendre();
+  assert.ok(t.q('.ve-cible'));
+  assert.equal(t.q('.ve-cible-zone'), null);
+});

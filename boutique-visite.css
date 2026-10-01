@@ -174,3 +174,7 @@
 /* Vue 360° : zoom et plein écran sous les rayons, la fiche occupe la droite. */
 .bv-stage.bv-360 .v360-tools{left:16px;right:auto;top:196px;bottom:auto;transform:none}
 @container bv (max-width:760px){.bv-stage.bv-360 .v360-tools{left:auto;right:8px;top:12px;bottom:auto}}
+/* Zone d'un produit : rectangle transparent posé sur l'article, touchable partout. */
+.bv-spot.bv-zone{width:auto;height:auto;min-width:24px;min-height:24px;border-radius:12px;background:rgba(255,253,247,.06);border:2px solid rgba(255,253,247,.85);box-shadow:0 0 0 1px rgba(0,0,0,.18),0 4px 14px rgba(0,0,0,.18)}
+.bv-spot.bv-zone::after{display:none}
+.bv-spot.bv-zone:hover,.bv-spot.bv-zone:focus-visible,.bv-spot.bv-zone[aria-pressed="true"]{background:rgba(28,104,69,.16);border-color:#fff}

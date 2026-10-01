@@ -206,7 +206,10 @@
         b.onmouseenter = b.onfocus = () => bulle(b, p);
         b.onmouseleave = b.onblur = cacherBulle;
         b.onclick = e => { e.stopPropagation(); ouvrirProduit(p.id, true); };
-        liste.push({ x: h.x, y: h.y, noeud: b });
+        // Zone tracée par le vendeur : le client touche l'article n'importe où dedans.
+        const zone = typeof h.w === 'number' && typeof h.h === 'number' && h.w > 0 && h.h > 0;
+        if (zone) b.classList.add('bv-zone');
+        liste.push(zone ? { x: h.x, y: h.y, w: h.w, h: h.h, noeud: b } : { x: h.x, y: h.y, noeud: b });
       }
       // Étiquettes de rayon posées par le vendeur : les toucher filtre ce rayon.
       const dansLaPhoto = v => typeof v === 'number' && v >= 0 && v <= 1;
@@ -243,6 +246,7 @@
       for (const pt of pointsDeLaScene(s)) {
         pt.noeud.style.left = pt.x * 100 + '%';
         pt.noeud.style.top = pt.y * 100 + '%';
+        if (pt.w) { pt.noeud.style.width = pt.w * 100 + '%'; pt.noeud.style.height = pt.h * 100 + '%'; }
         sc.appendChild(pt.noeud);
       }
       centrer();

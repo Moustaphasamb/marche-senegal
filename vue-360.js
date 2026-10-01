@@ -45,6 +45,34 @@
     return versPhoto(Math.atan2(x2, z2) / RAD, Math.asin(Math.max(-1, Math.min(1, y1))) / RAD);
   }
 
+  // Rectangle trace a l'ecran (fractions de la vue) -> zone du produit sur la photo :
+  // centre (x, y) et taille (w, h). La largeur passe l'arriere de la photo sans exploser.
+  function zoneDepuisEcran(ax, ay, bx, by, vue) {
+    const g = Math.min(ax, bx), d = Math.max(ax, bx), h = Math.min(ay, by), b = Math.max(ay, by);
+    const cx = (g + d) / 2, cy = (h + b) / 2;
+    const centre = deprojeter(cx, cy, vue);
+    const gauche = deprojeter(g, cy, vue), droite = deprojeter(d, cy, vue);
+    const haut = deprojeter(cx, h, vue), bas = deprojeter(cx, b, vue);
+    const largeur = (((droite.x - gauche.x) % 1) + 1) % 1;
+    return { x: centre.x, y: centre.y, w: arrondi(Math.min(1, largeur)), h: arrondi(Math.min(1, Math.max(0, bas.y - haut.y))) };
+  }
+
+  // Zone de la photo -> rectangle a l'ecran (centre px, py et taille pw, ph en fractions de la vue).
+  function projeterZone(zone, vue) {
+    const centre = projeter(zone, vue);
+    if (!centre.devant) return { px: 0, py: 0, pw: 0, ph: 0, devant: false };
+    const xs = [], ys = [];
+    for (const dx of [-0.5, 0, 0.5]) {
+      for (const dy of [-0.5, 0, 0.5]) {
+        const x = (((zone.x + dx * zone.w) % 1) + 1) % 1;
+        const p = projeter({ x, y: Math.min(1, Math.max(0, zone.y + dy * zone.h)) }, vue);
+        if (p.devant) { xs.push(p.px); ys.push(p.py); }
+      }
+    }
+    const g = Math.min(...xs), d = Math.max(...xs), hh = Math.min(...ys), bb = Math.max(...ys);
+    return { px: (g + d) / 2, py: (hh + bb) / 2, pw: d - g, ph: bb - hh, devant: true };
+  }
+
   // Écart a − b ramené entre -180 et 180 degrés.
   const ecartAngle = (a, b) => ((((a - b) % 360) + 540) % 360) - 180;
 
@@ -166,10 +194,16 @@
       }
       const v = { ...vue, aspect: r.width / r.height };
       for (const pt of points) {
-        const p = projeter(pt, v);
+        // Zone d'un produit (w, h) : le rectangle suit l'article quand la boutique tourne.
+        const zone = typeof pt.w === 'number' && typeof pt.h === 'number' && pt.w > 0 && pt.h > 0;
+        const p = zone ? projeterZone(pt, v) : projeter(pt, v);
         const visible = pret && p.devant && p.px > -0.02 && p.px < 1.02 && p.py > -0.02 && p.py < 1.02;
         pt.noeud.style.visibility = visible ? '' : 'hidden';
-        if (visible) { pt.noeud.style.left = p.px * r.width + 'px'; pt.noeud.style.top = p.py * r.height + 'px'; }
+        if (visible) {
+          pt.noeud.style.left = p.px * r.width + 'px';
+          pt.noeud.style.top = p.py * r.height + 'px';
+          if (zone) { pt.noeud.style.width = Math.max(24, p.pw * r.width) + 'px'; pt.noeud.style.height = Math.max(24, p.ph * r.height) + 'px'; }
+        }
       }
       if (typeof o.surVue === 'function') o.surVue({ ...vue });
     }
@@ -231,10 +265,22 @@
     // ── Doigt, souris, pincement ──
     const doigts = new Map();
     let depart = null, pince = null;
+    // Mode « entourer » (éditeur du vendeur) : glisser trace un rectangle au lieu de tourner.
+    let modeTrace = false, trace = null;
+    const cadreTrace = el('div', 'v360-trace');
+    cadreTrace.hidden = true;
+    racine.appendChild(cadreTrace);
+    function dessinerTrace(x, y) {
+      const r = canvas.getBoundingClientRect();
+      const g = Math.min(trace.x, x) - r.left, h = Math.min(trace.y, y) - r.top;
+      Object.assign(cadreTrace.style, { left: g + 'px', top: h + 'px', width: Math.abs(x - trace.x) + 'px', height: Math.abs(y - trace.y) + 'px' });
+      cadreTrace.hidden = false;
+    }
     canvas.addEventListener('pointerdown', ev => {
       arreterAuto();
       doigts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
       try { canvas.setPointerCapture(ev.pointerId); } catch { /* sans importance */ }
+      if (doigts.size === 1 && modeTrace) trace = { x: ev.clientX, y: ev.clientY };
       if (doigts.size === 1) depart = { t: Date.now(), bouge: 0 };
       if (doigts.size === 2) {
         const [a, b] = [...doigts.values()];
@@ -251,6 +297,10 @@
       if (pince && doigts.size === 2) {
         const [a, b] = [...doigts.values()];
         vue.fov = pince.fov * pince.d / (Math.hypot(a.x - b.x, a.y - b.y) || 1);
+      } else if (doigts.size === 1 && trace) {
+        if (depart) depart.bouge += Math.abs(maintenant.x - avant.x) + Math.abs(maintenant.y - avant.y);
+        dessinerTrace(maintenant.x, maintenant.y);
+        return;
       } else if (doigts.size === 1) {
         const k = vue.fov / (canvas.getBoundingClientRect().height || 1);
         vue.yaw -= (maintenant.x - avant.x) * k;
@@ -264,6 +314,20 @@
       doigts.delete(ev.pointerId);
       if (doigts.size < 2) pince = null;
       if (!doigts.size) racine.classList.remove('v360-glisse');
+      // Fin d'un rectangle tracé : la zone de l'article, en coordonnées de la photo.
+      if (trace) {
+        const r = canvas.getBoundingClientRect();
+        const a = { x: (trace.x - r.left) / r.width, y: (trace.y - r.top) / r.height };
+        const b = { x: (ev.clientX - r.left) / r.width, y: (ev.clientY - r.top) / r.height };
+        trace = null;
+        cadreTrace.hidden = true;
+        const assez = Math.abs(b.x - a.x) > 0.02 && Math.abs(b.y - a.y) > 0.02;
+        if (ev.type === 'pointerup' && assez && pret && typeof o.surTrace === 'function') {
+          o.surTrace(zoneDepuisEcran(a.x, a.y, b.x, b.y, { ...vue, aspect: r.width / r.height }));
+          if (!doigts.size) depart = null;
+          return;
+        }
+      }
       // Un toucher bref sans glisser pose un point (éditeur du vendeur).
       if (ev.type === 'pointerup' && depart && depart.bouge < 8 && Date.now() - depart.t < 600 && typeof o.surToucher === 'function' && pret) {
         const r = canvas.getBoundingClientRect();
@@ -347,6 +411,8 @@
         calque.replaceChildren(...points.map(p => p.noeud));
         demander();
       },
+      // Mode « entourer un produit » : glisser trace la zone au lieu de faire tourner.
+      tracer(actif) { modeTrace = !!actif; arreterAuto(); racine.classList.toggle('v360-mode-trace', modeTrace); },
       regarder(pt) { const a = versAngles(pt.x, pt.y); vue.yaw = a.yaw; vue.pitch = a.pitch * 0.6; arreterAuto(); limiter(); demander(); },
       tourner(degres) { vue.yaw += degres; arreterAuto(); limiter(); demander(); },
       etat: () => ({ ...vue }),
@@ -365,7 +431,7 @@
     };
   }
 
-  const api = { estPanorama, versAngles, versPhoto, projeter, deprojeter, ecartAngle, urlTaille, detecter, creer };
+  const api = { estPanorama, versAngles, versPhoto, projeter, deprojeter, zoneDepuisEcran, projeterZone, ecartAngle, urlTaille, detecter, creer };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Vue360 = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

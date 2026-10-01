@@ -13,3 +13,6 @@
 .v360:fullscreen{background:#000}
 .v360-badge{display:inline-flex;align-items:center;border-radius:99px;background:#1f7a4d;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;letter-spacing:.02em}
 @media (max-width:600px){.v360-tools{right:8px;top:auto;bottom:70px;transform:none}}
+/* Mode « entourer un produit » : le glisser trace un rectangle au lieu de tourner. */
+.v360.v360-mode-trace .v360-canvas{cursor:crosshair}
+.v360-trace{position:absolute;border:2px dashed #e0b447;background:rgba(224,180,71,.18);border-radius:8px;pointer-events:none;z-index:2}
