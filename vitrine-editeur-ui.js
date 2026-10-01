@@ -132,14 +132,7 @@
     function etapePhotos(p) {
       p.appendChild(el('h2', null, '1. Les photos de votre boutique'));
       p.appendChild(el('p', 've-help', `Commencez par une vue d’ensemble, puis un rayon ou un mur. Téléphone stable, bonne lumière, sans client reconnaissable ni document privé. Jusqu’à ${C.MAX_VUES} photos.`));
-      const conseil = el('details', 've-card ve-360-aide');
-      conseil.appendChild(el('summary', null, 'Montrer toute ma boutique en 360°'));
-      for (const t of [
-        'Une photo 360° fait le tour complet de la boutique : le client tourne à gauche, à droite, en haut et en bas.',
-        'Prenez-la avec une caméra 360° (Insta360, Ricoh Theta…) ou une application de photo sphérique, placée au milieu de la boutique, à hauteur des yeux.',
-        'Envoyez l’image telle que l’appareil la donne : deux fois plus large que haute. Elle est reconnue toute seule et marquée 360°.'
-      ]) conseil.appendChild(el('p', 've-help', t));
-      p.appendChild(conseil);
+      p.appendChild(carteVue360());
       if (e.vitrine && !e.vues.length) {
         const carte = el('div', 've-card');
         carte.appendChild(el('p', null, 'Votre boutique a déjà une photo de vitrine. Reprenez-la comme première photo, avec ses points.'));
@@ -201,6 +194,52 @@
       p.appendChild(ajout);
       navigation(p, null, { n: 2, texte: 'Placer mes produits' }, e.vues.length > 0);
     }
+
+    // Vue 360° : le vendeur fait le tour de sa boutique en photos, le serveur les recolle.
+    function carteVue360() {
+      const carte = el('section', 've-card ve-360-carte');
+      carte.setAttribute('aria-label', 'Vue 360° de la boutique');
+      carte.appendChild(el('h3', null, 'Créer une vue 360° avec mon téléphone'));
+      carte.appendChild(el('p', 've-help', 'Le client pourra tourner dans votre boutique, à gauche et à droite, comme s’il y était.'));
+      const etapes = el('ol', 've-360-etapes');
+      for (const t of [
+        'Placez-vous au milieu de la boutique.',
+        'Téléphone droit, à hauteur des yeux, en mode photo normal.',
+        'Prenez une photo, tournez d’un petit pas vers la droite, reprenez une photo. Chaque photo reprend un tiers de la précédente.',
+        `Continuez jusqu’à revenir au point de départ : ${C.SERIE_MIN} à ${C.SERIE_MAX} photos, 12 en général.`
+      ]) etapes.appendChild(el('li', null, t));
+      carte.appendChild(etapes);
+      const b = bouton('ve-btn ve-primary', 'Choisir mes photos du tour');
+      b.disabled = e.occupe || e.vues.length >= C.MAX_VUES;
+      b.onclick = () => $('ve-serie').click();
+      carte.appendChild(b);
+      carte.appendChild(el('p', 've-help', 'Restez sur place pendant les photos et évitez que des personnes passent devant. Une photo 360° déjà prise avec une caméra 360° s’ajoute avec « Ajouter une photo ».'));
+      return carte;
+    }
+
+    async function ajouterSerie360(fichiers) {
+      const refus = C.verifierSerie(fichiers);
+      if (refus) { statut(refus, true); return; }
+      const serie = C.ordonnerSerie(fichiers);
+      // Comme pour une photo : après une coupure, « Réessayer » ne relance pas l'assemblage déjà fait.
+      let url = null;
+      await agir(async () => {
+        if (!url) {
+          const envoi = await api.assembler360(serie);
+          if (!envoi || !envoi.success) return envoi;
+          url = envoi.url;
+        }
+        return api.creerVue({ title: 'Vue 360°', imageUrl: url });
+      }, r => { e.vues = [...e.vues, r.data]; }, {
+        enCours: `Assemblage de vos ${serie.length} photos en vue 360°… Cela prend environ une minute, gardez la page ouverte.`,
+        fait: 'Vue 360° créée · pas encore publiée'
+      });
+    }
+    $('ve-serie').onchange = () => {
+      const fichiers = Array.from($('ve-serie').files || []);
+      try { $('ve-serie').value = ''; } catch { /* certains navigateurs refusent */ }
+      if (fichiers.length) ajouterSerie360(fichiers);
+    };
 
     async function ajouterPhoto(fichier) {
       const refus = C.verifierFichier(fichier);

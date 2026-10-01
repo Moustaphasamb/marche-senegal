@@ -23,6 +23,25 @@
     return null;
   }
 
+  // Vue 360° assemblée par le serveur à partir de photos prises en tournant sur place.
+  const SERIE_MIN = 6;
+  const SERIE_MAX = 20;
+
+  // L'assemblage suit l'ordre de prise : l'heure de la photo, puis son numéro
+  // (IMG_9 avant IMG_10) quand le téléphone donne la même heure à toutes.
+  function ordonnerSerie(fichiers) {
+    return Array.from(fichiers || []).sort((a, b) =>
+      ((a.lastModified || 0) - (b.lastModified || 0)) || String(a.name).localeCompare(String(b.name), 'fr', { numeric: true }));
+  }
+
+  function verifierSerie(fichiers) {
+    const liste = Array.from(fichiers || []);
+    if (liste.length < SERIE_MIN) return `Choisissez au moins ${SERIE_MIN} photos qui font le tour de la boutique.`;
+    if (liste.length > SERIE_MAX) return `${SERIE_MAX} photos au maximum.`;
+    if (liste.some(f => !TYPES_PHOTO.includes(f.type))) return 'Choisissez des photos JPG, PNG ou WebP.';
+    return null;
+  }
+
   function deplacer(liste, index, sens) {
     const cible = index + sens;
     const copie = liste.slice();
@@ -112,7 +131,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -131,12 +150,13 @@
       reprendreVitrine: () => appel(base + '/import-vitrine', { method: 'POST' }),
       publier: () => appel(base + '/publish', { method: 'POST' }),
       abandonner: () => appel(base + '/draft', { method: 'DELETE' }),
-      envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier))
+      envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
+      assembler360: async fichiers => marquer(await envoyerSerie(fichiers))
     };
   }
 
   const api = {
-    MAX_VUES, MAX_POINTS, positionDansPhoto, verifierFichier, deplacer, rayonsOrdonnes,
+    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
     produitsNonPlaces, controles, creerApi
   };

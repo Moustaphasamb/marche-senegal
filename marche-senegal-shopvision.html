@@ -42,6 +42,7 @@
   <div class="ve-panel" id="ve-panel"></div>
   <input id="ve-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   <input id="ve-camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
+  <input id="ve-serie" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
 </section>
 <!-- /ve -->
   </main>
@@ -88,6 +89,39 @@
       }
     }
 
+    // Une photo de téléphone pèse 3 à 8 Mo : réduite à 1 600 px, elle en pèse ~300 Ko,
+    // assez pour l'assemblage et douze photos passent en 4G.
+    async function alleger(fichier) {
+      try {
+        const image = await createImageBitmap(fichier);
+        const k = Math.min(1, 1600 / Math.max(image.width, image.height));
+        const toile = document.createElement('canvas');
+        toile.width = Math.round(image.width * k);
+        toile.height = Math.round(image.height * k);
+        toile.getContext('2d').drawImage(image, 0, 0, toile.width, toile.height);
+        image.close();
+        const blob = await new Promise(ok => toile.toBlob(ok, 'image/jpeg', 0.85));
+        return blob || fichier;
+      } catch {
+        return fichier;
+      }
+    }
+
+    async function envoyerSerie360(fichiers) {
+      const corps = new FormData();
+      for (const [i, f] of fichiers.entries()) corps.append('photos', await alleger(f), 'photo-' + String(i + 1).padStart(2, '0') + '.jpg');
+      try {
+        const reponse = await fetch(API_URL + '/api/upload/showcase-360', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }, body: corps
+        });
+        const d = await reponse.json();
+        if (reponse.ok && d.success && typeof d.url === 'string') return { success: true, url: d.url };
+        return { success: false, message: d.message || 'L’assemblage de la vue 360° a échoué.' };
+      } catch {
+        return { success: false, message: 'Erreur de connexion au serveur' };
+      }
+    }
+
     try {
       if (!isLoggedIn()) {
         acces('Créez la vitrine de votre boutique', 'Connectez-vous avec votre compte vendeur pour préparer votre vitrine.', 'marche-senegal-connexion-vendeur.html', 'Se connecter comme vendeur');
@@ -107,7 +141,7 @@
       $('publicShopLink').hidden = false;
       $('ve').hidden = false;
       const editeur = VitrineEditeur.monter({
-        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine }),
+        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360 }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         confirmer: async message => window.confirm(message)

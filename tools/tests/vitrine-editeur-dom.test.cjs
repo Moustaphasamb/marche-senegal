@@ -489,3 +489,64 @@ test('finitions : après une action, le focus revient sur le titre de l étape',
   await t.attendre();
   assert.equal(t.w.document.activeElement, t.q('#ve-panel h2'));
 });
+
+// ── Vue 360° assemblée à partir des photos du tour ──
+async function choisirSerie(t, fichiers) {
+  const champ = t.q('#ve-serie');
+  Object.defineProperty(champ, 'files', { configurable: true, value: fichiers });
+  champ.dispatchEvent(new t.w.Event('change'));
+  for (let i = 0; i < 6; i++) await t.attendre();
+}
+const photoDuTour = (t, nom, heure, type = 'image/jpeg') => new t.w.File(['x'], nom, { type, lastModified: heure });
+
+test('la carte 360° guide le vendeur et ouvre le choix des photos du tour', async () => {
+  const t = await monter();
+  const carte = t.q('.ve-360-carte');
+  assert.ok(carte, 'carte 360°');
+  assert.match(carte.textContent, /milieu de la boutique/);
+  assert.match(carte.textContent, /6 à 20 photos/);
+  assert.ok(t.q('#ve-serie').multiple, 'plusieurs photos à la fois');
+});
+
+test('les photos du tour sont assemblées dans l’ordre de prise, puis deviennent une vue', async () => {
+  const t = await monter();
+  const appelsSerie = [];
+  t.api.assembler360 = async fichiers => { appelsSerie.push(Array.from(fichiers, f => f.name)); return { success: true, url: 'https://ex.test/vue-360.jpg' }; };
+  const fichiers = [7, 3, 1, 5, 2, 6, 4].map(k => photoDuTour(t, `IMG_${k}.jpg`, 1000 + k));
+  await choisirSerie(t, fichiers);
+  assert.deepEqual(appelsSerie, [['IMG_1.jpg', 'IMG_2.jpg', 'IMG_3.jpg', 'IMG_4.jpg', 'IMG_5.jpg', 'IMG_6.jpg', 'IMG_7.jpg']]);
+  assert.deepEqual(t.appels.at(-1), ['creerVue', { title: 'Vue 360°', imageUrl: 'https://ex.test/vue-360.jpg' }]);
+  assert.equal(t.qa('.ve-view').length, 1);
+  assert.match(t.q('#ve-status').textContent, /Vue 360° créée/);
+});
+
+test('moins de 6 photos : refusé avant tout envoi', async () => {
+  const t = await monter();
+  let appele = false;
+  t.api.assembler360 = async () => { appele = true; return { success: true, url: 'x' }; };
+  await choisirSerie(t, [1, 2, 3].map(k => photoDuTour(t, `IMG_${k}.jpg`, k)));
+  assert.equal(appele, false);
+  assert.match(t.q('#ve-status').textContent, /au moins 6 photos/);
+  assert.ok(t.q('#ve-status').classList.contains('ve-error'));
+});
+
+test('photos à reprendre : le message de l’assemblage est montré au vendeur', async () => {
+  const t = await monter();
+  const message = 'Le tour n’est pas complet : continuez à tourner jusqu’à revenir à votre point de départ.';
+  t.api.assembler360 = async () => ({ success: false, message });
+  await choisirSerie(t, [1, 2, 3, 4, 5, 6].map(k => photoDuTour(t, `IMG_${k}.jpg`, k)));
+  assert.equal(t.q('#ve-status').textContent, message);
+  assert.equal(t.qa('.ve-view').length, 0);
+});
+
+test('coupure après l’assemblage : « Réessayer » crée la vue sans tout réassembler', async () => {
+  const t = await monter({ creerEchoue: 1 });
+  let assemblages = 0;
+  t.api.assembler360 = async () => { assemblages += 1; return { success: true, url: 'https://ex.test/vue-360.jpg' }; };
+  await choisirSerie(t, [1, 2, 3, 4, 5, 6].map(k => photoDuTour(t, `IMG_${k}.jpg`, k)));
+  assert.match(t.q('#ve-status').textContent, /Non enregistré/);
+  t.q('#ve-status button').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.equal(assemblages, 1);
+  assert.equal(t.qa('.ve-view').length, 1);
+});

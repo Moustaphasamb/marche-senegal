@@ -71,3 +71,8 @@
 .ve-view .v360-badge{flex:none}
 .ve-360-aide summary{cursor:pointer;font-weight:700}
 @media (max-width:600px){.ve-photo.ve-360{aspect-ratio:4/5}}
+/* Carte « vue 360° avec mon téléphone » (étape 1). */
+.ve-360-carte{display:grid;gap:8px;border-color:var(--ve-green)}
+.ve-360-carte h3{margin:0;font-size:16px}
+.ve-360-etapes{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.ve-360-carte .ve-btn{justify-self:start}

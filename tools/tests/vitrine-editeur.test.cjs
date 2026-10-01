@@ -122,3 +122,36 @@ test('finitions : seule une vraie coupure réseau est marquée comme telle', asy
   assert.equal((await api.ouvrir()).reseau, undefined);
   assert.equal((await api.envoyerPhoto({})).reseau, true);
 });
+
+// ── Vue 360° assemblée à partir de plusieurs photos ──
+const fichier = (name, lastModified, type = 'image/jpeg') => ({ name, lastModified, type, size: 1000 });
+
+test('les photos de la série reprennent l’ordre de prise : heure, puis nom', () => {
+  const serie = [fichier('IMG_0010.jpg', 3000), fichier('IMG_0002.jpg', 1000), fichier('IMG_0009.jpg', 2000)];
+  assert.deepEqual(E.ordonnerSerie(serie).map(f => f.name), ['IMG_0002.jpg', 'IMG_0009.jpg', 'IMG_0010.jpg']);
+  // Même heure (certains téléphones la remplacent par l'heure du choix) : le numéro décide, 10 après 9.
+  const memeHeure = [fichier('IMG_10.jpg', 5), fichier('IMG_9.jpg', 5), fichier('IMG_1.jpg', 5)];
+  assert.deepEqual(E.ordonnerSerie(memeHeure).map(f => f.name), ['IMG_1.jpg', 'IMG_9.jpg', 'IMG_10.jpg']);
+});
+
+test('une série compte de 6 à 20 photos JPG, PNG ou WebP', () => {
+  const n = k => Array.from({ length: k }, (_, i) => fichier('p' + i + '.jpg', i));
+  assert.equal(E.verifierSerie(n(5)), 'Choisissez au moins 6 photos qui font le tour de la boutique.');
+  assert.equal(E.verifierSerie(n(6)), null);
+  assert.equal(E.verifierSerie(n(20)), null);
+  assert.equal(E.verifierSerie(n(21)), '20 photos au maximum.');
+  assert.equal(E.verifierSerie([...n(6), fichier('video.mp4', 9, 'video/mp4')]), 'Choisissez des photos JPG, PNG ou WebP.');
+  assert.equal(E.verifierSerie(null), 'Choisissez au moins 6 photos qui font le tour de la boutique.');
+});
+
+test('l’assemblage 360° passe par l’envoi de série, une coupure est marquée réseau', async () => {
+  const recus = [];
+  const api = E.creerApi({
+    apiCall: async () => ({ success: true }),
+    envoyerFichier: async () => ({ success: true, url: 'x' }),
+    envoyerSerie: async fichiers => { recus.push(fichiers.length); return { success: false, message: 'Erreur de connexion au serveur' }; }
+  });
+  const r = await api.assembler360([1, 2, 3, 4, 5, 6]);
+  assert.deepEqual(recus, [6]);
+  assert.equal(r.reseau, true);
+});
