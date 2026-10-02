@@ -37,7 +37,7 @@
 .tb-search-btn{width:27px;height:27px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s}.tb-search-btn:hover{background:var(--gl)}
 .tb-right{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 .tb-btn{position:relative;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .18s}.tb-btn:hover{border-color:var(--green);background:var(--gp)}
-.tb-notif{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.tb-notif{position:absolute;top:-5px;right:-7px;min-width:18px;height:18px;padding:0 3px;border-radius:99px;background:var(--red);color:#fff;font-size:.62rem;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid #fff}
 .tb-profile{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .18s}.tb-profile:hover{border-color:var(--green);background:var(--gp)}
 .tb-av{width:26px;height:26px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
 .tb-name{font-size:.8rem;font-weight:500;color:var(--text)}
@@ -370,8 +370,8 @@
   <nav class="sb-nav">
     <div class="sb-sec">Vue d'ensemble</div>
     <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-icon"><i class="ic" data-ic="chart-column"></i></span>Tableau de bord</div>
-    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon"><i class="ic" data-ic="users"></i></span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">48 260</span></div>
-    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon"><i class="ic" data-ic="store"></i></span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">12</span></div>
+    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-icon"><i class="ic" data-ic="users"></i></span>Utilisateurs<span class="sb-badge gold" id="sb-users-count">—</span></div>
+    <div class="sb-item" onclick="showPage('vendors',this)"><span class="sb-icon"><i class="ic" data-ic="store"></i></span>Vendeurs<span class="sb-badge" id="sb-vendors-pending">—</span></div>
     <div class="sb-sec">Commerce</div>
     <div class="sb-item" onclick="showPage('orders',this)"><span class="sb-icon"><i class="ic" data-ic="shopping-cart"></i></span>Commandes<span class="sb-badge green" id="sb-orders-count">—</span></div>
     <div class="sb-item" onclick="showPage('disputes',this)"><span class="sb-icon"><i class="ic" data-ic="scale"></i></span>Litiges<span class="sb-badge" id="sb-disputes-count">—</span></div>
@@ -395,14 +395,9 @@
 <div class="topbar">
   <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
   <div class="tb-title" id="page-title">Tableau de bord</div>
-  <div class="tb-search">
-    <input type="text" placeholder="Rechercher utilisateur, commande..."/>
-    <button class="tb-search-btn"><i class="ic" data-ic="search"></i></button>
-  </div>
   <div class="tb-right">
-    <button class="tb-btn" onclick="toast('Notifications admin...')"><i class="ic" data-ic="bell"></i><div class="tb-notif">14</div></button>
-    <button class="tb-btn" onclick="toast('Exporter rapport...')"><i class="ic" data-ic="chart-column"></i></button>
-    <div class="tb-profile" onclick="toast('Mon profil admin...')"><div class="tb-av">AD</div><span class="tb-name">Admin</span></div>
+    <button class="tb-btn" type="button" aria-label="Voir les dossiers à traiter" onclick="ouvrirSectionAdmin('overview')"><i class="ic" data-ic="bell"></i><span class="tb-notif" id="admin-alert-count" aria-hidden="true"></span></button>
+    <button class="tb-profile" type="button" onclick="ouvrirSectionAdmin('settings')"><span class="tb-av">AD</span><span class="tb-name">Admin</span></button>
   </div>
 </div>
 
@@ -412,53 +407,27 @@
   <!-- ── OVERVIEW ── -->
   <div class="ps active" id="ps-overview">
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="coins"></i></div><div class="kpi-chg up">↑ +22%</div></div><div class="kpi-val" id="kpi-revenue">12,4M</div><div class="kpi-label">Revenus plateforme (FCFA)</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="shopping-cart"></i></div><div class="kpi-chg up">↑ +18%</div></div><div class="kpi-val" id="kpi-orders">3 840</div><div class="kpi-label">Commandes ce mois</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="store"></i></div><div class="kpi-chg up">↑ +34</div></div><div class="kpi-val" id="kpi-shops">2 412</div><div class="kpi-label">Boutiques actives</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p"><i class="ic" data-ic="users"></i></div><div class="kpi-chg up">↑ +142</div></div><div class="kpi-val" id="kpi-users">48 260</div><div class="kpi-label">Utilisateurs inscrits</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r"><i class="ic" data-ic="scale"></i></div><div class="kpi-chg down">↑ +3</div></div><div class="kpi-val">8</div><div class="kpi-label">Litiges ouverts</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="truck"></i></div><div class="kpi-chg up">↑ +2%</div></div><div class="kpi-val">94%</div><div class="kpi-label">Taux livraison réussie</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic ic-gold" data-ic="star" data-ic-fill></i></div><div class="kpi-chg up">↑ +0.1</div></div><div class="kpi-val">4.7</div><div class="kpi-label">Note moyenne globale</div></div>
-      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="map"></i></div><div class="kpi-chg flat">→ stable</div></div><div class="kpi-val">14</div><div class="kpi-label">Régions couvertes</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="coins"></i></div></div><div class="kpi-val" id="kpi-revenue">—</div><div class="kpi-label">Montant des commandes livrées (FCFA)</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="shopping-cart"></i></div></div><div class="kpi-val" id="kpi-orders">—</div><div class="kpi-label">Commandes totales</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="store"></i></div></div><div class="kpi-val" id="kpi-shops">—</div><div class="kpi-label">Boutiques actives</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-p"><i class="ic" data-ic="users"></i></div></div><div class="kpi-val" id="kpi-users">—</div><div class="kpi-label">Utilisateurs inscrits</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-r"><i class="ic" data-ic="scale"></i></div></div><div class="kpi-val" id="kpi-disputes">—</div><div class="kpi-label">Litiges ouverts</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-gold"><i class="ic" data-ic="package"></i></div></div><div class="kpi-val" id="kpi-products">—</div><div class="kpi-label">Produits actifs</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-g"><i class="ic" data-ic="store"></i></div></div><div class="kpi-val" id="kpi-pending-vendors">—</div><div class="kpi-label">Boutiques à vérifier</div></div>
+      <div class="kpi"><div class="kpi-top"><div class="kpi-icon ki-b"><i class="ic" data-ic="shopping-cart"></i></div></div><div class="kpi-val" id="kpi-pending-orders">—</div><div class="kpi-label">Commandes en attente</div></div>
     </div>
 
     <div class="grid-2">
-      <!-- Revenue chart -->
+      <!-- Montants des commandes livrées -->
       <div class="card">
-        <div class="card-header"><div class="card-title"><i class="ic" data-ic="trending-up"></i> Revenus — 6 derniers mois</div><div class="card-action" onclick="toast('Exporter...')">Exporter CSV →</div></div>
-        <div class="bar-chart">
-          <div class="bc-wrap"><div class="bc-val">7,2M</div><div class="bc-bar g" style="height:58%"></div><div class="bc-label">Nov</div></div>
-          <div class="bc-wrap"><div class="bc-val">8,1M</div><div class="bc-bar g" style="height:65%"></div><div class="bc-label">Déc</div></div>
-          <div class="bc-wrap"><div class="bc-val">6,8M</div><div class="bc-bar g" style="height:54%"></div><div class="bc-label">Jan</div></div>
-          <div class="bc-wrap"><div class="bc-val">9,4M</div><div class="bc-bar g" style="height:75%"></div><div class="bc-label">Fév</div></div>
-          <div class="bc-wrap"><div class="bc-val">10,8M</div><div class="bc-bar g" style="height:87%"></div><div class="bc-label">Mar</div></div>
-          <div class="bc-wrap"><div class="bc-val">12,4M</div><div class="bc-bar gold" style="height:100%"></div><div class="bc-label">Avr</div></div>
-        </div>
-        <div class="chart-footer">
-          <div class="cf-stat">Total 6 mois : <strong>54,7M FCFA</strong></div>
-          <div class="cf-stat">Croissance : <strong style="color:var(--green)">+22%</strong></div>
-        </div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="trending-up"></i> Commandes livrées — derniers mois</div></div>
+        <div class="bar-chart" id="overview-revenue-chart">Chargement…</div>
+        <div class="chart-footer" id="overview-revenue-total"></div>
       </div>
-      <!-- Donut -->
+      <!-- Moyens de paiement des commandes livrées -->
       <div class="card">
-        <div class="card-header"><div class="card-title"><i class="ic" data-ic="chart-pie"></i> Répartition des revenus</div></div>
-        <div class="donut-wrap">
-          <div class="donut">
-            <svg width="90" height="90" viewBox="0 0 90 90">
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#D8E8DE" stroke-width="12"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#1B6B3A" stroke-width="12" stroke-dasharray="110 110" stroke-linecap="round"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#E6A817" stroke-width="12" stroke-dasharray="55 165" stroke-dashoffset="-110" stroke-linecap="round"/>
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#1565C0" stroke-width="12" stroke-dasharray="22 198" stroke-dashoffset="-165" stroke-linecap="round"/>
-            </svg>
-            <div class="donut-center"><div class="donut-pct">50%</div><div class="donut-sub">Abo.</div></div>
-          </div>
-          <div class="donut-legend">
-            <div class="dl"><div class="dl-dot" style="background:var(--green)"></div>Abonnements vendeurs — 50%</div>
-            <div class="dl"><div class="dl-dot" style="background:var(--gold)"></div>Commissions livraison — 25%</div>
-            <div class="dl"><div class="dl-dot" style="background:var(--blue)"></div>Commissions ventes — 15%</div>
-            <div class="dl"><div class="dl-dot" style="background:var(--border)"></div>Publicité & autres — 10%</div>
-          </div>
-        </div>
+        <div class="card-header"><div class="card-title"><i class="ic" data-ic="chart-pie"></i> Moyens de paiement des commandes livrées</div></div>
+        <div id="overview-payment-methods" style="padding:18px;display:flex;flex-direction:column;gap:10px">Chargement…</div>
       </div>
     </div>
 
@@ -518,16 +487,12 @@
   <div class="ps" id="ps-vendors">
     <div class="sec-header">
       <div class="sec-title" id="vendors-title"><i class="ic" data-ic="store"></i> Vendeurs</div>
-      <button class="sec-btn sec-btn-outline" onclick="toast('Exporter la liste...')"><i class="ic" data-ic="chart-column"></i> Exporter</button>
     </div>
     <div class="card">
       <table class="t">
         <thead><tr><th>Vendeur</th><th>Marché</th><th>Boutique</th><th>Ventes</th><th>Note</th><th>CNI</th><th>Actions</th></tr></thead>
         <tbody id="vendors-tbody">
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--green)">MF</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mode Fatou Ndoye</div></div></div></td><td><i class="ic" data-ic="landmark"></i> Sandaga</td><td>Mode Fatou</td><td>1 240</td><td>4.8 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="window.location.href='marche-senegal-boutique.html'">Voir</button><button class="ta reject" onclick="toast('Boutique suspendue')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--gold);color:var(--dark)">FD</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Ferme Diallo</div></div></div></td><td><i class="ic" data-ic="waves"></i> Ziguinchor</td><td>Ferme Diallo Casamance</td><td>2 100</td><td>4.9 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-ok">Validé</span></td><td><div class="tb-act"><button class="ta view" onclick="toast('Voir boutique...')">Voir</button><button class="ta reject" onclick="toast('Suspendu')">Suspendre</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:#8B3A8A">MB</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Mamadou Ba</div></div></div></td><td><i class="ic" data-ic="shopping-bag"></i> HLM</td><td>HLM Alimentation</td><td>En attente</td><td>—</td><td><span class="badge b-wait">En attente</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('✓ Validé !')">✓ Valider</button><button class="ta reject" onclick="toast('Refusé')">✕</button></div></td></tr>
-          <tr><td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="background:var(--red)">AC</div><div><div style="font-size:.82rem;font-weight:600;color:var(--dark)">Artisan Cheikh</div></div></div></td><td><i class="ic" data-ic="umbrella"></i> Mbour</td><td>Artisan Cheikh Mbour</td><td>480</td><td>5.0 <i class="ic ic-gold" data-ic="star" data-ic-fill></i></td><td><span class="badge b-rej">Suspendu</span></td><td><div class="tb-act"><button class="ta approve" onclick="toast('Boutique réactivée !')">Réactiver</button><button class="ta view" onclick="toast('Dossier...')">Dossier</button></div></td></tr>
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Ouvrez cette section pour charger les vendeurs.</td></tr>
         </tbody>
       </table>
     </div>
@@ -861,6 +826,13 @@ function showPage(id, navItem) {
   if (id === 'settings')                        loadSettings();
 }
 
+function ouvrirSectionAdmin(id) {
+  const navItem = Array.from(document.querySelectorAll('.sb-item'))
+    .find(item => item.getAttribute('onclick') === "showPage('" + id + "',this)");
+  showPage(id, navItem);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function logoutAdmin() {
   logout();
   window.location.href = 'marche-senegal-connexion-admin.html';
@@ -888,7 +860,7 @@ async function loadAdminStats() {
     const d = res.data || {};
 
     const rev = document.getElementById('kpi-revenue');
-    if (rev) rev.textContent = d.revenue ? (d.revenue / 1000000).toFixed(1) + 'M' : '—';
+    if (rev) rev.textContent = d.revenue != null ? d.revenue.toLocaleString('fr-FR') : '—';
 
     const ord = document.getElementById('kpi-orders');
     if (ord) ord.textContent = d.orders != null ? d.orders.toLocaleString('fr-FR') : '—';
@@ -898,6 +870,16 @@ async function loadAdminStats() {
 
     const usr = document.getElementById('kpi-users');
     if (usr) usr.textContent = d.users != null ? d.users.toLocaleString('fr-FR') : '—';
+
+    for (const [id, value] of [
+      ['kpi-disputes', d.disputes],
+      ['kpi-products', d.products],
+      ['kpi-pending-vendors', d.pendingVendors],
+      ['kpi-pending-orders', d.pendingOrders]
+    ]) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value != null ? value.toLocaleString('fr-FR') : '—';
+    }
 
     const sbUsr = document.getElementById('sb-users-count');
     if (sbUsr) sbUsr.textContent = d.users != null ? d.users.toLocaleString('fr-FR') : '—';
@@ -911,11 +893,73 @@ async function loadAdminStats() {
     const sbDisp = document.getElementById('sb-disputes-count');
     if (sbDisp) sbDisp.textContent = d.disputes != null ? d.disputes : '—';
 
+    const alertCount = document.getElementById('admin-alert-count');
+    if (alertCount) {
+      const count = (Number(d.pendingVendors) || 0) + (Number(d.disputes) || 0);
+      alertCount.textContent = count > 99 ? '99+' : String(count);
+      alertCount.style.display = count > 0 ? 'flex' : 'none';
+    }
+
     const vTitle = document.getElementById('vendors-title');
     if (vTitle) vTitle.textContent = '🏪 Vendeurs (' + (d.shops || '—') + ' actifs · ' + (d.pendingVendors || 0) + ' en attente)';
 
   } catch (e) {
     console.error('Erreur stats admin:', e);
+  }
+}
+
+async function loadOverviewRevenue() {
+  const chart = document.getElementById('overview-revenue-chart');
+  const total = document.getElementById('overview-revenue-total');
+  const methods = document.getElementById('overview-payment-methods');
+  try {
+    const res = await apiCall('/api/admin/revenue');
+    if (!res.success) throw new Error(res.message || 'Données indisponibles');
+    const data = res.data || {};
+    const months = (data.monthly || []).slice(-6);
+    chart.replaceChildren();
+    if (!months.length) {
+      chart.textContent = 'Aucune commande livrée pour le moment';
+    } else {
+      const maximum = Math.max(...months.map(m => m.revenue), 1);
+      months.forEach((month, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bc-wrap';
+        const value = document.createElement('div');
+        value.className = 'bc-val';
+        value.textContent = month.revenue.toLocaleString('fr-FR');
+        const bar = document.createElement('div');
+        bar.className = 'bc-bar ' + (index === months.length - 1 ? 'gold' : 'g');
+        bar.style.height = Math.max(4, Math.round(month.revenue / maximum * 58)) + 'px';
+        const label = document.createElement('div');
+        label.className = 'bc-label';
+        const monthIndex = Number(String(month.month).slice(5, 7)) - 1;
+        label.textContent = MONTH_LABELS[monthIndex] || String(month.month);
+        wrapper.append(value, bar, label);
+        chart.appendChild(wrapper);
+      });
+    }
+    const sixMonthTotal = months.reduce((sum, month) => sum + month.revenue, 0);
+    total.textContent = months.length ? 'Total des mois affichés : ' + sixMonthTotal.toLocaleString('fr-FR') + ' FCFA' : '';
+
+    methods.replaceChildren();
+    const byMethod = data.byMethod || [];
+    if (!byMethod.length) {
+      methods.textContent = 'Aucun moyen de paiement enregistré pour des commandes livrées';
+    } else {
+      const methodTotal = byMethod.reduce((sum, method) => sum + method.revenue, 0);
+      byMethod.forEach(method => {
+        const line = document.createElement('div');
+        const label = METHOD_LABELS[method.method] || method.method;
+        const share = methodTotal ? Math.round(method.revenue / methodTotal * 100) : 0;
+        line.textContent = label + ' · ' + method.revenue.toLocaleString('fr-FR') + ' FCFA (' + share + ' %)';
+        methods.appendChild(line);
+      });
+    }
+  } catch (error) {
+    chart.textContent = 'Données indisponibles';
+    total.textContent = '';
+    methods.textContent = 'Données indisponibles';
   }
 }
 
@@ -1102,8 +1146,8 @@ function buildVendorActions(actDiv, vendor, shop, badge) {
 // ── Modal CNI ──
 let _cniContext = null;
 
-function afficherPhotoCNI(conteneur, reference, vendorId, face, libelle) {
-  if (!reference) {
+function afficherPhotoCNI(conteneur, presente, vendorId, face, libelle) {
+  if (!presente) {
     const vide = document.createElement('div');
     vide.className = 'cni-photo-empty'; vide.textContent = libelle + ' non fourni';
     conteneur.appendChild(vide); return;
@@ -1112,9 +1156,7 @@ function afficherPhotoCNI(conteneur, reference, vendorId, face, libelle) {
   img.alt = 'CNI ' + libelle;
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;cursor:zoom-in';
   conteneur.appendChild(img);
-  const urlPromise = reference.startsWith('private:')
-    ? apiCall('/api/admin/vendors/' + encodeURIComponent(vendorId) + '/cni/' + face)
-    : Promise.resolve({ success: true, data: { url: reference } });
+  const urlPromise = apiCall('/api/admin/vendors/' + encodeURIComponent(vendorId) + '/cni/' + face);
   urlPromise.then(result => {
     if (!result.success || !result.data?.url) throw new Error(result.message || 'Image indisponible');
     img.src = result.data.url;
@@ -1140,7 +1182,7 @@ function openCNI(vendor, shop, badge, actDiv) {
   // Photo recto
   const front = document.getElementById('cni-front-wrap');
   front.replaceChildren();
-  afficherPhotoCNI(front, shop?.cniFrontUrl, vendor.id, 'front', 'Recto');
+  afficherPhotoCNI(front, shop?.cniFrontPresent, vendor.id, 'front', 'Recto');
   const fl = document.createElement('div');
   fl.className = 'cni-photo-label'; fl.textContent = 'Recto CNI';
   front.appendChild(fl);
@@ -1148,7 +1190,7 @@ function openCNI(vendor, shop, badge, actDiv) {
   // Photo verso
   const back = document.getElementById('cni-back-wrap');
   back.replaceChildren();
-  afficherPhotoCNI(back, shop?.cniBackUrl, vendor.id, 'back', 'Verso');
+  afficherPhotoCNI(back, shop?.cniBackPresent, vendor.id, 'back', 'Verso');
   const bl = document.createElement('div');
   bl.className = 'cni-photo-label'; bl.textContent = 'Verso CNI';
   back.appendChild(bl);
@@ -1209,13 +1251,15 @@ async function suspendShop(shopId, shopName, action, badge, actDiv, vendor) {
     if (action === 'suspend') {
       badge.className = 'badge b-susp';
       badge.textContent = 'Suspendu';
-      toast('⛔ ' + shopName + ' suspendu');
-      buildVendorActions(actDiv, vendor, { ...vendor.shop, id: shopId, name: shopName, status: 'SUSPENDED' }, badge);
+      vendor.shop = { ...vendor.shop, id: shopId, name: shopName, status: 'SUSPENDED' };
+      toast('⛔ ' + shopName + ' suspendu — ' + (result.notification?.sms === 'submitted' ? 'SMS accepté pour envoi' : 'SMS non envoyé'));
+      buildVendorActions(actDiv, vendor, vendor.shop, badge);
     } else {
       badge.className = 'badge b-ok';
       badge.textContent = 'Validé';
-      toast('✅ ' + shopName + ' réactivé');
-      buildVendorActions(actDiv, vendor, { ...vendor.shop, id: shopId, name: shopName, status: 'ACTIVE', isVerified: true }, badge);
+      vendor.shop = { ...vendor.shop, id: shopId, name: shopName, status: 'ACTIVE', isVerified: true };
+      toast('✅ ' + shopName + ' réactivé — ' + (result.notification?.sms === 'submitted' ? 'SMS accepté pour envoi' : 'SMS non envoyé'));
+      buildVendorActions(actDiv, vendor, vendor.shop, badge);
     }
   } catch (e) {
     toast('❌ Erreur lors de l\'action');
@@ -1251,7 +1295,9 @@ function appliquerResultatValidation(action, shopName, badge, actDiv, vendor, no
     badge.textContent = 'Refusé';
     toast('✗ ' + shopName + ' refusé — ' + messageEtatNotifications(notification), 6000);
   }
-  buildVendorActions(actDiv, vendor, { id: vendor.shop?.id, name: shopName, status: action === 'approve' ? 'ACTIVE' : 'REJECTED', isVerified: action === 'approve' }, badge);
+  vendor.shop = { ...vendor.shop, name: shopName, status: action === 'approve' ? 'ACTIVE' : 'REJECTED', isVerified: action === 'approve' };
+  buildVendorActions(actDiv, vendor, vendor.shop, badge);
+  loadAdminStats();
 }
 
 async function verifyVendor(userId, shopName, action, badge, actDiv, vendor) {
@@ -2515,6 +2561,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   afficherMoyensPaiement();
 
   await loadAdminStats();
+  loadOverviewRevenue();
   loadOverviewActivity();
   loadOverviewPending();
   loadOverviewDisputes();
@@ -2555,7 +2602,7 @@ async function loadOverviewPending() {
   try {
     const res = await apiCall('/api/admin/vendors?status=PENDING');
     const vendors = (res.data || []).slice(0, 5);
-    if (title) title.textContent = '🔍 Vérifications en attente (' + vendors.length + ')';
+    if (title) title.textContent = '🔍 Vérifications en attente (' + (res.data || []).length + ')';
     if (!vendors.length) {
       tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucune vérification en attente</td></tr>';
       return;
@@ -2604,6 +2651,8 @@ async function verifyVendorOverview(vendorId, action, btn) {
       if (remaining === 0 && tbody) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">Aucune vérification en attente</td></tr>';
       }
+      loadOverviewPending();
+      loadAdminStats();
     } else {
       toast('❌ ' + (res.message || 'Erreur'));
     }

@@ -1366,6 +1366,17 @@ async function payNow() {
       lastOrderNumber = result.data?.orderNumber || null;
       if (!lastMarketOrderId) throw new Error('Commande groupée sans identifiant');
 
+      // Le vendeur accepte sa partie avant tout paiement. La même clé de
+      // panier permet de reprendre ensuite cette commande sans réserver deux
+      // fois le stock. Le panier reste intact pendant cette attente.
+      if (result.data?.acceptance?.required && !result.data.acceptance.canPay) {
+        payBtn.innerHTML = '🔒 Payer';
+        payBtn.style.background = '';
+        payBtn.disabled = false;
+        window.location.href = 'marche-senegal-commande.html?marketOrderId=' + encodeURIComponent(lastMarketOrderId);
+        return;
+      }
+
     // Initier le paiement
     // Le montant à payer se lit sur la commande, côté serveur : le total que
     // cette page recalculait ne servait plus à personne.

@@ -765,6 +765,25 @@ function renderActions(order) {
 
   const actions = [];
 
+  if (order._isMarketOrder && ['PENDING', 'CANCELLED'].includes(order.status) && order.acceptance?.required) {
+    if (order.acceptance.refused > 0) {
+      actions.push(`<p style="width:100%;font-size:.86rem;color:var(--dark)">
+        Une boutique ne peut pas fournir ses articles. Aucun paiement n'a été lancé. Choisissez la suite : le nouveau total et les éventuelles promotions seront recalculés.
+      </p>`);
+      actions.push(`<button class="ac-btn ac-btn-green" onclick="cancelOrder(true)">Retirer les articles refusés et reprendre</button>`);
+      actions.push(`<button class="ac-btn" onclick="cancelOrder(false)">Choisir d'autres articles dans mon panier</button>`);
+    } else if (order.acceptance.canPay) {
+      actions.push(`<button class="ac-btn ac-btn-green" onclick="window.location.href='marche-senegal-panier.html'">
+        Retourner au panier et payer le total confirmé
+      </button>`);
+    } else {
+      actions.push(`<p style="width:100%;font-size:.86rem;color:var(--dark)">
+        ${order.acceptance.accepted} boutique(s) ont accepté, ${order.acceptance.pending} réponse(s) attendue(s). Aucun paiement ne sera lancé avant leurs réponses.
+      </p>`);
+      actions.push(`<button class="ac-btn" onclick="loadMarketOrder('${order.id}')">Actualiser les réponses</button>`);
+    }
+  }
+
   // Confirmer la réception — si en livraison ou prêt
   if (['DELIVERING', 'READY'].includes(order.status)) {
     actions.push(`
@@ -858,19 +877,43 @@ async function confirmDelivery() {
   }
 }
 
-async function cancelOrder() {
+async function cancelOrder(dropRefused = false) {
   if (!currentOrder) return;
-  if (!confirm('Voulez-vous vraiment annuler cette commande ?')) return;
+  const message = dropRefused
+    ? 'Annuler cette commande, retirer les articles des boutiques qui ont refusé, puis recalculer le panier ? Les autres boutiques devront accepter la nouvelle commande.'
+    : 'Voulez-vous vraiment annuler cette commande ?';
+  if (!confirm(message)) return;
 
   const annulables = currentOrder._isMarketOrder
     ? currentOrder.orders.filter(order => order.status === 'PENDING')
     : [currentOrder];
-  const results = await Promise.all(annulables.map(order => updateOrderStatus(order.id, 'CANCELLED')));
-  const result = { success: results.length > 0 && results.every(item => item.success) };
+  // Chaque annulation recalcule le statut du panier parent. Les exécuter dans
+  // l'ordre évite que deux recalculs concurrents écrivent un état périmé.
+  const results = [];
+  for (const order of annulables) {
+    results.push(await updateOrderStatus(order.id, 'CANCELLED'));
+  }
+  const result = { success: results.every(item => item.success) &&
+    (results.length > 0 || (currentOrder._isMarketOrder && currentOrder.orders.every(order => order.status === 'CANCELLED'))) };
 
   if (result.success) {
     showToast('Commande annulée');
-    setTimeout(() => location.reload(), 1500);
+    if (currentOrder._isMarketOrder && currentOrder.acceptance?.required) {
+      if (dropRefused) {
+        const refusedShops = new Set(currentOrder.orders
+          .filter(order => order.status === 'CANCELLED').map(order => order.shopId));
+        try {
+          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+          if (Array.isArray(cart)) {
+            localStorage.setItem('cart', JSON.stringify(cart.filter(item => !refusedShops.has(item.shopId))));
+          }
+        } catch (_) { /* Ne pas effacer un panier illisible. */ }
+      }
+      localStorage.removeItem('marketCheckout');
+      setTimeout(() => { window.location.href = 'marche-senegal-panier.html'; }, 900);
+    } else {
+      setTimeout(() => location.reload(), 1500);
+    }
   } else {
     showToast('❌ Erreur lors de l\'annulation');
   }
@@ -1116,7 +1159,9 @@ function renderMarketShopTracking(order) {
     const index = orderStatus.indexOf(child.status);
     const groupIndex = orderStatus.indexOf(order.status);
     const state = child.status === 'DELIVERED' ? 'done' : index >= 0 && index >= groupIndex ? 'active' : '';
-    return `<div class="mst-row"><span class="mst-dot ${state}"></span><div class="mst-info"><div class="mst-name">${escapeHtml(child.shop?.name || 'Boutique')}</div><div class="mst-status">${labels[child.status] || child.status}</div></div></div>`;
+    const label = order.acceptance?.required && child.status === 'PENDING' && child.sellerAcceptedAt
+      ? 'Articles acceptés · paiement attendu' : (labels[child.status] || child.status);
+    return `<div class="mst-row"><span class="mst-dot ${state}"></span><div class="mst-info"><div class="mst-name">${escapeHtml(child.shop?.name || 'Boutique')}</div><div class="mst-status">${label}</div></div></div>`;
   }).join('');
   container.classList.add('show');
 }

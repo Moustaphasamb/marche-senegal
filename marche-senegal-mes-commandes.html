@@ -404,7 +404,8 @@ function renderOrders(orders) {
             </td>
             <td>
               <span class="order-status ${getStatusClass(order.status)}">
-                ${getStatusLabel(order.status)}
+                ${order.status === 'PENDING' && order.marketOrder?.acceptanceRequired && order.sellerAcceptedAt
+                  ? '✓ Articles acceptés · paiement attendu' : getStatusLabel(order.status)}
               </span>
             </td>
             <td onclick="event.stopPropagation()">
@@ -455,12 +456,17 @@ function getOrderActions(order) {
   const actions = [];
 
   if (order.status === 'PENDING') {
-    actions.push(`
-      <button class="oa-btn confirm"
-        onclick="updateStatus('${order.id}','CONFIRMED')">
-        ✓ Confirmer
-      </button>
-    `);
+    if (order.marketOrder?.acceptanceRequired) {
+      if (!order.sellerAcceptedAt) actions.push(`
+        <button class="oa-btn confirm" onclick="acceptMarketOrder('${order.id}')">
+          ✓ Accepter les articles
+        </button>`);
+    } else {
+      actions.push(`
+        <button class="oa-btn confirm" onclick="updateStatus('${order.id}','CONFIRMED')">
+          ✓ Confirmer
+        </button>`);
+    }
   }
 
   if (order.status === 'CONFIRMED') {
@@ -533,6 +539,12 @@ function getOrderActions(order) {
 async function cancelOrder(orderId) {
   if (!confirm('Annuler cette commande ? Le client en sera averti par SMS.')) return;
   await updateStatus(orderId, 'CANCELLED');
+}
+
+async function acceptMarketOrder(orderId) {
+  const result = await apiCall(`/api/market-orders/orders/${encodeURIComponent(orderId)}/accept`, { method: 'POST' });
+  showToast(result.success ? 'Articles acceptés. Vous pourrez préparer après le paiement.' : (result.message || 'Acceptation impossible'));
+  if (result.success) await loadOrders();
 }
 
 // ── Mettre à jour le statut ──
@@ -672,7 +684,8 @@ async function openDetail(orderId) {
       <div class="dp-section-title">Statut actuel</div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <span class="order-status ${getStatusClass(order.status)}">
-          ${getStatusLabel(order.status)}
+          ${order.status === 'PENDING' && order.marketOrder?.acceptanceRequired && order.sellerAcceptedAt
+            ? '✓ Articles acceptés · paiement attendu' : getStatusLabel(order.status)}
         </span>
         <span style="font-size:.78rem;color:var(--muted)">
           ${new Date(order.updatedAt).toLocaleDateString('fr-FR')}
@@ -681,7 +694,13 @@ async function openDetail(orderId) {
     </div>
 
     <div class="dp-actions">
-      ${order.status === 'PENDING' ? `
+      ${order.status === 'PENDING' && order.marketOrder?.acceptanceRequired && !order.sellerAcceptedAt ? `
+        <button class="dp-action-btn dp-btn-green"
+          onclick="acceptMarketOrder('${order.id}');closeDetail()">
+          ✓ Accepter les articles
+        </button>
+      ` : ''}
+      ${order.status === 'PENDING' && !order.marketOrder?.acceptanceRequired ? `
         <button class="dp-action-btn dp-btn-green"
           onclick="updateStatus('${order.id}','CONFIRMED');closeDetail()">
           ✓ Confirmer la commande

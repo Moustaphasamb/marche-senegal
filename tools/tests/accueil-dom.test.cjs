@@ -22,9 +22,12 @@ const lire = (f) => fs.readFileSync(path.join(racine, f), 'utf8');
 
 function scriptsInternes(html) {
   const morceaux = [];
-  const motif = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;
+  const motif = /<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi;
   let trouve;
-  while ((trouve = motif.exec(html)) !== null) morceaux.push(trouve[1]);
+  while ((trouve = motif.exec(html)) !== null) {
+    // Les données structurées SEO sont du JSON-LD, pas du JavaScript à évaluer.
+    if (!/\btype\s*=\s*["']application\/ld\+json["']/i.test(trouve[1])) morceaux.push(trouve[2]);
+  }
   return morceaux.join('\n');
 }
 
