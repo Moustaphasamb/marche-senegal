@@ -82,6 +82,50 @@ test('contrôles avant publication', () => {
   assert.equal(E.controles({ boutiqueActive: true, produits, vues: [] }).pret, false);
 });
 
+test('bilan avant publication : résumé et conseils non bloquants', () => {
+  const produits = [
+    { id: 'p1', name: 'Huile de baobab', status: 'ACTIVE' },
+    { id: 'p2', name: 'Lait karité', status: 'ACTIVE' },
+    { id: 'p3', name: 'Savon noir', status: 'ACTIVE' },
+    { id: 'p4', name: 'Beurre de cacao', status: 'ACTIVE' },
+    { id: 'p5', name: 'Parfum oud', status: 'ACTIVE' },
+    { id: 'p6', name: 'Ancien', status: 'PAUSED' }
+  ];
+  const vues = [
+    vue('a', { title: 'Entrée', hotspots: [{ productId: 'p1', x: 0, y: 0 }, { productId: 'p1', x: 0.5, y: 0.5 }], labels: [{ categoryId: 'c-parfum', x: 0.2, y: 0.2 }] }),
+    vue('b', { title: 'Comptoir', hotspots: [] })
+  ];
+  const b = E.bilan({ vues, produits });
+  assert.equal(b.resume, '2 photos · 1 produit placé · 1 rayon étiqueté');
+  assert.deepEqual(b.conseils, [
+    { texte: '4 produits en vente ne sont sur aucune photo : Lait karité, Savon noir, Beurre de cacao…', etape: 2 },
+    { texte: 'La photo « Comptoir » n’a aucun produit.', etape: 2, sceneId: 'b' }
+  ]);
+});
+
+test('bilan : un seul produit oublié, et rien à conseiller quand tout est placé', () => {
+  const produits = [{ id: 'p1', name: 'Huile', status: 'ACTIVE' }, { id: 'p2', name: 'Savon', status: 'ACTIVE' }];
+  const une = [vue('a', { hotspots: [{ productId: 'p1', x: 0, y: 0 }] })];
+  assert.deepEqual(E.bilan({ vues: une, produits }).conseils, [{ texte: '1 produit en vente n’est sur aucune photo : Savon.', etape: 2 }]);
+  const tout = [vue('a', { hotspots: [{ productId: 'p1', x: 0, y: 0 }, { productId: 'p2', x: 1, y: 1 }], labels: [{ categoryId: 'x', x: 0, y: 0 }, { categoryId: 'y', x: 0, y: 0 }] })];
+  const b = E.bilan({ vues: tout, produits });
+  assert.equal(b.resume, '1 photo · 2 produits placés · 2 rayons étiquetés');
+  assert.deepEqual(b.conseils, []);
+});
+
+test('bilan sans catalogue : aucun conseil sur les produits (il serait faux)', () => {
+  const b = E.bilan({ vues: [vue('a', { hotspots: [{ productId: 'p1', x: 0, y: 0 }] })], produits: null });
+  assert.equal(b.resume, '1 photo · 1 produit placé · 0 rayon étiqueté');
+  assert.deepEqual(b.conseils, []);
+});
+
+test('message de partage WhatsApp avec le nom et le lien de la boutique', () => {
+  const lien = E.lienWhatsApp('Awa Beauté', 'https://marche-senegal-zeta.vercel.app/boutiques/b1');
+  assert.ok(lien.startsWith('https://wa.me/?text='));
+  assert.equal(decodeURIComponent(lien.split('text=')[1]), 'Venez visiter ma boutique Awa Beauté sur Marché Sénégal : https://marche-senegal-zeta.vercel.app/boutiques/b1');
+  assert.equal(decodeURIComponent(E.lienWhatsApp('', 'https://x.test/b').split('text=')[1]), 'Venez visiter ma boutique sur Marché Sénégal : https://x.test/b');
+});
+
 test('chaque action appelle sa route serveur', async () => {
   const appels = [];
   const api = E.creerApi({

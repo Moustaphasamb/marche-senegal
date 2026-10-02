@@ -68,8 +68,9 @@ async function monter(init = {}) {
   const confirmations = [];
   const ctl = w.VitrineEditeur.monter({
     api: s.api,
-    boutique: { id: 'b1', status: init.statut || 'ACTIVE' },
+    boutique: { id: 'b1', name: 'Awa Beauté', status: init.statut || 'ACTIVE' },
     lienApercu: 'marche-senegal-boutique.html?id=b1&apercu=brouillon',
+    lienPublic: 'https://ms.test/boutiques/b1',
     confirmer: async m => { confirmations.push(m); return !init.refuserConfirmation; }
   });
   await ctl.charger();
@@ -342,6 +343,57 @@ test('étape 4 : liste de contrôle, aperçu et publication', async () => {
   assert.equal(t.confirmations.length, 1);
   assert.ok(t.appels.some(a => a[0] === 'publier'));
   assert.match(t.q('#ve-status').textContent, /en ligne/);
+});
+
+// ── Partie 4 : bilan avant, moment « c'est en ligne » après ──
+test('étape 4 : bilan résumé et conseils non bloquants, chacun mène à sa correction', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] }), vue('b')] });
+  t.ctl.allerA(4);
+  assert.match(t.q('.ve-bilan').textContent, /2 photos · 1 produit placé · 0 rayon étiqueté/);
+  const conseils = t.qa('.ve-conseil');
+  assert.equal(conseils.length, 2);
+  assert.match(conseils[0].textContent, /1 produit en vente n’est sur aucune photo : <img src=x onerror=globalThis\.pirate=1>\./);
+  assert.equal(t.w.pirate, undefined);
+  assert.match(conseils[1].textContent, /La photo « Vue b » n’a aucun produit/);
+  assert.equal(t.bouton('Publier ma boutique').disabled, false, 'un conseil ne bloque pas');
+  conseils[1].querySelector('button').click();
+  assert.equal(t.q('#ve-steps button[data-etape="2"]').getAttribute('aria-current'), 'true');
+  assert.equal(t.ctl.etat.courante, 1);
+});
+
+test('après publication : « Votre vitrine est en ligne », voir, partager sur WhatsApp, copier le lien', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  const carte = t.q('.ve-en-ligne');
+  assert.ok(carte);
+  assert.match(carte.textContent, /Votre vitrine est en ligne/);
+  assert.equal(t.q('.ve-checks'), null);
+  const liens = [...carte.querySelectorAll('a')];
+  const voir = liens.find(a => /Voir ma boutique/.test(a.textContent));
+  assert.equal(voir.getAttribute('href'), 'https://ms.test/boutiques/b1');
+  assert.equal(voir.target, '_blank');
+  const wa = liens.find(a => /WhatsApp/.test(a.textContent));
+  assert.ok(wa.getAttribute('href').startsWith('https://wa.me/?text='));
+  assert.match(decodeURIComponent(wa.getAttribute('href')), /Awa Beauté sur Marché Sénégal : https:\/\/ms\.test\/boutiques\/b1/);
+  [...carte.querySelectorAll('button')].find(b => /Copier le lien/.test(b.textContent)).click();
+  await t.attendre();
+  assert.match(t.q('#ve-status').textContent, /https:\/\/ms\.test\/boutiques\/b1/);
+});
+
+test('après publication, une nouvelle modification ramène au bilan', async () => {
+  const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
+  t.ctl.allerA(4);
+  t.bouton('Publier ma boutique').click();
+  for (let i = 0; i < 6; i++) await t.attendre();
+  assert.ok(t.q('.ve-en-ligne'));
+  t.ctl.allerA(3);
+  t.qa('.ve-rayon')[0].querySelector('button[aria-label^="Descendre"]').click();
+  await t.attendre(); await t.attendre();
+  t.ctl.allerA(4);
+  assert.equal(t.q('.ve-en-ligne'), null);
+  assert.ok(t.q('.ve-checks'));
 });
 
 test('étape 4 : un point sur un produit hors vente bloque la publication', async () => {

@@ -210,6 +210,8 @@
         api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
+        // Adresse propre et partageable (WhatsApp) : /boutiques/:id, servie par api/page.js.
+        lienPublic: location.origin + '/boutiques/' + encodeURIComponent(boutique.id),
         confirmer: async message => window.confirm(message)
       });
       await editeur.charger();

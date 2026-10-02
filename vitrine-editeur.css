@@ -140,3 +140,12 @@
   .ve-apercu-fermer{display:inline-flex}
   body.ve-apercu-plein{overflow:hidden}
 }
+/* Étape 4 : bilan, conseils non bloquants, carte « Votre vitrine est en ligne » */
+.ve-bilan{font-weight:700;color:var(--ve-dark);margin:6px 0 10px}
+.ve-conseils{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:6px}
+.ve-conseil{background:#fbf5e6;border:1px solid #ecdcae;border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.45}
+.ve-en-ligne{background:var(--ve-gp);border:1px solid #cfdcc5;border-radius:var(--ve-r);padding:16px;margin:8px 0 14px}
+.ve-en-ligne h3{font-size:19px;color:var(--ve-dark);margin:0 0 4px}
+.ve-en-ligne .ve-add{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ve-en-ligne a.ve-btn{text-decoration:none}
+.ve-whatsapp.ve-primary{background:#1f8f4e;border-color:#1f8f4e}

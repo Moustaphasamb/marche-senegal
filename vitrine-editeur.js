@@ -162,6 +162,31 @@
     return { pret: lignes.every(l => l.ok), lignes };
   }
 
+  // Bilan de l'étape 4 : ce qui part en ligne, et des conseils qui n'empêchent pas de
+  // publier. Sans catalogue (produits null), rien n'est dit sur les produits oubliés.
+  function bilan({ vues, produits }) {
+    const s = n => (n > 1 ? 's' : '');
+    const places = new Set(vues.flatMap(v => (v.hotspots || []).map(p => p.productId)));
+    const etiquettes = vues.reduce((n, v) => n + (v.labels || []).length, 0);
+    const resume = `${vues.length} photo${s(vues.length)} · ${places.size} produit${s(places.size)} placé${s(places.size)} · ${etiquettes} rayon${s(etiquettes)} étiqueté${s(etiquettes)}`;
+    const conseils = [];
+    const oublies = Array.isArray(produits) ? produitsNonPlaces(vues, produits) : [];
+    if (oublies.length) {
+      const noms = oublies.slice(0, 3).map(p => p.name).join(', ') + (oublies.length > 3 ? '…' : '.');
+      conseils.push({ etape: 2, texte: oublies.length > 1 ? `${oublies.length} produits en vente ne sont sur aucune photo : ${noms}` : `1 produit en vente n’est sur aucune photo : ${noms}` });
+    }
+    for (const v of vues) {
+      if (!(v.hotspots || []).length) conseils.push({ etape: 2, sceneId: v.id, texte: `La photo « ${v.title} » n’a aucun produit.` });
+    }
+    return { resume, conseils };
+  }
+
+  // Partage après publication : wa.me ouvre WhatsApp avec le message prêt à envoyer.
+  function lienWhatsApp(nom, lien) {
+    const texte = `Venez visiter ma boutique ${nom ? nom + ' ' : ''}sur Marché Sénégal : ${lien}`;
+    return 'https://wa.me/?text=' + encodeURIComponent(texte);
+  }
+
   // Chaque action de l'éditeur et sa route serveur (plan 1).
   // apiCall ne lève jamais : une coupure réseau (ou une réponse illisible) revient avec
   // ce message exact. On la marque « reseau » pour que l'écran propose de réessayer,
@@ -218,7 +243,7 @@
   const api = {
     MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
-    produitsNonPlaces, controles, creerApi
+    produitsNonPlaces, controles, bilan, lienWhatsApp, creerApi
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.VitrineEditeurCore = api;

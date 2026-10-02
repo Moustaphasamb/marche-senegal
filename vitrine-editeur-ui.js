@@ -124,6 +124,8 @@
       if (r && r.success) {
         // Une correction enregistrée rend caduques les raisons d'un refus précédent.
         e.problemes = [];
+        // Toute nouvelle modification referme la carte « Votre vitrine est en ligne ».
+        e.enLigne = false;
         apercu.version += 1;
         succes(r);
         statut(textes.fait || 'Enregistré · pas encore publié');
@@ -876,7 +878,16 @@
     // ── Étape 4 : vérifier et publier ──
     function etapePublier(p) {
       p.appendChild(el('h2', null, '4. Vérifier et publier'));
+      if (e.enLigne) {
+        carteEnLigne(p);
+        navigation(p, { n: 3, texte: 'Rayons' }, null);
+        return;
+      }
       p.appendChild(el('p', 've-help', 'Tant que vous n’avez pas publié, vos clients voient l’ancienne version de votre vitrine.'));
+      // Ce qui part en ligne ; les conseils, qui n'empêchent pas de publier, viennent
+      // après les contrôles bloquants.
+      const resume = C.bilan({ vues: e.vues, produits: e.catalogueOk ? e.produits : null });
+      p.appendChild(el('p', 've-bilan', resume.resume));
       // Sans catalogue, les contrôles des produits seraient faux : la publication attend.
       const bilan = e.catalogueOk
         ? C.controles({ boutiqueActive: o.boutique && o.boutique.status === 'ACTIVE', vues: e.vues, produits: e.produits })
@@ -896,6 +907,19 @@
       for (const l of bilan.lignes) ligne(l.ok, l.texte, l.sceneId, l.etape || 2);
       for (const pb of e.problemes) ligne(false, pb.message, pb.sceneId, /^rayon/.test(pb.code || '') ? 3 : 2);
       p.appendChild(liste);
+      if (resume.conseils.length) {
+        p.appendChild(el('p', 've-help', 'Pour une vitrine plus complète (vous pouvez publier sans) :'));
+        const conseils = el('ul', 've-conseils');
+        for (const c of resume.conseils) {
+          const li = el('li', 've-conseil', '💡 ' + c.texte + ' ');
+          const i = c.sceneId ? e.vues.findIndex(v => v.id === c.sceneId) : -1;
+          const corriger = bouton('ve-link', 'Corriger');
+          corriger.onclick = () => { allerA(c.etape); if (i !== -1) e.courante = i; rendre(); };
+          li.appendChild(corriger);
+          conseils.appendChild(li);
+        }
+        p.appendChild(conseils);
+      }
       const actions = el('div', 've-add');
       const publier = bouton('ve-btn ve-primary', 'Publier ma boutique');
       publier.disabled = !bilan.pret || e.occupe;
@@ -903,7 +927,10 @@
         if (!await confirmer('Publier ? Vos photos, points, étiquettes et l’ordre des rayons remplaceront la version en ligne.')) return;
         e.problemes = [];
         const r = await agir(() => api.publier(), () => {}, { enCours: 'Publication en cours…', fait: 'Publication réussie' });
-        if (r && r.success) await charger('Votre vitrine est en ligne. Vous pouvez continuer à la modifier : rien ne change pour vos clients avant la prochaine publication.');
+        if (r && r.success) {
+          e.enLigne = true;
+          await charger('Votre vitrine est en ligne. Vous pouvez continuer à la modifier : rien ne change pour vos clients avant la prochaine publication.');
+        }
       };
       const abandon = bouton('ve-link ve-danger', 'Abandonner mes changements');
       abandon.disabled = e.occupe;
@@ -916,6 +943,27 @@
       actions.append(publier, abandon);
       p.appendChild(actions);
       navigation(p, { n: 3, texte: 'Rayons' }, null);
+    }
+
+    // Après « Publier » : la boutique est en ligne, le vendeur la voit et la fait connaître.
+    function carteEnLigne(p) {
+      const carte = el('div', 've-en-ligne');
+      carte.appendChild(el('h3', null, '🎉 Votre vitrine est en ligne'));
+      carte.appendChild(el('p', 've-help', 'Vos clients voient maintenant vos photos, vos produits et vos rayons. Faites-le savoir à vos clients.'));
+      const actions = el('div', 've-add');
+      const wa = el('a', 've-btn ve-primary ve-whatsapp', 'Partager sur WhatsApp');
+      wa.href = C.lienWhatsApp(o.boutique && o.boutique.name, o.lienPublic);
+      const voir = el('a', 've-btn', 'Voir ma boutique ↗');
+      voir.href = o.lienPublic;
+      for (const a of [wa, voir]) { a.target = '_blank'; a.rel = 'noopener'; }
+      const copier = bouton('ve-link', 'Copier le lien');
+      copier.onclick = async () => {
+        try { await root.navigator.clipboard.writeText(o.lienPublic); statut('Lien copié : ' + o.lienPublic); }
+        catch { statut('Copiez ce lien : ' + o.lienPublic); }
+      };
+      actions.append(wa, voir, copier);
+      carte.appendChild(actions);
+      p.appendChild(carte);
     }
 
     return { charger, etat: e, allerA };
