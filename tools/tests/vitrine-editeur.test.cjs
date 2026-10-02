@@ -181,3 +181,41 @@ test('l’enregistrement envoie la zone au serveur', async () => {
   await api.enregistrerVue({ id: 'a', title: 'A', imageUrl: 'https://ex.test/a.jpg', hotspots: [{ productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3, id: 'h1' }], labels: [] });
   assert.deepEqual(envoyes[0].hotspots, [{ productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3 }]);
 });
+
+// ── Partie 2b : reconnaissance par l'IA ──
+test('zone envoyée à l’IA : la zone tracée avec une marge, ou un cadre autour d’un simple point', () => {
+  assert.deepEqual(E.zoneDeDecoupe({ x: 0.5, y: 0.5, w: 0.2, h: 0.4 }), { x: 0.5, y: 0.5, w: 0.24, h: 0.48 });
+  assert.deepEqual(E.zoneDeDecoupe({ x: 0.5, y: 0.5 }), { x: 0.5, y: 0.5, w: 0.16, h: 0.24 });
+  // Près du bord : le cadre reste dans la photo.
+  const bord = E.zoneDeDecoupe({ x: 0.02, y: 0.98 });
+  assert.ok(bord.x - bord.w / 2 >= 0 && bord.y + bord.h / 2 <= 1.0001, JSON.stringify(bord));
+});
+
+test('fiche proposée : nom, description, catégorie et prix entier en FCFA obligatoires', () => {
+  const ok = { nom: 'Baskets rouges', description: 'Toile rouge.', categorieId: 'c1', prix: '25000', stock: '2' };
+  assert.equal(E.verifierFiche(ok), null);
+  assert.equal(E.verifierFiche({ ...ok, nom: ' ' }), 'Donnez un nom au produit.');
+  assert.equal(E.verifierFiche({ ...ok, description: '' }), 'Ajoutez une courte description.');
+  assert.equal(E.verifierFiche({ ...ok, categorieId: '' }), 'Choisissez une catégorie.');
+  assert.equal(E.verifierFiche({ ...ok, prix: '' }), 'Indiquez votre prix en FCFA.');
+  assert.equal(E.verifierFiche({ ...ok, prix: '2500.5' }), 'Le prix est un nombre entier de FCFA, sans virgule.');
+  assert.equal(E.verifierFiche({ ...ok, prix: '0' }), 'Le prix est un nombre entier de FCFA, sans virgule.');
+  assert.equal(E.verifierFiche({ ...ok, stock: '-1' }), 'Le stock est un nombre entier, 0 ou plus.');
+});
+
+test('l’API de l’éditeur sait reconnaître, lister les catégories et créer un produit', async () => {
+  const appels = [];
+  const api = E.creerApi({
+    apiCall: async (url, o = {}) => { appels.push([url, o.method || 'GET', o.body ? JSON.parse(o.body) : null]); return { success: true, data: {} }; },
+    envoyerFichier: async () => ({}),
+    decouperPhoto: async (url, zone) => 'data:image/jpeg;base64,QQ==',
+    envoyerPhotoProduit: async () => ({ success: true, url: 'https://ex.test/produit.jpg' })
+  });
+  await api.identifier('https://ex.test/a.jpg', { x: 0.5, y: 0.5, w: 0.2, h: 0.2 });
+  await api.categories();
+  await api.creerProduit({ name: 'Baskets', description: 'Rouges', price: 25000, stock: 2, categoryId: 'c1', images: ['https://ex.test/produit.jpg'] });
+  assert.deepEqual(appels[0], ['/api/shops/me/shopvision/identifier', 'POST', { image: 'data:image/jpeg;base64,QQ==' }]);
+  assert.deepEqual(appels[1], ['/api/categories', 'GET', null]);
+  assert.deepEqual(appels[2][0], '/api/products');
+  assert.deepEqual(appels[2][2].price, 25000);
+});

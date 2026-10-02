@@ -101,3 +101,16 @@
 .ve-cible.ve-cible-zone{border-radius:8px;border-width:2px;background:rgba(196,155,53,.16)}
 .ve-entourer{margin:4px 0 6px}
 .ve-entourer[aria-pressed="true"]{background:var(--ve-gold);border-color:var(--ve-gold);color:#1b1407}
+/* Partie 2b : l'IA reconnaît l'article entouré. */
+.ve-ia{display:grid;gap:8px;padding:10px 12px;border-radius:12px;background:var(--ve-gp);margin:4px 0 10px}
+.ve-ia-btn{justify-self:start;background:var(--ve-dark);border-color:var(--ve-dark);color:#fff}
+.ve-ia-vu{margin:0;font-weight:700;color:var(--ve-dark)}
+.ve-ia-erreur{color:var(--ve-red)}
+.ve-ia-choix{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ve-ou{margin:4px 0}
+.ve-fiche{display:grid;gap:8px;border-top:1px solid var(--ve-border);padding-top:10px}
+.ve-fiche h4{margin:0;font-size:15px}
+.ve-fiche-photo{width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--ve-border)}
+.ve-champ{display:grid;gap:4px;font-size:13px;font-weight:600}
+.ve-champ input,.ve-champ textarea,.ve-champ select{font:inherit;font-weight:400;padding:8px 10px;border:1px solid var(--ve-border);border-radius:10px;background:var(--ve-white);min-width:0}
+.ve-fiche .ve-btn{justify-self:start}

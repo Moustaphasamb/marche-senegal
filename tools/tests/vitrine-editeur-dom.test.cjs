@@ -647,3 +647,86 @@ test('un toucher simple pose toujours un point, sans zone', async () => {
   assert.ok(t.q('.ve-cible'));
   assert.equal(t.q('.ve-cible-zone'), null);
 });
+
+// ── Partie 2b : l'IA reconnaît l'article entouré ──
+async function avecZoneChoisie(t) {
+  t.q('#ve-steps button[data-etape="2"]').click();
+  await t.attendre();
+  t.q('.ve-photo img').getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 });
+  glisser(t, t.q('.ve-photo'), [20, 10], [60, 50]);
+  await t.attendre();
+}
+function iaFactice(t, reponse) {
+  const appels = [];
+  t.api.decouper = async (url, zone) => { appels.push(['decouper', url, JSON.parse(JSON.stringify(zone))]); return { success: true, image: 'data:image/jpeg;base64,QQ==' }; };
+  t.api.identifierImage = async image => { appels.push(['identifier', image]); return reponse; };
+  t.api.categories = async () => ({ success: true, data: [{ id: 'c-chaussures', name: 'Chaussures', emoji: '👟' }] });
+  t.api.envoyerPhotoProduit = async image => { appels.push(['photo', image]); return { success: true, url: 'https://ex.test/produit.jpg' }; };
+  t.api.creerProduit = async p => { appels.push(['creer', JSON.parse(JSON.stringify(p))]); return { success: true, data: { id: 'p-nouveau', name: p.name, status: 'ACTIVE' } }; };
+  return appels;
+}
+const attendreBeaucoup = async t => { for (let i = 0; i < 10; i++) await t.attendre(); };
+
+test('IA : l’article reconnu dans le catalogue s’associe en un geste', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  await avecZoneChoisie(t);
+  const premier = t.qa('.ve-product')[0].textContent;
+  const appels = iaFactice(t, { success: true, data: { lisible: true, description: 'Un flacon doré', correspondances: [{ productId: PRODUITS[0].id, nom: premier, raison: 'même flacon' }], proposition: { nom: '', description: '', categorieId: null } } });
+  t.bouton('Reconnaître avec l’IA').click();
+  await attendreBeaucoup(t);
+  assert.deepEqual(appels[0], ['decouper', 'https://ex.test/a.jpg', { x: 0.2, y: 0.3, w: 0.2, h: 0.4 }], 'la zone tracée ; la marge est ajoutée par les règles');
+  assert.match(t.q('.ve-ia-vu').textContent, /Un flacon doré/);
+  t.bouton('Associer à « ' + premier + ' »').click();
+  await attendreBeaucoup(t);
+  const envoi = t.appels.filter(a => a[0] === 'enregistrerVue').at(-1)[1];
+  assert.equal(envoi.hotspots[0].productId, PRODUITS[0].id);
+  assert.equal(envoi.hotspots[0].w, 0.2);
+});
+
+test('IA : fiche proposée, le vendeur met son prix, le produit est créé avec la photo puis placé', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  await avecZoneChoisie(t);
+  const appels = iaFactice(t, { success: true, data: { lisible: true, description: 'Baskets rouges', correspondances: [], proposition: { nom: 'Baskets rouges', description: 'Baskets en toile rouge.', categorieId: 'c-chaussures' } } });
+  t.bouton('Reconnaître avec l’IA').click();
+  await attendreBeaucoup(t);
+  t.bouton('Créer la fiche « Baskets rouges »').click();
+  await attendreBeaucoup(t);
+  const champs = t.qa('.ve-fiche .ve-champ input, .ve-fiche .ve-champ textarea, .ve-fiche .ve-champ select');
+  assert.equal(champs[0].value, 'Baskets rouges');
+  assert.equal(champs[2].value, 'c-chaussures');
+  // Sans prix : refusé, rien n'est envoyé.
+  t.bouton('Créer et placer ce produit').click();
+  await t.attendre();
+  assert.equal(t.q('#ve-status').textContent, 'Indiquez votre prix en FCFA.');
+  assert.ok(!appels.some(a => a[0] === 'creer'));
+  const prix = t.qa('.ve-fiche .ve-champ input')[1];
+  prix.value = '25000';
+  prix.dispatchEvent(new t.w.Event('input'));
+  t.bouton('Créer et placer ce produit').click();
+  await attendreBeaucoup(t);
+  assert.deepEqual(appels.find(a => a[0] === 'photo'), ['photo', 'data:image/jpeg;base64,QQ==']);
+  assert.deepEqual(appels.find(a => a[0] === 'creer')[1], { name: 'Baskets rouges', description: 'Baskets en toile rouge.', price: 25000, stock: 1, categoryId: 'c-chaussures', images: ['https://ex.test/produit.jpg'] });
+  const envoi = t.appels.filter(a => a[0] === 'enregistrerVue').at(-1)[1];
+  assert.equal(envoi.hotspots[0].productId, 'p-nouveau');
+  assert.match(t.q('#ve-status').textContent, /Fiche « Baskets rouges » créée et placée/);
+});
+
+test('IA non activée : le message est montré, la liste du catalogue reste disponible', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  await avecZoneChoisie(t);
+  iaFactice(t, { success: false, message: 'La reconnaissance par IA n’est pas encore activée.' });
+  t.bouton('Reconnaître avec l’IA').click();
+  await attendreBeaucoup(t);
+  assert.equal(t.q('.ve-ia-erreur').textContent, 'La reconnaissance par IA n’est pas encore activée.');
+  assert.ok(t.qa('.ve-product').length > 0);
+});
+
+test('IA : article flou, on propose une photo de près', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  await avecZoneChoisie(t);
+  iaFactice(t, { success: true, data: { lisible: false, description: '', correspondances: [], proposition: { nom: '', description: '', categorieId: null } } });
+  t.bouton('Reconnaître avec l’IA').click();
+  await attendreBeaucoup(t);
+  assert.ok(t.bouton('Photo de l’article de près'));
+  assert.equal(t.q('#ve-photo-produit').getAttribute('capture'), 'environment');
+});

@@ -43,6 +43,7 @@
   <input id="ve-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   <input id="ve-camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
   <input id="ve-serie" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  <input id="ve-photo-produit" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
 </section>
 <!-- /ve -->
   </main>
@@ -117,6 +118,49 @@
       }));
     }
 
+    // Partie 2b : la zone entourée, découpée dans la photo (768 px au plus) pour l'IA.
+    async function decouperPhoto(adresse, zone) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise((ok, ko) => { img.onload = ok; img.onerror = () => ko(new Error('Photo inaccessible')); img.src = Vue360.urlTaille(adresse, 2400); });
+      const W = img.naturalWidth, H = img.naturalHeight;
+      const sw = zone.w * W, sh = zone.h * H;
+      const k = Math.min(1, 768 / Math.max(sw, sh));
+      const toile = document.createElement('canvas');
+      toile.width = Math.max(1, Math.round(sw * k));
+      toile.height = Math.max(1, Math.round(sh * k));
+      toile.getContext('2d').drawImage(img, (zone.x - zone.w / 2) * W, (zone.y - zone.h / 2) * H, sw, sh, 0, 0, toile.width, toile.height);
+      return toile.toDataURL('image/jpeg', 0.85);
+    }
+
+    // Photo de l'article prise de près : 1 024 px au plus.
+    async function fichierEnImage(fichier) {
+      const image = await createImageBitmap(fichier);
+      const k = Math.min(1, 1024 / Math.max(image.width, image.height));
+      const toile = document.createElement('canvas');
+      toile.width = Math.round(image.width * k);
+      toile.height = Math.round(image.height * k);
+      toile.getContext('2d').drawImage(image, 0, 0, toile.width, toile.height);
+      image.close();
+      return toile.toDataURL('image/jpeg', 0.85);
+    }
+
+    // Photo du produit créé par la fiche de l'IA : même envoi que la page « Ajouter un produit ».
+    async function envoyerPhotoProduit(image) {
+      try {
+        const corps = new FormData();
+        corps.append('image', await (await fetch(image)).blob(), 'produit.jpg');
+        const reponse = await fetch(API_URL + '/api/upload/image', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }, body: corps
+        });
+        const d = await reponse.json();
+        if (reponse.ok && d.success && typeof d.url === 'string') return { success: true, url: d.url };
+        return { success: false, message: d.message || 'L’envoi de la photo du produit a échoué.' };
+      } catch {
+        return { success: false, message: 'Erreur de connexion au serveur' };
+      }
+    }
+
     async function envoyerSerie360(fichiers) {
       const corps = new FormData();
       for (const [i, f] of fichiers.entries()) corps.append('photos', await alleger(f), 'photo-' + String(i + 1).padStart(2, '0') + '.jpg');
@@ -151,7 +195,7 @@
       $('publicShopLink').hidden = false;
       $('ve').hidden = false;
       const editeur = VitrineEditeur.monter({
-        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos }),
+        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         confirmer: async message => window.confirm(message)

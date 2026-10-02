@@ -42,6 +42,28 @@
     return null;
   }
 
+  // Partie 2b. Morceau de photo envoyé à l'IA : la zone tracée avec 20 % de marge, ou
+  // un cadre autour d'un simple point. Le cadre reste dans la photo.
+  function zoneDeDecoupe(pos) {
+    const w = Math.min(1, nombre(pos.w) ? pos.w * 1.2 : 0.16);
+    const h = Math.min(1, nombre(pos.h) ? pos.h * 1.2 : 0.24);
+    const x = Math.min(1 - w / 2, Math.max(w / 2, pos.x));
+    const y = Math.min(1 - h / 2, Math.max(h / 2, pos.y));
+    return { x: arrondi(x), y: arrondi(y), w: arrondi(w), h: arrondi(h) };
+  }
+
+  // Fiche proposée par l'IA, complétée par le vendeur avant création.
+  function verifierFiche(f) {
+    if (!String(f.nom || '').trim()) return 'Donnez un nom au produit.';
+    if (!String(f.description || '').trim()) return 'Ajoutez une courte description.';
+    if (!f.categorieId) return 'Choisissez une catégorie.';
+    const prix = String(f.prix ?? '').trim();
+    if (!prix) return 'Indiquez votre prix en FCFA.';
+    if (!/^\d+$/.test(prix) || Number(prix) <= 0) return 'Le prix est un nombre entier de FCFA, sans virgule.';
+    if (!/^\d+$/.test(String(f.stock ?? '1').trim())) return 'Le stock est un nombre entier, 0 ou plus.';
+    return null;
+  }
+
   function deplacer(liste, index, sens) {
     const cible = index + sens;
     const copie = liste.slice();
@@ -147,7 +169,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -168,6 +190,22 @@
       abandonner: () => appel(base + '/draft', { method: 'DELETE' }),
       envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
       assembler360: async fichiers => marquer(await envoyerSerie(fichiers)),
+      // Partie 2b : l'IA reconnaît l'article (zone découpée dans la photo, ou photo de près).
+      decouper: async (adresse, pos) => {
+        try { return { success: true, image: await decouperPhoto(adresse, zoneDeDecoupe(pos)) }; } catch { return { success: false, message: RESEAU, reseau: true }; }
+      },
+      identifier: async (adresse, pos) => {
+        let image;
+        try { image = await decouperPhoto(adresse, zoneDeDecoupe(pos)); } catch { return { success: false, message: RESEAU, reseau: true }; }
+        return appel(base + '/identifier', avec('POST', { image }));
+      },
+      identifierImage: image => appel(base + '/identifier', avec('POST', { image })),
+      imageDuFichier: async fichier => {
+        try { return { success: true, image: await fichierEnImage(fichier) }; } catch { return { success: false, message: 'Cette photo n’a pas pu être lue. Choisissez une photo JPG ou PNG.' }; }
+      },
+      categories: () => appel('/api/categories'),
+      creerProduit: p => appel('/api/products', avec('POST', p)),
+      envoyerPhotoProduit: async image => marquer(await envoyerPhotoProduit(image)),
       // Photos déjà envoyées une par une : on les retélécharge pour les assembler.
       assemblerVues: async adresses => {
         let fichiers;
@@ -178,7 +216,7 @@
   }
 
   const api = {
-    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, zoneDansPhoto, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
+    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
     produitsNonPlaces, controles, creerApi
   };

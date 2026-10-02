@@ -317,6 +317,16 @@
         fait: 'Vue 360° créée · pas encore publiée'
       });
     }
+    // Photo de l'article de près (partie 2b) : l'IA recommence avec elle, et elle servira de photo du produit.
+    $('ve-photo-produit').onchange = async () => {
+      const f = $('ve-photo-produit').files && $('ve-photo-produit').files[0];
+      try { $('ve-photo-produit').value = ''; } catch { /* certains navigateurs refusent */ }
+      const vue = e.vues[e.courante];
+      if (!f || !vue || !e.choix) return;
+      const r = await api.imageDuFichier(f);
+      if (!r.success) { statut(r.message, true); return; }
+      reconnaitre(vue, r.image);
+    };
     $('ve-serie').onchange = () => {
       const fichiers = Array.from($('ve-serie').files || []);
       try { $('ve-serie').value = ''; } catch { /* certains navigateurs refusent */ }
@@ -541,9 +551,152 @@
       navigation(p, { n: 1, texte: 'Photos' }, { n: 3, texte: 'Mes rayons' });
     }
 
+    // ── Partie 2b : l'IA reconnaît l'article entouré ──
+    // e.ia vaut pour le choix en cours seulement (un nouveau toucher repart de zéro).
+    const iaDuChoix = () => (e.ia && e.ia.choix === e.choix ? e.ia : null);
+
+    function associer(vue, productId) {
+      const nouvelle = C.ajouterPoint(vue, { ...e.choix, productId });
+      if (!nouvelle) { statut(`${C.MAX_POINTS} points au maximum sur une photo.`, true); return; }
+      enregistrer(nouvelle);
+    }
+
+    async function reconnaitre(vue, imageDePres) {
+      const choix = e.choix;
+      e.ia = { choix, etat: 'en_cours', imageDePres };
+      rendre();
+      let r, image = imageDePres;
+      try {
+        if (!image) {
+          const d = await api.decouper(vue.imageUrl, choix);
+          if (d && d.success) image = d.image; else r = d;
+        }
+        if (image) r = await api.identifierImage(image);
+      } catch { r = { success: false, message: 'Erreur de connexion au serveur' }; }
+      if (e.choix !== choix) return;
+      e.ia = r && r.success
+        ? { choix, etat: 'fait', resultat: r.data, image, imageDePres }
+        : { choix, etat: 'erreur', message: (r && r.message) || 'La reconnaissance n’a pas répondu. Réessayez.', imageDePres };
+      rendre();
+    }
+
+    function chargerCategories() {
+      if (e.categories) return;
+      e.categories = [];
+      api.categories().then(r => { e.categories = r && r.success ? r.data || [] : []; rendre(); });
+    }
+
+    function blocIA(vue) {
+      const ia = iaDuChoix();
+      const bloc = el('div', 've-ia');
+      if (!ia) {
+        const b = bouton('ve-btn ve-ia-btn', '✨ Reconnaître avec l’IA');
+        b.disabled = e.occupe;
+        b.onclick = () => reconnaitre(vue, null);
+        bloc.append(b, el('p', 've-help', 'L’IA regarde l’article entouré et vous propose le bon produit, ou une fiche toute prête.'));
+        return bloc;
+      }
+      if (ia.etat === 'en_cours') { bloc.appendChild(el('p', 've-help ve-strong', 'L’IA regarde l’article…')); return bloc; }
+      if (ia.etat === 'erreur') {
+        bloc.appendChild(el('p', 've-help ve-ia-erreur', ia.message));
+        const r = bouton('ve-link', 'Réessayer');
+        r.onclick = () => reconnaitre(vue, ia.imageDePres);
+        bloc.appendChild(r);
+        return bloc;
+      }
+      const res = ia.resultat;
+      if (res.description) bloc.appendChild(el('p', 've-ia-vu', 'L’IA voit : ' + res.description));
+      if (!res.lisible) {
+        bloc.appendChild(el('p', 've-help', 'L’article est trop petit ou flou sur cette photo. Prenez-le en photo de près : l’IA le reconnaîtra mieux.'));
+        const cam = bouton('ve-btn', '📷 Photo de l’article de près');
+        cam.onclick = () => $('ve-photo-produit').click();
+        bloc.appendChild(cam);
+      }
+      for (const c of res.correspondances) {
+        const ligne = el('div', 've-ia-choix');
+        const b = bouton('ve-btn ve-primary', 'Associer à « ' + c.nom + ' »');
+        b.disabled = e.occupe;
+        b.onclick = () => associer(vue, c.productId);
+        ligne.appendChild(b);
+        if (c.raison) ligne.appendChild(el('span', 've-help', c.raison));
+        bloc.appendChild(ligne);
+      }
+      if (res.proposition.nom) {
+        if (!ia.fiche) {
+          const b = bouton(res.correspondances.length ? 've-btn' : 've-btn ve-primary', 'Créer la fiche « ' + res.proposition.nom + ' »');
+          b.onclick = () => {
+            ia.fiche = { nom: res.proposition.nom, description: res.proposition.description, categorieId: res.proposition.categorieId || '', prix: '', stock: '1' };
+            chargerCategories();
+            rendre();
+          };
+          bloc.appendChild(b);
+        } else bloc.appendChild(formulaireFiche(vue, ia));
+      }
+      if (res.lisible && !res.correspondances.length && !res.proposition.nom) bloc.appendChild(el('p', 've-help', 'L’IA n’a rien proposé : choisissez le produit dans la liste ci-dessous.'));
+      return bloc;
+    }
+
+    // Fiche préparée par l'IA : le vendeur corrige et met SON prix. Créée avec la photo découpée.
+    function formulaireFiche(vue, ia) {
+      const f = ia.fiche;
+      const form = el('div', 've-fiche');
+      form.appendChild(el('h4', null, 'Nouvelle fiche produit'));
+      if (ia.image) { const i = el('img', 've-fiche-photo'); i.src = ia.image; i.alt = 'Photo du produit'; form.appendChild(i); }
+      const champ = (libelle, noeud) => { const l = el('label', 've-champ'); l.append(el('span', null, libelle), noeud); form.appendChild(l); return noeud; };
+      const nom = champ('Nom', el('input'));
+      nom.value = f.nom; nom.maxLength = 80; nom.oninput = () => { f.nom = nom.value; };
+      const desc = champ('Description', el('textarea'));
+      desc.value = f.description; desc.rows = 3; desc.oninput = () => { f.description = desc.value; };
+      const cat = champ('Catégorie', el('select'));
+      cat.appendChild(el('option', null, (e.categories || []).length ? 'Choisir…' : 'Chargement…')).value = '';
+      for (const c of e.categories || []) { const o = el('option', null, (c.emoji ? c.emoji + ' ' : '') + c.name); o.value = c.id; cat.appendChild(o); }
+      cat.value = f.categorieId || '';
+      cat.onchange = () => { f.categorieId = cat.value; };
+      const prix = champ('Votre prix (FCFA)', el('input'));
+      prix.inputMode = 'numeric'; prix.placeholder = 'ex. 25000'; prix.value = f.prix; prix.oninput = () => { f.prix = prix.value; };
+      const stock = champ('Stock', el('input'));
+      stock.inputMode = 'numeric'; stock.value = f.stock; stock.oninput = () => { f.stock = stock.value; };
+      const creer = bouton('ve-btn ve-primary', 'Créer et placer ce produit');
+      creer.disabled = e.occupe;
+      creer.onclick = () => creerFiche(vue, ia);
+      form.appendChild(creer);
+      return form;
+    }
+
+    async function creerFiche(vue, ia) {
+      const refus = C.verifierFiche(ia.fiche);
+      if (refus) { statut(refus, true); return; }
+      const choix = e.choix;
+      // Après une coupure, « Réessayer » ne renvoie ni la photo ni la fiche déjà créées.
+      await agir(async () => {
+        if (!ia.photoUrl && ia.image) {
+          const up = await api.envoyerPhotoProduit(ia.image);
+          if (!up || !up.success) return up;
+          ia.photoUrl = up.url;
+        }
+        if (!ia.produit) {
+          const r = await api.creerProduit({
+            name: ia.fiche.nom.trim(), description: ia.fiche.description.trim(),
+            price: Number(ia.fiche.prix), stock: Number(String(ia.fiche.stock || '1').trim()),
+            categoryId: ia.fiche.categorieId, images: ia.photoUrl ? [ia.photoUrl] : []
+          });
+          if (!r || !r.success) return r;
+          ia.produit = r.data;
+          e.produits = [...e.produits, r.data];
+        }
+        return enregistrerVue(C.ajouterPoint(vue, { ...choix, productId: ia.produit.id }));
+      }, r => {
+        const i = e.vues.findIndex(x => x.id === vue.id);
+        if (i !== -1) e.vues[i] = r.data;
+        e.choix = null; e.mode = null; e.ia = null;
+      }, { enCours: 'Création de la fiche…', fait: 'Fiche « ' + ia.fiche.nom.trim() + ' » créée et placée · pas encore publié' });
+    }
+
     function choixProduit(vue) {
       const carte = el('div', 've-card ve-choice');
       carte.appendChild(el('h3', null, 'Quel produit est ici ?'));
+      carte.appendChild(blocIA(vue));
+      carte.appendChild(el('p', 've-help ve-ou', 'Ou choisissez-le dans votre catalogue :'));
       const recherche = el('input', 've-search');
       recherche.type = 'search';
       recherche.placeholder = 'Nom du produit…';
@@ -556,11 +709,7 @@
         if (!trouves.length) liste.appendChild(el('p', 've-help', e.produits.length ? 'Aucun produit ne correspond.' : 'Votre catalogue est vide : créez d’abord un produit.'));
         for (const x of trouves.slice(0, 30)) {
           const b = bouton('ve-product', x.name + (x.status === 'ACTIVE' ? '' : ' (hors vente)'));
-          b.onclick = () => {
-            const nouvelle = C.ajouterPoint(vue, { ...e.choix, productId: x.id });
-            if (!nouvelle) { statut(`${C.MAX_POINTS} points au maximum sur une photo.`, true); return; }
-            enregistrer(nouvelle);
-          };
+          b.onclick = () => associer(vue, x.id);
           liste.appendChild(b);
         }
       };
