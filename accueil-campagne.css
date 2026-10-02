@@ -1,0 +1,103 @@
+/* Campagne d'accueil : offres réelles sous la navigation et Panier Marché. */
+body.accueil-immersif .hero {padding-top:205px}
+.accueil-immersif .promos-band {
+  position:absolute;top:88px;left:0;right:0;z-index:2;
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
+  gap:20px;min-height:64px;padding:8px var(--home-gutter);
+  background:rgba(9,42,28,.83);border-block:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.accueil-immersif .promos-band .pb-label {
+  display:flex;align-items:center;gap:8px;margin:0;white-space:nowrap;
+  color:#f4c542;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+}
+.accueil-immersif .promos-band .pb-label .ic {font-size:15px}
+.accueil-immersif .promo-pills {
+  display:flex;align-items:center;gap:12px;min-width:0;overflow-x:auto;overflow-y:hidden;
+  flex-wrap:nowrap;scroll-snap-type:x mandatory;scrollbar-width:none;
+}
+.accueil-immersif .promo-pills::-webkit-scrollbar {display:none}
+.accueil-immersif .promo-pill {
+  display:flex;align-items:center;gap:13px;flex:0 0 auto;min-width:0;max-width:100%;
+  padding:7px 13px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;scroll-snap-align:start;text-align:left;
+}
+.accueil-immersif .pp-link {display:flex;align-items:center;gap:11px;min-width:0;color:#fff}
+.accueil-immersif .pp-link:hover .pp-shop {text-decoration:underline}
+.accueil-immersif .pp-disc {font:600 17px/1 'Newsreader',Georgia,serif;color:#f4c542;white-space:nowrap}
+.accueil-immersif .pp-shop {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#f8f6e9;margin:0;max-width:230px}
+.accueil-immersif .promo-pill .pp-code {
+  flex:0 0 auto;margin:0;padding:5px 9px;border-radius:5px;
+  border-color:rgba(255,255,255,.38);background:transparent;color:#fff;font-size:11px;
+}
+.accueil-immersif .promo-fallback {color:#fff;font-size:12px;font-weight:600;padding:9px 0}
+.accueil-immersif .promo-fallback::after {content:'↗';margin-left:12px}
+.accueil-immersif .promo-fallback:hover {text-decoration:underline}
+.accueil-immersif .promo-controls {display:flex;gap:6px}
+.accueil-immersif .promo-controls button {
+  width:30px;height:30px;border:1px solid rgba(255,255,255,.42);border-radius:50%;
+  background:transparent;color:#fff;cursor:pointer;font:22px/1 Arial,sans-serif;
+}
+.accueil-immersif .promo-controls button:hover {background:rgba(255,255,255,.18)}
+.accueil-immersif .promos-band :is(a,button):focus-visible,
+.accueil-immersif .hero-market-link:focus-visible,
+.accueil-immersif .market-basket a:focus-visible {outline:3px solid #f4c542;outline-offset:3px}
+.accueil-immersif .hero-market-link {
+  display:inline-flex;align-items:center;gap:12px;margin-top:23px;padding:9px 0;
+  color:#f4f5e9;font-size:12px;font-weight:700;border-bottom:1px solid #f4f5e9a8;
+}
+.accueil-immersif .hero-market-link:hover {color:#d8e9ba;border-color:#d8e9ba}
+.accueil-immersif .market-basket {
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(35px,6vw,110px);
+  padding:clamp(62px,7vw,120px) var(--home-gutter);background:#e9eddf;color:#173b2b;
+}
+.accueil-immersif .market-basket-eyebrow {
+  display:block;margin-bottom:22px;color:#476747;font-size:10px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+}
+.accueil-immersif .market-basket h2 {
+  font:400 clamp(38px,4.2vw,70px)/1.08 'Newsreader',Georgia,serif;
+  letter-spacing:-.04em;margin:0 0 26px;
+}
+.accueil-immersif .market-basket h2 em {color:#3f704b;font-weight:400}
+.accueil-immersif .market-basket-heading>p {max-width:52ch;color:#4c5c4e;font-size:14px;line-height:1.8}
+.accueil-immersif .market-basket-heading>a {
+  display:inline-flex;gap:24px;margin-top:26px;padding:13px 20px;border-radius:7px;
+  background:#1b6b3a;color:#fff;font-size:12px;font-weight:700;
+}
+.accueil-immersif .market-basket-heading>a:hover {background:#124e2b}
+.accueil-immersif .market-basket-steps {border-top:1px solid #b9c7b6}
+.accueil-immersif .market-basket-steps>div {
+  display:grid;grid-template-columns:44px 1fr;column-gap:16px;row-gap:5px;
+  padding:23px 0;border-bottom:1px solid #b9c7b6;
+}
+.accueil-immersif .market-basket-steps>div span {grid-row:span 2;color:#56775b;font:400 25px/1 'Newsreader',Georgia,serif}
+.accueil-immersif .market-basket-steps strong {font-size:14px}
+.accueil-immersif .market-basket-steps>div p {font-size:12px;color:#5b6b5c;line-height:1.6}
+.accueil-immersif .market-basket-note {
+  margin-top:20px;padding:15px 17px;border-radius:8px;background:#f5f6ef;
+  color:#526451;font-size:11px;line-height:1.7;
+}
+@media(max-width:900px) {
+  .accueil-immersif .market-basket {grid-template-columns:1fr;gap:42px}
+}
+@media(max-width:600px) {
+  body.accueil-immersif .hero {min-height:830px;padding-top:205px}
+  .accueil-immersif .promos-band {top:72px;min-height:76px;gap:8px;padding:7px 20px;grid-template-columns:minmax(0,1fr) auto}
+  .accueil-immersif .promos-band .pb-label {display:none}
+  .accueil-immersif .promo-pill {width:100%;min-height:60px;padding:7px 9px;gap:7px;justify-content:space-between}
+  .accueil-immersif .pp-link {display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+  .accueil-immersif .pp-disc {font-size:18px}
+  .accueil-immersif .pp-shop {font-size:11px;max-width:none;white-space:normal;line-height:1.25}
+  .accueil-immersif .promo-pill .pp-code {font-size:10px;padding:6px 7px;white-space:nowrap}
+  .accueil-immersif .hero-market-link {margin-top:14px}
+  .accueil-immersif .market-basket {padding:62px 22px}
+  .accueil-immersif .market-basket h2 {font-size:clamp(38px,10vw,52px)}
+}
+@media(max-width:365px) {
+  .accueil-immersif .promo-pill .pp-code {display:none}
+  .accueil-immersif .pp-shop {max-width:150px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .accueil-immersif .promo-pills {scroll-behavior:auto}
+}
