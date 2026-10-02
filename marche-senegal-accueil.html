@@ -230,6 +230,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <script src="icons.js"></script>
 <link rel="preload" href="assets/banner-hero.jpg" as="image" fetchpriority="high"/>
 <link rel="stylesheet" href="accueil-immersif.css"/>
+<link rel="stylesheet" href="accueil-campagne.css"/>
 <script src="accueil-immersif.js" defer></script>
 <link rel="stylesheet" href="design-marche.css"/>
 <script src="design-marche.js" defer></script>
@@ -265,10 +266,18 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <img class="hero-scene" data-src="assets/type-fleuve.jpg" width="1920" height="1086" decoding="async" alt=""/>
     <video id="hero-video" data-video-src="" muted loop playsinline preload="none" poster="assets/banner-hero.jpg" tabindex="-1"></video>
   </figure>
+  <aside class="promos-band" aria-label="À découvrir en ce moment">
+    <span class="pb-label"><i class="ic" data-ic="sparkles" aria-hidden="true"></i> En ce moment</span>
+    <div class="promo-pills" id="promo-pills" aria-label="Offres des boutiques"></div>
+    <div class="promo-controls" id="promo-controls" hidden>
+      <button type="button" id="promo-prev" aria-label="Offre précédente">‹</button>
+      <button type="button" id="promo-next" aria-label="Offre suivante">›</button>
+    </div>
+  </aside>
   <div class="hero-content">
     <p class="hero-eyebrow"><span></span><span id="hero-greeting">D’ici. Tout simplement.</span></p>
-    <h1 id="home-title">Le bon produit.<br/>Le bon <em>vendeur.</em></h1>
-    <p class="hero-desc">Du tissu wax aux essentiels du quotidien, découvrez des produits, repérez leur boutique et échangez directement avec le vendeur.</p>
+    <h1 id="home-title">Un marché.<br/>Plusieurs boutiques.<br/><em>Un même panier.</em></h1>
+    <p class="hero-desc">Du tissu wax aux essentiels du quotidien, choisissez dans plusieurs boutiques d’un même marché et rassemblez vos trouvailles dans une seule commande.</p>
     <form class="hero-search" action="marche-senegal-recherche.html" method="get" role="search">
       <label class="sr-only" for="hero-query">Quel produit recherchez-vous ?</label>
       <i class="ic" data-ic="search" aria-hidden="true"></i>
@@ -276,6 +285,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
       <button type="submit">Rechercher <span class="home-arrow" aria-hidden="true"></span></button>
     </form>
     <div class="hero-suggestions"><span>À découvrir</span><a href="marche-senegal-recherche.html?category=mode">Mode &amp; wax</a><a href="marche-senegal-recherche.html?category=artisan">Artisanat</a><a href="marche-senegal-recherche.html?category=aliment">Saveurs locales</a></div>
+    <a class="hero-market-link" href="#marches">Choisir un marché <span class="home-arrow" aria-hidden="true"></span></a>
   </div>
   <div class="hero-footer">
     <a class="hero-explore" href="#marches"><span class="explore-arrow" aria-hidden="true">↓</span> Entrez dans nos marchés</a>
@@ -298,6 +308,20 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div><span class="hstat-num" id="hstat-regions">—</span><span class="hstat-label">Régions représentées</span></div>
   </div>
 </div>
+<section class="market-basket" aria-labelledby="market-basket-title">
+  <div class="market-basket-heading">
+    <span class="market-basket-eyebrow">La bonne idée Marché Sénégal</span>
+    <h2 id="market-basket-title">Plusieurs boutiques.<br/><em>Un seul parcours.</em></h2>
+    <p>Dans un même marché, composez votre panier chez différents vendeurs. Vous retrouvez vos achats dans une commande commune et suivez la réponse de chaque boutique.</p>
+    <a href="marche-senegal-marche.html">Trouver mon marché <span class="home-arrow" aria-hidden="true"></span></a>
+  </div>
+  <div class="market-basket-steps">
+    <div><span>01</span><strong>Explorez votre marché</strong><p>Découvrez les boutiques et les produits réellement disponibles.</p></div>
+    <div><span>02</span><strong>Composez un Panier Marché</strong><p>Ajoutez les articles de plusieurs vendeurs du même marché.</p></div>
+    <div><span>03</span><strong>Suivez chaque boutique</strong><p>Chaque vendeur confirme sa partie de la commande.</p></div>
+    <p class="market-basket-note">La collecte et la livraison communes par un partenaire seront proposées quand ce service sera disponible, après accord des vendeurs et validation du tarif par l’acheteur.</p>
+  </div>
+</section>
 <!-- MARCHÉS -->
 <section class="section-wrap white-bg" id="marches">
   <div class="section-top">
@@ -340,16 +364,6 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
   </div>
   <p class="universe-credit">Visuels d’ambiance et illustrations.</p>
 </section>
-<!-- PROMO BAND -->
-<div class="promos-band">
-  <div><div class="pb-label"><i class="ic" data-ic="flame"></i> Offres du moment</div><div class="pb-title">Des offres à saisir</div><div class="pb-sub">Découvrez les réductions proposées par les boutiques</div></div>
-  <!-- Ces quatre pastilles étaient écrites en dur — « -15% Mode Fatou ·
-       Sandaga », « -20% Artisan Thiès » — les mêmes pour tout le monde, et
-       fausses pour tout le monde : aucune ne correspondait à une promotion
-       réelle. Elles sont maintenant posées par loadPromosBand(), et la bande
-       entière disparaît quand aucun vendeur n'a d'offre en cours. -->
-  <div class="promo-pills" id="promo-pills"></div>
-</div>
 <!-- PRODUITS -->
 <section class="section-wrap bg" id="catalogue">
   <div class="section-top"><div><div class="section-label"><i class="ic" data-ic="shopping-bag"></i> Catalogue</div><h2 class="section-title">Le prochain coup de cœur<br/><em>est peut-être ici.</em></h2></div><a href="marche-senegal-recherche.html" class="section-link">Voir les produits →</a></div>
@@ -432,40 +446,48 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 
 let cartCount = 0;
 
-// ── Charger les produits depuis l'API ──
-// Le bandeau « Promotions actives aujourd'hui » annonçait quatre offres
-// inventées. Il montre de vraies promotions de vrais vendeurs, ou rien.
+// ── Bandeau d'accueil : offres réelles ou simple lien de découverte ──
 async function loadPromosBand() {
-  const bande = document.querySelector('.promos-band');
   const pastilles = document.getElementById('promo-pills');
   if (!pastilles) return;
 
   const result = await getActivePromotions();
-  const promos = (result.success && result.data) || [];
+  const promos = result.success && Array.isArray(result.data) ? result.data : [];
 
   if (!promos.length) {
-    if (bande) bande.style.display = 'none';
+    const lien = document.createElement('a');
+    lien.className = 'promo-fallback';
+    lien.href = 'marche-senegal-recherche.html';
+    lien.textContent = 'Explorez les nouveautés des boutiques';
+    pastilles.replaceChildren(lien);
     return;
   }
 
   const fragment = document.createDocumentFragment();
   promos.forEach((promo) => {
-    const pastille = document.createElement('div');
+    const pastille = document.createElement('article');
     pastille.className = 'promo-pill';
 
-    const remise = document.createElement('div');
+    const lien = document.createElement('a');
+    lien.className = 'pp-link';
+    lien.href = promo.shopId
+      ? 'marche-senegal-boutique.html?id=' + encodeURIComponent(promo.shopId)
+      : 'marche-senegal-recherche.html';
+
+    const remise = document.createElement('strong');
     remise.className = 'pp-disc';
     // Une livraison offerte n'a pas de pourcentage : afficher « -0% » ferait
     // passer une vraie offre pour une erreur.
     remise.textContent = promo.discount > 0 ? '-' + promo.discount + '%' : 'OFFERT';
 
-    const boutique = document.createElement('div');
+    const boutique = document.createElement('span');
     boutique.className = 'pp-shop';
     const nomMarche = promo.shop?.market?.name;
     boutique.textContent = (promo.shop?.name || 'Boutique') + (nomMarche ? ' · ' + nomMarche : '');
 
-    pastille.appendChild(remise);
-    pastille.appendChild(boutique);
+    lien.appendChild(remise);
+    lien.appendChild(boutique);
+    pastille.appendChild(lien);
 
     if (promo.code) {
       const code = document.createElement('button');
@@ -474,7 +496,6 @@ async function loadPromosBand() {
       code.textContent = 'Copier ' + promo.code;
       code.title = 'Copier le code promo';
       code.onclick = (event) => {
-        event.stopPropagation();
         const copie = navigator.clipboard?.writeText
           ? navigator.clipboard.writeText(promo.code)
           : Promise.reject(new Error('clipboard indisponible'));
@@ -484,21 +505,32 @@ async function loadPromosBand() {
       pastille.appendChild(code);
     }
 
-    // Le code ne sert à rien s'il ne mène nulle part : la pastille ouvre la
-    // boutique qui l'offre.
-    if (promo.shopId) {
-      pastille.style.cursor = 'pointer';
-      pastille.title = promo.code ? 'Code ' + promo.code : promo.title;
-      pastille.onclick = () => {
-        window.location.href = 'marche-senegal-boutique.html?id=' + promo.shopId;
-      };
-    }
-
     fragment.appendChild(pastille);
   });
 
   pastilles.replaceChildren(fragment);
-  if (bande) bande.style.display = '';
+  const controles = document.getElementById('promo-controls');
+  if (promos.length < 2 || !controles) return;
+  controles.hidden = false;
+  let actif = 0;
+  const avancer = (pas) => {
+    actif = (actif + pas + promos.length) % promos.length;
+    const premiere = pastilles.firstElementChild;
+    const cible = pastilles.children[actif];
+    if (!premiere || !cible) return;
+    const mouvementReduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    pastilles.scrollTo({
+      left: cible.offsetLeft - premiere.offsetLeft,
+      behavior: mouvementReduit ? 'instant' : 'smooth'
+    });
+  };
+  document.getElementById('promo-prev').onclick = () => avancer(-1);
+  document.getElementById('promo-next').onclick = () => avancer(1);
+  setInterval(() => {
+    if (document.hidden || pastilles.matches(':hover') || pastilles.contains(document.activeElement) ||
+        matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) return;
+    avancer(1);
+  }, 6500);
 }
 
 async function loadProducts(filters = {}) {
