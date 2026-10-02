@@ -114,3 +114,29 @@
 .ve-champ{display:grid;gap:4px;font-size:13px;font-weight:600}
 .ve-champ input,.ve-champ textarea,.ve-champ select{font:inherit;font-weight:400;padding:8px 10px;border:1px solid var(--ve-border);border-radius:10px;background:var(--ve-white);min-width:0}
 .ve-fiche .ve-btn{justify-self:start}
+/* Aperçu client (étapes 3 et 4) : la vraie page boutique, à droite sur grand écran,
+   en plein écran à la demande sur téléphone (« Voir comme un client »). */
+.ve-apercu[hidden]{display:none}
+.ve-apercu-tete{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--ve-dark);margin:0 0 8px}
+.ve-apercu-tete a{color:var(--ve-green);font-weight:600;font-size:13px;text-decoration:none;margin-left:auto}
+.ve-apercu-ecran{border:1px solid var(--ve-border);border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 8px 24px rgba(23,59,42,.12)}
+.ve-apercu-ecran iframe{display:block;width:100%;height:100%;border:0}
+.ve-apercu-fermer{display:none}
+.ve-voir-client{margin:0 0 12px}
+@media (min-width:1100px){
+  .ve-main:has(.ve-avec-apercu){max-width:1320px}
+  .ve-avec-apercu .ve-corps{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+  .ve-apercu{position:sticky;top:12px}
+  .ve-apercu-ecran{height:min(760px,calc(100vh - 90px))}
+  .ve-voir-client{display:none}
+}
+@media (max-width:1099px){
+  .ve-apercu{display:none}
+  .ve-apercu.ve-ouvert{display:flex;flex-direction:column;position:fixed;inset:0;z-index:1000;background:var(--ve-bg);padding:10px}
+  .ve-apercu.ve-ouvert .ve-apercu-tete{flex-wrap:nowrap}
+  .ve-apercu.ve-ouvert .ve-apercu-fermer{order:-1;padding:8px 14px}
+  .ve-apercu.ve-ouvert #ve-apercu-onglet{display:none}
+  .ve-apercu.ve-ouvert .ve-apercu-ecran{flex:1;border-radius:12px}
+  .ve-apercu-fermer{display:inline-flex}
+  body.ve-apercu-plein{overflow:hidden}
+}

@@ -22,6 +22,53 @@
     const api = o.api;
     const confirmer = o.confirmer || (async () => true);
 
+    // ── Aperçu client (étapes 3 et 4) ──
+    // La vraie page boutique, dans une fenêtre créée une seule fois hors du panneau :
+    // la reconstruire la rechargerait. Elle n'est rechargée qu'après un enregistrement
+    // (version) et, sur téléphone, seulement quand le vendeur l'ouvre : pas de page
+    // chargée pour rien sur le réseau mobile.
+    const ECRAN_LARGE = '(min-width: 1100px)';
+    const large = () => !root.matchMedia || root.matchMedia(ECRAN_LARGE).matches;
+    const apercu = { version: 0, affichee: -1, cadre: null };
+    function majApercu() {
+      const zone = $('ve-apercu');
+      if (!zone) return;
+      const montrer = e.etape >= 3 && e.vues.length > 0;
+      zone.hidden = !montrer;
+      $('ve').classList.toggle('ve-avec-apercu', montrer);
+      if (!montrer) { fermerApercu(); return; }
+      $('ve-apercu-onglet').href = o.lienApercu;
+      if (e.occupe || apercu.affichee === apercu.version) return;
+      if (!large() && !zone.classList.contains('ve-ouvert')) return;
+      if (!apercu.cadre) {
+        apercu.cadre = el('iframe');
+        apercu.cadre.title = 'Votre boutique vue par un client';
+        $('ve-apercu-ecran').appendChild(apercu.cadre);
+      }
+      apercu.cadre.src = o.lienApercu + '&integre=1&v=' + apercu.version;
+      apercu.affichee = apercu.version;
+    }
+    function fermerApercu() {
+      $('ve-apercu').classList.remove('ve-ouvert');
+      doc.body.classList.remove('ve-apercu-plein');
+    }
+    // Bouton du panneau, visible seulement sur téléphone (CSS) : l'aperçu en plein écran.
+    function voirClient(p) {
+      const b = bouton('ve-btn ve-voir-client', '👁 Voir comme un client');
+      b.onclick = () => {
+        $('ve-apercu').classList.add('ve-ouvert');
+        doc.body.classList.add('ve-apercu-plein');
+        majApercu();
+        $('ve-apercu-fermer').focus();
+      };
+      p.appendChild(b);
+    }
+    if ($('ve-apercu')) {
+      $('ve-apercu-fermer').onclick = fermerApercu;
+      $('ve-apercu').addEventListener('keydown', ev => { if (ev.key === 'Escape') fermerApercu(); });
+      if (root.matchMedia) root.matchMedia(ECRAN_LARGE).addEventListener('change', majApercu);
+    }
+
     // choix : position touchée en attente d'un produit (étape 2).
     // mode : { type: 'point' | 'deplacer', index } (étape 2) ou { type: 'etiquette', categoryId } (étape 3).
     const e = { etape: 1, vues: [], rayons: [], ordre: [], vitrine: false, produits: [], catalogueOk: false, courante: 0, choix: null, mode: null, occupe: false, problemes: [] };
@@ -56,6 +103,7 @@
       if (e.catalogueOk) e.produits = c.data || [];
       e.courante = Math.min(e.courante, Math.max(0, e.vues.length - 1));
       if (!e.vues.length) e.etape = 1;
+      apercu.version += 1;
       statut(message || 'Brouillon enregistré sur le serveur · pas encore publié');
       if (!e.catalogueOk) statut('Votre catalogue n’a pas pu être chargé : ' + ((c && c.message) || 'réessayez.'), true, () => charger(message));
       rendre();
@@ -76,6 +124,7 @@
       if (r && r.success) {
         // Une correction enregistrée rend caduques les raisons d'un refus précédent.
         e.problemes = [];
+        apercu.version += 1;
         succes(r);
         statut(textes.fait || 'Enregistré · pas encore publié');
         rendre();
@@ -119,6 +168,7 @@
         titre.tabIndex = -1;
         if (focusDedans) titre.focus({ preventScroll: true });
       }
+      majApercu();
     }
 
     function navigation(p, precedent, suivant, actif = true) {
@@ -742,6 +792,7 @@
     function etapeRayons(p) {
       p.appendChild(el('h2', null, '3. Vos rayons'));
       p.appendChild(el('p', 've-help', 'Choisissez l’ordre des rayons dans votre boutique. Vous pouvez aussi poser leur nom sur une photo : l’acheteur le touche pour voir le rayon.'));
+      voirClient(p);
       const rayons = C.rayonsOrdonnes(e.rayons, e.ordre);
       if (!rayons.length) p.appendChild(el('p', 've-help', 'Vos rayons apparaîtront quand vos produits auront une catégorie.'));
       const liste = el('ol', 've-rayons');
@@ -846,10 +897,6 @@
       for (const pb of e.problemes) ligne(false, pb.message, pb.sceneId, /^rayon/.test(pb.code || '') ? 3 : 2);
       p.appendChild(liste);
       const actions = el('div', 've-add');
-      const apercu = el('a', 've-btn', 'Voir l’aperçu comme un client ↗');
-      apercu.href = o.lienApercu;
-      apercu.target = '_blank';
-      apercu.rel = 'noopener';
       const publier = bouton('ve-btn ve-primary', 'Publier ma boutique');
       publier.disabled = !bilan.pret || e.occupe;
       publier.onclick = async () => {
@@ -865,7 +912,8 @@
         const r = await agir(() => api.abandonner(), () => {});
         if (r && r.success) { e.etape = 1; e.problemes = []; await charger('Modifications abandonnées : vous repartez de la version en ligne.'); }
       };
-      actions.append(apercu, publier, abandon);
+      voirClient(actions);
+      actions.append(publier, abandon);
       p.appendChild(actions);
       navigation(p, { n: 3, texte: 'Rayons' }, null);
     }

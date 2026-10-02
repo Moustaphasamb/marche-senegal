@@ -60,6 +60,8 @@ function serveur(init = {}) {
 async function monter(init = {}) {
   const dom = new JSDOM('<!doctype html><body>' + bloc + '</body>', { url: 'http://localhost:5500/marche-senegal-shopvision.html', runScripts: 'outside-only' });
   const w = dom.window;
+  // etroit : écran de téléphone (l'aperçu client ne s'affiche qu'à la demande).
+  if (init.etroit) w.matchMedia = () => ({ matches: false, addEventListener() {} });
   w.eval(lire('vitrine-editeur.js'));
   w.eval(lire('vitrine-editeur-ui.js'));
   const s = serveur(init);
@@ -243,6 +245,50 @@ test('étape 3 : les rayons suivent l ordre choisi et se réordonnent', async ()
   assert.deepEqual(t.qa('.ve-rname').map(x => x.textContent), ['🌸 Parfums', '🧴 Soins visage']);
 });
 
+// ── Aperçu client intégré (partie 3) ──
+const srcApercu = t => (t.q('#ve-apercu iframe') || {}).src || '';
+
+test('aperçu client : caché aux étapes 1 et 2, montré aux étapes 3 et 4 avec la vraie page en mode intégré', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  assert.equal(t.q('#ve-apercu').hidden, true);
+  t.ctl.allerA(2);
+  assert.equal(t.q('#ve-apercu').hidden, true);
+  t.ctl.allerA(3);
+  assert.equal(t.q('#ve-apercu').hidden, false);
+  assert.match(srcApercu(t), /marche-senegal-boutique\.html\?id=b1&apercu=brouillon&integre=1/);
+  assert.match(t.q('#ve-apercu').textContent, /Ce que voit le client/);
+  assert.equal(t.q('#ve-apercu a').getAttribute('href'), 'marche-senegal-boutique.html?id=b1&apercu=brouillon');
+  t.ctl.allerA(4);
+  assert.equal(t.q('#ve-apercu').hidden, false);
+});
+
+test('aperçu client : rechargé après un enregistrement réussi, pas à chaque affichage', async () => {
+  const t = await monter({ scenes: [vue('a')] });
+  t.ctl.allerA(3);
+  const avant = srcApercu(t);
+  const cadre = t.q('#ve-apercu iframe');
+  t.qa('.ve-rayon')[0].querySelector('button.ve-btn').click(); // « Poser l'étiquette » : simple affichage
+  await t.attendre();
+  assert.equal(srcApercu(t), avant);
+  assert.equal(t.q('#ve-apercu iframe'), cadre, 'la fenêtre n est pas recréée');
+  t.qa('.ve-rayon')[0].querySelector('button[aria-label^="Descendre"]').click();
+  await t.attendre(); await t.attendre();
+  assert.notEqual(srcApercu(t), avant);
+  assert.match(srcApercu(t), /integre=1/);
+});
+
+test('aperçu client sur téléphone : rien n est chargé avant « Voir comme un client », puis plein écran et retour', async () => {
+  const t = await monter({ scenes: [vue('a')], etroit: true });
+  t.ctl.allerA(3);
+  assert.equal(srcApercu(t), '');
+  t.bouton('Voir comme un client').click();
+  await t.attendre();
+  assert.ok(t.q('#ve-apercu').classList.contains('ve-ouvert'));
+  assert.match(srcApercu(t), /integre=1/);
+  t.q('#ve-apercu button').click();
+  assert.equal(t.q('#ve-apercu').classList.contains('ve-ouvert'), false);
+});
+
 test('étape 3 : poser une étiquette de rayon sur la photo', async () => {
   const t = await monter({ scenes: [vue('a')] });
   t.ctl.allerA(3);
@@ -287,8 +333,10 @@ test('étape 4 : liste de contrôle, aperçu et publication', async () => {
   const t = await monter({ scenes: [vue('a', { hotspots: [{ productId: 'p1', x: 0.5, y: 0.5 }] })] });
   t.ctl.allerA(4);
   assert.ok(t.qa('.ve-checks li').every(li => li.classList.contains('ve-ok')));
-  const apercu = t.qa('#ve-panel a').find(a => /aperçu/i.test(a.textContent));
-  assert.equal(apercu.getAttribute('href'), 'marche-senegal-boutique.html?id=b1&apercu=brouillon');
+  // L'aperçu est la fenêtre « Ce que voit le client », avec son lien vers un onglet.
+  assert.equal(t.q('#ve-apercu').hidden, false);
+  assert.equal(t.q('#ve-apercu-onglet').getAttribute('href'), 'marche-senegal-boutique.html?id=b1&apercu=brouillon');
+  assert.ok(t.bouton('Voir comme un client'));
   t.bouton('Publier ma boutique').click();
   for (let i = 0; i < 6; i++) await t.attendre();
   assert.equal(t.confirmations.length, 1);

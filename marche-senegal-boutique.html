@@ -299,6 +299,21 @@
 <link rel="stylesheet" href="boutique-visite.css"/>
 <link rel="stylesheet" href="vue-360.css"/>
 <script src="design-marche.js" defer></script>
+<script>
+// Aperçu intégré dans « Ma vitrine » (fenêtre du vendeur) : la page sans menu ni fil
+// d'Ariane. Jamais hors de cette fenêtre : un lien partagé garde la page complète.
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (q.get('apercu') === 'brouillon' && q.get('integre') === '1' && window.self !== window.top) {
+    document.documentElement.classList.add('ms-integre');
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  }
+})();
+</script>
+<style>
+.ms-integre .nav,.ms-integre .nav-drawer,.ms-integre .breadcrumb,.ms-integre .mobile-nav{display:none!important}
+.ms-integre body{padding-bottom:0}
+</style>
 </head>
 <body class="ms-design page-boutique">
 
@@ -709,6 +724,19 @@ async function demarrerVisite(shop) {
       return !actif;
     }
   });
+  // Dans la fenêtre d'aperçu du vendeur, on arrive directement sur la vitrine ; refait
+  // après le chargement complet, car bannière et avis arrivés ensuite déplacent la page.
+  // scrollTo et non scrollIntoView : ce dernier fait aussi défiler la page du vendeur.
+  // « instant » : le défilement doux de la page s'interrompt en route dans la fenêtre.
+  if (document.documentElement.classList.contains('ms-integre')) {
+    const allerVitrine = () => {
+      const bv = document.getElementById('bv');
+      if (bv) window.scrollTo({ top: bv.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
+    };
+    allerVitrine();
+    if (document.readyState === 'complete') setTimeout(allerVitrine, 600);
+    else window.addEventListener('load', () => setTimeout(allerVitrine, 100), { once: true });
+  }
 }
 
 async function loadShop(shopId) {

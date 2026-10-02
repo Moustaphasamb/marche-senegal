@@ -39,7 +39,19 @@
     <li><button type="button" data-etape="4">4 · Publier</button></li>
   </ol>
   <p class="ve-status" id="ve-status" role="status" aria-live="polite"></p>
-  <div class="ve-panel" id="ve-panel"></div>
+  <div class="ve-corps">
+    <div class="ve-panel" id="ve-panel"></div>
+    <!-- Aperçu client (étapes 3 et 4) : la vraie page boutique, hors du panneau pour
+         ne pas se recharger à chaque affichage. Sur téléphone, ouvert à la demande. -->
+    <aside class="ve-apercu" id="ve-apercu" hidden aria-label="Ce que voit le client">
+      <div class="ve-apercu-tete">
+        <b>Ce que voit le client</b>
+        <a id="ve-apercu-onglet" target="_blank" rel="noopener">Ouvrir dans un onglet ↗</a>
+        <button type="button" class="ve-btn ve-apercu-fermer" id="ve-apercu-fermer">← Revenir</button>
+      </div>
+      <div class="ve-apercu-ecran" id="ve-apercu-ecran"></div>
+    </aside>
+  </div>
   <input id="ve-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   <input id="ve-camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
   <input id="ve-serie" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
