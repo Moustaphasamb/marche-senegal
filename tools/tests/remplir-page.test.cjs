@@ -26,10 +26,10 @@ test('marché : titre, description, canonique, base, identifiant injecté', () =
   const html = remplirPage(MODELE, 'marche', MARCHE);
   assert.match(html, /<title>Marché Sandaga, Dakar — Marché Sénégal<\/title>/);
   assert.match(html, /<meta name="description" content="Le marché le plus connu du pays\."/);
-  assert.match(html, /<link rel="canonical" href="https:\/\/marche-senegal-zeta\.vercel\.app\/marches\/sandaga">/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/marchesenegal.sn\/marches\/sandaga">/);
   assert.match(html, /<head><base href="\/">/);
   assert.match(html, /window\.__MS_PAGE__=\{"type":"marche","id":"m1"\}/);
-  assert.match(html, /property="og:image" content="https:\/\/marche-senegal-zeta\.vercel\.app\/assets\/marches\/sandaga\.jpg"/);
+  assert.match(html, /property="og:image" content="https:\/\/marchesenegal.sn\/assets\/marches\/sandaga\.jpg"/);
   assert.equal(jsonLd(html)['@type'], 'Place');
   assert.equal(jsonLd(html).geo.latitude, 14.67);
   assert.equal(jsonLd(html).geo.longitude, -17.438);
@@ -53,7 +53,7 @@ test('boutique : Store, lien vers son marché et ses produits', () => {
   assert.equal(jsonLd(html)['@type'], 'Store');
   assert.match(html, /href="\/marches\/sandaga"/);
   assert.match(html, /href="\/produits\/p1">Tissu wax — 4 500 FCFA/);
-  assert.match(html, /<link rel="canonical" href="https:\/\/marche-senegal-zeta\.vercel\.app\/boutiques\/s1">/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/marchesenegal.sn\/boutiques\/s1">/);
 });
 
 test('produit : Product avec offre en XOF, sans image', () => {
@@ -117,7 +117,7 @@ test('description longue : coupée à 155 caractères au mot', () => {
 
 test('marché sans slug : pas d adresse propre', () => {
   assert.equal(urlPropre('marche', { id: 'x' }), null);
-  assert.equal(urlPropre('produit', { id: 'p1' }), 'https://marche-senegal-zeta.vercel.app/produits/p1');
+  assert.equal(urlPropre('produit', { id: 'p1' }), 'https://marchesenegal.sn/produits/p1');
 });
 
 test('introuvable : noindex', () => {
@@ -144,7 +144,7 @@ test('marché : FAQ lisible et balisage FAQPage identique', () => {
 test('marché réel sans description : indexé quand même (décision de Moustapha)', () => {
   const html = remplirPage(MODELE, 'marche', { id: 'm9', slug: 'bakel', name: 'Marché de Bakel', city: 'Bakel', region: 'Tambacounda', shops: [] });
   assert.doesNotMatch(html, /noindex/);
-  assert.ok(html.includes('<link rel="canonical" href="https://marche-senegal-zeta.vercel.app/marches/bakel">'));
+  assert.ok(html.includes('<link rel="canonical" href="https://marchesenegal.sn/marches/bakel">'));
 });
 
 test('marché sans slug (Autre lieu ouvert par son identifiant) : non indexé', () => {

@@ -6,19 +6,19 @@ Le site est en français. Les prix sont affichés en francs CFA (FCFA). La créa
 
 ## Pages principales
 
-- [Accueil](https://marche-senegal-zeta.vercel.app/marche-senegal-accueil.html) : présentation, marchés, produits et boutiques mis en avant
-- [Les marchés](https://marche-senegal-zeta.vercel.app/marche-senegal-marche.html) : les marchés du Sénégal référencés, par ville et par région
-- [Recherche de produits](https://marche-senegal-zeta.vercel.app/marche-senegal-recherche.html) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
+- [Accueil](https://marchesenegal.sn/marche-senegal-accueil.html) : présentation, marchés, produits et boutiques mis en avant
+- [Les marchés](https://marchesenegal.sn/marche-senegal-marche.html) : les marchés du Sénégal référencés, par ville et par région
+- [Recherche de produits](https://marchesenegal.sn/marche-senegal-recherche.html) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
 
 ## Marchés
 
-Chaque marché, boutique et produit a une adresse lisible sans JavaScript (`/marches/<nom>`, `/boutiques/<id>`, `/produits/<id>`) ; la liste complète est dans le [sitemap](https://marche-senegal-zeta.vercel.app/sitemap.xml).
+Chaque marché, boutique et produit a une adresse lisible sans JavaScript (`/marches/<nom>`, `/boutiques/<id>`, `/produits/<id>`) ; la liste complète est dans le [sitemap](https://marchesenegal.sn/sitemap.xml).
 
-- [Marché Sandaga](https://marche-senegal-zeta.vercel.app/marches/sandaga) : Dakar, Plateau
-- [Marché Kermel](https://marche-senegal-zeta.vercel.app/marches/kermel) : Dakar, Plateau
-- [Marché Tilène](https://marche-senegal-zeta.vercel.app/marches/tilene) : Dakar, Médina
-- [Marché HLM](https://marche-senegal-zeta.vercel.app/marches/hlm-5) : Dakar
-- [Marché Colobane](https://marche-senegal-zeta.vercel.app/marches/colobane) : Dakar
+- [Marché Sandaga](https://marchesenegal.sn/marches/sandaga) : Dakar, Plateau
+- [Marché Kermel](https://marchesenegal.sn/marches/kermel) : Dakar, Plateau
+- [Marché Tilène](https://marchesenegal.sn/marches/tilene) : Dakar, Médina
+- [Marché HLM](https://marchesenegal.sn/marches/hlm-5) : Dakar
+- [Marché Colobane](https://marchesenegal.sn/marches/colobane) : Dakar
 
 ## Comment ça marche pour un acheteur
 
@@ -29,10 +29,10 @@ Chaque marché, boutique et produit a une adresse lisible sans JavaScript (`/mar
 
 ## Pour les commerçants
 
-- [Ouvrir une boutique](https://marche-senegal-zeta.vercel.app/marche-senegal-connexion-vendeur.html) : inscription gratuite, dans un marché ou hors marché
+- [Ouvrir une boutique](https://marchesenegal.sn/marche-senegal-connexion-vendeur.html) : inscription gratuite, dans un marché ou hors marché
 
 ## Catégories
 
-- [Mode et wax](https://marche-senegal-zeta.vercel.app/marche-senegal-recherche.html?category=mode)
-- [Artisanat](https://marche-senegal-zeta.vercel.app/marche-senegal-recherche.html?category=artisan)
-- [Saveurs locales](https://marche-senegal-zeta.vercel.app/marche-senegal-recherche.html?category=aliment)
+- [Mode et wax](https://marchesenegal.sn/marche-senegal-recherche.html?category=mode)
+- [Artisanat](https://marchesenegal.sn/marche-senegal-recherche.html?category=artisan)
+- [Saveurs locales](https://marchesenegal.sn/marche-senegal-recherche.html?category=aliment)

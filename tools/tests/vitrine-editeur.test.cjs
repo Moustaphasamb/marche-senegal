@@ -120,9 +120,9 @@ test('bilan sans catalogue : aucun conseil sur les produits (il serait faux)', (
 });
 
 test('message de partage WhatsApp avec le nom et le lien de la boutique', () => {
-  const lien = E.lienWhatsApp('Awa Beauté', 'https://marche-senegal-zeta.vercel.app/boutiques/b1');
+  const lien = E.lienWhatsApp('Awa Beauté', 'https://marchesenegal.sn/boutiques/b1');
   assert.ok(lien.startsWith('https://wa.me/?text='));
-  assert.equal(decodeURIComponent(lien.split('text=')[1]), 'Venez visiter ma boutique Awa Beauté sur Marché Sénégal : https://marche-senegal-zeta.vercel.app/boutiques/b1');
+  assert.equal(decodeURIComponent(lien.split('text=')[1]), 'Venez visiter ma boutique Awa Beauté sur Marché Sénégal : https://marchesenegal.sn/boutiques/b1');
   assert.equal(decodeURIComponent(E.lienWhatsApp('', 'https://x.test/b').split('text=')[1]), 'Venez visiter ma boutique sur Marché Sénégal : https://x.test/b');
 });
 

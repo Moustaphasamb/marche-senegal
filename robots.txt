@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marche-senegal-zeta.vercel.app/sitemap.xml
+Sitemap: https://marchesenegal.sn/sitemap.xml

@@ -6,7 +6,7 @@
 
 const { questionsMarche } = require('../../faq-marche.js');
 
-const SITE = 'https://marche-senegal-zeta.vercel.app';
+const SITE = 'https://marchesenegal.sn';
 const MARQUE = 'Marché Sénégal';
 
 function echapper(texte) {
