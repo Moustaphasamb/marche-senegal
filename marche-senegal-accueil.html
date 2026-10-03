@@ -647,8 +647,9 @@ async function loadProducts(filters = {}) {
         <div class="prod-name">${escapeHtml(prod.name)}</div>
         <div class="prod-shop">${escapeHtml(prod.shop.name)} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
         <div class="prod-rating">
-          <span class="prod-stars">★★★★★</span>
-          ${prod.rating} (${prod.totalReviews})
+          ${prod.totalReviews > 0
+            ? `<span class="prod-stars">★</span> ${prod.rating} (${prod.totalReviews} avis)`
+            : 'Nouveau'}
         </div>
         <div class="prod-footer">
           <div>
@@ -881,7 +882,7 @@ async function loadFeaturedShops() {
         <div class="shop-name">${escapeHtml(shop.name)}</div>
         <div class="shop-market">${escapeHtml(city)}</div>
         <div class="shop-stats">
-          <div><div class="ss-val">${shop.rating ?? '–'} ⭐</div><div class="ss-lbl">Note</div></div>
+          <div><div class="ss-val">${shop.totalReviews > 0 ? shop.rating + ' ⭐' : 'Nouveau'}</div><div class="ss-lbl">Note</div></div>
           <div><div class="ss-val">${shop._count?.products ?? 0}</div><div class="ss-lbl">Produits</div></div>
           <div><div class="ss-val">${shop.isVerified ? '✓' : '–'}</div><div class="ss-lbl">Vérifié</div></div>
         </div>

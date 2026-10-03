@@ -762,8 +762,9 @@ async function loadMarketProducts(marketId) {
             <div class="prod-name">${escapeHtml(prod.name)}</div>
             <div class="prod-shop">${escapeHtml(prod.shop.name)} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
             <div class="prod-rating">
-              <span class="stars">★★★★★</span>
-              ${prod.rating} (${prod.totalReviews})
+              ${prod.totalReviews > 0
+                ? `<span class="stars">★</span> ${prod.rating} (${prod.totalReviews} avis)`
+                : 'Nouveau'}
             </div>
             <div class="prod-footer">
               <div>

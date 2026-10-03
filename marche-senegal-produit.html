@@ -780,8 +780,10 @@ async function loadProduct(productId) {
   // ── Mettre à jour la note ──
   const ratingNum = document.querySelector('.pi-rating-num');
   const ratingCount = document.querySelector('.pi-rating-count');
-  if (ratingNum) ratingNum.textContent = prod.rating;
-  if (ratingCount) ratingCount.textContent = `(${prod.totalReviews} avis)`;
+  // Une note n'apparaît qu'avec de vrais avis : sinon, « Nouveau ».
+  const aDesAvis = prod.totalReviews > 0;
+  if (ratingNum) ratingNum.textContent = aDesAvis ? '★ ' + prod.rating : 'Nouveau';
+  if (ratingCount) ratingCount.textContent = aDesAvis ? `(${prod.totalReviews} avis)` : 'Aucun avis pour le moment';
 
   // ── Mettre à jour le prix ──
   const price = document.querySelector('.pi-price');

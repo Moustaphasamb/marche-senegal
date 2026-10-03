@@ -327,8 +327,9 @@ async function loadResults() {
           ${prod.shop?.isVerified ? '· Vérifié ✓' : ''}
         </div>
         <div class="rc-rating">
-          <span class="rc-stars">★★★★★</span>
-          ${prod.rating} (${prod.totalReviews})
+          ${prod.totalReviews > 0
+            ? `<span class="rc-stars">★</span> ${prod.rating} (${prod.totalReviews} avis)`
+            : 'Nouveau'}
         </div>
         <div class="rc-footer">
           <div>
