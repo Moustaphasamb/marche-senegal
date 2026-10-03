@@ -184,6 +184,11 @@
 
 /* ═══════ RIGHT COLUMN ═══════ */
 .right-col{display:flex;flex-direction:column;gap:14px}
+/* Code promo remonté sous l'en-tête : il doit donner envie avant les produits. */
+.promo-haut{max-width:1280px;margin:18px auto 0;padding:0 5vw}
+.sec-h{font-family:'Newsreader',serif;font-size:1.35rem;font-weight:500;color:var(--dark);margin:0 0 14px}
+.ic-desc{font-size:.8rem;color:var(--text);line-height:1.6;margin:0 0 14px}
+a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;margin-top:8px;box-sizing:border-box}
 .promo-card{background:linear-gradient(135deg,var(--dark),#1a4a2e);border-radius:var(--radius);padding:18px;color:#fff}
 .pc-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gold);margin-bottom:5px}
 .pc-code{font-size:1.3rem;font-weight:700;letter-spacing:.07em;color:#fff;margin-bottom:3px;font-family:'Newsreader',serif}
@@ -255,7 +260,6 @@
   .nav-hamburger{display:flex}
   .mobile-nav{display:block}
   .main{grid-template-columns:1fr}
-  .right-col{order:-1}
   body{padding-bottom:86px}
   .toast{bottom:96px}
   .chat-panel{
@@ -273,6 +277,7 @@
   .sh-stats-row{gap:14px}
   .sh-actions .sh-btn-outline{display:none}
   .main{padding:16px 4vw 20px}
+  .promo-haut{padding:0 4vw;margin-top:14px}
   .prods-grid{grid-template-columns:repeat(2,1fr);gap:9px}
   .tabs .tab{font-size:.74rem;padding:8px 0}
 }
@@ -383,6 +388,20 @@
   </div>
 </div>
 
+<!-- Cette carte annonçait « FATOU15 · -15% sur toute la boutique » sur
+     TOUTES les boutiques : le code de la boutique de démonstration, que
+     l'acheteur copiait sans qu'il puisse fonctionner. Elle porte maintenant
+     les promotions réelles du vendeur, lues sur /api/promotions/shop/:id,
+     et reste cachée quand il n'y en a aucune. -->
+<div class="promo-haut">
+  <div class="promo-card" id="promo-card" style="display:none">
+    <div class="pc-label"><i class="ic" data-ic="flame"></i> Promotion active</div>
+    <div class="pc-code" id="pc-code">—</div>
+    <div class="pc-detail" id="pc-detail"></div>
+    <button class="pc-copy" id="pc-copy">Copier le code promo</button>
+  </div>
+</div>
+
 <!-- ═══════ VISITE DE LA BOUTIQUE (boutique-visite-ui.js) ═══════ -->
 <div class="bv-wrap">
 <section class="bv" id="bv" aria-label="Visite de la boutique" hidden>
@@ -439,12 +458,10 @@
 
   <!-- LEFT -->
   <div id="left-col">
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('avis',this)"><i class="ic ic-gold" data-ic="star" data-ic-fill></i> Avis</div>
-      <div class="tab" onclick="switchTab('infos',this)"><i class="ic" data-ic="info"></i> Infos</div>
-    </div>
+    <!-- Les onglets Avis / Infos sont devenus deux blocs lisibles d'un coup :
+         l'onglet Infos répétait la carte des infos pratiques. -->
+    <h2 class="sec-h">Avis clients <span id="avis-n"></span></h2>
 
-    <!-- TAB AVIS -->
     <div id="tab-avis">
       <div class="rating-summary">
         <div class="rs-big"><div class="rs-num"></div><div class="rs-stars"></div><div class="rs-count"></div></div>
@@ -475,56 +492,16 @@
 
       <div class="review-list"></div>
     </div>
-
-    <!-- TAB INFOS -->
-    <div id="tab-infos" style="display:none">
-      <div class="info-tab">
-        <p class="it-desc">Découvrez l'histoire et les spécialités de cette boutique.</p>
-        <!-- Ce bloc était entièrement écrit en dur : horaires, adresse « Allée 3,
-             Stand 12 · Marché Sandaga », numéro factice, tarifs de livraison et
-             garantie de retour. Autant d'engagements commerciaux affichés au nom
-             d'un vendeur qui ne les avait jamais choisis. Chaque ligne n'apparaît
-             plus que si la donnée existe (voir remplirInfosBoutique). -->
-        <div class="it-row" id="it-horaires" style="display:none"><div class="it-icon"><i class="ic" data-ic="clock"></i></div><div><div class="it-label">Horaires d'ouverture</div><div class="it-sub"></div><span class="it-open"></span></div></div>
-        <div class="it-row" id="it-adresse" style="display:none"><div class="it-icon"><i class="ic" data-ic="map-pin"></i></div><div><div class="it-label">Adresse physique</div><div class="it-sub"></div></div></div>
-      </div>
-    </div>
   </div>
 
   <!-- RIGHT -->
   <div class="right-col">
-    <!-- Cette carte annonçait « FATOU15 · -15% sur toute la boutique » sur
-         TOUTES les boutiques : le code de la boutique de démonstration, que
-         l'acheteur copiait sans qu'il puisse fonctionner. Elle porte maintenant
-         les promotions réelles du vendeur, lues sur /api/promotions/shop/:id,
-         et reste cachée quand il n'y en a aucune. -->
-    <div class="promo-card" id="promo-card" style="display:none">
-      <div class="pc-label"><i class="ic" data-ic="flame"></i> Promotion active</div>
-      <div class="pc-code" id="pc-code">—</div>
-      <div class="pc-detail" id="pc-detail"></div>
-      <button class="pc-copy" id="pc-copy">Copier le code promo</button>
-    </div>
-
-    <div class="contact-card">
-      <div class="cc-title" id="cc-title">Contacter la boutique</div>
-      <div class="cc-btns">
-        <button class="cc-btn cc-primary" onclick="openChat()">
-          <div class="cc-icon" style="background:rgba(255,255,255,.2)"><i class="ic" data-ic="message-circle"></i></div>
-          <span>Écrire au vendeur</span>
-        </button>
-        <button class="cc-btn" id="btn-whatsapp" onclick="openWhatsApp()">
-          <div class="cc-icon" style="background:#E8F5E9"><i class="ic" data-ic="smartphone"></i></div>
-          <span>WhatsApp direct</span>
-        </button>
-        <button class="cc-btn" id="btn-call" onclick="callShop()">
-          <div class="cc-icon" style="background:var(--gp)"><i class="ic" data-ic="phone"></i></div>
-          <span>Appeler la boutique</span>
-        </button>
-      </div>
-    </div>
-
+    <!-- La carte « Contacter » répétait le bouton de l'en-tête, et ses boutons
+         WhatsApp et Appeler ne marchaient pas : le numéro du vendeur n'est pas
+         public. Le bouton Contacter de l'en-tête ouvre la messagerie. -->
     <div class="info-card">
-      <div class="ic-title">Infos rapides</div>
+      <h2 class="ic-title">Infos pratiques</h2>
+      <p class="ic-desc" id="ic-description" style="display:none"></p>
       <!-- Ces trois lignes étaient écrites en dur, identiques pour toutes les
            boutiques : des horaires que le vendeur n'a pas saisis, un « Sous
            24h » que rien ne garantit, et trois moyens de paiement dont un
@@ -533,16 +510,9 @@
            la donnée n'existe pas. -->
       <div class="ic-row" id="ic-horaires" style="display:none"><div class="ic-icon"><i class="ic" data-ic="clock"></i></div><div><div class="ic-label">Horaires</div><div class="ic-sub" id="ic-horaires-val"></div></div></div>
       <div class="ic-row"><div class="ic-icon"><i class="ic" data-ic="truck"></i></div><div><div class="ic-label">Livraison</div><div class="ic-sub" id="ic-livraison-val">Retrait en boutique disponible</div></div></div>
-      <div class="ic-row" id="ic-paiement" style="margin-bottom:0;display:none"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Moyens de paiement</div><div class="ic-sub" id="ic-paiement-val"></div></div></div>
-    </div>
-
-    <div class="map-card">
-      <div class="map-visual"><i class="ic" data-ic="map"></i><div class="map-pin"><i class="ic" data-ic="map-pin"></i></div></div>
-      <div class="map-body">
-        <div class="map-address"></div>
-        <div class="map-sub">Emplacement communiqué par la boutique</div>
-        <div class="map-btn" id="btn-map"><i class="ic" data-ic="map-pin"></i> Localisation enregistrée dans l’application</div>
-      </div>
+      <div class="ic-row" id="ic-paiement" style="display:none"><div class="ic-icon"><i class="ic" data-ic="lock"></i></div><div><div class="ic-label">Moyens de paiement</div><div class="ic-sub" id="ic-paiement-val"></div></div></div>
+      <div class="ic-row" id="ic-adresse" style="margin-bottom:0;display:none"><div class="ic-icon"><i class="ic" data-ic="map-pin"></i></div><div style="flex:1"><div class="ic-label">Adresse</div><div class="ic-sub" id="ic-adresse-val"></div>
+        <a class="map-btn" id="btn-itineraire" target="_blank" rel="noopener noreferrer"><i class="ic" data-ic="map"></i> Itinéraire</a></div></div>
     </div>
 
     <div class="chat-panel" id="chat-panel">
@@ -591,7 +561,6 @@
 
 let cartCount = 0;
 let currentShop = null;
-let currentTab = 'avis';
 
 // ── Récupérer l'ID de la boutique depuis l'URL ──
 function getShopIdFromURL() {
@@ -810,44 +779,26 @@ async function loadShop(shopId) {
     champ.placeholder = `Rechercher dans ${shop.name}...`;
   });
 
-  // « Contacter Fatou Ndoye » était écrit en dur : chaque boutique affichait
-  // le nom d'une autre vendeuse.
-  const ccTitle = document.getElementById('cc-title');
-  if (ccTitle) ccTitle.textContent = 'Contacter ' + shop.name;
-
   // Le bandeau du chat affichait lui aussi « Mode Fatou Ndoye »
   const chatName = document.getElementById('chat-name-txt');
   if (chatName) chatName.textContent = shop.name;
 
-  // L'onglet annonçait « Avis (234) » alors que le hero affichait 0 juste
-  // au-dessus : le nombre était écrit en dur.
-  const avisTab = document.querySelector(".tab[onclick*=\"'avis'\"]");
-  if (avisTab) avisTab.textContent = '⭐ Avis (' + (shop.totalReviews || 0) + ')';
+  // Nombre d'avis à côté du titre : le vrai, calculé par le serveur.
+  const avisN = document.getElementById('avis-n');
+  if (avisN) avisN.textContent = shop.totalReviews > 0 ? '(' + shop.totalReviews + ')' : '';
 
   // Visite de la boutique : photos publiées, rayons, fiche, panier et produits.
   demarrerVisite(shop);
 
   // La description rédigée par le vendeur dans « Ma boutique » n'était jamais
   // lue : toutes les boutiques affichaient le texte de Mode Fatou Ndoye.
-  const itDesc = document.querySelector('.it-desc');
-  if (itDesc) {
-    if (shop.description) itDesc.textContent = shop.description;
-    else itDesc.style.display = 'none';
+  const description = document.getElementById('ic-description');
+  if (description && shop.description) {
+    description.textContent = shop.description;
+    description.style.display = '';
   }
 
-  // Adresse sous la carte : « Marché Sandaga — Allée 3, Stand 12 » était figé.
-  const mapAddress = document.querySelector('.map-address');
-  if (mapAddress) {
-    const lieu = [shop.locationName, shop.locationCity, shop.address, shop.market?.name].filter(Boolean).join(' — ');
-    if (lieu) mapAddress.textContent = lieu;
-    else mapAddress.style.display = 'none';
-  }
-  const mapSub = document.querySelector('.map-sub');
-  if (mapSub) mapSub.textContent = shop.locationType === 'CUSTOM'
-    ? 'Lieu personnalisé — recherche interne par quartier et ville'
-    : (shop.address || shop.market?.city || 'Localisation à préciser');
-
-  remplirInfosBoutique(shop);
+  remplirAdresse(shop);
 
   if (shop.market) {
     const bcLinks = document.querySelectorAll('.bc-link');
@@ -915,18 +866,6 @@ function loadShopReviews(shop) {
   shop.reviews.forEach(review => reviewList.appendChild(buildReviewCard(review)));
 }
 
-// ── Changer d'onglet ──
-function switchTab(tab, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-  currentTab = tab;
-
-  const tabs = ['avis', 'infos'];
-  tabs.forEach(t => {
-    const el = document.getElementById('tab-' + t);
-    if (el) el.style.display = t === tab ? '' : 'none';
-  });
-}
 
 // ── Suivre la boutique ──
 function follow() {
@@ -1002,51 +941,21 @@ function sendMsg() {
 // ── Alias toast (nav HTML) → showToast ──
 function toast(msg) { showToast(msg); }
 
-// ── WhatsApp ──
-function openWhatsApp() {
-  const phone = currentShop?.phone;
-  if (!phone) { showToast('Numéro non disponible'); return; }
-  const cleaned = phone.replace(/\D/g, '');
-  window.open('https://wa.me/' + cleaned, '_blank');
-}
-
-// ── Appel téléphonique ──
-function callShop() {
-  const phone = currentShop?.phone;
-  if (!phone) { showToast('Numéro non disponible'); return; }
-  window.location.href = 'tel:' + phone;
-}
-
-// La localisation reste interne à l’application : aucune dépendance à une
-// carte externe n’est nécessaire pour retrouver une boutique.
-function openMap() {
-  showToast('La localisation est consultable dans Marché Sénégal.');
-}
-
-// Remplit le bloc « Infos boutique » avec les seules données réellement
-// connues. Une ligne sans donnée reste masquée plutôt que d'afficher un
-// engagement que le vendeur n'a jamais pris.
-function remplirInfosBoutique(shop) {
-  // Horaires : champ openingHours, saisi par le vendeur dans « Ma boutique »
-  const horaires = shop.openingHours;
-  const texteHoraires = typeof horaires === 'string' ? horaires : (horaires?.text || '');
-  const ligneHoraires = document.getElementById('it-horaires');
-  if (ligneHoraires && texteHoraires.trim()) {
-    ligneHoraires.querySelector('.it-sub').textContent = texteHoraires;
-    const badge = ligneHoraires.querySelector('.it-open');
-    if (badge) badge.textContent = shop.isOpen ? 'Ouverte maintenant' : 'Fermée';
-    ligneHoraires.style.display = '';
-  }
-
-  // Adresse : celle du marché, seule adresse dont on dispose réellement
-  const ligneAdresse = document.getElementById('it-adresse');
-  if (ligneAdresse) {
-    const parts = [shop.locationName, shop.locationCity, shop.address, shop.market?.name, shop.market?.city].filter(Boolean);
-    if (parts.length) {
-      ligneAdresse.querySelector('.it-sub').textContent = parts.join(' · ');
-      ligneAdresse.style.display = '';
-    }
-  }
+// Adresse et itinéraire. L'itinéraire vise le marché (ou le quartier) et la
+// ville, jamais la position GPS : une boutique « Autre lieu » est souvent tenue
+// depuis un domicile, et ses coordonnées exactes restent privées.
+function remplirAdresse(shop) {
+  const ligne = document.getElementById('ic-adresse');
+  if (!ligne) return;
+  const lieu = (shop.locationType === 'CUSTOM'
+    ? [shop.locationName, shop.locationCity]
+    : [shop.market?.name, shop.market?.city || shop.locationCity]
+  ).filter(Boolean).join(', ');
+  if (!lieu) return;
+  document.getElementById('ic-adresse-val').textContent = [lieu, shop.address].filter(Boolean).join(' · ');
+  document.getElementById('btn-itineraire').href =
+    'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(lieu + ', Sénégal');
+  ligne.style.display = '';
 }
 
 // Ce compte à rebours annonçait une expiration « à 20h00 » que rien ne fondait
@@ -1195,7 +1104,12 @@ async function renderInfosRapides(shop) {
   const ligneHoraires = document.getElementById('ic-horaires');
   const valHoraires = document.getElementById('ic-horaires-val');
   const horaires = shop?.openingHours;
-  if (ligneHoraires && valHoraires && horaires && typeof horaires === 'object') {
+  // Horaires en texte libre (« Lun–Sam 8h–19h ») ou { text }, sinon par jour.
+  const texteLibre = typeof horaires === 'string' ? horaires : (horaires?.text || '');
+  if (ligneHoraires && valHoraires && texteLibre.trim()) {
+    valHoraires.textContent = texteLibre.trim();
+    ligneHoraires.style.display = '';
+  } else if (ligneHoraires && valHoraires && horaires && typeof horaires === 'object') {
     const parts = [];
     for (const [jour, plage] of Object.entries(horaires)) {
       if (!plage) continue;
