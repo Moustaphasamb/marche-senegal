@@ -1,7 +1,6 @@
-/* Campagne d'accueil : offres réelles sous la navigation et Panier Marché. */
-body.accueil-immersif .hero {padding-top:205px}
+/* Campagne d'accueil : offres réelles après la scène d'accueil et Panier Marché. */
 .accueil-immersif .promos-band {
-  position:absolute;top:88px;left:0;right:0;z-index:2;
+  position:relative;top:auto;left:auto;right:auto;z-index:1;width:100%;
   display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
   gap:20px;min-height:64px;padding:8px var(--home-gutter);
   background:rgba(9,42,28,.83);border-block:1px solid rgba(255,255,255,.18);
@@ -94,8 +93,8 @@ body.accueil-immersif .hero {padding-top:205px}
   .accueil-immersif .market-basket {grid-template-columns:1fr;gap:42px}
 }
 @media(max-width:600px) {
-  body.accueil-immersif .hero {min-height:700px;padding-top:170px}
-  .accueil-immersif .promos-band {top:72px;min-height:58px;gap:8px;padding:7px 20px;grid-template-columns:minmax(0,1fr) auto}
+  body.accueil-immersif .hero {min-height:700px}
+  .accueil-immersif .promos-band {min-height:58px;gap:8px;padding:7px 20px;grid-template-columns:minmax(0,1fr) auto}
   .accueil-immersif .promos-band .pb-label {display:none}
   .accueil-immersif .promo-pill {min-height:43px;padding:5px 11px;gap:8px}
   .accueil-immersif .pp-link {gap:7px}
