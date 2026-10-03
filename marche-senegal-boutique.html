@@ -248,29 +248,18 @@
 .chat-send{background:var(--green);color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
 .chat-send:hover{background:var(--gl)}
 
-/* ═══════ MOBILE STICKY CTA ═══════ */
-.mobile-cta{
-  display:none;position:fixed;bottom:70px;left:0;right:0;
-  z-index:150;padding:10px 16px;
-  background:rgba(250,250,247,.96);
-  backdrop-filter:blur(10px);
-  border-top:1px solid var(--border);
-  gap:8px;
-}
-
 /* ═══════ RESPONSIVE ═══════ */
 @media(max-width:900px){
   .nav-search{display:none}
   .nav-btn.nav-btn-login{display:none}
   .nav-hamburger{display:flex}
   .mobile-nav{display:block}
-  .mobile-cta{display:flex}
   .main{grid-template-columns:1fr}
   .right-col{order:-1}
-  body{padding-bottom:130px}
-  .toast{bottom:140px}
+  body{padding-bottom:86px}
+  .toast{bottom:96px}
   .chat-panel{
-    position:fixed;bottom:130px;left:0;right:0;
+    position:fixed;bottom:86px;left:0;right:0;
     z-index:300;border-radius:var(--radius) var(--radius) 0 0;
     max-height:380px;
   }
@@ -578,12 +567,6 @@
     </div>
   </div>
 
-</div>
-
-<!-- Mobile sticky CTA -->
-<div class="mobile-cta" id="mobile-cta">
-  <button class="sh-btn sh-btn-primary" style="flex:1;justify-content:center" onclick="openChat()"><i class="ic" data-ic="message-circle"></i> Contacter</button>
-  <button class="sh-btn sh-btn-gold" style="flex:1;justify-content:center" onclick="follow()"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Suivre</button>
 </div>
 
 <!-- Mobile nav -->
