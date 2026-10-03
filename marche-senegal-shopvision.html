@@ -102,12 +102,12 @@
       }
     }
 
-    // Une photo de téléphone pèse 3 à 8 Mo : réduite à 1 600 px, elle en pèse ~300 Ko,
-    // assez pour l'assemblage et douze photos passent en 4G.
+    // Une photo de téléphone pèse 3 à 8 Mo : réduite à 1 200 px, la taille à laquelle le
+    // service d'assemblage travaille, elle en pèse ~150 Ko et douze photos passent en 4G.
     async function alleger(fichier) {
       try {
         const image = await createImageBitmap(fichier);
-        const k = Math.min(1, 1600 / Math.max(image.width, image.height));
+        const k = Math.min(1, 1200 / Math.max(image.width, image.height));
         const toile = document.createElement('canvas');
         toile.width = Math.round(image.width * k);
         toile.height = Math.round(image.height * k);
@@ -120,10 +120,10 @@
       }
     }
 
-    // Photos déjà dans la vitrine : version réduite à 1 600 px servie par Cloudinary.
+    // Photos déjà dans la vitrine : version réduite à 1 200 px servie par Cloudinary.
     async function telechargerPhotos(adresses) {
       return Promise.all(adresses.map(async (adresse, i) => {
-        const reponse = await fetch(Vue360.urlTaille(adresse, 1600));
+        const reponse = await fetch(Vue360.urlTaille(adresse, 1200));
         if (!reponse.ok) throw new Error('Photo inaccessible');
         const blob = await reponse.blob();
         return new File([blob], 'photo-' + String(i + 1).padStart(2, '0') + '.jpg', { type: blob.type || 'image/jpeg' });
@@ -184,7 +184,8 @@
         if (reponse.ok && d.success && typeof d.url === 'string') return { success: true, url: d.url };
         return { success: false, message: d.message || 'L’assemblage de la vue 360° a échoué.' };
       } catch {
-        return { success: false, message: 'Erreur de connexion au serveur' };
+        // Le serveur n'a rien reçu : c'est la connexion du téléphone qui a coupé pendant l'envoi.
+        return { success: false, message: 'L’envoi des photos a été coupé. Vérifiez votre connexion internet (le Wi-Fi est plus sûr), puis réessayez.' };
       }
     }
 
