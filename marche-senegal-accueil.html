@@ -270,8 +270,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <span class="pb-label"><i class="ic" data-ic="sparkles" aria-hidden="true"></i> En ce moment</span>
     <div class="promo-pills" id="promo-pills" aria-label="Offres des boutiques"></div>
     <div class="promo-controls" id="promo-controls" hidden>
-      <button type="button" id="promo-prev" aria-label="Offre précédente">‹</button>
-      <button type="button" id="promo-next" aria-label="Offre suivante">›</button>
+      <button type="button" id="promo-motion" aria-label="Mettre le défilement des offres en pause" aria-pressed="false">Ⅱ</button>
     </div>
   </aside>
   <div class="hero-content">
@@ -285,6 +284,10 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
       <button type="submit">Rechercher <span class="home-arrow" aria-hidden="true"></span></button>
     </form>
     <div class="hero-suggestions"><span>À découvrir</span><a href="marche-senegal-recherche.html?category=mode">Mode &amp; wax</a><a href="marche-senegal-recherche.html?category=artisan">Artisanat</a><a href="marche-senegal-recherche.html?category=aliment">Saveurs locales</a></div>
+    <div class="hero-mobile-actions">
+      <a href="#marches">Explorer les marchés <span class="home-arrow" aria-hidden="true"></span></a>
+      <a href="marche-senegal-recherche.html">Voir les produits <span class="home-arrow" aria-hidden="true"></span></a>
+    </div>
     <a class="hero-market-link" href="#marches">Choisir un marché <span class="home-arrow" aria-hidden="true"></span></a>
   </div>
   <div class="hero-footer">
@@ -446,91 +449,156 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 
 let cartCount = 0;
 
-// ── Bandeau d'accueil : offres réelles ou simple lien de découverte ──
+// Le flux complet est paginé ; l'ancien serveur ignore « scope=all » et
+// répond avec ses quatre codes habituels jusqu'à la mise en ligne de l'API.
+async function chargerPromotionsAccueil() {
+  const toutes = [];
+  let offset = 0;
+  while (true) {
+    const resultat = await apiCall('/api/promotions/active?scope=all&offset=' + offset);
+    if (!resultat.success || !Array.isArray(resultat.data)) break;
+    toutes.push(...resultat.data);
+    if (!Number.isSafeInteger(resultat.nextOffset) || resultat.nextOffset <= offset) break;
+    offset = resultat.nextOffset;
+  }
+  return toutes;
+}
+
+async function chargerProduitsEnPromo() {
+  const tous = [];
+  let page = 1;
+  while (true) {
+    const resultat = await getProducts({ promo: true, page, limit: 50, sortBy: 'popular' });
+    if (!resultat.success || !Array.isArray(resultat.data)) break;
+    tous.push(...resultat.data.filter((produit) =>
+      Number(produit.originalPrice) > Number(produit.price) && Number(produit.price) > 0));
+    if (page >= Number(resultat.pagination?.totalPages || 1)) break;
+    page += 1;
+  }
+  return tous;
+}
+
+function creerPastillePromo(offre) {
+  const pastille = document.createElement('article');
+  pastille.className = 'promo-pill';
+  const lien = document.createElement('a');
+  lien.className = 'pp-link';
+  const titre = document.createElement('strong');
+  titre.className = 'pp-disc';
+  const detail = document.createElement('span');
+  detail.className = 'pp-shop';
+  if (offre.kind === 'product') {
+    const pourcentage = Math.round((1 - offre.price / offre.originalPrice) * 100);
+    titre.textContent = '-' + pourcentage + '% · ' + offre.name;
+    detail.textContent = offre.shop?.name || 'Produit en promotion';
+    lien.href = 'marche-senegal-produit.html?id=' + encodeURIComponent(offre.id);
+  } else {
+    titre.textContent = offre.type === 'CODE' ? '-' + offre.discount + '%'
+      : offre.type === 'FREE_DELIVERY' ? 'Livraison offerte'
+      : 'Offre boutique · ' + offre.title;
+    detail.textContent = (offre.shop?.name || 'Boutique') +
+      (offre.shop?.market?.name ? ' · ' + offre.shop.market.name : '');
+    lien.href = offre.shopId
+      ? 'marche-senegal-boutique.html?id=' + encodeURIComponent(offre.shopId)
+      : 'marche-senegal-recherche.html';
+  }
+  lien.append(titre, detail);
+  pastille.appendChild(lien);
+  if (offre.code) {
+    const code = document.createElement('button');
+    code.type = 'button';
+    code.className = 'pp-code';
+    code.dataset.copyCode = offre.code;
+    code.textContent = 'Code ' + offre.code;
+    code.setAttribute('aria-label', 'Copier le code ' + offre.code);
+    pastille.appendChild(code);
+  }
+  return pastille;
+}
+
+// La séquence se répète visuellement pour une boucle parfaitement continue.
+// Les copies sont retirées du parcours clavier et de l'arbre d'accessibilité.
+function installerDefilementPromos(conteneur, sequence) {
+  const rail = sequence.parentElement;
+  const bouton = document.getElementById('promo-motion');
+  const controles = document.getElementById('promo-controls');
+  const mouvementReduit = matchMedia('(prefers-reduced-motion: reduce)');
+  let pauseDemandee = false;
+  const synchroniserPause = () => {
+    rail.classList.toggle('is-paused', pauseDemandee || document.hidden);
+    bouton.setAttribute('aria-pressed', String(pauseDemandee));
+    bouton.setAttribute('aria-label', pauseDemandee ? 'Reprendre le défilement des offres' : 'Mettre le défilement des offres en pause');
+    bouton.textContent = pauseDemandee ? '▶' : 'Ⅱ';
+  };
+  const mesurer = () => {
+    rail.querySelectorAll('.promo-copy').forEach((copie) => copie.remove());
+    const statique = mouvementReduit.matches || navigator.connection?.saveData;
+    conteneur.classList.toggle('is-static', Boolean(statique));
+    controles.hidden = Boolean(statique);
+    rail.classList.toggle('is-moving', !statique);
+    if (statique) return;
+    const largeur = sequence.getBoundingClientRect().width;
+    if (!largeur) return;
+    const nombreCopies = Math.ceil(conteneur.clientWidth / largeur) + 1;
+    for (let i = 0; i < nombreCopies; i += 1) {
+      const copie = sequence.cloneNode(true);
+      copie.classList.add('promo-copy');
+      copie.setAttribute('aria-hidden', 'true');
+      copie.querySelectorAll('a,button').forEach((element) => { element.tabIndex = -1; });
+      rail.appendChild(copie);
+    }
+    rail.style.setProperty('--promo-distance', largeur + 'px');
+    rail.style.setProperty('--promo-duration', Math.max(12, largeur / 38) + 's');
+  };
+  bouton.addEventListener('click', () => { pauseDemandee = !pauseDemandee; synchroniserPause(); });
+  document.addEventListener('visibilitychange', synchroniserPause);
+  mouvementReduit.addEventListener('change', mesurer);
+  if ('ResizeObserver' in window) new ResizeObserver(mesurer).observe(conteneur);
+  mesurer();
+  synchroniserPause();
+}
+
 async function loadPromosBand() {
-  const pastilles = document.getElementById('promo-pills');
-  if (!pastilles) return;
-
-  const result = await getActivePromotions();
-  const promos = result.success && Array.isArray(result.data) ? result.data : [];
-
-  if (!promos.length) {
+  const conteneur = document.getElementById('promo-pills');
+  if (!conteneur) return;
+  const [promotions, produits] = await Promise.all([chargerPromotionsAccueil(), chargerProduitsEnPromo()]);
+  const vus = new Set();
+  const offres = [
+    ...promotions.filter((promo) => ['CODE', 'FREE_DELIVERY', 'SALE', 'OFFER'].includes(promo.type))
+      .map((promo) => ({ ...promo, kind: 'promotion' })),
+    ...produits.map((produit) => ({ ...produit, kind: 'product' }))
+  ].filter((offre) => {
+    const cle = offre.kind + ':' + offre.id;
+    if (!offre.id || vus.has(cle)) return false;
+    vus.add(cle);
+    return true;
+  });
+  if (!offres.length) {
     const lien = document.createElement('a');
     lien.className = 'promo-fallback';
     lien.href = 'marche-senegal-recherche.html';
     lien.textContent = 'Explorez les nouveautés des boutiques';
-    pastilles.replaceChildren(lien);
+    conteneur.replaceChildren(lien);
     return;
   }
-
-  const fragment = document.createDocumentFragment();
-  promos.forEach((promo) => {
-    const pastille = document.createElement('article');
-    pastille.className = 'promo-pill';
-
-    const lien = document.createElement('a');
-    lien.className = 'pp-link';
-    lien.href = promo.shopId
-      ? 'marche-senegal-boutique.html?id=' + encodeURIComponent(promo.shopId)
-      : 'marche-senegal-recherche.html';
-
-    const remise = document.createElement('strong');
-    remise.className = 'pp-disc';
-    // Une livraison offerte n'a pas de pourcentage : afficher « -0% » ferait
-    // passer une vraie offre pour une erreur.
-    remise.textContent = promo.discount > 0 ? '-' + promo.discount + '%' : 'OFFERT';
-
-    const boutique = document.createElement('span');
-    boutique.className = 'pp-shop';
-    const nomMarche = promo.shop?.market?.name;
-    boutique.textContent = (promo.shop?.name || 'Boutique') + (nomMarche ? ' · ' + nomMarche : '');
-
-    lien.appendChild(remise);
-    lien.appendChild(boutique);
-    pastille.appendChild(lien);
-
-    if (promo.code) {
-      const code = document.createElement('button');
-      code.type = 'button';
-      code.className = 'pp-code';
-      code.textContent = 'Copier ' + promo.code;
-      code.title = 'Copier le code promo';
-      code.onclick = (event) => {
-        const copie = navigator.clipboard?.writeText
-          ? navigator.clipboard.writeText(promo.code)
-          : Promise.reject(new Error('clipboard indisponible'));
-        copie.then(() => showToast('✓ Code ' + promo.code + ' copié'))
-          .catch(() => showToast('Code : ' + promo.code));
-      };
-      pastille.appendChild(code);
-    }
-
-    fragment.appendChild(pastille);
+  const rail = document.createElement('div');
+  rail.className = 'promo-rail';
+  const sequence = document.createElement('div');
+  sequence.className = 'promo-sequence';
+  offres.forEach((offre) => sequence.appendChild(creerPastillePromo(offre)));
+  rail.appendChild(sequence);
+  conteneur.replaceChildren(rail);
+  conteneur.addEventListener('click', (event) => {
+    const code = event.target.closest('[data-copy-code]');
+    if (!code) return;
+    const valeur = code.dataset.copyCode;
+    const copie = navigator.clipboard?.writeText
+      ? navigator.clipboard.writeText(valeur)
+      : Promise.reject(new Error('clipboard indisponible'));
+    copie.then(() => showToast('Code ' + valeur + ' copié'))
+      .catch(() => showToast('Code : ' + valeur));
   });
-
-  pastilles.replaceChildren(fragment);
-  const controles = document.getElementById('promo-controls');
-  if (promos.length < 2 || !controles) return;
-  controles.hidden = false;
-  let actif = 0;
-  const avancer = (pas) => {
-    actif = (actif + pas + promos.length) % promos.length;
-    const premiere = pastilles.firstElementChild;
-    const cible = pastilles.children[actif];
-    if (!premiere || !cible) return;
-    const mouvementReduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    pastilles.scrollTo({
-      left: cible.offsetLeft - premiere.offsetLeft,
-      behavior: mouvementReduit ? 'instant' : 'smooth'
-    });
-  };
-  document.getElementById('promo-prev').onclick = () => avancer(-1);
-  document.getElementById('promo-next').onclick = () => avancer(1);
-  setInterval(() => {
-    if (document.hidden || pastilles.matches(':hover') || pastilles.contains(document.activeElement) ||
-        matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) return;
-    avancer(1);
-  }, 6500);
+  installerDefilementPromos(conteneur, sequence);
 }
 
 async function loadProducts(filters = {}) {

@@ -13,14 +13,24 @@ body.accueil-immersif .hero {padding-top:205px}
 }
 .accueil-immersif .promos-band .pb-label .ic {font-size:15px}
 .accueil-immersif .promo-pills {
-  display:flex;align-items:center;gap:12px;min-width:0;overflow-x:auto;overflow-y:hidden;
-  flex-wrap:nowrap;scroll-snap-type:x mandatory;scrollbar-width:none;
+  min-width:0;overflow:hidden;scrollbar-width:none;
 }
 .accueil-immersif .promo-pills::-webkit-scrollbar {display:none}
+.accueil-immersif .promo-pills.is-static {overflow-x:auto}
+.accueil-immersif .promo-rail {display:flex;align-items:center;width:max-content;max-width:none;will-change:transform}
+.accueil-immersif .promo-rail.is-moving {animation:promo-flow var(--promo-duration,20s) linear infinite}
+.accueil-immersif .promo-rail.is-paused,
+.accueil-immersif .promo-pills:hover .promo-rail,
+.accueil-immersif .promo-pills:focus-within .promo-rail {animation-play-state:paused}
+.accueil-immersif .promo-sequence {display:flex;align-items:center;gap:12px;flex:none;padding-right:12px}
+@keyframes promo-flow {
+  from {transform:translateX(calc(-1 * var(--promo-distance,300px)))}
+  to {transform:translateX(0)}
+}
 .accueil-immersif .promo-pill {
-  display:flex;align-items:center;gap:13px;flex:0 0 auto;min-width:0;max-width:100%;
+  display:flex;align-items:center;gap:13px;flex:none;min-width:0;
   padding:7px 13px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
-  border-radius:8px;scroll-snap-align:start;text-align:left;
+  border-radius:8px;text-align:left;
 }
 .accueil-immersif .pp-link {display:flex;align-items:center;gap:11px;min-width:0;color:#fff}
 .accueil-immersif .pp-link:hover .pp-shop {text-decoration:underline}
@@ -34,6 +44,7 @@ body.accueil-immersif .hero {padding-top:205px}
 .accueil-immersif .promo-fallback::after {content:'↗';margin-left:12px}
 .accueil-immersif .promo-fallback:hover {text-decoration:underline}
 .accueil-immersif .promo-controls {display:flex;gap:6px}
+.accueil-immersif .promo-controls[hidden] {display:none}
 .accueil-immersif .promo-controls button {
   width:30px;height:30px;border:1px solid rgba(255,255,255,.42);border-radius:50%;
   background:transparent;color:#fff;cursor:pointer;font:22px/1 Arial,sans-serif;
@@ -47,6 +58,7 @@ body.accueil-immersif .hero {padding-top:205px}
   color:#f4f5e9;font-size:12px;font-weight:700;border-bottom:1px solid #f4f5e9a8;
 }
 .accueil-immersif .hero-market-link:hover {color:#d8e9ba;border-color:#d8e9ba}
+.accueil-immersif .hero-mobile-actions {display:none}
 .accueil-immersif .market-basket {
   display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(35px,6vw,110px);
   padding:clamp(62px,7vw,120px) var(--home-gutter);background:#e9eddf;color:#173b2b;
@@ -82,22 +94,25 @@ body.accueil-immersif .hero {padding-top:205px}
   .accueil-immersif .market-basket {grid-template-columns:1fr;gap:42px}
 }
 @media(max-width:600px) {
-  body.accueil-immersif .hero {min-height:830px;padding-top:205px}
-  .accueil-immersif .promos-band {top:72px;min-height:76px;gap:8px;padding:7px 20px;grid-template-columns:minmax(0,1fr) auto}
+  body.accueil-immersif .hero {min-height:700px;padding-top:170px}
+  .accueil-immersif .promos-band {top:72px;min-height:58px;gap:8px;padding:7px 20px;grid-template-columns:minmax(0,1fr) auto}
   .accueil-immersif .promos-band .pb-label {display:none}
-  .accueil-immersif .promo-pill {width:100%;min-height:60px;padding:7px 9px;gap:7px;justify-content:space-between}
-  .accueil-immersif .pp-link {display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-  .accueil-immersif .pp-disc {font-size:18px}
-  .accueil-immersif .pp-shop {font-size:11px;max-width:none;white-space:normal;line-height:1.25}
+  .accueil-immersif .promo-pill {min-height:43px;padding:5px 11px;gap:8px}
+  .accueil-immersif .pp-link {gap:7px}
+  .accueil-immersif .pp-disc {font-size:16px}
+  .accueil-immersif .pp-shop {font-size:11px;max-width:150px}
   .accueil-immersif .promo-pill .pp-code {font-size:10px;padding:6px 7px;white-space:nowrap}
-  .accueil-immersif .hero-market-link {margin-top:14px}
+  .accueil-immersif .hero-search,.accueil-immersif .hero-suggestions,.accueil-immersif .hero-market-link {display:none}
+  .accueil-immersif .hero-mobile-actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .accueil-immersif .hero-mobile-actions a {display:inline-flex;align-items:center;gap:12px;min-height:46px;padding:10px 15px;border-radius:25px;background:#f9faf1;color:#174d30;font-size:12px;font-weight:700}
+  .accueil-immersif .hero-mobile-actions a+ a {background:rgba(12,51,34,.38);border:1px solid rgba(255,255,255,.6);color:#fff}
   .accueil-immersif .market-basket {padding:62px 22px}
   .accueil-immersif .market-basket h2 {font-size:clamp(38px,10vw,52px)}
 }
 @media(max-width:365px) {
-  .accueil-immersif .promo-pill .pp-code {display:none}
-  .accueil-immersif .pp-shop {max-width:150px}
+  .accueil-immersif .pp-shop {max-width:105px}
 }
 @media(prefers-reduced-motion:reduce) {
-  .accueil-immersif .promo-pills {scroll-behavior:auto}
+  .accueil-immersif .promo-rail {animation:none!important}
+  .accueil-immersif .promo-copy {display:none}
 }
