@@ -330,6 +330,11 @@ body{padding-left:var(--sidebar-w);padding-top:var(--topbar-h);}
           <textarea id="shopHours" placeholder="Ex : Lun – Sam : 8h – 19h&#10;Dimanche : 9h – 14h" oninput="updatePreview()" style="min-height:70px;"></textarea>
         </div>
         <div class="field">
+          <label>Numéro WhatsApp affiché aux acheteurs <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label>
+          <input type="tel" id="shopWhatsapp" inputmode="tel" autocomplete="tel" placeholder="Ex : 77 123 45 67">
+          <p class="field-hint">Rempli, un bouton « WhatsApp » apparaît sur votre boutique et les acheteurs peuvent vous écrire directement. Laissez vide pour qu’ils passent uniquement par la messagerie de Marché Sénégal.</p>
+        </div>
+        <div class="field">
           <label>Lien visite virtuelle</label>
           <input type="url" id="shopTour" placeholder="https://youtube.com/watch?v=…">
           <p class="field-hint">YouTube, Google Maps 360° ou tout autre lien vidéo.</p>
@@ -733,6 +738,7 @@ function fillForm(shop, stats) {
     ho.value = typeof hours === 'string' ? hours : (hours?.text || '');
   }
   const to = document.getElementById('shopTour'); if (to) to.value = shop.virtualTourUrl || '';
+  const wa = document.getElementById('shopWhatsapp'); if (wa) wa.value = shop.whatsapp || '';
   document.getElementById('sellerDeliveryEnabled').checked = shop.deliveryEnabled === true;
   document.getElementById('sellerDeliveryFee').value = shop.deliveryFee ?? '';
   document.getElementById('sellerDeliveryDaysMin').value = shop.deliveryDaysMin ?? '';
@@ -873,7 +879,9 @@ async function saveShop() {
     avatarUrl: document.getElementById('shopAvatar').value.trim() || null,
     bannerUrl: document.getElementById('shopBanner').value.trim() || null,
     openingHours: document.getElementById('shopHours').value.trim() || null,
-    virtualTourUrl: document.getElementById('shopTour').value.trim() || null
+    virtualTourUrl: document.getElementById('shopTour').value.trim() || null,
+    // Vide : aucun bouton WhatsApp sur la boutique. Le serveur vérifie le format.
+    whatsapp: document.getElementById('shopWhatsapp')?.value.trim() || null
   };
   if (shopLocationType === 'CUSTOM' && (!body.locationName || !body.locationCity || !body.address)) {
     showToastLocal('Indiquez le quartier, la ville et l’adresse de votre boutique', 'error');

@@ -70,6 +70,8 @@
 }
 .sh-btn-primary{background:var(--green);color:#fff}.sh-btn-primary:hover{background:var(--gl)}
 .sh-btn-gold{background:var(--gold);color:var(--dark)}.sh-btn-gold:hover{filter:brightness(1.08)}
+.sh-btn-wa{background:#25D366;color:#fff;text-decoration:none}.sh-btn-wa:hover{filter:brightness(1.06)}
+.sh-btn-wa[hidden]{display:none}
 .sh-btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8)}
 .sh-btn-outline:hover{background:rgba(255,255,255,.1)}
 .sh-stats-row{display:flex;gap:22px;flex-wrap:wrap}
@@ -373,6 +375,8 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
         </div>
         <div class="sh-actions">
           <button class="sh-btn sh-btn-primary" onclick="openChat()"><i class="ic" data-ic="message-circle"></i> Contacter</button>
+          <!-- Seulement si le vendeur a choisi d'afficher un numéro WhatsApp dans « Ma boutique ». -->
+          <a class="sh-btn sh-btn-wa" id="btn-whatsapp" target="_blank" rel="noopener noreferrer" hidden><i class="ic" data-ic="message-circle"></i> WhatsApp</a>
           <button class="sh-btn sh-btn-gold" onclick="follow()"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Suivre</button>
           <button class="sh-btn sh-btn-outline" onclick="share()"><i class="ic" data-ic="share-2"></i> Partager</button>
         </div>
@@ -780,6 +784,15 @@ async function loadShop(shopId) {
   });
 
   // Le bandeau du chat affichait lui aussi « Mode Fatou Ndoye »
+  // WhatsApp : le numéro que le vendeur a choisi d'afficher, avec un message prêt.
+  const btnWhatsapp = document.getElementById('btn-whatsapp');
+  const numeroWhatsapp = String(shop.whatsapp || '').replace(/\D/g, '');
+  if (btnWhatsapp && numeroWhatsapp) {
+    const message = `Bonjour ${shop.name}, je vous contacte depuis Marché Sénégal : ${location.origin}/boutiques/${shop.id}`;
+    btnWhatsapp.href = 'https://wa.me/' + numeroWhatsapp + '?text=' + encodeURIComponent(message);
+    btnWhatsapp.hidden = false;
+  }
+
   const chatName = document.getElementById('chat-name-txt');
   if (chatName) chatName.textContent = shop.name;
 
