@@ -200,6 +200,33 @@ test('l’assemblage 360° passe par l’envoi de série, une coupure est marqu�
   assert.equal(r.reseau, true);
 });
 
+test('4G : la progression de l’envoi remonte jusqu’à l’écran', async () => {
+  const messages = [];
+  const api = E.creerApi({
+    apiCall: async () => ({ success: true }),
+    envoyerSerie: async (fichiers, suivi) => { suivi('Envoi des photos : 1 sur 6…'); return { success: true, url: 'https://ex.test/360.jpg' }; }
+  });
+  const r = await api.assembler360([1, 2, 3, 4, 5, 6], t => messages.push(t));
+  assert.equal(r.url, 'https://ex.test/360.jpg');
+  assert.deepEqual(messages, ['Envoi des photos : 1 sur 6…']);
+});
+
+test('4G : des photos déjà en ligne sont assemblées sans repasser par le téléphone', async () => {
+  let telecharge = false;
+  const recues = [];
+  const api = E.creerApi({
+    apiCall: async () => ({ success: true }),
+    telechargerPhotos: async () => { telecharge = true; return []; },
+    assemblerAdresses: async (adresses, suivi) => { recues.push(adresses); suivi('Assemblage…'); return { success: true, url: 'https://ex.test/360.jpg' }; }
+  });
+  const messages = [];
+  const r = await api.assemblerVues(['https://ex.test/a.jpg', 'https://ex.test/b.jpg'], t => messages.push(t));
+  assert.equal(r.url, 'https://ex.test/360.jpg');
+  assert.deepEqual(recues, [['https://ex.test/a.jpg', 'https://ex.test/b.jpg']]);
+  assert.deepEqual(messages, ['Assemblage…']);
+  assert.equal(telecharge, false);
+});
+
 // ── Zone d'un produit (partie 2a) ──
 test('un point garde sa zone en passant par l’éditeur', () => {
   const v = E.ajouterPoint(vue('a'), { productId: 'p1', x: 0.4, y: 0.5, w: 0.2, h: 0.3, autre: 'x' });

@@ -324,13 +324,13 @@
       let url = null;
       const r = await agir(async () => {
         if (!url) {
-          const envoi = await api.assemblerVues(simples.map(v => v.imageUrl));
+          const envoi = await api.assemblerVues(simples.map(v => v.imageUrl), t => statut(t));
           if (!envoi || !envoi.success) return envoi;
           url = envoi.url;
         }
         return api.creerVue({ title: 'Vue 360°', imageUrl: url });
       }, r => { e.vues = [...e.vues, r.data]; e.apercu = r.data.id; rondes.set(r.data.imageUrl, true); }, {
-        enCours: `Assemblage de vos ${simples.length} photos en vue 360°… Cela prend environ une minute, gardez la page ouverte.`,
+        enCours: `Assemblage de vos ${simples.length} photos en vue 360°… Environ une minute, même en 4G.`,
         fait: 'Vue 360° créée · pas encore publiée'
       });
       if (!r || !r.success) return;
@@ -359,13 +359,14 @@
       let url = null;
       await agir(async () => {
         if (!url) {
-          const envoi = await api.assembler360(serie);
+          // La progression (« Envoi des photos : 4 sur 11… », reprise après coupure) s'affiche ici.
+          const envoi = await api.assembler360(serie, t => statut(t));
           if (!envoi || !envoi.success) return envoi;
           url = envoi.url;
         }
         return api.creerVue({ title: 'Vue 360°', imageUrl: url });
       }, r => { e.vues = [...e.vues, r.data]; e.apercu = r.data.id; rondes.set(r.data.imageUrl, true); }, {
-        enCours: `Assemblage de vos ${serie.length} photos en vue 360°… Cela prend environ une minute, gardez la page ouverte.`,
+        enCours: `Préparation de vos ${serie.length} photos pour la vue 360°…`,
         fait: 'Vue 360° créée · pas encore publiée'
       });
     }

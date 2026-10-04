@@ -173,20 +173,94 @@
       }
     }
 
-    async function envoyerSerie360(fichiers) {
-      const corps = new FormData();
-      for (const [i, f] of fichiers.entries()) corps.append('photos', await alleger(f), 'photo-' + String(i + 1).padStart(2, '0') + '.jpg');
-      try {
-        const reponse = await fetch(API_URL + '/api/upload/showcase-360', {
-          method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }, body: corps
-        });
-        const d = await reponse.json();
-        if (reponse.ok && d.success && typeof d.url === 'string') return { success: true, url: d.url };
-        return { success: false, message: d.message || 'L’assemblage de la vue 360° a échoué.' };
-      } catch {
-        // Le serveur n'a rien reçu : c'est la connexion du téléphone qui a coupé pendant l'envoi.
-        return { success: false, message: 'L’envoi des photos a été coupé. Vérifiez votre connexion internet (le Wi-Fi est plus sûr), puis réessayez.' };
+    // ── Vue 360° en 4G ──
+    // Les vendeurs prennent leurs photos au marché, en 4G : une coupure de quelques
+    // secondes ou un appel ne doit rien faire perdre. Les photos partent une par une
+    // (seule la photo en cours est renvoyée après une coupure), puis le serveur
+    // assemble en arrière-plan pendant que la page vient seulement prendre des nouvelles.
+    const COUPURE_LONGUE = 'La connexion est coupée depuis trop longtemps. Vos photos déjà envoyées sont gardées : réessayez quand le réseau revient.';
+    const pause = ms => new Promise(ok => setTimeout(ok, ms));
+    // Attend que le réseau revienne (événement « online ») ou la fin du délai.
+    const attendreReseau = ms => new Promise(ok => {
+      const fin = () => { clearTimeout(minuterie); window.removeEventListener('online', fin); ok(); };
+      const minuterie = setTimeout(fin, ms);
+      window.addEventListener('online', fin);
+    });
+
+    // Rejoue une étape tant que le réseau coupe (~3 min au plus) ; un refus du serveur
+    // (photo invalide, adresse refusée) ne se rejoue pas.
+    async function avecReprise(etape, suivi, texteCoupure) {
+      for (let essai = 1; ; essai++) {
+        try { return await etape(); } catch (erreur) {
+          if ((erreur && erreur.refus) || essai >= 9) throw erreur;
+          if (suivi) suivi(texteCoupure);
+          await attendreReseau(Math.min(2000 * 2 ** (essai - 1), 30000));
+        }
       }
+    }
+
+    // Appel au serveur qui distingue un refus (à montrer) d'une coupure (à rejouer).
+    async function appelSerie(chemin, options = {}) {
+      const reponse = await fetch(API_URL + chemin, {
+        ...options, headers: { Authorization: 'Bearer ' + localStorage.getItem('token'), ...(options.headers || {}) }
+      });
+      let d = null;
+      try { d = await reponse.json(); } catch { /* réponse coupée en route */ }
+      if (reponse.ok && d && d.success) return d;
+      if (d && reponse.status === 404 && d.code === 'introuvable') throw { introuvable: true };
+      if (d && reponse.status >= 400 && reponse.status < 500 && reponse.status !== 408 && reponse.status !== 429) {
+        throw { refus: true, message: d.message || 'L’assemblage de la vue 360° a échoué.' };
+      }
+      throw new Error('serveur indisponible ' + reponse.status);
+    }
+
+    async function assemblerAdresses(urls, suivi) {
+      try {
+        const lancer = async () => (await appelSerie('/api/upload/showcase-360/travaux', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urls })
+        })).data;
+        let travail = await avecReprise(lancer, suivi, 'Réseau coupé : l’assemblage démarrera dès que la connexion revient…');
+        const debut = Date.now();
+        while (travail.statut === 'en_cours') {
+          if (suivi) suivi('Assemblage de la vue 360° sur le serveur… Environ une minute. Si le réseau coupe, rien n’est perdu.');
+          if (Date.now() - debut > 6 * 60 * 1000) {
+            return { success: false, message: 'L’assemblage prend plus de temps que prévu. Réessayez dans quelques minutes : vos photos sont déjà envoyées.' };
+          }
+          await pause(3000);
+          try {
+            travail = (await appelSerie('/api/upload/showcase-360/travaux/' + encodeURIComponent(travail.id))).data;
+          } catch (erreur) {
+            if (erreur && erreur.refus) throw erreur;
+            // Serveur redémarré : l'assemblage est perdu, mais pas les photos. On relance.
+            if (erreur && erreur.introuvable) travail = await avecReprise(lancer, suivi, 'Réseau coupé : reprise dès que la connexion revient…');
+            else if (suivi) suivi('Réseau coupé : l’assemblage continue sur le serveur, la page reprend dès que la connexion revient…');
+          }
+        }
+        if (travail.statut === 'pret') return { success: true, url: travail.url };
+        return { success: false, message: travail.message || 'L’assemblage de la vue 360° a échoué.' };
+      } catch (erreur) {
+        return { success: false, message: erreur && erreur.refus ? erreur.message : COUPURE_LONGUE };
+      }
+    }
+
+    async function envoyerSerie360(fichiers, suivi) {
+      const urls = [];
+      try {
+        for (const [i, f] of fichiers.entries()) {
+          const position = `${i + 1} sur ${fichiers.length}`;
+          if (suivi) suivi(`Envoi des photos : ${position}…`);
+          const image = await alleger(f);
+          const envoyer = async () => {
+            const corps = new FormData();
+            corps.append('photo', image, 'photo-' + String(i + 1).padStart(2, '0') + '.jpg');
+            return (await appelSerie('/api/upload/showcase-360/photo', { method: 'POST', body: corps })).url;
+          };
+          urls.push(await avecReprise(envoyer, suivi, `Réseau coupé : la photo ${position} repartira dès que la connexion revient…`));
+        }
+      } catch (erreur) {
+        return { success: false, message: erreur && erreur.refus ? erreur.message : COUPURE_LONGUE };
+      }
+      return assemblerAdresses(urls, suivi);
     }
 
     try {
@@ -208,7 +282,7 @@
       $('publicShopLink').hidden = false;
       $('ve').hidden = false;
       const editeur = VitrineEditeur.monter({
-        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
+        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, assemblerAdresses, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         // Adresse propre et partageable (WhatsApp) : /boutiques/:id, servie par api/page.js.

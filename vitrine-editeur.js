@@ -194,7 +194,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, assemblerAdresses, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -214,7 +214,8 @@
       publier: () => appel(base + '/publish', { method: 'POST' }),
       abandonner: () => appel(base + '/draft', { method: 'DELETE' }),
       envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
-      assembler360: async fichiers => marquer(await envoyerSerie(fichiers)),
+      // `suivi` reçoit la progression (« Envoi des photos : 4 sur 11… ») pour l'écran.
+      assembler360: async (fichiers, suivi) => marquer(await envoyerSerie(fichiers, suivi)),
       // Partie 2b : l'IA reconnaît l'article (zone découpée dans la photo, ou photo de près).
       decouper: async (adresse, pos) => {
         try { return { success: true, image: await decouperPhoto(adresse, zoneDeDecoupe(pos)) }; } catch { return { success: false, message: RESEAU, reseau: true }; }
@@ -231,8 +232,10 @@
       categories: () => appel('/api/categories'),
       creerProduit: p => appel('/api/products', avec('POST', p)),
       envoyerPhotoProduit: async image => marquer(await envoyerPhotoProduit(image)),
-      // Photos déjà envoyées une par une : on les retélécharge pour les assembler.
-      assemblerVues: async adresses => {
+      // Photos déjà en ligne : le serveur les assemble directement ; sans cette
+      // possibilité, on les retélécharge pour les renvoyer en série.
+      assemblerVues: async (adresses, suivi) => {
+        if (assemblerAdresses) return marquer(await assemblerAdresses(adresses, suivi));
         let fichiers;
         try { fichiers = await telechargerPhotos(adresses); } catch { return { success: false, message: RESEAU, reseau: true }; }
         return marquer(await envoyerSerie(fichiers));
