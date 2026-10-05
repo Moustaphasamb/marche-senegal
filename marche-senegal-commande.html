@@ -784,8 +784,8 @@ function renderActions(order) {
     }
   }
 
-  // Confirmer la réception — si en livraison ou prêt
-  if (['DELIVERING', 'READY'].includes(order.status)) {
+  // Confirmer la réception — seulement une commande payée et réellement remise
+  if (commandesAConfirmer(order).length > 0) {
     actions.push(`
       <button class="ac-btn ac-btn-green" onclick="confirmDelivery()">
         ✅ Confirmer la réception
@@ -853,6 +853,24 @@ function renderActions(order) {
   container.innerHTML = actions.join('');
 }
 
+// Même règle que le serveur (src/lib/access.js du backend) : l'acheteur ne
+// confirme qu'une commande payée, et seulement une fois remise — prête pour
+// un retrait, en livraison sinon. Une commande Panier Marché est payée d'un
+// seul coup : c'est le paiement du panier qui compte pour chaque boutique.
+function receptionConfirmable(commande, statutPaiement) {
+  if (statutPaiement !== 'COMPLETED') return false;
+  return commande.deliveryType === 'PICKUP'
+    ? commande.status === 'READY'
+    : commande.status === 'DELIVERING';
+}
+
+function commandesAConfirmer(commande) {
+  if (commande._isMarketOrder) {
+    return (commande.orders || []).filter(fille => receptionConfirmable(fille, commande.payment?.status));
+  }
+  return receptionConfirmable(commande, commande.payment?.status) ? [commande] : [];
+}
+
 // ── Actions ──
 async function confirmDelivery() {
   if (!currentOrder) return;
@@ -861,9 +879,7 @@ async function confirmDelivery() {
   btn.textContent = '⏳ Confirmation...';
   btn.disabled = true;
 
-  const eligibles = currentOrder._isMarketOrder
-    ? currentOrder.orders.filter(order => ['DELIVERING', 'READY'].includes(order.status))
-    : [currentOrder];
+  const eligibles = commandesAConfirmer(currentOrder);
   const results = await Promise.all(eligibles.map(order => updateOrderStatus(order.id, 'DELIVERED')));
   const result = { success: results.length > 0 && results.every(item => item.success) };
 
