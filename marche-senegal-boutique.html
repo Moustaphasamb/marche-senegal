@@ -188,6 +188,9 @@
 .right-col{display:flex;flex-direction:column;gap:14px}
 /* Code promo remonté sous l'en-tête : il doit donner envie avant les produits. */
 .promo-haut{max-width:1280px;margin:18px auto 0;padding:0 5vw}
+.video-boutique{max-width:1280px;margin:18px auto 0;padding:0 5vw}
+.video-boutique[hidden]{display:none}
+.video-boutique video{display:block;width:100%;max-height:70vh;border-radius:var(--radius);background:#111}
 .sec-h{font-family:'Newsreader',serif;font-size:1.35rem;font-weight:500;color:var(--dark);margin:0 0 14px}
 .ic-desc{font-size:.8rem;color:var(--text);line-height:1.6;margin:0 0 14px}
 a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;margin-top:8px;box-sizing:border-box}
@@ -397,6 +400,10 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
      l'acheteur copiait sans qu'il puisse fonctionner. Elle porte maintenant
      les promotions réelles du vendeur, lues sur /api/promotions/shop/:id,
      et reste cachée quand il n'y en a aucune. -->
+<!-- Vidéo de la boutique, filmée par le vendeur : la vraie boutique, en mouvement. -->
+<section class="video-boutique" id="video-boutique" aria-label="Vidéo de la boutique" hidden>
+  <video controls playsinline preload="none"></video>
+</section>
 <div class="promo-haut">
   <div class="promo-card" id="promo-card" style="display:none">
     <div class="pc-label"><i class="ic" data-ic="flame"></i> Promotion active</div>
@@ -695,6 +702,18 @@ async function demarrerVisite(shop) {
   }
 }
 
+// Vidéo de la boutique : version légère (720 px, mp4) pour la 4G, image d'aperçu à 1 s.
+// Rien n'est téléchargé avant que l'acheteur appuie sur lecture (preload="none").
+function afficherVideoBoutique(shop) {
+  const section = document.getElementById('video-boutique');
+  const url = shop && shop.videoUrl;
+  if (!section || typeof url !== 'string' || !url.includes('/video/upload/')) return;
+  const video = section.querySelector('video');
+  video.src = url.replace('/video/upload/', '/video/upload/c_limit,w_720,q_auto,vc_auto/').replace(/\.[a-z0-9]+$/i, '.mp4');
+  video.poster = url.replace('/video/upload/', '/video/upload/so_1,c_limit,w_720/').replace(/\.[a-z0-9]+$/i, '.jpg');
+  section.hidden = false;
+}
+
 async function loadShop(shopId) {
   const result = await getShop(shopId);
 
@@ -737,6 +756,7 @@ async function loadShop(shopId) {
   }
 
   renderInfosRapides(shop);
+  afficherVideoBoutique(shop);
 
   // Mettre à jour la localisation
   const shLocation = document.querySelector('.sh-location');

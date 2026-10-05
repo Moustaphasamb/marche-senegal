@@ -237,6 +237,30 @@ test('videoEnImages rend les images, ou un message pour le vendeur', async () =>
   assert.doesNotMatch(r.message, /decode/);
 });
 
+// ── Vidéo de ma boutique ──
+test('la vidéo est lue en version légère (720 px, mp4) avec une image d’aperçu', () => {
+  const url = 'https://res.cloudinary.com/demo/video/upload/v17/marche-senegal/videos/b1/tour.mov';
+  assert.equal(E.videoLegere(url), 'https://res.cloudinary.com/demo/video/upload/c_limit,w_720,q_auto,vc_auto/v17/marche-senegal/videos/b1/tour.mp4');
+  assert.equal(E.afficheVideo(url), 'https://res.cloudinary.com/demo/video/upload/so_1,c_limit,w_720/v17/marche-senegal/videos/b1/tour.jpg');
+});
+
+test('fichier vidéo : une vidéo, 100 Mo au plus', () => {
+  assert.equal(E.verifierFichierVideo({ type: 'video/mp4', size: 40 * 1024 * 1024 }), null);
+  assert.match(E.verifierFichierVideo({ type: 'image/jpeg', size: 10 }), /vidéo/);
+  assert.match(E.verifierFichierVideo({ type: 'video/mp4', size: 120 * 1024 * 1024 }), /100 Mo/);
+});
+
+test('enregistrer ou retirer la vidéo passe par PUT /api/shops/me/video', async () => {
+  const appels = [];
+  const api = E.creerApi({ apiCall: async (chemin, o) => { appels.push([chemin, o.method, JSON.parse(o.body)]); return { success: true, data: {} }; } });
+  await api.enregistrerVideo('https://ex.test/v.mp4');
+  await api.enregistrerVideo(null);
+  assert.deepEqual(appels, [
+    ['/api/shops/me/video', 'PUT', { url: 'https://ex.test/v.mp4' }],
+    ['/api/shops/me/video', 'PUT', { url: null }]
+  ]);
+});
+
 test('4G : la progression de l’envoi remonte jusqu’à l’écran', async () => {
   const messages = [];
   const api = E.creerApi({

@@ -30,6 +30,7 @@
 .ve-view img{width:64px;height:48px;object-fit:cover;border-radius:8px;flex:none;background:var(--ve-gp)}
 .ve-title{flex:1;min-width:0;height:40px;border:1px solid var(--ve-border);border-radius:8px;padding:0 10px;font:inherit}
 .ve-add{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.ve-video-carte video{display:block;width:100%;max-height:60vh;border-radius:12px;background:#111;margin:8px 0}
 .ve-nav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;border-top:1px solid var(--ve-border);padding-top:12px}
 .ve-nav .ve-primary{margin-left:auto}
 .ve-tabs{display:flex;gap:6px;overflow-x:auto;margin:8px 0;scrollbar-width:none}

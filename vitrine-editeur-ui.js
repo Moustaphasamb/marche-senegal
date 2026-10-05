@@ -71,7 +71,7 @@
 
     // choix : position touchée en attente d'un produit (étape 2).
     // mode : { type: 'point' | 'deplacer', index } (étape 2) ou { type: 'etiquette', categoryId } (étape 3).
-    const e = { etape: 1, vues: [], rayons: [], ordre: [], vitrine: false, produits: [], catalogueOk: false, courante: 0, choix: null, mode: null, occupe: false, problemes: [] };
+    const e = { etape: 1, vues: [], rayons: [], ordre: [], vitrine: false, produits: [], catalogueOk: false, courante: 0, choix: null, mode: null, occupe: false, problemes: [], video: (o.boutique && o.boutique.videoUrl) || null };
 
     // Une étiquette dont le rayon n'a plus de produit ferait refuser tout l'enregistrement
     // de la photo par le serveur : elle n'est pas envoyée (l'étape 3 la montre à retirer).
@@ -188,6 +188,7 @@
       // L'assemblage 360° fait par le site a été retiré (2026-10-05) : il échouait trop
       // souvent avec des photos prises à la main. Pour une vue large, le mode Panorama
       // du téléphone assemble lui-même, bien mieux. Les vues 360° déjà créées restent.
+      p.appendChild(carteVideo());
       p.appendChild(cartePhotoSimple(plein));
       if (plein) p.appendChild(el('p', 've-help', `${C.MAX_VUES} photos au maximum : retirez-en une pour en ajouter.`));
       if (e.vitrine && !e.vues.length) {
@@ -298,6 +299,64 @@
         if (f) ajouterPhoto(f);
       };
     }
+
+    // ── Vidéo de ma boutique ──
+    // Filmée par le vendeur, lue telle quelle par les acheteurs : rien à assembler, rien
+    // qui puisse échouer. Contrairement aux photos, elle est visible tout de suite.
+    function carteVideo() {
+      const carte = el('section', 've-card ve-video-carte');
+      carte.setAttribute('aria-label', 'Vidéo de ma boutique');
+      carte.appendChild(el('h3', null, '🎥 Vidéo de ma boutique'));
+      if (e.video) {
+        const lecteur = el('video', 've-video');
+        lecteur.setAttribute('src', C.videoLegere(e.video));
+        lecteur.setAttribute('poster', C.afficheVideo(e.video));
+        lecteur.setAttribute('playsinline', '');
+        lecteur.controls = true;
+        lecteur.preload = 'metadata';
+        carte.appendChild(lecteur);
+        carte.appendChild(el('p', 've-help', 'Visible tout de suite en haut de votre page boutique.'));
+        const actions = el('div', 've-add');
+        const remplacer = bouton('ve-btn', 'Remplacer la vidéo');
+        remplacer.disabled = e.occupe;
+        remplacer.onclick = () => $('ve-video-boutique').click();
+        const retirer = bouton('ve-btn ve-danger', 'Retirer la vidéo');
+        retirer.disabled = e.occupe;
+        retirer.onclick = async () => {
+          if (!await confirmer('Retirer la vidéo de votre boutique ? Elle disparaît tout de suite de votre page.')) return;
+          agir(() => api.enregistrerVideo(null), () => { e.video = null; }, { enCours: 'Retrait de la vidéo…', fait: 'Vidéo retirée de votre boutique' });
+        };
+        actions.append(remplacer, retirer);
+        carte.appendChild(actions);
+      } else {
+        carte.appendChild(el('p', 've-help', 'Filmez 15 à 30 secondes : l’entrée, vos rayons, vos plus beaux produits. Pas besoin de tourner sur vous-même : marchez et montrez, comme pour un statut WhatsApp.'));
+        const filmer = bouton('ve-btn ve-primary', '🎥 Filmer ou choisir une vidéo');
+        filmer.disabled = e.occupe;
+        filmer.onclick = () => $('ve-video-boutique').click();
+        carte.appendChild(filmer);
+      }
+      return carte;
+    }
+
+    async function ajouterVideoBoutique(fichier) {
+      const refus = C.verifierFichierVideo(fichier);
+      if (refus) { statut(refus, true); return; }
+      // Après une coupure, « Réessayer » ne renvoie pas une vidéo déjà arrivée.
+      let url = null;
+      await agir(async () => {
+        if (!url) {
+          const envoi = await api.envoyerVideo(fichier, t => statut(t));
+          if (!envoi || !envoi.success) return envoi;
+          url = envoi.url;
+        }
+        return api.enregistrerVideo(url);
+      }, r => { e.video = r.data.videoUrl; }, { enCours: 'Préparation de la vidéo…', fait: 'Vidéo en ligne sur votre boutique' });
+    }
+    $('ve-video-boutique').onchange = () => {
+      const f = ($('ve-video-boutique').files || [])[0];
+      try { $('ve-video-boutique').value = ''; } catch { /* certains navigateurs refusent */ }
+      if (f) ajouterVideoBoutique(f);
+    };
 
     // ── Étapes 2 à 4 : complétées par les tâches suivantes ──
     // ── Outils communs aux étapes 2 et 3 ──

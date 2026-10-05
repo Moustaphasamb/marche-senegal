@@ -44,6 +44,26 @@
     return fichier && String(fichier.type || '').startsWith('video/') ? null : 'Choisissez une vidéo du tour de votre boutique.';
   }
 
+  // ── Vidéo de ma boutique (15 à 30 s, lue telle quelle sur la page boutique) ──
+  const VIDEO_MAX_OCTETS = 100 * 1024 * 1024; // limite de l'offre Cloudinary
+
+  function verifierFichierVideo(fichier) {
+    const refus = verifierVideo(fichier);
+    if (refus) return refus;
+    if (fichier.size > VIDEO_MAX_OCTETS) return 'La vidéo dépasse 100 Mo : filmez 15 à 30 secondes, ou baissez la qualité vidéo de votre appareil photo.';
+    return null;
+  }
+
+  // Lecture en 4G : 720 px, qualité et codec choisis par Cloudinary, toujours en mp4.
+  function videoLegere(url) {
+    return String(url).replace('/video/upload/', '/video/upload/c_limit,w_720,q_auto,vc_auto/').replace(/\.[a-z0-9]+$/i, '.mp4');
+  }
+
+  // Image d'aperçu : la vidéo à 1 seconde, en JPEG.
+  function afficheVideo(url) {
+    return String(url).replace('/video/upload/', '/video/upload/so_1,c_limit,w_720/').replace(/\.[a-z0-9]+$/i, '.jpg');
+  }
+
   function verifierDureeVideo(duree) {
     if (!Number.isFinite(duree) || duree <= 0) return VIDEO_ILLISIBLE;
     if (duree < VIDEO_MIN_S) return 'La vidéo est trop courte : filmez 20 à 30 secondes en faisant un tour complet sur vous-même.';
@@ -218,7 +238,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, assemblerAdresses, extraireImages, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, assemblerAdresses, extraireImages, envoyerVideo, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -240,6 +260,9 @@
       envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
       // `suivi` reçoit la progression (« Envoi des photos : 4 sur 11… ») pour l'écran.
       assembler360: async (fichiers, suivi) => marquer(await envoyerSerie(fichiers, suivi)),
+      // Vidéo de ma boutique : envoi par morceaux (page), puis enregistrement de l'adresse.
+      envoyerVideo: async (fichier, suivi) => marquer(await envoyerVideo(fichier, suivi)),
+      enregistrerVideo: url => appel('/api/shops/me/video', avec('PUT', { url })),
       // Vidéo du tour → images, sur le téléphone : la vidéo elle-même n'est jamais envoyée.
       videoEnImages: async (fichier, suivi) => {
         try { return { success: true, fichiers: await extraireImages(fichier, suivi) }; } catch (erreur) {
@@ -274,7 +297,8 @@
   }
 
   const api = {
-    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, IMAGES_VIDEO, instantsVideo, verifierVideo, verifierDureeVideo, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
+    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, IMAGES_VIDEO, instantsVideo, verifierVideo, verifierDureeVideo,
+    verifierFichierVideo, videoLegere, afficheVideo, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
     produitsNonPlaces, controles, bilan, lienWhatsApp, creerApi
   };

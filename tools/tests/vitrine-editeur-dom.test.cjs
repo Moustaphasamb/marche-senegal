@@ -68,7 +68,7 @@ async function monter(init = {}) {
   const confirmations = [];
   const ctl = w.VitrineEditeur.monter({
     api: s.api,
-    boutique: { id: 'b1', name: 'Awa Beauté', status: init.statut || 'ACTIVE' },
+    boutique: { id: 'b1', name: 'Awa Beauté', status: init.statut || 'ACTIVE', videoUrl: init.videoUrl || null },
     lienApercu: 'marche-senegal-boutique.html?id=b1&apercu=brouillon',
     lienPublic: 'https://ms.test/boutiques/b1',
     confirmer: async m => { confirmations.push(m); return !init.refuserConfirmation; }
@@ -591,6 +591,61 @@ test('finitions : après une action, le focus revient sur le titre de l étape',
 });
 
 // L'assemblage 360° du site a été retiré (2026-10-05) : il échouait trop souvent.
+// ── Vidéo de ma boutique ──
+async function choisirVideoBoutique(t, fichier) {
+  const champ = t.q('#ve-video-boutique');
+  Object.defineProperty(champ, 'files', { configurable: true, value: [fichier] });
+  champ.dispatchEvent(new t.w.Event('change'));
+  for (let i = 0; i < 8; i++) await t.attendre();
+}
+
+test('sans vidéo : la carte propose de filmer ou de choisir une vidéo', async () => {
+  const t = await monter();
+  const carte = t.q('.ve-video-carte');
+  assert.ok(carte, 'carte vidéo');
+  assert.match(carte.textContent, /15 à 30 secondes/);
+  assert.ok(t.bouton('Filmer ou choisir une vidéo'));
+  assert.match(t.q('#ve-video-boutique').getAttribute('accept'), /video/);
+  assert.equal(carte.querySelector('video'), null);
+});
+
+test('une vidéo choisie est envoyée, enregistrée, puis montrée en version légère', async () => {
+  const t = await monter();
+  const enregistrees = [];
+  t.api.envoyerVideo = async (fichier, suivi) => { suivi('Envoi de la vidéo : 50 %'); return { success: true, url: 'https://res.cloudinary.com/demo/video/upload/v17/marche-senegal/videos/b1/tour.mp4' }; };
+  t.api.enregistrerVideo = async url => { enregistrees.push(url); return { success: true, data: { videoUrl: url } }; };
+  await choisirVideoBoutique(t, new t.w.File(['v'], 'boutique.mp4', { type: 'video/mp4' }));
+  assert.deepEqual(enregistrees, ['https://res.cloudinary.com/demo/video/upload/v17/marche-senegal/videos/b1/tour.mp4']);
+  const video = t.q('.ve-video-carte video');
+  assert.ok(video, 'lecteur affiché');
+  assert.match(video.getAttribute('src'), /c_limit,w_720,q_auto,vc_auto/);
+  assert.match(t.q('#ve-status').textContent, /Vidéo en ligne/);
+  assert.ok(t.bouton('Remplacer la vidéo'));
+});
+
+test('retirer la vidéo, après confirmation', async () => {
+  const t = await monter({ videoUrl: 'https://res.cloudinary.com/demo/video/upload/v17/marche-senegal/videos/b1/tour.mp4' });
+  const enregistrees = [];
+  t.api.enregistrerVideo = async url => { enregistrees.push(url); return { success: true, data: { videoUrl: url } }; };
+  assert.ok(t.q('.ve-video-carte video'), 'vidéo existante affichée');
+  t.bouton('Retirer la vidéo').click();
+  for (let i = 0; i < 8; i++) await t.attendre();
+  assert.deepEqual(enregistrees, [null]);
+  assert.equal(t.confirmations.length, 1);
+  assert.equal(t.q('.ve-video-carte video'), null);
+});
+
+test('une vidéo trop lourde est refusée avant tout envoi', async () => {
+  const t = await monter();
+  let envoye = false;
+  t.api.envoyerVideo = async () => { envoye = true; return { success: true, url: 'x' }; };
+  const lourde = new t.w.File(['v'], 'longue.mp4', { type: 'video/mp4' });
+  Object.defineProperty(lourde, 'size', { value: 150 * 1024 * 1024 });
+  await choisirVideoBoutique(t, lourde);
+  assert.equal(envoye, false);
+  assert.match(t.q('#ve-status').textContent, /100 Mo/);
+});
+
 test('étape photos : une seule carte photo, le conseil Panorama, plus aucune fabrication de 360°', async () => {
   const t = await monter();
   const panneau = t.q('#ve-panel');
