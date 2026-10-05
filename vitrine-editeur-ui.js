@@ -183,11 +183,12 @@
     // ── Étape 1 : photos ──
     function etapePhotos(p) {
       p.appendChild(el('h2', null, '1. Les photos de votre boutique'));
-      p.appendChild(el('p', 've-help', `Deux façons de montrer votre boutique, à combiner si vous voulez. Bonne lumière, sans client reconnaissable ni document privé. Jusqu’à ${C.MAX_VUES} photos.`));
+      p.appendChild(el('p', 've-help', `Un rayon, un mur, l’entrée : montrez votre boutique telle qu’elle est. Bonne lumière, sans client reconnaissable ni document privé. Jusqu’à ${C.MAX_VUES} photos.`));
       const plein = e.vues.length >= C.MAX_VUES;
-      const choix = el('div', 've-choix');
-      choix.append(carteVue360(plein), cartePhotoSimple(plein));
-      p.appendChild(choix);
+      // L'assemblage 360° fait par le site a été retiré (2026-10-05) : il échouait trop
+      // souvent avec des photos prises à la main. Pour une vue large, le mode Panorama
+      // du téléphone assemble lui-même, bien mieux. Les vues 360° déjà créées restent.
+      p.appendChild(cartePhotoSimple(plein));
       if (plein) p.appendChild(el('p', 've-help', `${C.MAX_VUES} photos au maximum : retirez-en une pour en ajouter.`));
       if (e.vitrine && !e.vues.length) {
         const carte = el('div', 've-card');
@@ -243,8 +244,6 @@
       });
       if (e.vues.length) p.appendChild(el('h3', 've-sous-titre', `Vos photos (${e.vues.length})`));
       p.appendChild(liste);
-      const simples = e.vues.filter(v => !estRonde(v.imageUrl) && (rondes.has(v.imageUrl) || !root.Vue360));
-      if (simples.length >= C.SERIE_MIN) p.appendChild(carteAssembler(simples, plein));
       const apercu = e.vues.find(v => v.id === idApercu());
       if (apercu) {
         p.appendChild(el('h3', 've-sous-titre', 'Aperçu : tournez dans votre boutique'));
@@ -260,46 +259,11 @@
       return (choisie || rondesVues[rondesVues.length - 1] || {}).id;
     }
 
-    // Vue 360° : le vendeur fait le tour de sa boutique en photos, le serveur les recolle.
-    function carteVue360(plein) {
-      const carte = el('section', 've-card ve-choix-carte ve-360-carte');
-      carte.setAttribute('aria-label', 'Vue 360° de la boutique');
-      const tete = el('div', 've-choix-tete');
-      tete.append(el('span', 'v360-badge', '360°'), el('span', 've-conseille', 'Conseillé'));
-      carte.appendChild(tete);
-      carte.appendChild(el('h3', null, 'Vue 360° de ma boutique'));
-      carte.appendChild(el('p', 've-help', 'Le client tourne dans votre boutique, à gauche et à droite, comme s’il y était.'));
-      // Filmer est le choix principal : un seul geste, connu de tous (statut WhatsApp),
-      // et des images qui se chevauchent toujours assez pour l'assemblage.
-      const guide = el('details', 've-guide');
-      guide.open = !e.vues.length;
-      guide.appendChild(el('summary', null, 'Comment filmer'));
-      const etapes = el('ol', 've-360-etapes');
-      for (const t of [
-        'Placez-vous au milieu de la boutique.',
-        'Téléphone droit, à hauteur des yeux, en mode vidéo normal (ni ralenti ni HDR).',
-        'Tournez lentement sur vous-même vers la droite, pendant 20 à 30 secondes, jusqu’à revenir au point de départ.',
-        'Restez sur place et évitez que des personnes passent devant.'
-      ]) etapes.appendChild(el('li', null, t));
-      guide.appendChild(etapes);
-      carte.appendChild(guide);
-      const filmer = bouton('ve-btn ve-primary', '🎥 Filmer ma boutique');
-      filmer.disabled = e.occupe || plein;
-      filmer.onclick = () => $('ve-video').click();
-      carte.appendChild(filmer);
-      const photos = bouton('ve-btn', `ou choisir mes photos du tour (${C.SERIE_MIN} à ${C.SERIE_MAX})`);
-      photos.disabled = e.occupe || plein;
-      photos.onclick = () => $('ve-serie').click();
-      carte.appendChild(photos);
-      return carte;
-    }
-
     function cartePhotoSimple(plein) {
       const carte = el('section', 've-card ve-choix-carte');
-      carte.setAttribute('aria-label', 'Photo simple');
-      carte.appendChild(el('div', 've-choix-tete')).appendChild(el('span', 've-genre', 'Photo simple'));
-      carte.appendChild(el('h3', null, 'Une photo d’un rayon ou d’un mur'));
-      carte.appendChild(el('p', 've-help', 'Une seule photo, sans tourner. Une photo 360° prise avec une caméra 360° s’ajoute aussi ici.'));
+      carte.setAttribute('aria-label', 'Ajouter une photo');
+      carte.appendChild(el('h3', null, 'Ajouter une photo de la boutique'));
+      carte.appendChild(el('p', 've-help', 'Astuce : pour une vue large, utilisez le mode « Panorama » de votre appareil photo, puis ajoutez-la ici comme une photo. Une photo 360° prise avec une caméra 360° s’ajoute aussi ici.'));
       const ajout = el('div', 've-add');
       const galerie = bouton('ve-btn', 'Ajouter une photo');
       galerie.disabled = plein || e.occupe;
@@ -311,105 +275,6 @@
       carte.appendChild(ajout);
       return carte;
     }
-
-    // Photos ajoutées une par une : si elles font le tour de la boutique, on les assemble.
-    function carteAssembler(simples, plein) {
-      const carte = el('section', 've-card ve-assembler');
-      carte.appendChild(el('h3', null, `Vos ${simples.length} photos font le tour de la boutique ?`));
-      carte.appendChild(el('p', 've-help', 'Assemblez-les en une vue 360°, dans l’ordre de la liste. Elles doivent montrer la même boutique, prises en tournant sur place.'));
-      const b = bouton('ve-btn ve-primary', 'Assembler ces photos en 360°');
-      b.disabled = e.occupe || plein;
-      b.onclick = () => assemblerVues(simples);
-      carte.appendChild(b);
-      if (plein) carte.appendChild(el('p', 've-help', 'Retirez d’abord une photo : la vue 360° prendra sa place.'));
-      return carte;
-    }
-
-    async function assemblerVues(simples) {
-      let url = null;
-      const r = await agir(async () => {
-        if (!url) {
-          const envoi = await api.assemblerVues(simples.map(v => v.imageUrl), t => statut(t));
-          if (!envoi || !envoi.success) return envoi;
-          url = envoi.url;
-        }
-        return api.creerVue({ title: 'Vue 360°', imageUrl: url });
-      }, r => { e.vues = [...e.vues, r.data]; e.apercu = r.data.id; rondes.set(r.data.imageUrl, true); }, {
-        enCours: `Assemblage de vos ${simples.length} photos en vue 360°… Environ une minute, même en 4G.`,
-        fait: 'Vue 360° créée · pas encore publiée'
-      });
-      if (!r || !r.success) return;
-      const avecPoints = simples.filter(v => (v.hotspots || []).length).length;
-      const question = `Vue 360° créée. Retirer les ${simples.length} photos séparées ?`
-        + (avecPoints ? ` ${avecPoints} d’entre elles ont des produits placés, qui seront retirés aussi.` : '')
-        + ' Votre vitrine en ligne ne change pas avant la publication.';
-      if (!await confirmer(question)) return;
-      const ids = new Set(simples.map(v => v.id));
-      await agir(async () => {
-        for (const v of simples) {
-          if (!e.vues.some(x => x.id === v.id)) continue;
-          const s = await api.supprimerVue(v.id);
-          if (!s || !s.success) return s;
-          e.vues = e.vues.filter(x => x.id !== v.id);
-        }
-        return { success: true };
-      }, () => { e.vues = e.vues.filter(x => !ids.has(x.id)); }, { fait: 'Photos séparées retirées · pas encore publié' });
-    }
-
-    async function ajouterSerie360(fichiers) {
-      const refus = C.verifierSerie(fichiers);
-      if (refus) { statut(refus, true); return; }
-      const serie = C.ordonnerSerie(fichiers);
-      // Comme pour une photo : après une coupure, « Réessayer » ne relance pas l'assemblage déjà fait.
-      let url = null;
-      await agir(async () => {
-        if (!url) {
-          // La progression (« Envoi des photos : 4 sur 11… », reprise après coupure) s'affiche ici.
-          const envoi = await api.assembler360(serie, t => statut(t));
-          if (!envoi || !envoi.success) return envoi;
-          url = envoi.url;
-        }
-        return api.creerVue({ title: 'Vue 360°', imageUrl: url });
-      }, r => { e.vues = [...e.vues, r.data]; e.apercu = r.data.id; rondes.set(r.data.imageUrl, true); }, {
-        enCours: `Préparation de vos ${serie.length} photos pour la vue 360°…`,
-        fait: 'Vue 360° créée · pas encore publiée'
-      });
-    }
-    // Photo de l'article de près (partie 2b) : l'IA recommence avec elle, et elle servira de photo du produit.
-    $('ve-photo-produit').onchange = async () => {
-      const f = $('ve-photo-produit').files && $('ve-photo-produit').files[0];
-      try { $('ve-photo-produit').value = ''; } catch { /* certains navigateurs refusent */ }
-      const vue = e.vues[e.courante];
-      if (!f || !vue || !e.choix) return;
-      const r = await api.imageDuFichier(f);
-      if (!r.success) { statut(r.message, true); return; }
-      reconnaitre(vue, r.image);
-    };
-    $('ve-serie').onchange = () => {
-      const fichiers = Array.from($('ve-serie').files || []);
-      try { $('ve-serie').value = ''; } catch { /* certains navigateurs refusent */ }
-      if (fichiers.length) ajouterSerie360(fichiers);
-    };
-
-    // « Filmer ma boutique » : la vidéo est découpée en images sur le téléphone, puis
-    // ces images suivent exactement le chemin des photos du tour (envoi 4G, assemblage).
-    async function ajouterVideo360(fichier) {
-      const refus = C.verifierVideo(fichier);
-      if (refus) { statut(refus, true); return; }
-      if (e.occupe) { statut('Patientez : un enregistrement est en cours.'); return; }
-      e.occupe = true;
-      statut('Préparation de la vidéo…');
-      rendre();
-      let r;
-      try { r = await api.videoEnImages(fichier, t => statut(t)); } finally { e.occupe = false; }
-      if (!r || !r.success) { statut((r && r.message) || 'Cette vidéo n’a pas pu être lue.', true); rendre(); return; }
-      await ajouterSerie360(r.fichiers);
-    }
-    $('ve-video').onchange = () => {
-      const fichier = ($('ve-video').files || [])[0];
-      try { $('ve-video').value = ''; } catch { /* certains navigateurs refusent */ }
-      if (fichier) ajouterVideo360(fichier);
-    };
 
     async function ajouterPhoto(fichier) {
       const refus = C.verifierFichier(fichier);
