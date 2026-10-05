@@ -604,8 +604,64 @@ test('la carte 360° guide le vendeur et ouvre le choix des photos du tour', asy
   const carte = t.q('.ve-360-carte');
   assert.ok(carte, 'carte 360°');
   assert.match(carte.textContent, /milieu de la boutique/);
-  assert.match(carte.textContent, /6 à 20 photos/);
+  assert.match(carte.textContent, /photos du tour \(6 à 20\)/);
   assert.ok(t.q('#ve-serie').multiple, 'plusieurs photos à la fois');
+});
+
+// ── Filmer ma boutique ──
+async function choisirVideo(t, fichier) {
+  const champ = t.q('#ve-video');
+  Object.defineProperty(champ, 'files', { configurable: true, value: [fichier] });
+  champ.dispatchEvent(new t.w.Event('change'));
+  for (let i = 0; i < 8; i++) await t.attendre();
+}
+
+test('la carte 360° propose d’abord de filmer la boutique, les photos restent possibles', async () => {
+  const t = await monter();
+  const carte = t.q('.ve-360-carte');
+  assert.match(carte.textContent, /Comment filmer/);
+  assert.match(carte.textContent, /20 à 30 secondes/);
+  const filmer = [...carte.querySelectorAll('button')].find(b => /Filmer ma boutique/.test(b.textContent));
+  assert.ok(filmer, 'bouton Filmer ma boutique');
+  assert.ok(filmer.classList.contains('ve-primary'), 'c’est le choix principal');
+  assert.ok([...carte.querySelectorAll('button')].some(b => /photos du tour/.test(b.textContent)), 'les photos restent possibles');
+  assert.match(t.q('#ve-video').getAttribute('accept'), /video/);
+});
+
+test('une vidéo du tour devient des images, assemblées en une vue 360°', async () => {
+  const t = await monter();
+  const series = [];
+  t.api.videoEnImages = async (fichier, suivi) => {
+    suivi('Préparation de la vidéo : image 1 sur 18…');
+    return { success: true, fichiers: Array.from({ length: 18 }, (_, i) => new t.w.File(['x'], `image-${String(i + 1).padStart(2, '0')}.jpg`, { type: 'image/jpeg', lastModified: 1000 + i })) };
+  };
+  t.api.assembler360 = async fichiers => { series.push(Array.from(fichiers, f => f.name)); return { success: true, url: 'https://ex.test/vue-360.jpg' }; };
+  await choisirVideo(t, new t.w.File(['v'], 'tour.mp4', { type: 'video/mp4' }));
+  assert.equal(series.length, 1);
+  assert.equal(series[0].length, 18);
+  assert.equal(series[0][0], 'image-01.jpg');
+  assert.equal(series[0][17], 'image-18.jpg');
+  assert.deepEqual(t.appels.at(-1), ['creerVue', { title: 'Vue 360°', imageUrl: 'https://ex.test/vue-360.jpg' }]);
+  assert.match(t.q('#ve-status').textContent, /Vue 360° créée/);
+});
+
+test('une vidéo illisible ou trop courte : message clair, rien n’est envoyé', async () => {
+  const t = await monter();
+  let envoye = false;
+  t.api.videoEnImages = async () => ({ success: false, message: 'La vidéo est trop courte : filmez 20 à 30 secondes en faisant un tour complet sur vous-même.' });
+  t.api.assembler360 = async () => { envoye = true; return { success: true, url: 'x' }; };
+  await choisirVideo(t, new t.w.File(['v'], 'tour.mp4', { type: 'video/mp4' }));
+  assert.equal(envoye, false);
+  assert.match(t.q('#ve-status').textContent, /trop courte/);
+});
+
+test('un fichier qui n’est pas une vidéo est refusé avant tout traitement', async () => {
+  const t = await monter();
+  let traite = false;
+  t.api.videoEnImages = async () => { traite = true; return { success: true, fichiers: [] }; };
+  await choisirVideo(t, new t.w.File(['x'], 'photo.jpg', { type: 'image/jpeg' }));
+  assert.equal(traite, false);
+  assert.match(t.q('#ve-status').textContent, /vidéo/);
 });
 
 test('les photos du tour sont assemblées dans l’ordre de prise, puis deviennent une vue', async () => {

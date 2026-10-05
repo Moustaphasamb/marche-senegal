@@ -27,6 +27,30 @@
   const SERIE_MIN = 6;
   const SERIE_MAX = 20;
 
+  // « Filmer ma boutique » : le vendeur filme 20 à 30 s en tournant sur place, le
+  // téléphone en tire 18 images (deux voisines se chevauchent largement, ce qui rend
+  // l'assemblage plus sûr qu'avec des photos), et seules ces images partent en 4G.
+  const IMAGES_VIDEO = 18;
+  const VIDEO_MIN_S = 8;
+  const VIDEO_MAX_S = 90;
+  const VIDEO_ILLISIBLE = 'Cette vidéo n’a pas pu être lue. Filmez en mode vidéo normal (ni ralenti ni HDR), puis réessayez.';
+
+  // Milieu de chaque tranche de la vidéo : ni la toute première ni la toute dernière image.
+  function instantsVideo(duree, nombre) {
+    return Array.from({ length: nombre }, (_, i) => duree * (i + 0.5) / nombre);
+  }
+
+  function verifierVideo(fichier) {
+    return fichier && String(fichier.type || '').startsWith('video/') ? null : 'Choisissez une vidéo du tour de votre boutique.';
+  }
+
+  function verifierDureeVideo(duree) {
+    if (!Number.isFinite(duree) || duree <= 0) return VIDEO_ILLISIBLE;
+    if (duree < VIDEO_MIN_S) return 'La vidéo est trop courte : filmez 20 à 30 secondes en faisant un tour complet sur vous-même.';
+    if (duree > VIDEO_MAX_S) return 'La vidéo est trop longue : 1 minute 30 au maximum, 20 à 30 secondes suffisent.';
+    return null;
+  }
+
   // L'assemblage suit l'ordre de prise : l'heure de la photo, puis son numéro
   // (IMG_9 avant IMG_10) quand le téléphone donne la même heure à toutes.
   function ordonnerSerie(fichiers) {
@@ -194,7 +218,7 @@
   const RESEAU = 'Erreur de connexion au serveur';
   const marquer = r => (r && r.success === false && r.message === RESEAU ? { ...r, reseau: true } : r);
 
-  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, assemblerAdresses, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
+  function creerApi({ apiCall, envoyerFichier, envoyerSerie, telechargerPhotos, assemblerAdresses, extraireImages, decouperPhoto, envoyerPhotoProduit, fichierEnImage }) {
     const appel = async (...args) => marquer(await apiCall(...args));
     const base = '/api/shops/me/shopvision';
     const avec = (method, corps) => ({ method, body: JSON.stringify(corps) });
@@ -216,6 +240,12 @@
       envoyerPhoto: async fichier => marquer(await envoyerFichier(fichier)),
       // `suivi` reçoit la progression (« Envoi des photos : 4 sur 11… ») pour l'écran.
       assembler360: async (fichiers, suivi) => marquer(await envoyerSerie(fichiers, suivi)),
+      // Vidéo du tour → images, sur le téléphone : la vidéo elle-même n'est jamais envoyée.
+      videoEnImages: async (fichier, suivi) => {
+        try { return { success: true, fichiers: await extraireImages(fichier, suivi) }; } catch (erreur) {
+          return { success: false, message: erreur && erreur.vendeur ? erreur.message : VIDEO_ILLISIBLE };
+        }
+      },
       // Partie 2b : l'IA reconnaît l'article (zone découpée dans la photo, ou photo de près).
       decouper: async (adresse, pos) => {
         try { return { success: true, image: await decouperPhoto(adresse, zoneDeDecoupe(pos)) }; } catch { return { success: false, message: RESEAU, reseau: true }; }
@@ -244,7 +274,7 @@
   }
 
   const api = {
-    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
+    MAX_VUES, MAX_POINTS, SERIE_MIN, SERIE_MAX, IMAGES_VIDEO, instantsVideo, verifierVideo, verifierDureeVideo, positionDansPhoto, zoneDansPhoto, zoneDeDecoupe, verifierFiche, verifierFichier, ordonnerSerie, verifierSerie, deplacer, rayonsOrdonnes,
     ajouterPoint, remplacerPoint, retirerPoint, poserEtiquette, retirerEtiquette, etiquetteDe,
     produitsNonPlaces, controles, bilan, lienWhatsApp, creerApi
   };

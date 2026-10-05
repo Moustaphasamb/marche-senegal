@@ -200,6 +200,43 @@ test('l’assemblage 360° passe par l’envoi de série, une coupure est marqu�
   assert.equal(r.reseau, true);
 });
 
+// ── Filmer ma boutique : une vidéo du tour devient une série d'images ──
+test('les images sont prises à intervalles réguliers sur toute la vidéo', () => {
+  const t = E.instantsVideo(24, E.IMAGES_VIDEO);
+  assert.equal(t.length, E.IMAGES_VIDEO);
+  assert.ok(t.every((x, i) => i === 0 || x > t[i - 1]), 'dans l’ordre');
+  assert.ok(t[0] > 0 && t.at(-1) < 24, 'ni avant le début ni après la fin');
+  assert.ok(E.IMAGES_VIDEO >= E.SERIE_MIN && E.IMAGES_VIDEO <= E.SERIE_MAX, 'dans les limites de l’assemblage');
+});
+
+test('seule une vidéo de 8 s à 1 min 30 est acceptée, avec un conseil clair', () => {
+  assert.equal(E.verifierVideo({ type: 'video/mp4' }), null);
+  assert.equal(E.verifierVideo({ type: 'video/quicktime' }), null);
+  assert.match(E.verifierVideo({ type: 'image/jpeg' }), /vidéo/);
+  assert.match(E.verifierVideo(null), /vidéo/);
+  assert.match(E.verifierDureeVideo(4), /trop courte/);
+  assert.match(E.verifierDureeVideo(120), /trop longue/);
+  assert.equal(E.verifierDureeVideo(25), null);
+  assert.match(E.verifierDureeVideo(NaN), /n’a pas pu être lue/);
+});
+
+test('videoEnImages rend les images, ou un message pour le vendeur', async () => {
+  const images = Array.from({ length: 18 }, (_, i) => ({ name: `image-${i + 1}.jpg` }));
+  const ok = E.creerApi({ apiCall: async () => ({}), extraireImages: async (f, suivi) => { suivi('image 1 sur 18'); return images; } });
+  const messages = [];
+  assert.deepEqual(await ok.videoEnImages({ type: 'video/mp4' }, m => messages.push(m)), { success: true, fichiers: images });
+  assert.deepEqual(messages, ['image 1 sur 18']);
+
+  const courte = E.creerApi({ apiCall: async () => ({}), extraireImages: async () => { throw { vendeur: true, message: 'La vidéo est trop courte.' }; } });
+  assert.deepEqual(await courte.videoEnImages({ type: 'video/mp4' }), { success: false, message: 'La vidéo est trop courte.' });
+
+  const illisible = E.creerApi({ apiCall: async () => ({}), extraireImages: async () => { throw new Error('decode'); } });
+  const r = await illisible.videoEnImages({ type: 'video/mp4' });
+  assert.equal(r.success, false);
+  assert.match(r.message, /n’a pas pu être lue/);
+  assert.doesNotMatch(r.message, /decode/);
+});
+
 test('4G : la progression de l’envoi remonte jusqu’à l’écran', async () => {
   const messages = [];
   const api = E.creerApi({

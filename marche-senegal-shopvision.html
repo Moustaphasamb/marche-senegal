@@ -55,6 +55,8 @@
   <input id="ve-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
   <input id="ve-camera" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
   <input id="ve-serie" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  <!-- Sans « capture » : le téléphone propose de filmer ou de choisir une vidéo déjà prise. -->
+  <input id="ve-video" type="file" accept="video/*" hidden>
   <input id="ve-photo-produit" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
 </section>
 <!-- /ve -->
@@ -117,6 +119,51 @@
         return blob || fichier;
       } catch {
         return fichier;
+      }
+    }
+
+    // « Filmer ma boutique » : la vidéo est lue sur le téléphone et 18 images en sont
+    // tirées, à 1 200 px comme les photos. La vidéo (30 à 60 Mo) ne part jamais en 4G.
+    async function extraireImages(fichier, suivi) {
+      const C = VitrineEditeurCore;
+      const adresse = URL.createObjectURL(fichier);
+      const video = document.createElement('video');
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      try {
+        video.src = adresse;
+        await new Promise((ok, ko) => {
+          video.onloadedmetadata = ok;
+          video.onerror = () => ko(new Error('vidéo illisible'));
+        });
+        const refus = C.verifierDureeVideo(video.duration);
+        if (refus) throw { vendeur: true, message: refus };
+        const k = Math.min(1, 1200 / Math.max(video.videoWidth, video.videoHeight));
+        const toile = document.createElement('canvas');
+        toile.width = Math.round(video.videoWidth * k);
+        toile.height = Math.round(video.videoHeight * k);
+        const pinceau = toile.getContext('2d');
+        const debut = Date.now();
+        const images = [];
+        const instants = C.instantsVideo(video.duration, C.IMAGES_VIDEO);
+        for (const [i, instant] of instants.entries()) {
+          if (suivi) suivi(`Préparation de la vidéo : image ${i + 1} sur ${instants.length}…`);
+          await new Promise((ok, ko) => {
+            const minuterie = setTimeout(() => ko(new Error('lecture trop lente')), 15000);
+            video.onseeked = () => { clearTimeout(minuterie); ok(); };
+            video.currentTime = instant;
+          });
+          pinceau.drawImage(video, 0, 0, toile.width, toile.height);
+          const blob = await new Promise(ok => toile.toBlob(ok, 'image/jpeg', 0.85));
+          if (!blob) throw new Error('image vide');
+          // L'heure suit l'ordre de la vidéo : l'assemblage range la série par heure.
+          images.push(new File([blob], 'image-' + String(i + 1).padStart(2, '0') + '.jpg', { type: 'image/jpeg', lastModified: debut + i * 1000 }));
+        }
+        return images;
+      } finally {
+        URL.revokeObjectURL(adresse);
+        video.removeAttribute('src');
       }
     }
 
@@ -282,7 +329,7 @@
       $('publicShopLink').hidden = false;
       $('ve').hidden = false;
       const editeur = VitrineEditeur.monter({
-        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, assemblerAdresses, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
+        api: VitrineEditeurCore.creerApi({ apiCall, envoyerFichier: envoyerPhotoVitrine, envoyerSerie: envoyerSerie360, telechargerPhotos, assemblerAdresses, extraireImages, decouperPhoto, envoyerPhotoProduit, fichierEnImage }),
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         // Adresse propre et partageable (WhatsApp) : /boutiques/:id, servie par api/page.js.

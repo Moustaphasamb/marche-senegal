@@ -269,23 +269,28 @@
       carte.appendChild(tete);
       carte.appendChild(el('h3', null, 'Vue 360° de ma boutique'));
       carte.appendChild(el('p', 've-help', 'Le client tourne dans votre boutique, à gauche et à droite, comme s’il y était.'));
+      // Filmer est le choix principal : un seul geste, connu de tous (statut WhatsApp),
+      // et des images qui se chevauchent toujours assez pour l'assemblage.
       const guide = el('details', 've-guide');
       guide.open = !e.vues.length;
-      guide.appendChild(el('summary', null, 'Comment prendre les photos'));
+      guide.appendChild(el('summary', null, 'Comment filmer'));
       const etapes = el('ol', 've-360-etapes');
       for (const t of [
         'Placez-vous au milieu de la boutique.',
-        'Téléphone droit, à hauteur des yeux, en mode photo normal.',
-        'Prenez une photo, tournez d’un petit pas vers la droite, reprenez une photo. Chaque photo reprend un tiers de la précédente.',
-        `Continuez jusqu’à revenir au point de départ : ${C.SERIE_MIN} à ${C.SERIE_MAX} photos, 12 en général.`,
+        'Téléphone droit, à hauteur des yeux, en mode vidéo normal (ni ralenti ni HDR).',
+        'Tournez lentement sur vous-même vers la droite, pendant 20 à 30 secondes, jusqu’à revenir au point de départ.',
         'Restez sur place et évitez que des personnes passent devant.'
       ]) etapes.appendChild(el('li', null, t));
       guide.appendChild(etapes);
       carte.appendChild(guide);
-      const b = bouton('ve-btn ve-primary', 'Choisir mes photos du tour');
-      b.disabled = e.occupe || plein;
-      b.onclick = () => $('ve-serie').click();
-      carte.appendChild(b);
+      const filmer = bouton('ve-btn ve-primary', '🎥 Filmer ma boutique');
+      filmer.disabled = e.occupe || plein;
+      filmer.onclick = () => $('ve-video').click();
+      carte.appendChild(filmer);
+      const photos = bouton('ve-btn', `ou choisir mes photos du tour (${C.SERIE_MIN} à ${C.SERIE_MAX})`);
+      photos.disabled = e.occupe || plein;
+      photos.onclick = () => $('ve-serie').click();
+      carte.appendChild(photos);
       return carte;
     }
 
@@ -384,6 +389,26 @@
       const fichiers = Array.from($('ve-serie').files || []);
       try { $('ve-serie').value = ''; } catch { /* certains navigateurs refusent */ }
       if (fichiers.length) ajouterSerie360(fichiers);
+    };
+
+    // « Filmer ma boutique » : la vidéo est découpée en images sur le téléphone, puis
+    // ces images suivent exactement le chemin des photos du tour (envoi 4G, assemblage).
+    async function ajouterVideo360(fichier) {
+      const refus = C.verifierVideo(fichier);
+      if (refus) { statut(refus, true); return; }
+      if (e.occupe) { statut('Patientez : un enregistrement est en cours.'); return; }
+      e.occupe = true;
+      statut('Préparation de la vidéo…');
+      rendre();
+      let r;
+      try { r = await api.videoEnImages(fichier, t => statut(t)); } finally { e.occupe = false; }
+      if (!r || !r.success) { statut((r && r.message) || 'Cette vidéo n’a pas pu être lue.', true); rendre(); return; }
+      await ajouterSerie360(r.fichiers);
+    }
+    $('ve-video').onchange = () => {
+      const fichier = ($('ve-video').files || [])[0];
+      try { $('ve-video').value = ''; } catch { /* certains navigateurs refusent */ }
+      if (fichier) ajouterVideo360(fichier);
     };
 
     async function ajouterPhoto(fichier) {
