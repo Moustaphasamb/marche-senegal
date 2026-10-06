@@ -79,3 +79,26 @@ test('menu vendeur : « Mes stories » après « Ma boutique »', () => {
   assert.match(menu, /cle: 'boutique'[^\n]*\n\s*\{ cle: 'stories', icone: '📸', texte: 'Mes stories', href: 'marche-senegal-mes-stories\.html' \}/);
   assert.match(menu, /'marche-senegal-mes-stories\.html':\s*'stories'/);
 });
+
+test('revue : une photo trop lourde est refusée avant l’envoi', async () => {
+  const { w, d } = await page();
+  let envois = 0;
+  w.envoyerPhotoStory = async () => { envois++; return { success: true, url: 'x' }; };
+  await w.choisirFichierStory(new w.File([new Uint8Array(5 * 1024 * 1024 + 10)], 'grosse.jpg', { type: 'image/jpeg' }));
+  await w.publierMaStory();
+  assert.equal(envois, 0);
+  assert.match(d.getElementById('st-etat').textContent, /5 Mo/);
+});
+
+test('revue : après un échec, le nouvel essai réutilise le fichier déjà envoyé', async () => {
+  const { w } = await page();
+  let envois = 0;
+  let essais = 0;
+  w.envoyerPhotoStory = async () => { envois++; return { success: true, url: 'https://res.cloudinary.com/d/image/upload/v1/marche-senegal/stories/b1/n.jpg' }; };
+  w.publierStory = async () => { essais++; return essais === 1 ? { success: false, message: 'Erreur de connexion au serveur' } : { success: true, data: { id: 'n1' } }; };
+  await w.choisirFichierStory(new w.File([new Uint8Array([1])], 'a.jpg', { type: 'image/jpeg' }));
+  await w.publierMaStory();
+  await w.publierMaStory();
+  assert.equal(essais, 2);
+  assert.equal(envois, 1);
+});

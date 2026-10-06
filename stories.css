@@ -23,7 +23,7 @@ body.st-ouvert{overflow:hidden}
 .st-finie i{width:100%}
 .st-active i{animation:st-remplir var(--duree,5000ms) linear forwards}
 .st-video .st-active i{animation:none}
-.st-pause .st-active i{animation-play-state:paused}
+.st-pause .st-active i,.st-attente .st-active i{animation-play-state:paused}
 @keyframes st-remplir{from{width:0}to{width:100%}}
 .st-tete{display:flex;align-items:center;gap:10px;padding:10px 12px;position:relative;z-index:2}
 .st-logo-lecteur .st-anneau{width:36px;height:36px;padding:0;background:#1B6B3A;font-size:.8rem}

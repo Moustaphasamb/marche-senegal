@@ -94,6 +94,26 @@ textarea,select{width:100%;padding:10px 12px;border:1.5px solid var(--border);bo
 let fichierStory = null;
 let typeStory = null;
 let planVendeur = 'FREE';
+// Adresse du fichier déjà envoyé : un nouvel essai de publication ne le renvoie pas.
+let urlEnvoyee = null;
+const MAX_PHOTO = 5 * 1024 * 1024;
+
+// Réduit la photo à 1080 × 1920 au plus (JPEG) : plus légère en 4G et sous la
+// limite de 5 Mo du serveur. Sans canvas utilisable, la photo part telle quelle.
+async function reduirePhoto(fichier) {
+  try {
+    if (typeof createImageBitmap !== 'function') return fichier;
+    const image = await createImageBitmap(fichier);
+    const echelle = Math.min(1, 1080 / image.width, 1920 / image.height);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(image.width * echelle);
+    canvas.height = Math.round(image.height * echelle);
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    if (image.close) image.close();
+    const reduite = await new Promise(ok => canvas.toBlob(ok, 'image/jpeg', 0.85));
+    return reduite && reduite.size < fichier.size ? reduite : fichier;
+  } catch { return fichier; }
+}
 
 const $ = id => document.getElementById(id);
 function etat(texte, erreur) {
@@ -122,6 +142,7 @@ async function choisirFichierStory(fichier) {
     if (refus) { etat(refus, true); return; }
   }
   fichierStory = fichier;
+  urlEnvoyee = null;
   typeStory = video ? 'VIDEO' : 'PHOTO';
   const apercu = $('st-apercu');
   apercu.replaceChildren();
@@ -138,7 +159,7 @@ async function choisirFichierStory(fichier) {
 }
 
 function annulerStory() {
-  fichierStory = null; typeStory = null;
+  fichierStory = null; typeStory = null; urlEnvoyee = null;
   $('st-formulaire').hidden = true;
   $('st-apercu').replaceChildren();
   $('st-legende').value = '';
@@ -151,18 +172,31 @@ async function publierMaStory() {
   if (!fichierStory) return;
   const bouton = $('st-publier');
   bouton.disabled = true;
-  etat(typeStory === 'VIDEO' ? 'Envoi de la vidéo : 0 %' : 'Envoi de la photo…');
-  const envoi = typeStory === 'VIDEO'
-    ? await EnvoiVideo.envoyer(fichierStory, {
+  if (!urlEnvoyee) {
+    let envoi;
+    if (typeStory === 'VIDEO') {
+      etat('Envoi de la vidéo : 0 %');
+      envoi = await EnvoiVideo.envoyer(fichierStory, {
         obtenirAutorisation: () => apiCall('/api/stories/video/autorisation', { method: 'POST' }),
         suivi: t => etat(t)
-      })
-    : await envoyerPhotoStory(fichierStory);
-  if (!envoi.success) { etat(envoi.message, true); bouton.disabled = false; return; }
+      });
+    } else {
+      etat('Envoi de la photo…');
+      const photo = await reduirePhoto(fichierStory);
+      if (photo.size > MAX_PHOTO) {
+        etat('Photo trop lourde : 5 Mo maximum. Reprenez-la en qualité normale, puis réessayez.', true);
+        bouton.disabled = false;
+        return;
+      }
+      envoi = await envoyerPhotoStory(photo);
+    }
+    if (!envoi.success) { etat(envoi.message, true); bouton.disabled = false; return; }
+    urlEnvoyee = envoi.url;
+  }
 
   const r = await publierStory({
     mediaType: typeStory,
-    mediaUrl: envoi.url,
+    mediaUrl: urlEnvoyee,
     caption: $('st-legende').value.trim() || null,
     productId: $('st-produit').value || null
   });

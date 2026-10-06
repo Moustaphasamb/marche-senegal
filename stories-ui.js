@@ -49,6 +49,9 @@
   // ── Lecteur ──
   function ouvrir(groupes, indexGroupe, options) {
     const dureePhoto = options.dureePhoto || C.PHOTO_MS;
+    // Délai de secours : une photo qui n'arrive pas (réseau coupé) est passée.
+    const attenteMax = options.attenteMax || 10000;
+    let enAttente = false;
     const vues = C.vuesDe(options.stockage);
     let pos = { g: indexGroupe, s: C.premiereAVoir(groupes[indexGroupe], vues) };
     let minuterie = null;
@@ -132,7 +135,8 @@
     function afficher() {
       arreterMinuterie();
       enPause = false;
-      lecteur.classList.remove('st-pause');
+      enAttente = false;
+      lecteur.classList.remove('st-pause', 'st-attente');
       const story = courante();
       const shop = boutique();
       lecteur.setAttribute('aria-label', 'Stories de ' + shop.name);
@@ -176,9 +180,20 @@
         const img = el('img');
         img.alt = story.caption || 'Story de ' + shop.name;
         img.addEventListener('error', () => { if (!ferme) avancer(); });
+        // En 4G, la photo met plusieurs secondes à arriver : ses 5 s ne comptent
+        // qu'une fois affichée, sinon elle passerait sans avoir été vue.
+        enAttente = true;
+        lecteur.classList.add('st-attente');
+        minuterie = setTimeout(avancer, attenteMax);
+        img.addEventListener('load', () => {
+          if (ferme || courante() !== story) return;
+          enAttente = false;
+          lecteur.classList.remove('st-attente');
+          if (enPause) { arreterMinuterie(); restePhoto = dureePhoto; debutPhoto = Date.now(); }
+          else lancerPhoto(dureePhoto);
+        });
         img.src = adresse;
         media.appendChild(img);
-        lancerPhoto(dureePhoto);
       }
       prechargerSuivante();
     }
@@ -197,6 +212,11 @@
       lecteur.classList.toggle('st-pause', oui);
       const video = media.querySelector('video');
       if (video) { if (oui) video.pause(); else jouer(video, video.muted); return; }
+      if (enAttente) {
+        arreterMinuterie();
+        if (!oui) minuterie = setTimeout(avancer, attenteMax);
+        return;
+      }
       if (oui) { arreterMinuterie(); restePhoto -= Date.now() - debutPhoto; }
       else lancerPhoto(Math.max(0, restePhoto));
     }

@@ -57,11 +57,14 @@ test('le lecteur : vue notée, avance seul, passe à la boutique suivante puis s
   assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a1');
   assert.equal(d.querySelector('.st-produit').hidden, true);
   assert.deepEqual(journal.vues[0], ['a1', '0b6f3c1e-1111-4222-8333-444455556666']);
+  d.querySelector('.st-media img').dispatchEvent(new w.Event('load'));
   await attendre(60);
   assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a2');
   assert.equal(d.querySelector('.st-produit').hidden, false);
+  d.querySelector('.st-media img').dispatchEvent(new w.Event('load'));
   await attendre(50);
   assert.equal(d.querySelector('.st-nom-lecteur').textContent, 'Tissus Sow');
+  d.querySelector('.st-media img').dispatchEvent(new w.Event('load'));
   await attendre(50);
   assert.equal(d.querySelector('.st-lecteur'), null);
   assert.equal(journal.fermetures, 1);
@@ -98,5 +101,26 @@ test('rouvrir une boutique reprend à la première story non vue', () => {
   options.dureePhoto = 100000;
   w.StoriesCore.noterVue(w.localStorage, 'a1');
   w.StoriesUI.ouvrir(groupes(), 0, options);
+  assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a2');
+});
+
+test('revue : en 4G, la photo ne compte son temps qu’une fois arrivée', async () => {
+  const { w, d, options } = monter();
+  options.dureePhoto = 30;
+  options.attenteMax = 100000;
+  w.StoriesUI.ouvrir(groupes(), 0, options);
+  await attendre(60);
+  assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a1');
+  d.querySelector('.st-media img').dispatchEvent(new w.Event('load'));
+  await attendre(60);
+  assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a2');
+});
+
+test('revue : une photo qui n’arrive jamais est passée après le délai de secours', async () => {
+  const { w, d, options } = monter();
+  options.dureePhoto = 100000;
+  options.attenteMax = 40;
+  w.StoriesUI.ouvrir(groupes(), 0, options);
+  await attendre(80);
   assert.equal(d.querySelector('.st-legende').textContent, 'Arrivage a2');
 });
