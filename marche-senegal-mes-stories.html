@@ -13,7 +13,11 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text)}
 button,input,select,textarea{font-family:inherit}
-.main{max-width:760px;margin:0 auto;padding:24px 4vw 60px}
+/* Même cadre que les autres pages vendeur : sous la barre fixe, à côté du menu. */
+.main{margin-top:var(--topbar-h);margin-left:var(--sidebar-w);padding:22px 28px 60px}
+.main>.carte{max-width:760px}
+@media(max-width:960px){.main{margin-left:0}}
+@media(max-width:600px){.main{padding:16px 4vw 50px}}
 .carte{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px}
 .carte h2{font-size:1.05rem;margin-bottom:6px}
 .aide{color:var(--muted);font-size:.85rem;margin-bottom:14px}
