@@ -61,6 +61,10 @@
 <!-- /ve -->
   </main>
   <script src="api.js"></script>
+  <script>
+  // Vitrine en pause (api.js) : hors atelier, retour à Ma boutique.
+  if (!vitrineVisible()) { location.replace('marche-senegal-ma-boutique.html'); }
+  </script>
   <script src="marche-senegal-menu-vendeur.js"></script>
   <script src="vitrine-editeur.js"></script>
   <script src="vue-360.js"></script>
@@ -69,6 +73,7 @@
   // Accès vendeur, puis l'assistant (vitrine-editeur-ui.js). Chaque action est
   // enregistrée en brouillon sur le serveur ; rien n'est public avant « Publier ».
   (async function () {
+    if (!vitrineVisible()) return; // en pause : la page part vers Ma boutique
     const $ = id => document.getElementById(id);
     $('menuButton').onclick = toggleSidebar;
 

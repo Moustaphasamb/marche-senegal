@@ -10,6 +10,25 @@ const API_URL = (window.location.hostname === 'localhost' || window.location.hos
   : PROD_API_URL;
 
 // ────────────────────────────────
+// « Ma vitrine » en pause (2026-10-06) : cachée aux vendeurs et aux acheteurs
+// (éditeur, photos cliquables, 360°, vidéo). Rien n'est supprimé : passer
+// VITRINE_ACTIVE à true rallume tout. En attendant, ?atelier=1 la rallume
+// pour cet onglet, pour continuer à la travailler ; ?atelier=0 l'éteint.
+// ────────────────────────────────
+const VITRINE_ACTIVE = false;
+function vitrineVisible() {
+  if (VITRINE_ACTIVE) return true;
+  const atelier = new URLSearchParams(window.location.search).get('atelier');
+  try {
+    if (atelier === '1') sessionStorage.setItem('ms-atelier', '1');
+    if (atelier === '0') sessionStorage.removeItem('ms-atelier');
+    return sessionStorage.getItem('ms-atelier') === '1';
+  } catch {
+    return atelier === '1';
+  }
+}
+
+// ────────────────────────────────
 // Fonction principale pour appeler l'API
 // ────────────────────────────────
 async function apiCall(endpoint, options = {}) {

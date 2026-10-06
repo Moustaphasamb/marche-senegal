@@ -650,8 +650,11 @@ async function brouillonAApercevoir(shop) {
 
 async function demarrerVisite(shop) {
   let scenes = [];
-  const brouillon = await brouillonAApercevoir(shop);
-  if (brouillon) {
+  // Vitrine en pause (api.js) : rayons et produits seulement, sans photos ni 360°.
+  const brouillon = vitrineVisible() ? await brouillonAApercevoir(shop) : null;
+  if (!vitrineVisible()) {
+    /* rien à charger */
+  } else if (brouillon) {
     scenes = brouillon.scenes;
     shop.rayonOrder = brouillon.rayonOrder;
     showToast('Aperçu de votre brouillon · pas encore publié');
@@ -661,7 +664,7 @@ async function demarrerVisite(shop) {
       if (r.success && Array.isArray(r.data)) scenes = r.data;
     } catch { /* sans photos, la page reste utilisable */ }
   }
-  if (!scenes.length) scenes = BoutiqueVisiteCore.sceneVitrine(shop);
+  if (!scenes.length && vitrineVisible()) scenes = BoutiqueVisiteCore.sceneVitrine(shop);
   let favoris = new Set();
   try {
     if (isLoggedIn() && getCurrentUser()?.role === 'BUYER') {
@@ -707,6 +710,7 @@ async function demarrerVisite(shop) {
 function afficherVideoBoutique(shop) {
   const section = document.getElementById('video-boutique');
   const url = shop && shop.videoUrl;
+  if (!vitrineVisible()) return; // vitrine en pause (api.js)
   if (!section || typeof url !== 'string' || !url.includes('/video/upload/')) return;
   const video = section.querySelector('video');
   video.src = url.replace('/video/upload/', '/video/upload/c_limit,w_720,q_auto,vc_auto/').replace(/\.[a-z0-9]+$/i, '.mp4');

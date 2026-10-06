@@ -130,6 +130,7 @@ function construireMenuVendeur() {
 
   const navigation = barre.querySelector('#sb-nav');
   ENTREES_MENU_VENDEUR.forEach(entree => {
+    if (entree.cle === 'shopvision' && !vitrineVisible()) return; // vitrine en pause (api.js)
     if (entree.section) {
       const titre = document.createElement('div');
       titre.className = 'sb-section-label';

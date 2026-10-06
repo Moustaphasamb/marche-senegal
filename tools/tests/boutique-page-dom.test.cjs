@@ -19,6 +19,8 @@ const shop = {
 async function charger({ scenes = [], extra = {}, brouillon = null, adresse = '?id=b1', vendeur = false } = {}) {
   const dom = new JSDOM(html, { url: 'http://localhost:5500/marche-senegal-boutique.html' + adresse, runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window;
+  // Vitrine en pause (api.js) : ces tests la vérifient en mode atelier ; la pause a son propre test.
+  w.sessionStorage.setItem('ms-atelier', '1');
   w.eval(lire('api.js'));
   w.fetch = async () => { throw new Error('réseau interdit dans ce test'); };
   w.getShop = async () => ({ success: true, data: structuredClone({ ...shop, ...extra }) });
