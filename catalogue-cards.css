@@ -1,0 +1,132 @@
+/* Même carte catalogue sur l'accueil, le marché et la vitrine boutique.
+   La recherche garde ses règles existantes dans recherche-refonte.css. */
+body.page-accueil .products-grid,
+body.page-marche .prods-grid,
+body.page-boutique .bv-cards{grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:16px}
+body.page-produit .similar-grid{grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:16px}
+
+body.page-accueil .prod-card,
+body.page-marche .prod-card,
+body.page-boutique .bv-card,
+body.page-produit .sim-card{display:flex;flex-direction:column;height:auto;overflow:hidden;border:1px solid #e7e7dd;border-radius:16px;background:#fffefa;box-shadow:0 8px 24px #1a3d2b12}
+
+body.page-accueil .prod-img,
+body.page-marche .prod-img,
+body.page-boutique .bv-card .bv-img,
+body.page-produit .sim-img{display:flex;align-items:center;justify-content:center;position:relative;height:265px;flex:0 0 265px;aspect-ratio:auto;background:#e8e9df!important;overflow:hidden}
+body.page-accueil .prod-img img,
+body.page-marche .prod-img img,
+body.page-boutique .bv-card .bv-img img,
+body.page-produit .sim-img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+body.page-accueil .prod-card:hover .prod-img img,
+body.page-marche .prod-card:hover .prod-img img,
+body.page-boutique .bv-card:hover .bv-img img,
+body.page-produit .sim-card:hover .sim-img img{transform:scale(1.035)}
+
+.catalogue-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;width:100%;height:100%;background:linear-gradient(145deg,#ede7d6,#d7e2d2);color:#526b55;text-align:center}
+.catalogue-placeholder span{font-family:Georgia,serif;font-size:48px;font-weight:700;line-height:1}
+.catalogue-placeholder small{max-width:135px;font:500 11px/1.4 Manrope,sans-serif;color:#526b55}
+
+body.page-accueil .prod-body,
+body.page-marche .prod-body,
+body.page-boutique .bv-info,
+body.page-produit .sim-body{display:flex;flex:0 0 auto;min-height:0;flex-direction:column;padding:10px 12px}
+body.page-accueil .prod-market,
+body.page-marche .prod-market-tag{flex:none;display:block;max-width:100%;padding:0;margin:0 0 4px;background:none;border-radius:0;color:#68806b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-accueil .prod-name,
+body.page-marche .prod-name,
+body.page-boutique .bv-name,
+body.page-produit .sim-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:0;margin:0 0 3px;color:#253d2d;font-size:15px;font-weight:750;line-height:1.25}
+body.page-accueil .prod-shop,
+body.page-marche .prod-shop{flex:none;margin:0;color:#6a776b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-produit .sim-shop{flex:none;margin:0;color:#6a776b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-accueil .prod-rating,
+body.page-marche .prod-rating,
+body.page-boutique .bv-rating{min-height:0;margin:3px 0 0;color:#68786a;font-size:11px}
+:is(body.page-accueil .prod-rating,body.page-marche .prod-rating):empty{display:none}
+body.page-accueil .prod-footer,
+body.page-marche .prod-footer,
+body.page-boutique .bv-row,
+body.page-produit .sim-footer{flex:none;margin-top:auto;padding-top:5px}
+body.page-accueil .prod-price,
+body.page-marche .prod-price,
+body.page-boutique .bv-row .bv-price,
+body.page-produit .sim-price{font-size:16px;font-weight:800;white-space:nowrap}
+body.page-accueil .prod-old-price,
+body.page-marche .prod-old,
+body.page-boutique .bv-price s{color:#939b91;font-size:11px}
+body.page-accueil .prod-cart-btn,
+body.page-marche .add-btn,
+body.page-boutique .bv-mini,
+body.page-produit .sim-add{flex:none;width:36px;height:36px;border-radius:9px;background:#176443;color:#fff}
+body.page-accueil .prod-badge,
+body.page-marche .prod-badge,
+body.page-boutique .bv-flag,
+body.page-produit .sim-badge{border-radius:6px;background:#e5b840;color:#233724;font-size:11px;font-weight:800}
+body.page-accueil .prod-wish,
+body.page-marche .prod-wish,
+body.page-boutique .bv-heart{width:36px;height:36px;border:1px solid #e7e7dd;border-radius:50%;background:#fffefa}
+
+@media(max-width:600px){
+  body.page-accueil .products-grid,
+  body.page-marche .prods-grid,
+  body.page-boutique .bv-cards,
+  body.page-produit .similar-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  body.page-accueil .prod-card,
+  body.page-marche .prod-card,
+  body.page-boutique .bv-card,
+  body.page-produit .sim-card{border-radius:13px}
+  body.page-accueil .prod-img,
+  body.page-marche .prod-img,
+  body.page-boutique .bv-card .bv-img,
+  body.page-produit .sim-img{height:260px;flex-basis:260px}
+  body.page-accueil .prod-body,
+  body.page-marche .prod-body,
+  body.page-boutique .bv-info,
+  body.page-produit .sim-body{padding:8px}
+  body.page-accueil .prod-market,
+  body.page-marche .prod-market-tag{font-size:10px;margin-bottom:3px}
+  body.page-accueil .prod-name,
+  body.page-marche .prod-name,
+  body.page-boutique .bv-name,
+  body.page-produit .sim-name{font-size:13px;line-height:1.22;margin-bottom:2px}
+  body.page-accueil .prod-shop,
+  body.page-marche .prod-shop{font-size:10px}
+  body.page-accueil .prod-footer,
+  body.page-marche .prod-footer,
+  body.page-boutique .bv-row,
+  body.page-produit .sim-footer{padding-top:3px}
+  body.page-accueil .prod-price,
+  body.page-marche .prod-price,
+  body.page-boutique .bv-row .bv-price,
+  body.page-produit .sim-price{font-size:14px}
+  body.page-accueil .prod-cart-btn,
+  body.page-marche .add-btn,
+  body.page-boutique .bv-mini,
+  body.page-produit .sim-add{width:32px;height:32px}
+  .catalogue-placeholder span{font-size:38px}
+  .catalogue-placeholder small{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.page-accueil .prod-img img,
+  body.page-marche .prod-img img,
+  body.page-boutique .bv-card .bv-img img,
+  body.page-produit .sim-img img{transition:none}
+}
+
+/* design-marche.css porte des sélecteurs plus spécifiques que les styles de
+   page : rétablir la géométrie commune sans affecter les autres cartes. */
+body.ms-design.page-accueil .prod-card,
+body.ms-design.page-marche .prod-card{border:1px solid #e7e7dd;border-radius:16px;background:#fffefa;box-shadow:0 8px 24px #1a3d2b12}
+body.ms-design.page-accueil .prod-body,
+body.ms-design.page-marche .prod-body{gap:0;padding:10px 12px}
+body.ms-design.page-accueil .prod-footer,
+body.ms-design.page-marche .prod-footer{padding-top:5px}
+@media(max-width:600px){
+  body.ms-design.page-accueil .prod-card,
+  body.ms-design.page-marche .prod-card{border-radius:13px}
+  body.ms-design.page-accueil .prod-body,
+  body.ms-design.page-marche .prod-body{gap:0;padding:8px}
+  body.ms-design.page-accueil .prod-footer,
+  body.ms-design.page-marche .prod-footer{padding-top:3px}
+}

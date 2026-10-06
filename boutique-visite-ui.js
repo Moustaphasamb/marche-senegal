@@ -378,6 +378,13 @@
       for (const p of liste) {
         const card = el('article', 'bv-card');
         const img = vignette('bv-img', p);
+        if (!img.querySelector('img')) {
+          const manque = el('span', 'catalogue-placeholder');
+          const marque = el('span', null, 'M');
+          marque.setAttribute('aria-hidden', 'true');
+          manque.append(marque, el('small', null, 'Photo du vendeur à venir'));
+          img.appendChild(manque);
+        }
         img.tabIndex = 0;
         img.setAttribute('role', 'button');
         img.setAttribute('aria-label', 'Voir ' + p.name);
