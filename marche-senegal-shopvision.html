@@ -61,6 +61,7 @@
 <!-- /ve -->
   </main>
   <script src="api.js"></script>
+  <script src="envoi-video.js"></script>
   <script>
   // Vitrine en pause (api.js) : hors atelier, retour à Ma boutique.
   if (!vitrineVisible()) { location.replace('marche-senegal-ma-boutique.html'); }
@@ -108,78 +109,11 @@
       }
     }
 
-    // ── Vidéo de ma boutique : envoi direct à Cloudinary, par morceaux ──
-    // Une vidéo pèse 30 à 60 Mo. Elle part en morceaux de 6 Mo portant le même
-    // identifiant ; Cloudinary les recolle. En 4G, une coupure ne fait renvoyer que le
-    // morceau en cours, dès que le réseau revient. Le serveur ne fait que signer l'envoi.
-    const MORCEAU_VIDEO = 6 * 1024 * 1024;
-    const attendreReseau = ms => new Promise(ok => {
-      const fin = () => { clearTimeout(minuterie); window.removeEventListener('online', fin); ok(); };
-      const minuterie = setTimeout(fin, ms);
-      window.addEventListener('online', fin);
+    // ── Vidéo de ma boutique : envoi par morceaux (envoi-video.js) ──
+    const envoyerVideoBoutique = (fichier, suivi) => EnvoiVideo.envoyer(fichier, {
+      obtenirAutorisation: () => apiCall('/api/shops/me/video/autorisation', { method: 'POST' }),
+      suivi
     });
-    // Rejoue une étape tant que le réseau coupe (~3 min au plus) ; un refus ne se rejoue pas.
-    async function avecReprise(etape, suivi, texteCoupure) {
-      for (let essai = 1; ; essai++) {
-        try { return await etape(); } catch (erreur) {
-          if ((erreur && erreur.refus) || essai >= 9) throw erreur;
-          if (suivi) suivi(texteCoupure);
-          await attendreReseau(Math.min(2000 * 2 ** (essai - 1), 30000));
-        }
-      }
-    }
-
-    async function envoyerVideoBoutique(fichier, suivi) {
-      try {
-        const autorisation = await avecReprise(async () => {
-          const r = await apiCall('/api/shops/me/video/autorisation', { method: 'POST' });
-          if (r && r.success) return r.data;
-          if (r && r.message && r.message !== 'Erreur de connexion au serveur') throw { refus: true, message: r.message };
-          throw new Error('réseau');
-        }, suivi, 'Réseau coupé : l’envoi de la vidéo commencera dès que la connexion revient…');
-
-        const adresse = `https://api.cloudinary.com/v1_1/${autorisation.cloudName}/video/upload`;
-        const identifiant = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random().toString(16).slice(2);
-        let resultat = null;
-        for (let debut = 0; debut < fichier.size; debut += MORCEAU_VIDEO) {
-          const fin = Math.min(debut + MORCEAU_VIDEO, fichier.size);
-          const pourcent = Math.round((debut / fichier.size) * 100);
-          if (suivi) suivi(`Envoi de la vidéo : ${pourcent} %`);
-          resultat = await avecReprise(async () => {
-            const corps = new FormData();
-            corps.append('file', fichier.slice(debut, fin), fichier.name || 'boutique.mp4');
-            corps.append('api_key', autorisation.apiKey);
-            corps.append('timestamp', autorisation.timestamp);
-            corps.append('folder', autorisation.folder);
-            corps.append('signature', autorisation.signature);
-            const reponse = await fetch(adresse, {
-              method: 'POST',
-              headers: { 'X-Unique-Upload-Id': identifiant, 'Content-Range': `bytes ${debut}-${fin - 1}/${fichier.size}` },
-              body: corps
-            });
-            let d = null;
-            try { d = await reponse.json(); } catch { /* réponse coupée en route */ }
-            if (reponse.ok) return d || {};
-            if (reponse.status >= 400 && reponse.status < 500 && reponse.status !== 408 && reponse.status !== 429) {
-              console.error('Cloudinary a refusé la vidéo :', d && d.error && d.error.message);
-              throw { refus: true, message: 'Cette vidéo n’a pas pu être envoyée. Filmez en mode vidéo normal, 15 à 30 secondes, puis réessayez.' };
-            }
-            throw new Error('serveur ' + reponse.status);
-          }, suivi, `Réseau coupé à ${pourcent} % : l’envoi reprendra là où il s’est arrêté dès que la connexion revient…`);
-        }
-        if (!resultat || typeof resultat.secure_url !== 'string') {
-          return { success: false, message: 'L’envoi de la vidéo n’a pas abouti. Réessayez.' };
-        }
-        if (suivi) suivi('Envoi de la vidéo : 100 %');
-        return { success: true, url: resultat.secure_url };
-      } catch (erreur) {
-        return {
-          success: false,
-          message: erreur && erreur.refus ? erreur.message
-            : 'La connexion est coupée depuis trop longtemps. Réessayez quand le réseau revient.'
-        };
-      }
-    }
 
     // Partie 2b : la zone entourée, découpée dans la photo (768 px au plus) pour l'IA.
     async function decouperPhoto(adresse, zone) {
