@@ -298,6 +298,7 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
 <link rel="stylesheet" href="boutique-visite.css"/>
 <link rel="stylesheet" href="catalogue-cards.css"/>
 <link rel="stylesheet" href="vue-360.css"/>
+<link rel="stylesheet" href="stories.css"/>
 <script src="design-marche.js" defer></script>
 <script>
 // Aperçu intégré dans « Ma vitrine » (fenêtre du vendeur) : la page sans menu ni fil
@@ -566,6 +567,8 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
 <script src="boutique-visite.js"></script>
 <script src="vue-360.js"></script>
 <script src="boutique-visite-ui.js"></script>
+<script src="stories.js"></script>
+<script src="stories-ui.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE BOUTIQUE — Données dynamiques
@@ -719,6 +722,28 @@ function afficherVideoBoutique(shop) {
   section.hidden = false;
 }
 
+// Stories de la boutique : anneau autour du logo ; le toucher ouvre le lecteur.
+async function chargerStoriesBoutique(shop) {
+  const logo = document.querySelector('.sh-avatar');
+  if (!logo || !window.StoriesUI) return;
+  let groupe = null;
+  try {
+    const r = await getShopStories(shop.id);
+    groupe = r && r.success ? r.data : null;
+  } catch { return; }
+  if (!groupe || !Array.isArray(groupe.stories) || !groupe.stories.length) return;
+  const options = StoriesUI.optionsSite();
+  const marquer = () => logo.classList.toggle('st-vu', StoriesCore.toutVu(groupe, StoriesCore.vuesDe(options.stockage)));
+  logo.classList.add('st-logo-actif');
+  logo.setAttribute('role', 'button');
+  logo.setAttribute('tabindex', '0');
+  logo.setAttribute('aria-label', 'Voir les stories de ' + shop.name);
+  marquer();
+  const ouvrirStories = () => StoriesUI.ouvrir([groupe], 0, { ...options, surFermeture: marquer });
+  logo.addEventListener('click', ouvrirStories);
+  logo.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ouvrirStories(); } });
+}
+
 async function loadShop(shopId) {
   const result = await getShop(shopId);
 
@@ -789,6 +814,7 @@ async function loadShop(shopId) {
         (shop.name.split(' ')[1] ? shop.name.split(' ')[1].charAt(0) : '');
     }
   }
+  chargerStoriesBoutique(shop);
 
   // Mettre à jour les stats
   const stats = document.querySelectorAll('.sh-stat-n');

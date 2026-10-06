@@ -236,6 +236,7 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <script src="accueil-motion.js" type="module"></script>
 <link rel="stylesheet" href="design-marche.css"/>
 <link rel="stylesheet" href="catalogue-cards.css"/>
+<link rel="stylesheet" href="stories.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="accueil-immersif ms-design page-accueil">
@@ -303,6 +304,10 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div><span class="hstat-num" id="hstat-regions">—</span><span class="hstat-label">Régions représentées</span></div>
   </div>
 </div>
+<!-- Stories des boutiques : remplie par stories-ui.js, cachée quand rien n'est en cours. -->
+<section class="st-rangee" id="stories-rangee" aria-label="Stories des boutiques" hidden>
+  <div class="st-rangee-liste"></div>
+</section>
 <section class="market-basket" aria-labelledby="market-basket-title">
   <div class="market-basket-heading">
     <span class="market-basket-eyebrow">La bonne idée Marché Sénégal</span>
@@ -438,6 +443,8 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 </nav>
 <script src="guide-marche.js"></script>
 <script src="api.js"></script>
+<script src="stories.js"></script>
+<script src="stories-ui.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE ACCUEIL — Données dynamiques
@@ -1115,6 +1122,16 @@ function updateHeroGreeting() {
 const HERO_BANNER = 'assets/banner-hero.jpg';
 
 // ── Initialisation au chargement de la page ──
+// Stories des boutiques : la rangée reste cachée si rien n'est en cours ou si le réseau échoue.
+async function chargerStories() {
+  const section = document.getElementById('stories-rangee');
+  if (!section || !window.StoriesUI) return;
+  try {
+    const r = await getStories();
+    if (r && r.success && Array.isArray(r.data)) StoriesUI.monterRangee(section, r.data, StoriesUI.optionsSite());
+  } catch { /* la rangée reste cachée */ }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateCartCount();
   updateAuthButton();
@@ -1133,6 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProducts();
   loadFeaturedShops();
   loadPromosBand();
+  chargerStories();
 });
 </script>
 </body>
