@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mes stories — Marché Sénégal Vendeur</title>
+<meta name="description" content="Publiez une photo ou une courte vidéo de vos nouveautés, visible 24 h par les acheteurs de Marché Sénégal."/>
+<meta name="robots" content="noindex"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+:root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--gold:#E6A817;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font-family:inherit}
+.main{max-width:760px;margin:0 auto;padding:24px 4vw 60px}
+.carte{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px}
+.carte h2{font-size:1.05rem;margin-bottom:6px}
+.aide{color:var(--muted);font-size:.85rem;margin-bottom:14px}
+.bouton{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;border-radius:99px;border:0;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
+.bouton:disabled{background:var(--muted);cursor:not-allowed}
+.bouton.secondaire{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+#st-formulaire[hidden],#st-apercu[hidden]{display:none}
+#st-apercu{margin:14px 0;max-width:240px;border-radius:12px;overflow:hidden;background:#000}
+#st-apercu img,#st-apercu video{display:block;width:100%;max-height:420px;object-fit:contain}
+label.champ{display:block;font-size:.85rem;font-weight:600;margin:12px 0 6px}
+textarea,select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.95rem;background:#fff}
+.compteur{font-size:.75rem;color:var(--muted);text-align:right}
+#st-etat{margin-top:10px;font-size:.9rem;min-height:1.2em}
+#st-etat.erreur{color:var(--red)}
+.ms-story{display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--border)}
+.ms-story:first-child{border-top:0}
+.ms-story img{width:64px;height:64px;border-radius:10px;object-fit:cover;background:var(--gp);flex-shrink:0}
+.ms-story .infos{flex:1;min-width:0}
+.ms-story .phrase{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-story .chiffres{font-size:.82rem;color:var(--muted);margin-top:4px}
+.ms-story.terminee{opacity:.65}
+.st-supprimer{background:none;border:1px solid var(--red);color:var(--red);border-radius:99px;padding:6px 12px;cursor:pointer;font-weight:600}
+</style>
+<script src="icons.js"></script>
+<link rel="stylesheet" href="identite-vendeur.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<script src="design-marche.js" defer></script>
+</head>
+<body class="espace-vendeur ms-design page-mes-stories">
+<div class="toast" id="toast"></div>
+
+<!-- La barre latérale est construite par marche-senegal-menu-vendeur.js -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Ouvrir le menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="tb-title"><i class="ic" data-ic="camera"></i> Mes stories</div>
+</header>
+
+<div class="main">
+  <section class="carte">
+    <h2>Publier une story</h2>
+    <p class="aide">Une photo ou une vidéo de 15 secondes de vos nouveautés. Elle reste visible 24 h sur l'accueil et sur votre boutique.</p>
+    <p class="aide" id="st-quota"></p>
+    <button type="button" class="bouton" id="st-choisir"><i class="ic" data-ic="camera"></i> Prendre ou choisir une photo ou une vidéo</button>
+    <input type="file" id="st-fichier" accept="image/jpeg,image/png,image/webp,video/*" hidden>
+    <div id="st-formulaire" hidden>
+      <div id="st-apercu" hidden></div>
+      <label class="champ" for="st-legende">Une phrase (facultatif)</label>
+      <textarea id="st-legende" rows="2" maxlength="100" placeholder="Arrivage de wax ce matin !"></textarea>
+      <div class="compteur"><span id="st-compteur">0</span> / 100</div>
+      <label class="champ" for="st-produit">Lier un produit (facultatif)</label>
+      <select id="st-produit"><option value="">Aucun produit</option></select>
+      <p style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="bouton" id="st-publier">Publier</button>
+        <button type="button" class="bouton secondaire" id="st-annuler">Annuler</button>
+      </p>
+    </div>
+    <p id="st-etat" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="carte">
+    <h2>Mes stories des 7 derniers jours</h2>
+    <div id="st-liste"><p class="aide">Chargement…</p></div>
+  </section>
+</div>
+
+<script src="api.js"></script>
+<script src="marche-senegal-menu-vendeur.js"></script>
+<script src="stories.js"></script>
+<script src="envoi-video.js"></script>
+<script>
+// Page « Mes stories » : publier (photo ou vidéo de 15 s), voir ses chiffres, supprimer.
+let fichierStory = null;
+let typeStory = null;
+let planVendeur = 'FREE';
+
+const $ = id => document.getElementById(id);
+function etat(texte, erreur) {
+  $('st-etat').textContent = texte || '';
+  $('st-etat').classList.toggle('erreur', !!erreur);
+}
+
+function dureeVideo(fichier) {
+  return new Promise(resoudre => {
+    try {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => { URL.revokeObjectURL(video.src); resoudre(video.duration); };
+      video.onerror = () => resoudre(NaN);
+      video.src = URL.createObjectURL(fichier);
+      setTimeout(() => resoudre(NaN), 4000);
+    } catch { resoudre(NaN); }
+  });
+}
+
+async function choisirFichierStory(fichier) {
+  if (!fichier) return;
+  const video = /^video\//.test(fichier.type);
+  if (video) {
+    const refus = StoriesCore.refusDuree(await dureeVideo(fichier));
+    if (refus) { etat(refus, true); return; }
+  }
+  fichierStory = fichier;
+  typeStory = video ? 'VIDEO' : 'PHOTO';
+  const apercu = $('st-apercu');
+  apercu.replaceChildren();
+  try {
+    const media = document.createElement(video ? 'video' : 'img');
+    media.src = URL.createObjectURL(fichier);
+    if (video) { media.muted = true; media.controls = true; media.playsInline = true; }
+    else media.alt = 'Aperçu de la story';
+    apercu.appendChild(media);
+    apercu.hidden = false;
+  } catch { apercu.hidden = true; }
+  $('st-formulaire').hidden = false;
+  etat('');
+}
+
+function annulerStory() {
+  fichierStory = null; typeStory = null;
+  $('st-formulaire').hidden = true;
+  $('st-apercu').replaceChildren();
+  $('st-legende').value = '';
+  $('st-compteur').textContent = '0';
+  $('st-produit').value = '';
+  $('st-fichier').value = '';
+}
+
+async function publierMaStory() {
+  if (!fichierStory) return;
+  const bouton = $('st-publier');
+  bouton.disabled = true;
+  etat(typeStory === 'VIDEO' ? 'Envoi de la vidéo : 0 %' : 'Envoi de la photo…');
+  const envoi = typeStory === 'VIDEO'
+    ? await EnvoiVideo.envoyer(fichierStory, {
+        obtenirAutorisation: () => apiCall('/api/stories/video/autorisation', { method: 'POST' }),
+        suivi: t => etat(t)
+      })
+    : await envoyerPhotoStory(fichierStory);
+  if (!envoi.success) { etat(envoi.message, true); bouton.disabled = false; return; }
+
+  const r = await publierStory({
+    mediaType: typeStory,
+    mediaUrl: envoi.url,
+    caption: $('st-legende').value.trim() || null,
+    productId: $('st-produit').value || null
+  });
+  if (!r.success) {
+    const limite = r.data && Object.prototype.hasOwnProperty.call(r.data, 'prochaineA');
+    etat(limite ? StoriesCore.messageLimite(planVendeur, r.data.prochaineA) : (r.message || 'La publication a échoué.'), true);
+    bouton.disabled = false;
+    return;
+  }
+  annulerStory();
+  bouton.disabled = false;
+  etat('Votre story est en ligne pour 24 h.');
+  await chargerMesStories();
+}
+
+function ligneStory(s) {
+  const ligne = document.createElement('div');
+  const finie = !!s.removedAt || new Date(s.expiresAt) <= new Date();
+  ligne.className = 'ms-story' + (finie ? ' terminee' : '');
+  const img = document.createElement('img');
+  img.alt = '';
+  const vignette = StoriesCore.vignette(s);
+  if (vignette) img.src = vignette;
+  const infos = document.createElement('div');
+  infos.className = 'infos';
+  const phrase = document.createElement('div');
+  phrase.className = 'phrase';
+  phrase.textContent = s.caption || (s.mediaType === 'VIDEO' ? 'Vidéo' : 'Photo') + (s.product ? ' · ' + s.product.name : '');
+  const chiffres = document.createElement('div');
+  chiffres.className = 'chiffres';
+  const statut = s.removedAt ? (s.removedBy === 'ADMIN' ? 'retirée par Marché Sénégal' : 'supprimée') : StoriesCore.tempsRestant(s.expiresAt);
+  chiffres.textContent = `${s.vues} vue${s.vues > 1 ? 's' : ''} · ${s.clicsProduit} clic${s.clicsProduit > 1 ? 's' : ''} produit · ${statut}`;
+  infos.append(phrase, chiffres);
+  ligne.append(img, infos);
+  if (!finie) {
+    const supprimer = document.createElement('button');
+    supprimer.type = 'button';
+    supprimer.className = 'st-supprimer';
+    supprimer.textContent = 'Supprimer';
+    supprimer.addEventListener('click', async () => {
+      if (!confirm('Supprimer cette story ? Elle disparaîtra tout de suite pour les acheteurs.')) return;
+      const r = await supprimerStory(s.id);
+      if (r.success) chargerMesStories();
+      else etat(r.message || 'Suppression impossible.', true);
+    });
+    ligne.appendChild(supprimer);
+  }
+  return ligne;
+}
+
+function texteAide(texte) {
+  const p = document.createElement('p');
+  p.className = 'aide';
+  p.textContent = texte;
+  return p;
+}
+
+async function chargerMesStories() {
+  const r = await getMesStories();
+  const liste = $('st-liste');
+  if (!r.success) { liste.replaceChildren(texteAide(r.message || 'Impossible de charger vos stories.')); return; }
+  const { plan, statut, quota, stories } = r.data;
+  planVendeur = plan;
+  $('st-choisir').disabled = statut !== 'ACTIVE' || quota.restantes === 0;
+  $('st-quota').textContent = statut !== 'ACTIVE'
+    ? 'Votre boutique doit être validée et active pour publier une story.'
+    : quota.restantes === 0
+      ? StoriesCore.messageLimite(plan, quota.prochaineA)
+      : (plan === 'FREE' ? 'Plan Gratuit : 1 story par jour.' : `Encore ${quota.restantes} stories possibles aujourd'hui.`);
+  if (!stories.length) { liste.replaceChildren(texteAide('Aucune story pour le moment.')); return; }
+  liste.replaceChildren(...stories.map(ligneStory));
+}
+
+async function chargerProduits() {
+  const r = await getMyProducts();
+  if (!r.success || !Array.isArray(r.data)) return;
+  const select = $('st-produit');
+  r.data.filter(p => p.status === 'ACTIVE').forEach(p => {
+    const option = document.createElement('option');
+    option.value = p.id;
+    option.textContent = p.name;
+    select.appendChild(option);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const utilisateur = getCurrentUser();
+  if (!utilisateur || utilisateur.role !== 'SELLER') {
+    window.location.href = 'marche-senegal-connexion-vendeur.html';
+    return;
+  }
+  $('st-choisir').addEventListener('click', () => $('st-fichier').click());
+  $('st-fichier').addEventListener('change', e => choisirFichierStory(e.target.files[0]));
+  $('st-legende').addEventListener('input', e => { $('st-compteur').textContent = [...e.target.value].length; });
+  $('st-publier').addEventListener('click', publierMaStory);
+  $('st-annuler').addEventListener('click', annulerStory);
+  await Promise.all([chargerMesStories(), chargerProduits()]);
+});
+</script>
+</body>
+</html>

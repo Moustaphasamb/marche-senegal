@@ -25,6 +25,7 @@ const ENTREES_MENU_VENDEUR = [
   { section: 'Boutique' },
   { cle: 'ajout',     icone: '➕', texte: 'Ajouter un produit', href: 'marche-senegal-ajout-produit.html' },
   { cle: 'boutique',  icone: '🏪', texte: 'Ma boutique',        href: 'marche-senegal-ma-boutique.html' },
+  { cle: 'stories', icone: '📸', texte: 'Mes stories', href: 'marche-senegal-mes-stories.html' },
   { cle: 'shopvision', icone: '📷', texte: 'Ma vitrine', href: 'marche-senegal-shopvision.html' },
   // Masquée tant que le vendeur n'a pas renseigné de visite virtuelle.
   { cle: 'visite',    icone: '🎥', texte: 'Visite virtuelle', action: ouvrirVisiteVirtuelle, id: 'sb-tour', masquee: true },
@@ -47,6 +48,7 @@ const PAGE_VERS_ENTREE = {
   'marche-senegal-mes-commandes.html':    'commandes',
   'marche-senegal-ajout-produit.html':    'ajout',
   'marche-senegal-ma-boutique.html':      'boutique',
+  'marche-senegal-mes-stories.html':     'stories',
   'marche-senegal-shopvision.html':      'shopvision',
   'marche-senegal-mes-revenus.html':     'revenus',
 };
