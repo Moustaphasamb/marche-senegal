@@ -255,7 +255,8 @@ function carteStoryEpinglee(story) {
   return carte;
 }
 async function preparerReponseStory() {
-  if (estVendeur || currentUser?.role !== 'BUYER') return;
+  // Tout client peut répondre, y compris le vendeur d'une autre boutique.
+  if (estVendeur || !currentUser) return;
   const id = new URLSearchParams(window.location.search).get('story');
   if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
   let story = null;
@@ -759,6 +760,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const buyerDemande = getBuyerIdFromURL();
+  // Le vendeur qui touche « Répondre » sur sa propre story arrive ici : on le lui dit.
+  if (estVendeur && new URLSearchParams(window.location.search).get('story'))
+    showToast('C’est votre story : vos clients y répondent ici, dans vos conversations.');
 
   // Le vendeur arrive sur la liste de ses fils ; l'acheteur sur le sien.
   if (estVendeur && !buyerDemande) {

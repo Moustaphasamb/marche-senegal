@@ -13,7 +13,7 @@ const ID = '74acb0e6-f8f7-4391-8f9e-19e9f6d9a7da';
 const story = { id: ID, mediaType: 'VIDEO', mediaUrl: 'https://res.cloudinary.com/d/video/upload/v1/marche-senegal/stories/b1/a.mp4', caption: 'Arrivage de wax', createdAt: new Date().toISOString(), product: null };
 
 // Le démarrage de la page (connexion, socket) n'est pas lancé : seules ses fonctions servent.
-function page({ stories = [story], echec = false, role = 'BUYER' } = {}) {
+function page({ stories = [story], echec = false, role = 'BUYER', proprietaire = false } = {}) {
   const dom = new JSDOM(lire('marche-senegal-chat.html'), { url: 'https://marchesenegal.sn/marche-senegal-chat.html?shopId=b1&story=' + ID, runScripts: 'outside-only' });
   const w = dom.window;
   fenetres.push(w);
@@ -23,7 +23,7 @@ function page({ stories = [story], echec = false, role = 'BUYER' } = {}) {
   w.eval(lire('stories.js'));
   w.getShopStories = async () => { if (echec) throw new Error('réseau'); return { success: true, data: stories.length ? { shop: { id: 'b1' }, stories } : null }; };
   // Les « let » de la page ne vivent que dans leur évaluation : un accès y est ajouté.
-  const acces = `;window.__t = { get story() { return storyEnReponse; } }; currentUser = { id: 'u1', role: '${role}' }; currentShopId = 'b1';`;
+  const acces = `;window.__t = { get story() { return storyEnReponse; } }; currentUser = { id: 'u1', role: '${role}' }; currentShopId = 'b1'; estVendeur = ${proprietaire};`;
   for (const s of w.document.querySelectorAll('script:not([src])')) w.eval(s.textContent + acces);
   return { w, d: w.document };
 }
@@ -68,11 +68,23 @@ test('réseau coupé : la carte reste, sans image', async () => {
   assert.equal(carte.querySelector('img'), null);
 });
 
-test('un vendeur ne voit pas de carte', async () => {
-  const { w, d } = page({ role: 'SELLER' });
+test('le vendeur de la boutique ne voit pas de carte', async () => {
+  const { w, d } = page({ role: 'SELLER', proprietaire: true });
   w.eval('renderMessages([], "u1")');
   await w.eval('preparerReponseStory()');
   assert.equal(d.getElementById('story-epinglee'), null);
+});
+
+test('un vendeur d’une autre boutique répond comme un client : la story est épinglée', async () => {
+  const { w, d } = page({ role: 'SELLER' });
+  w.eval('renderMessages([], "u1")');
+  await w.eval('preparerReponseStory()');
+  assert.ok(d.getElementById('story-epinglee'));
+  assert.equal(w.__t.story, ID);
+});
+
+test('le vendeur qui arrive sur sa propre story est prévenu', () => {
+  assert.match(lire('marche-senegal-chat.html'), /C’est votre story : vos clients y répondent ici, dans vos conversations./);
 });
 
 test('message envoyé : la bulle montre la story, des deux côtés', async () => {

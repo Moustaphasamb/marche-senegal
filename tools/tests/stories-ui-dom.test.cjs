@@ -42,10 +42,50 @@ test('la rangée : Pro non vue d’abord, nom, initiales ; vide : cachée', () =
   assert.equal(section.hidden, false);
   const ronds = [...d.querySelectorAll('.st-rond')];
   assert.deepEqual(ronds.map(r => r.querySelector('.st-nom').textContent), ['Tissus Sow', 'Awa Beauté']);
-  assert.equal(ronds[1].querySelector('.st-anneau').textContent, 'AB');
+  assert.equal(ronds[1].querySelector('.st-mini').textContent, 'AB');
+  assert.equal(ronds[0].querySelector('.st-mini img').src, 'https://res.cloudinary.com/d/image/upload/logo.jpg');
   assert.equal(ronds[0].getAttribute('aria-label'), 'Voir les stories de Tissus Sow');
   w.StoriesUI.monterRangee(section, [], options);
   assert.equal(section.hidden, true);
+});
+
+test('le cercle montre la story elle-même, celle qui s’ouvrira', () => {
+  const { w, d, options } = monter();
+  const section = d.getElementById('r');
+  w.StoriesUI.monterRangee(section, groupes(), options);
+  const apercu = () => [...d.querySelectorAll('.st-rond')].map(r => r.querySelector('.st-anneau img.st-apercu').src);
+  assert.deepEqual(apercu(), [
+    'https://res.cloudinary.com/d/image/upload/c_fill,w_160,h_160,q_auto,f_auto/v1/marche-senegal/stories/b/b1s.jpg',
+    'https://res.cloudinary.com/d/image/upload/c_fill,w_160,h_160,q_auto,f_auto/v1/marche-senegal/stories/b/a1.jpg'
+  ]);
+  // a1 vue : le cercle d'Awa montre a2, la prochaine à voir.
+  w.StoriesCore.noterVue(options.stockage, 'a1');
+  w.StoriesUI.monterRangee(section, groupes(), options);
+  assert.equal(apercu()[1], 'https://res.cloudinary.com/d/image/upload/c_fill,w_160,h_160,q_auto,f_auto/v1/marche-senegal/stories/b/a2.jpg');
+});
+
+test('ses propres stories : pas de bouton « Répondre »', () => {
+  const { w, d, options } = monter();
+  options.dureePhoto = 100000;
+  options.estMaBoutique = id => id === 'b1';
+  w.StoriesUI.ouvrir(groupes(), 0, options);
+  assert.equal(d.querySelector('.st-repondre').hidden, true);
+  d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight' }));
+  d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowRight' }));
+  assert.equal(d.querySelector('.st-nom-lecteur').textContent, 'Tissus Sow');
+  assert.equal(d.querySelector('.st-repondre').hidden, false);
+});
+
+test('optionsSite : la boutique du vendeur connecté est reconnue', () => {
+  const { w } = monter();
+  w.getCurrentUser = () => ({ role: 'SELLER', shop: { id: 'b1' } });
+  const o = w.StoriesUI.optionsSite();
+  assert.equal(o.estMaBoutique('b1'), true);
+  assert.equal(o.estMaBoutique('b2'), false);
+  w.getCurrentUser = () => ({ role: 'BUYER' });
+  assert.equal(w.StoriesUI.optionsSite().estMaBoutique('b1'), false);
+  w.getCurrentUser = () => { throw new Error('stockage bloqué'); };
+  assert.equal(w.StoriesUI.optionsSite().estMaBoutique('b1'), false);
 });
 
 test('le lecteur : vue notée, avance seul, passe à la boutique suivante puis se ferme', async () => {

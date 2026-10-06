@@ -24,6 +24,29 @@
     return anneau;
   }
 
+  // Cercle de la rangée : la story qui s'ouvrira, comme sur WhatsApp ou Instagram,
+  // avec le logo de la boutique en petit. Sans image, le logo reprend sa place.
+  function cercle(groupe, vues) {
+    const story = groupe.stories[C.premiereAVoir(groupe, vues)];
+    const apercu = C.vignette(story);
+    if (!apercu) return pastille(groupe.shop);
+    const anneau = el('span', 'st-anneau');
+    const img = el('img', 'st-apercu');
+    img.src = apercu; img.alt = ''; img.loading = 'lazy'; img.width = 64; img.height = 64;
+    anneau.appendChild(img);
+    const mini = el('span', 'st-mini');
+    if (logoSur(groupe.shop.avatarUrl)) {
+      const logo = el('img');
+      logo.src = groupe.shop.avatarUrl; logo.alt = ''; logo.loading = 'lazy'; logo.width = 22; logo.height = 22;
+      mini.appendChild(logo);
+    } else {
+      mini.textContent = C.initiales(groupe.shop.name);
+    }
+    const tout = el('span', 'st-cercle');
+    tout.append(anneau, mini);
+    return tout;
+  }
+
   // ── Rangée ──
   function monterRangee(section, groupes, options) {
     const liste = section.querySelector('.st-rangee-liste');
@@ -35,7 +58,7 @@
       const rond = el('button', 'st-rond' + (C.toutVu(groupe, vues) ? ' st-vu' : ''));
       rond.type = 'button';
       rond.setAttribute('aria-label', 'Voir les stories de ' + groupe.shop.name);
-      rond.appendChild(pastille(groupe.shop));
+      rond.appendChild(cercle(groupe, vues));
       rond.appendChild(el('span', 'st-nom', groupe.shop.name));
       rond.addEventListener('click', () => ouvrir(ordre, i, {
         ...options,
@@ -145,6 +168,8 @@
       quand.textContent = C.ilYA(story.createdAt);
       legende.textContent = story.caption || '';
       produitBtn.hidden = !story.product;
+      // On ne répond pas à sa propre story : ses clients le font.
+      repondreBtn.hidden = !!(options.estMaBoutique && options.estMaBoutique(shop.id));
       son.hidden = true;
       remplirBarres();
       barres.style.setProperty('--duree', dureePhoto + 'ms');
@@ -307,6 +332,11 @@
       marquerVue: (id, cle) => typeof root.marquerStoryVue === 'function' && root.marquerStoryVue(id, cle),
       clicProduit: id => typeof root.clicProduitStory === 'function' && root.clicProduitStory(id),
       allerProduit: id => { root.location.href = 'marche-senegal-produit.html?id=' + encodeURIComponent(id); },
+      estMaBoutique: shopId => {
+        let moi = null;
+        try { moi = typeof root.getCurrentUser === 'function' ? root.getCurrentUser() : null; } catch { moi = null; }
+        return !!(moi && moi.role === 'SELLER' && moi.shop && moi.shop.id === shopId);
+      },
       repondre: (story, shop) => {
         const cible = 'marche-senegal-chat.html?shopId=' + encodeURIComponent(shop.id) + '&story=' + encodeURIComponent(story.id);
         const connecte = typeof root.isLoggedIn === 'function' && root.isLoggedIn();
