@@ -79,29 +79,34 @@ body.ms-design.page-recherche .rc-add{width:34px;height:34px}
 
 /* Cartes catalogue : photographie dominante, informations nettes et prix lisible. */
 body.ms-design.page-recherche .results-grid{grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:16px}
-body.ms-design.page-recherche .rc{display:flex;flex-direction:column;border-radius:16px;border-color:#e7e7dd;background:#fffefa;box-shadow:0 8px 24px #1a3d2b12}
-body.ms-design.page-recherche .rc-img{height:auto;aspect-ratio:1 / 1;background:#e8e9df!important;overflow:hidden}
+body.ms-design.page-recherche .rc{display:flex;flex-direction:column;height:345px;border-radius:16px;border-color:#e7e7dd;background:#fffefa;box-shadow:0 8px 24px #1a3d2b12}
+body.ms-design.page-recherche .rc-img{height:66%;flex:0 0 66%;aspect-ratio:auto;background:#e8e9df!important;overflow:hidden}
 body.ms-design.page-recherche .rc-img img{display:block;transition:transform .35s ease}
 body.ms-design.page-recherche .rc:hover .rc-img img{transform:scale(1.035)}
 body.ms-design.page-recherche .rc-placeholder{background:linear-gradient(145deg,#ede7d6,#d7e2d2);color:#526b55;gap:7px;font-size:48px}
 body.ms-design.page-recherche .rc-placeholder span{font-weight:700;line-height:1}
 body.ms-design.page-recherche .rc-placeholder small{max-width:135px;text-align:center;color:#526b55;font-size:11px;line-height:1.4;letter-spacing:0}
 body.ms-design.page-recherche .rc-badge{border-radius:6px;background:#e5b840;color:#233724;font-size:11px;font-weight:800}
-body.ms-design.page-recherche .rc-body{display:flex;flex:1;flex-direction:column;padding:13px}
-body.ms-design.page-recherche .rc-market{font-size:11px;color:#68806b;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.ms-design.page-recherche .rc-name{font-size:15px;font-weight:750;line-height:1.28;min-height:38px;margin-bottom:6px}
+body.ms-design.page-recherche .rc-body{display:flex;flex:1;min-height:0;flex-direction:column;padding:10px 12px}
+body.ms-design.page-recherche .rc-market{font-size:11px;color:#68806b;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.ms-design.page-recherche .rc-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:15px;font-weight:750;line-height:1.25;min-height:0;margin-bottom:3px}
 body.ms-design.page-recherche .rc-shop{font-size:11px;color:#6a776b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.ms-design.page-recherche .rc-rating{font-size:11px;color:#68786a;min-height:0;margin:6px 0 11px}
-body.ms-design.page-recherche .rc-footer{margin-top:auto;padding-top:11px}
+body.ms-design.page-recherche .rc-rating{font-size:11px;color:#68786a;min-height:0;margin:3px 0 0}
+body.ms-design.page-recherche .rc-rating:empty{display:none}
+body.ms-design.page-recherche .rc-footer{margin-top:auto;padding-top:5px}
 body.ms-design.page-recherche .rc-price{font-size:16px;font-weight:800;white-space:nowrap}
 body.ms-design.page-recherche .rc-old{font-size:11px;color:#939b91}
 body.ms-design.page-recherche .rc-add{width:36px;height:36px;border-radius:9px;background:#176443;color:#fff}
 @media(max-width:600px){
   body.ms-design.page-recherche .results-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  body.ms-design.page-recherche .rc{border-radius:13px}
-  body.ms-design.page-recherche .rc-body{padding:10px}
-  body.ms-design.page-recherche .rc-name{font-size:14px;min-height:36px}
+  body.ms-design.page-recherche .rc{height:315px;border-radius:13px}
+  body.ms-design.page-recherche .rc-body{padding:8px}
+  body.ms-design.page-recherche .rc-market{font-size:10px;margin-bottom:3px}
+  body.ms-design.page-recherche .rc-name{font-size:13px;line-height:1.22;margin-bottom:2px}
+  body.ms-design.page-recherche .rc-shop{font-size:10px}
+  body.ms-design.page-recherche .rc-footer{padding-top:3px}
   body.ms-design.page-recherche .rc-price{font-size:14px}
+  body.ms-design.page-recherche .rc-add{width:32px;height:32px}
   body.ms-design.page-recherche .rc-placeholder{font-size:38px}
   body.ms-design.page-recherche .rc-placeholder small{font-size:10px}
 }

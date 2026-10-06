@@ -332,7 +332,7 @@ async function loadResults() {
         </div>
         <div class="rc-rating">${Number(prod.totalReviews) > 0
           ? `<span class="rc-stars" aria-hidden="true">★</span> ${Number(prod.rating || 0).toFixed(1)} (${Number(prod.totalReviews)} avis)`
-          : 'Pas encore d’avis'}</div>
+          : ''}</div>
         <div class="rc-footer">
           <div>
             <span class="rc-price">${formatPrice(prod.price)}</span>
