@@ -99,11 +99,16 @@ a{text-decoration:none;color:inherit}
   .msg-row{max-width:88%}
   .nav{padding:0 12px}
 }
-.story-reponse{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--gp,#E8F5EC);font-size:.85rem}
-.story-reponse[hidden]{display:none}
-.story-reponse img{border-radius:8px;object-fit:cover;background:#ccc}
-.story-reponse img[hidden]{display:none}
-.bubble-img{display:block;width:120px;height:120px;object-fit:cover;border-radius:10px;margin-bottom:6px}
+/* Story épinglée : la story à laquelle l'acheteur répond, dans la conversation */
+.story-epinglee{align-self:flex-end;display:flex;align-items:flex-start;gap:12px;max-width:88%;padding:10px;background:var(--gp);border:1.5px solid var(--gl);border-radius:16px;animation:fadeUp .2s ease}
+.story-epinglee img{flex-shrink:0;width:96px;height:128px;object-fit:cover;border-radius:10px;background:#ccc}
+.se-corps{flex:1;min-width:0;font-size:.85rem;line-height:1.4}
+.se-titre{font-weight:700;color:var(--green)}
+.se-phrase{margin-top:4px;color:var(--text);word-break:break-word}
+.se-aide{margin-top:6px;font-size:.78rem;color:var(--muted)}
+.se-fermer{flex-shrink:0;width:28px;height:28px;border:none;border-radius:50%;background:#fff;color:var(--muted);font-size:1.1rem;line-height:1;cursor:pointer}
+.bubble-story{font-size:.72rem;font-weight:600;opacity:.85;margin-bottom:6px}
+.bubble-img{display:block;width:120px;height:160px;object-fit:cover;border-radius:10px;margin-bottom:6px}
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="identite-vendeur.css"/>
@@ -133,12 +138,6 @@ a{text-decoration:none;color:inherit}
   <div class="loading-chat">
     <div class="ls"></div><div class="ls"></div><div class="ls"></div>
   </div>
-</div>
-
-<!-- Réponse à une story : rappelle à l'acheteur de quoi il parle. -->
-<div class="story-reponse" id="story-reponse" hidden>
-  <img id="story-reponse-img" alt="" width="40" height="40" hidden>
-  <span>Vous répondez à une story de cette boutique.</span>
 </div>
 
 <!-- INPUT -->
@@ -206,27 +205,75 @@ function preparerMessageCommande() {
   document.getElementById('send-btn').disabled = false;
 }
 
-// Réponse à une story : la vignette s'affiche ici, et le premier message envoyé
-// porte l'id de la story ; le serveur y joint lui-même la vignette.
+// Réponse à une story : la story est épinglée dans la conversation, là où partira
+// le message. Le premier message envoyé porte son id ; le serveur y joint lui-même
+// la vignette, que le vendeur voit au-dessus du texte.
 let storyEnReponse = null;
+function retirerStoryEpinglee() {
+  storyEnReponse = null;
+  document.getElementById('story-epinglee')?.remove();
+  const saisie = document.getElementById('msg-input');
+  if (saisie) saisie.placeholder = 'Écrire un message...';
+}
+function carteStoryEpinglee(story) {
+  const carte = document.createElement('div');
+  carte.className = 'story-epinglee';
+  carte.id = 'story-epinglee';
+  const vignette = story ? StoriesCore.vignette(story) : null;
+  if (vignette) {
+    const img = document.createElement('img');
+    img.src = vignette;
+    img.alt = 'Story';
+    img.width = 96;
+    img.height = 128;
+    carte.appendChild(img);
+  }
+  const corps = document.createElement('div');
+  corps.className = 'se-corps';
+  const titre = document.createElement('div');
+  titre.className = 'se-titre';
+  titre.textContent = '↩ Vous répondez à cette story';
+  corps.appendChild(titre);
+  if (story && story.caption) {
+    const phrase = document.createElement('div');
+    phrase.className = 'se-phrase';
+    phrase.textContent = '« ' + story.caption + ' »';
+    corps.appendChild(phrase);
+  }
+  const aide = document.createElement('div');
+  aide.className = 'se-aide';
+  aide.textContent = 'Écrivez votre message : la story sera jointe pour le vendeur.';
+  corps.appendChild(aide);
+  carte.appendChild(corps);
+  const fermer = document.createElement('button');
+  fermer.type = 'button';
+  fermer.className = 'se-fermer';
+  fermer.setAttribute('aria-label', 'Ne plus répondre à cette story');
+  fermer.textContent = '×';
+  fermer.onclick = retirerStoryEpinglee;
+  carte.appendChild(fermer);
+  return carte;
+}
 async function preparerReponseStory() {
   if (estVendeur || currentUser?.role !== 'BUYER') return;
   const id = new URLSearchParams(window.location.search).get('story');
   if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
-  storyEnReponse = id;
-  document.getElementById('story-reponse').hidden = false;
-  const saisie = document.getElementById('msg-input');
-  if (saisie && !saisie.value) saisie.placeholder = 'Répondre à cette story…';
+  let story = null;
   try {
     const r = await getShopStories(getShopIdFromURL());
-    const story = r && r.success && r.data ? r.data.stories.find(s => s.id === id) : null;
-    const vignette = story ? StoriesCore.vignette(story) : null;
-    if (vignette) {
-      const img = document.getElementById('story-reponse-img');
-      img.src = vignette;
-      img.hidden = false;
+    if (r && r.success) {
+      story = r.data ? r.data.stories.find(s => s.id === id) || null : null;
+      // Story terminée ou retirée : rien à épingler, le serveur ne la joindrait pas.
+      if (!story) return;
     }
-  } catch { /* le bandeau reste, sans image */ }
+  } catch { /* réseau coupé : la carte s'affiche sans image */ }
+  storyEnReponse = id;
+  const zone = document.getElementById('messages-wrap');
+  zone.querySelector('.empty-chat')?.remove();
+  zone.appendChild(carteStoryEpinglee(story));
+  zone.scrollTop = zone.scrollHeight;
+  const saisie = document.getElementById('msg-input');
+  if (saisie && !saisie.value) saisie.placeholder = 'Répondre à cette story…';
 }
 
 // ── Formater l'heure ──
@@ -270,6 +317,10 @@ function buildBubble(msg, isMine) {
   bubble.className = 'bubble';
   // Seule une image de notre compte Cloudinary est affichée (vignette de story).
   if (typeof msg.imageUrl === 'string' && /^https:\/\/res\.cloudinary\.com\//.test(msg.imageUrl)) {
+    const etiquette = document.createElement('div');
+    etiquette.className = 'bubble-story';
+    etiquette.textContent = '↩ Réponse à une story';
+    bubble.appendChild(etiquette);
     const image = document.createElement('img');
     image.className = 'bubble-img';
     image.alt = 'Story';
@@ -623,8 +674,7 @@ async function sendMessage() {
     showToast('❌ ' + (result.message || 'Erreur d\'envoi'), 'error');
     input.value = content;
   } else {
-    storyEnReponse = null;
-    document.getElementById('story-reponse').hidden = true;
+    retirerStoryEpinglee();
     appendMessage(result.data);
   }
   btn.disabled = false;

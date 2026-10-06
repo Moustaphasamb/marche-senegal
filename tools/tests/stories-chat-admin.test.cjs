@@ -10,9 +10,8 @@ const lire = f => fs.readFileSync(path.join(racine, f), 'utf8');
 test('messagerie : le premier message part avec storyId, une seule fois', () => {
   const chat = lire('marche-senegal-chat.html');
   assert.match(chat, /<script src="stories\.js"><\/script>/);
-  assert.match(chat, /id="story-reponse"/);
   assert.match(chat, /JSON\.stringify\(storyEnReponse \? \{ content, storyId: storyEnReponse \} : \{ content \}\)/);
-  assert.match(chat, /storyEnReponse = null;/);
+  assert.match(chat, /retirerStoryEpinglee\(\);\s+appendMessage\(result\.data\);/);
   assert.match(chat, /preparerReponseStory\(\);/);
 });
 

@@ -3,18 +3,18 @@
 (function (root) {
   'use strict';
   const PHOTO_MS = 5000;
-  const DUREE_VIDEO_MAX = 15;
+  const DUREE_VIDEO_MAX = 45;
   const CLE_VUES = 'ms-stories-vues';
   const CLE_VISITEUR = 'ms-visiteur';
   const MAX_VUES = 300;
 
   const cloudinaire = u => typeof u === 'string' && /^https:\/\/res\.cloudinary\.com\/[^/]+\/(image|video)\/upload\//.test(u);
 
-  // Versions légères pour la 4G : photo 1080 px, vidéo 720 px coupée à 15 s.
+  // Versions légères pour la 4G : photo 1080 px, vidéo 720 px coupée à 45 s.
   function adresseMedia(story) {
     if (!story || !cloudinaire(story.mediaUrl)) return null;
     if (story.mediaType === 'VIDEO') {
-      return story.mediaUrl.replace('/video/upload/', '/video/upload/c_limit,w_720,q_auto,vc_auto,du_15/').replace(/\.[a-z0-9]+$/i, '.mp4');
+      return story.mediaUrl.replace('/video/upload/', '/video/upload/c_limit,w_720,q_auto,vc_auto,du_45/').replace(/\.[a-z0-9]+$/i, '.mp4');
     }
     return story.mediaUrl.replace('/image/upload/', '/image/upload/c_limit,w_1080,q_auto,f_auto/');
   }
@@ -104,7 +104,7 @@
   }
   function refusDuree(secondes) {
     if (!(secondes > DUREE_VIDEO_MAX + 0.5)) return null;
-    return `Votre vidéo dure ${Math.round(secondes)} s. Une story dure 15 secondes au plus : coupez-la dans la galerie de votre téléphone, puis réessayez.`;
+    return `Votre vidéo dure ${Math.round(secondes)} s. Une story dure 45 secondes au plus : coupez-la dans la galerie de votre téléphone, puis réessayez.`;
   }
   function messageLimite(plan, prochaineA, maintenant = Date.now()) {
     const attente = prochaineA ? ` Votre prochaine story est possible ${dansCombien(prochaineA, maintenant)}.` : '';

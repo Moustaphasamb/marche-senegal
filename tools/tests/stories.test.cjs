@@ -36,11 +36,11 @@ test('navigation : suivante, boutique suivante, fin ; précédente', () => {
   assert.equal(C.premiereAVoir(gs[0], new Set(['a1', 'a2'])), 0);
 });
 
-test('adresses légères : photo 1080, vidéo 720 coupée à 15 s, vignettes', () => {
+test('adresses légères : photo 1080, vidéo 720 coupée à 45 s, vignettes', () => {
   const photo = { mediaType: 'PHOTO', mediaUrl: 'https://res.cloudinary.com/d/image/upload/v1/marche-senegal/stories/b1/a.png' };
   const video = { mediaType: 'VIDEO', mediaUrl: 'https://res.cloudinary.com/d/video/upload/v1/marche-senegal/stories/b1/a.mov' };
   assert.equal(C.adresseMedia(photo), 'https://res.cloudinary.com/d/image/upload/c_limit,w_1080,q_auto,f_auto/v1/marche-senegal/stories/b1/a.png');
-  assert.equal(C.adresseMedia(video), 'https://res.cloudinary.com/d/video/upload/c_limit,w_720,q_auto,vc_auto,du_15/v1/marche-senegal/stories/b1/a.mp4');
+  assert.equal(C.adresseMedia(video), 'https://res.cloudinary.com/d/video/upload/c_limit,w_720,q_auto,vc_auto,du_45/v1/marche-senegal/stories/b1/a.mp4');
   assert.equal(C.affiche(video), 'https://res.cloudinary.com/d/video/upload/so_0,c_limit,w_720/v1/marche-senegal/stories/b1/a.jpg');
   assert.equal(C.vignette(video), 'https://res.cloudinary.com/d/video/upload/so_0,c_fill,w_160,h_160/v1/marche-senegal/stories/b1/a.jpg');
   assert.equal(C.adresseMedia({ mediaType: 'PHOTO', mediaUrl: 'javascript:alert(1)' }), null);
@@ -71,9 +71,10 @@ test('textes : il y a, temps restant, initiales, durée, limite', () => {
   assert.equal(C.tempsRestant(new Date(T - 1), T), 'terminée');
   assert.equal(C.initiales('Awa Beauté'), 'AB');
   assert.equal(C.initiales(''), '?');
-  assert.equal(C.refusDuree(15.3), null);
+  assert.equal(C.refusDuree(45.3), null);
+  assert.equal(C.refusDuree(30), null);
   assert.equal(C.refusDuree(NaN), null);
-  assert.equal(C.refusDuree(42.2), 'Votre vidéo dure 42 s. Une story dure 15 secondes au plus : coupez-la dans la galerie de votre téléphone, puis réessayez.');
+  assert.equal(C.refusDuree(52.2), 'Votre vidéo dure 52 s. Une story dure 45 secondes au plus : coupez-la dans la galerie de votre téléphone, puis réessayez.');
   assert.equal(C.messageLimite('FREE', new Date(T + 5 * H - 60000), T), 'Avec le plan Gratuit, vous publiez 1 story par jour. Votre prochaine story est possible dans 5 h. Passez Pro pour en publier autant que vous voulez.');
   assert.equal(C.messageLimite('PRO', null, T), 'Vous avez publié 30 stories en 24 h.');
 });
