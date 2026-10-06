@@ -1,0 +1,30 @@
+/* Direction éditoriale de l'accueil, en conservant les données et la navigation existantes. */
+body.accueil-immersif .hero-content{max-width:900px}
+body.accueil-immersif .hero h1{font-size:clamp(56px,7.4vw,112px);line-height:1.01;letter-spacing:-.055em}
+body.accueil-immersif .hero-desc{max-width:570px;font-size:clamp(15px,1.25vw,19px);line-height:1.75;color:#f4f5eb}
+.accueil-immersif .home-hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:13px;margin-top:35px}
+.accueil-immersif .home-hero-button{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:56px;border-radius:99px;padding:14px 25px;font-size:14px;font-weight:700;transition:transform .25s ease,background .25s ease}
+.accueil-immersif .home-hero-button:hover{transform:translateY(-3px)}
+.accueil-immersif .home-hero-button:focus-visible{outline:3px solid #e9bd50;outline-offset:4px}
+.accueil-immersif .home-hero-button-primary{background:#fffcf6;color:#183a28}
+.accueil-immersif .home-hero-button-secondary{border:1px solid #ffffffa8;color:#fff;background:#143c2a3d}
+.accueil-immersif .home-story{display:grid;grid-template-columns:1fr 1fr;min-height:450px;background:#142e22;color:#fff}
+.accueil-immersif .home-story-photo{min-height:450px;overflow:hidden}
+.accueil-immersif .home-story-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.accueil-immersif .home-story-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(45px,7vw,110px)}
+.accueil-immersif .home-story-kicker{color:#e9bd50;text-transform:uppercase;letter-spacing:.2em;font-size:11px;font-weight:800}
+.accueil-immersif .home-story h2{font-family:'Newsreader',Georgia,serif;font-size:clamp(38px,4.2vw,65px);font-weight:500;line-height:1.08;letter-spacing:-.045em;margin:20px 0}
+.accueil-immersif .home-story-copy>p:not(.home-story-kicker){max-width:490px;color:#d5e2d3;line-height:1.8;font-size:16px}
+.accueil-immersif .home-story-copy>a{display:inline-flex;gap:20px;border-bottom:1px solid currentColor;padding-bottom:8px;margin-top:25px;font-size:13px;font-weight:800}
+@media(max-width:700px){
+  body.accueil-immersif .hero h1{font-size:clamp(47px,11vw,67px)}
+  body.accueil-immersif .hero-desc{font-size:14px;max-width:36ch}
+  .accueil-immersif .home-hero-actions{gap:10px;margin-top:28px}
+  .accueil-immersif .home-hero-button{min-height:50px;padding:12px 18px;font-size:12px;gap:12px}
+  .accueil-immersif .home-story{grid-template-columns:1fr}
+  .accueil-immersif .home-story-photo{min-height:0;height:290px}
+  .accueil-immersif .home-story-copy{padding:46px 24px 55px}
+  .accueil-immersif .home-story h2{font-size:clamp(37px,9vw,50px)}
+  .accueil-immersif .home-story-copy>p:not(.home-story-kicker){font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.accueil-immersif .home-hero-button{transition:none}.accueil-immersif .home-hero-button:hover{transform:none}}

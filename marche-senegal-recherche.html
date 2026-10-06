@@ -108,6 +108,7 @@
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
+<link rel="stylesheet" href="recherche-refonte.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="ms-design page-recherche">
@@ -129,9 +130,10 @@
   </div>
 </div>
 <div class="search-hero">
-  <div class="sh-label"><i class="ic" data-ic="search"></i> Un produit en tête ? Trouvez aussi la boutique et le marché où le découvrir.</div>
-  <div class="sh-title">Que cherchez-vous ? <span id="search-query" hidden></span></div>
-  <div class="sh-bar"><input type="text" id="main-search" placeholder="Produit, boutique, marché..."/><button class="sh-bar-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
+  <div class="sh-label"><i class="ic" data-ic="search"></i> Vos envies ont une adresse</div>
+  <h1 class="sh-title">Une idée en tête ?<br/><em>Trouvez-la ici.</em> <span id="search-query" hidden></span></h1>
+  <p class="sh-description">Cherchez un produit, découvrez la boutique qui le propose et repérez son marché ou son quartier.</p>
+  <div class="sh-bar"><label class="sr-only" for="main-search">Rechercher un produit, une boutique ou un marché</label><input type="search" id="main-search" placeholder="Un produit, une boutique, un marché…" enterkeyhint="search"/><button class="sh-bar-btn" onclick="doSearch()"><i class="ic" data-ic="search"></i> Rechercher</button></div>
   <div class="sh-suggestions">
     <div class="sh-sug" onclick="setSug('boubou wax sandaga')"><i class="ic" data-ic="landmark"></i> boubou wax sandaga</div>
     <div class="sh-sug" onclick="setSug('bazin brodé')"><i class="ic" data-ic="spool"></i> bazin brodé</div>
@@ -170,10 +172,12 @@
     </div>
     <div class="fs-section">
       <div class="fs-title">Marché <span class="fs-clear" onclick="clearMarkets()">Effacer</span></div>
+      <p class="fs-help">Choisissez un marché à la fois. Les marchés avec des boutiques apparaissent d’abord.</p>
       <input class="mp-search" id="mp-search" type="text" placeholder="Rechercher un marché…" oninput="filterMarketPills(this.value)">
       <div class="market-pills" id="market-pills">
         <div style="font-size:.78rem;color:var(--muted);padding:8px 0;text-align:center">Chargement…</div>
       </div>
+      <button class="mp-more" id="mp-more" type="button" onclick="toggleAllMarketPills()" hidden>Voir tous les marchés</button>
     </div>
     <div class="fs-section">
       <div class="fs-title">Options</div>
@@ -307,7 +311,7 @@ async function loadResults() {
         ${urlImageSure(prod.images?.[0])
           ? `<img src="${escapeHtml(urlImageSure(prod.images[0]))}" alt=""
                   style="width:100%;height:100%;object-fit:cover"/>`
-          : '👗'
+          : '<span class="rc-placeholder"><span aria-hidden="true">M</span><small>Photo du vendeur à venir</small></span>'
         }
         ${prod.originalPrice
           ? `<div class="rc-badge">
@@ -326,11 +330,9 @@ async function loadResults() {
           ${escapeHtml(prod.shop?.name || '')}
           ${prod.shop?.isVerified ? '· Vérifié ✓' : ''}
         </div>
-        <div class="rc-rating">
-          ${prod.totalReviews > 0
-            ? `<span class="rc-stars">★</span> ${prod.rating} (${prod.totalReviews} avis)`
-            : 'Nouveau'}
-        </div>
+        <div class="rc-rating">${Number(prod.totalReviews) > 0
+          ? `<span class="rc-stars" aria-hidden="true">★</span> ${Number(prod.rating || 0).toFixed(1)} (${Number(prod.totalReviews)} avis)`
+          : 'Pas encore d’avis'}</div>
         <div class="rc-footer">
           <div>
             <span class="rc-price">${formatPrice(prod.price)}</span>
@@ -546,6 +548,7 @@ function getMktEmojiSearch(name) {
 }
 
 let _allMarketsPills = [];
+let _showAllMarketsPills = false;
 
 function _renderMarketPills(markets) {
   const container = document.getElementById('market-pills');
@@ -557,7 +560,7 @@ function _renderMarketPills(markets) {
   container.innerHTML = markets.map(m => {
     const shortName = nomCourtMarche(m.name);
     const emoji = getMktEmojiSearch(m.name);
-    return `<div class="mp-item" data-market-id="${m.id}" onclick="toggleMarket(this)">
+    return `<div class="mp-item${currentFilters.marketId === m.id ? ' sel' : ''}" data-market-id="${escapeHtml(m.id)}" onclick="toggleMarket(this)">
       <span class="mp-emoji">${emoji}</span>
       <span class="mp-name">${escapeHtml(shortName)}</span>
       <span class="mp-count">${m._count?.shops ?? 0}</span>
@@ -565,26 +568,49 @@ function _renderMarketPills(markets) {
   }).join('');
 }
 
-async function loadMarketPills() {
-  const result = await getMarkets();
-  if (!result.success || !result.data?.length) return;
-  _allMarketsPills = result.data;
-  _renderMarketPills(result.data);
+function refreshMarketPills() {
+  const query = document.getElementById('mp-search')?.value.toLowerCase().trim() || '';
+  const matches = query ? _allMarketsPills.filter(m =>
+    m.name.toLowerCase().includes(query) ||
+    (m.city || '').toLowerCase().includes(query) ||
+    (m.region || '').toLowerCase().includes(query)
+  ) : _allMarketsPills;
+  const available = matches.filter(m => (m._count?.shops || 0) > 0 || currentFilters.marketId === m.id);
+  const visible = query || _showAllMarketsPills ? matches : available;
+  _renderMarketPills(visible);
+  const more = document.getElementById('mp-more');
+  if (more) {
+    more.hidden = Boolean(query) || available.length === _allMarketsPills.length;
+    more.textContent = _showAllMarketsPills ? 'Afficher les marchés avec boutiques' : 'Voir tous les marchés';
+  }
 }
 
-function filterMarketPills(query) {
-  const q = query.toLowerCase().trim();
-  if (!q) { _renderMarketPills(_allMarketsPills); return; }
-  _renderMarketPills(_allMarketsPills.filter(m =>
-    m.name.toLowerCase().includes(q) ||
-    (m.city || '').toLowerCase().includes(q) ||
-    (m.region || '').toLowerCase().includes(q)
-  ));
+async function loadMarketPills() {
+  const result = await getMarkets();
+  if (!result.success || !result.data?.length) {
+    document.getElementById('market-pills').innerHTML = '<div class="fs-help">Marchés indisponibles pour le moment.</div>';
+    return;
+  }
+  _allMarketsPills = [...result.data].sort((a, b) =>
+    (b._count?.shops || 0) - (a._count?.shops || 0) || a.name.localeCompare(b.name, 'fr')
+  );
+  refreshMarketPills();
+}
+
+function filterMarketPills() {
+  refreshMarketPills();
+}
+
+function toggleAllMarketPills() {
+  _showAllMarketsPills = !_showAllMarketsPills;
+  refreshMarketPills();
 }
 
 // ── Marché toggle ──
 function toggleMarket(el) {
-  el.classList.toggle('sel');
+  const wasSelected = el.classList.contains('sel');
+  document.querySelectorAll('.mp-item.sel').forEach(item => item.classList.remove('sel'));
+  if (!wasSelected) el.classList.add('sel');
   updateMarketFilter();
 }
 
@@ -602,6 +628,7 @@ function updateMarketFilter() {
 function clearMarkets() {
   document.querySelectorAll('.mp-item').forEach(p => p.classList.remove('sel'));
   delete currentFilters.marketId;
+  refreshMarketPills();
 }
 
 // ── Tri ──

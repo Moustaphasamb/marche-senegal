@@ -231,7 +231,9 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
 <link rel="preload" href="assets/banner-hero.jpg" as="image" fetchpriority="high"/>
 <link rel="stylesheet" href="accueil-immersif.css"/>
 <link rel="stylesheet" href="accueil-campagne.css"/>
+<link rel="stylesheet" href="accueil-refonte.css"/>
 <script src="accueil-immersif.js" defer></script>
+<script src="accueil-motion.js" type="module"></script>
 <link rel="stylesheet" href="design-marche.css"/>
 <script src="design-marche.js" defer></script>
 </head>
@@ -267,21 +269,10 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <video id="hero-video" data-video-src="" muted loop playsinline preload="none" poster="assets/banner-hero.jpg" tabindex="-1"></video>
   </figure>
   <div class="hero-content">
-    <p class="hero-eyebrow"><span></span><span id="hero-greeting">D’ici. Tout simplement.</span></p>
-    <h1 id="home-title">Un marché.<br/>Plusieurs boutiques.<br/><em>Un même panier.</em></h1>
-    <p class="hero-desc">Du tissu wax aux essentiels du quotidien, choisissez dans plusieurs boutiques d’un même marché et rassemblez vos trouvailles dans une seule commande.</p>
-    <form class="hero-search" action="marche-senegal-recherche.html" method="get" role="search">
-      <label class="sr-only" for="hero-query">Quel produit recherchez-vous ?</label>
-      <i class="ic" data-ic="search" aria-hidden="true"></i>
-      <input id="hero-query" type="search" name="q" placeholder="Que cherchez-vous aujourd’hui ?" enterkeyhint="search" maxlength="160"/>
-      <button type="submit">Rechercher <span class="home-arrow" aria-hidden="true"></span></button>
-    </form>
-    <div class="hero-suggestions"><span>À découvrir</span><a href="marche-senegal-recherche.html?category=mode">Mode &amp; wax</a><a href="marche-senegal-recherche.html?category=artisan">Artisanat</a><a href="marche-senegal-recherche.html?category=aliment">Saveurs locales</a></div>
-    <div class="hero-mobile-actions">
-      <a href="#marches">Explorer les marchés <span class="home-arrow" aria-hidden="true"></span></a>
-      <a href="marche-senegal-recherche.html">Voir les produits <span class="home-arrow" aria-hidden="true"></span></a>
-    </div>
-    <a class="hero-market-link" href="#marches">Choisir un marché <span class="home-arrow" aria-hidden="true"></span></a>
+    <p class="hero-eyebrow"><span></span><span id="hero-greeting">Le Sénégal se retrouve ici</span></p>
+    <h1 id="home-title">Le marché d’ici.<br/><em>À portée de main.</em></h1>
+    <p class="hero-desc">Des allées de nos marchés aux boutiques de nos quartiers, découvrez ce que les commerçants proposent, échangez avec eux et choisissez à votre rythme.</p>
+    <div class="home-hero-actions"><a class="home-hero-button home-hero-button-primary" href="marche-senegal-marche.html">Explorer les marchés <span aria-hidden="true">↗</span></a><a class="home-hero-button home-hero-button-secondary" href="marche-senegal-recherche.html">Trouver un produit <span aria-hidden="true">↗</span></a></div>
   </div>
   <div class="hero-footer">
     <a class="hero-explore" href="#marches"><span class="explore-arrow" aria-hidden="true">↓</span> Entrez dans nos marchés</a>
@@ -324,6 +315,10 @@ footer{background:#0A1710;padding:52px 5vw 28px;color:rgba(255,255,255,.45)}
     <div><span>03</span><strong>Suivez chaque boutique</strong><p>Chaque vendeur confirme sa partie de la commande.</p></div>
     <p class="market-basket-note">La collecte et la livraison communes par un partenaire seront proposées quand ce service sera disponible, après accord des vendeurs et validation du tarif par l’acheteur.</p>
   </div>
+</section>
+<section class="home-story" aria-labelledby="home-story-title">
+  <div class="home-story-photo"><img src="assets/marche-sandaga.jpg" width="1920" height="1086" loading="lazy" alt="Allée d’un marché sénégalais"/></div>
+  <div class="home-story-copy"><p class="home-story-kicker">Un commerce plus proche</p><h2 id="home-story-title">Les marchés ont une histoire. <em>Les boutiques aussi.</em></h2><p>Retrouvez des vendeurs, découvrez leurs produits et repérez leur boutique — dans un marché ou ailleurs dans la ville.</p><a href="#marches">Rencontrer les marchés <span aria-hidden="true">↗</span></a></div>
 </section>
 <!-- MARCHÉS -->
 <section class="section-wrap white-bg" id="marches">
