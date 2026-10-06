@@ -381,6 +381,7 @@
     <div class="sb-item" onclick="showPage('revenue',this)"><span class="sb-icon"><i class="ic" data-ic="coins"></i></span>Revenus</div>
     <div class="sb-item" onclick="showPage('deliveries',this)"><span class="sb-icon"><i class="ic" data-ic="bike"></i></span>Livreurs</div>
     <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon"><i class="ic" data-ic="target"></i></span>Promotions</div>
+    <div class="sb-item" onclick="showPage('stories',this)"><span class="sb-icon"><i class="ic" data-ic="camera"></i></span>Stories</div>
     <div class="sb-sec">Système</div>
     <div class="sb-item" onclick="showPage('settings',this)"><span class="sb-icon"><i class="ic" data-ic="settings"></i></span>Paramètres</div>
     <div class="sb-item" onclick="showPage('logs',this)"><span class="sb-icon"><i class="ic" data-ic="clipboard-list"></i></span>Logs</div>
@@ -703,6 +704,19 @@
     </div>
   </div>
 
+  <!-- ── STORIES ── -->
+  <div class="ps" id="ps-stories">
+    <div class="sec-header">
+      <div class="sec-title" id="stories-title"><i class="ic" data-ic="camera"></i> Stories en cours</div>
+    </div>
+    <div class="card">
+      <table class="t">
+        <thead><tr><th>Story</th><th>Boutique</th><th>Phrase</th><th>Publiée</th><th>Action</th></tr></thead>
+        <tbody id="stories-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ── LOGS ── -->
   <div class="ps" id="ps-logs">
     <div class="sec-header">
@@ -763,6 +777,7 @@
 </main>
 
 <script src="api.js"></script>
+<script src="stories.js"></script>
 <script>
 // ════════════════════════════════════════
 //   DASHBOARD ADMIN — Données dynamiques
@@ -820,6 +835,7 @@ function showPage(id, navItem) {
   if (id === 'disputes'   && !disputesLoaded)   loadDisputes();
   if (id === 'products'   && !productsLoaded)   loadProducts();
   if (id === 'promotions' && !promotionsLoaded) loadPromotions();
+  if (id === 'stories')                         loadStoriesAdmin();
   if (id === 'logs')                            loadLogs();
   if (id === 'revenue'    && !revenueLoaded)    loadRevenue();
   if (id === 'deliveries' && !deliveriesLoaded) loadDeliveries();
@@ -2161,6 +2177,77 @@ async function basculerPromotion(id, actuellementActive, titre) {
     } else {
       showToast(res.message || 'Action impossible');
     }
+  } catch (e) {
+    showToast('Erreur — backend démarré ?');
+  }
+}
+
+// ══════════════════════════════════════
+//   STORIES — MODÉRATION
+// ══════════════════════════════════════
+async function loadStoriesAdmin() {
+  const tbody = document.getElementById('stories-tbody');
+  if (!tbody) return;
+  const ligneMessage = (texte, couleur) => {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 5;
+    td.style.cssText = 'text-align:center;padding:24px;color:' + (couleur || 'var(--muted)');
+    td.textContent = texte;
+    tr.appendChild(td);
+    tbody.replaceChildren(tr);
+  };
+  ligneMessage('Chargement…');
+  try {
+    const res = await apiCall('/api/stories/admin/en-cours');
+    if (!res.success) { ligneMessage(res.message || 'Erreur de chargement', 'var(--red)'); return; }
+    const stories = res.data || [];
+    const titre = document.getElementById('stories-title');
+    if (titre) titre.textContent = 'Stories en cours (' + stories.length + ')';
+    if (!stories.length) { ligneMessage('Aucune story en cours'); return; }
+    tbody.replaceChildren();
+    stories.forEach(s => {
+      const tr = document.createElement('tr');
+      const tdImage = document.createElement('td');
+      const lien = document.createElement('a');
+      lien.href = s.mediaUrl; lien.target = '_blank'; lien.rel = 'noopener';
+      const img = document.createElement('img');
+      img.alt = s.mediaType === 'VIDEO' ? 'Vidéo' : 'Photo';
+      img.width = 56; img.height = 56;
+      img.style.cssText = 'border-radius:8px;object-fit:cover;background:#ddd';
+      const vignette = StoriesCore.vignette(s);
+      if (vignette) img.src = vignette;
+      lien.appendChild(img);
+      tdImage.appendChild(lien);
+      const tdBoutique = document.createElement('td');
+      tdBoutique.textContent = s.shop?.name || '—';
+      const tdPhrase = document.createElement('td');
+      tdPhrase.style.fontSize = '.8rem';
+      tdPhrase.textContent = s.caption || '—';
+      const tdQuand = document.createElement('td');
+      tdQuand.style.cssText = 'font-size:.76rem;color:var(--muted)';
+      tdQuand.textContent = StoriesCore.ilYA(s.createdAt);
+      const tdAction = document.createElement('td');
+      const bouton = document.createElement('button');
+      bouton.className = 'badge b-rej';
+      bouton.style.cssText = 'cursor:pointer;border:none';
+      bouton.textContent = 'Retirer';
+      bouton.onclick = () => retirerStoryAdmin(s.id, s.shop?.name || 'cette boutique');
+      tdAction.appendChild(bouton);
+      tr.append(tdImage, tdBoutique, tdPhrase, tdQuand, tdAction);
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    ligneMessage('Erreur de chargement — backend démarré ?', 'var(--red)');
+  }
+}
+
+async function retirerStoryAdmin(id, boutique) {
+  if (!confirm('Retirer la story de « ' + boutique + ' » ? Elle disparaîtra tout de suite.')) return;
+  try {
+    const res = await apiCall('/api/stories/admin/' + encodeURIComponent(id), { method: 'DELETE' });
+    showToast(res.message || (res.success ? 'Story retirée' : 'Action impossible'));
+    if (res.success) loadStoriesAdmin();
   } catch (e) {
     showToast('Erreur — backend démarré ?');
   }

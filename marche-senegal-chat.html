@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script src="api.js"></script>
+<script src="stories.js"></script>
 <style>
 :root{
   --green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;
@@ -98,6 +99,11 @@ a{text-decoration:none;color:inherit}
   .msg-row{max-width:88%}
   .nav{padding:0 12px}
 }
+.story-reponse{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--gp,#E8F5EC);font-size:.85rem}
+.story-reponse[hidden]{display:none}
+.story-reponse img{border-radius:8px;object-fit:cover;background:#ccc}
+.story-reponse img[hidden]{display:none}
+.bubble-img{display:block;width:120px;height:120px;object-fit:cover;border-radius:10px;margin-bottom:6px}
 </style>
 <script src="icons.js"></script>
 <link rel="stylesheet" href="identite-vendeur.css"/>
@@ -127,6 +133,12 @@ a{text-decoration:none;color:inherit}
   <div class="loading-chat">
     <div class="ls"></div><div class="ls"></div><div class="ls"></div>
   </div>
+</div>
+
+<!-- Réponse à une story : rappelle à l'acheteur de quoi il parle. -->
+<div class="story-reponse" id="story-reponse" hidden>
+  <img id="story-reponse-img" alt="" width="40" height="40" hidden>
+  <span>Vous répondez à une story de cette boutique.</span>
 </div>
 
 <!-- INPUT -->
@@ -194,6 +206,29 @@ function preparerMessageCommande() {
   document.getElementById('send-btn').disabled = false;
 }
 
+// Réponse à une story : la vignette s'affiche ici, et le premier message envoyé
+// porte l'id de la story ; le serveur y joint lui-même la vignette.
+let storyEnReponse = null;
+async function preparerReponseStory() {
+  if (estVendeur || currentUser?.role !== 'BUYER') return;
+  const id = new URLSearchParams(window.location.search).get('story');
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
+  storyEnReponse = id;
+  document.getElementById('story-reponse').hidden = false;
+  const saisie = document.getElementById('msg-input');
+  if (saisie && !saisie.value) saisie.placeholder = 'Répondre à cette story…';
+  try {
+    const r = await getShopStories(getShopIdFromURL());
+    const story = r && r.success && r.data ? r.data.stories.find(s => s.id === id) : null;
+    const vignette = story ? StoriesCore.vignette(story) : null;
+    if (vignette) {
+      const img = document.getElementById('story-reponse-img');
+      img.src = vignette;
+      img.hidden = false;
+    }
+  } catch { /* le bandeau reste, sans image */ }
+}
+
 // ── Formater l'heure ──
 function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -233,7 +268,16 @@ function buildBubble(msg, isMine) {
 
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
-  bubble.textContent = msg.content;
+  // Seule une image de notre compte Cloudinary est affichée (vignette de story).
+  if (typeof msg.imageUrl === 'string' && /^https:\/\/res\.cloudinary\.com\//.test(msg.imageUrl)) {
+    const image = document.createElement('img');
+    image.className = 'bubble-img';
+    image.alt = 'Story';
+    image.loading = 'lazy';
+    image.src = msg.imageUrl;
+    bubble.appendChild(image);
+  }
+  bubble.appendChild(document.createTextNode(msg.content));
 
   const time = document.createElement('div');
   time.className = 'msg-time';
@@ -573,12 +617,14 @@ async function sendMessage() {
   input.value = '';
 
   const result = await appelMessagerie(cheminConversation(currentShopId, currentBuyerId), {
-    method: 'POST', body: JSON.stringify({ content })
+    method: 'POST', body: JSON.stringify(storyEnReponse ? { content, storyId: storyEnReponse } : { content })
   });
   if (!result.success) {
     showToast('❌ ' + (result.message || 'Erreur d\'envoi'), 'error');
     input.value = content;
   } else {
+    storyEnReponse = null;
+    document.getElementById('story-reponse').hidden = true;
     appendMessage(result.data);
   }
   btn.disabled = false;
@@ -678,6 +724,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   currentBuyerId = null;
   await loadChat(currentShopId, null);
   preparerMessageCommande();
+  preparerReponseStory();
   connectSocket(currentShopId, currentUser?.id, currentUser?.id);
 });
 </script>
