@@ -229,6 +229,53 @@ async function getShop(id) {
   return await apiCall(`/api/shops/${id}`);
 }
 
+// ────────────────────────────────
+// STORIES DES VENDEURS
+// ────────────────────────────────
+// Lecture publique : un jeton périmé dans le navigateur ne doit jamais renvoyer
+// l'acheteur à l'accueil, d'où redirectOnUnauthorized: false.
+async function getStories() {
+  return await apiCall('/api/stories', { redirectOnUnauthorized: false });
+}
+async function getShopStories(shopId) {
+  return await apiCall('/api/stories/boutique/' + encodeURIComponent(shopId), { redirectOnUnauthorized: false });
+}
+async function marquerStoryVue(id, viewerKey) {
+  return await apiCall('/api/stories/' + encodeURIComponent(id) + '/vue', {
+    method: 'POST', body: JSON.stringify({ viewerKey }), redirectOnUnauthorized: false
+  });
+}
+// keepalive : le clic part même si la page change aussitôt pour la fiche produit.
+async function clicProduitStory(id) {
+  return await apiCall('/api/stories/' + encodeURIComponent(id) + '/clic-produit', {
+    method: 'POST', keepalive: true, redirectOnUnauthorized: false
+  });
+}
+async function getMesStories() {
+  return await apiCall('/api/stories/mes-stories');
+}
+async function publierStory(donnees) {
+  return await apiCall('/api/stories', { method: 'POST', body: JSON.stringify(donnees) });
+}
+async function supprimerStory(id) {
+  return await apiCall('/api/stories/' + encodeURIComponent(id), { method: 'DELETE' });
+}
+// Photo de story : envoi multipart, sans l'en-tête JSON d'apiCall.
+async function envoyerPhotoStory(fichier) {
+  const corps = new FormData();
+  corps.append('image', fichier);
+  try {
+    const reponse = await fetch(API_URL + '/api/upload/story', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }, body: corps
+    });
+    const d = await reponse.json();
+    if (reponse.ok && d.success && typeof d.url === 'string') return { success: true, url: d.url };
+    return { success: false, message: d.message || 'L’envoi de la photo a échoué.' };
+  } catch {
+    return { success: false, message: 'Erreur de connexion au serveur' };
+  }
+}
+
 // Récupérer le dashboard du vendeur connecté
 async function getDashboard() {
   return await apiCall('/api/shops/dashboard');
