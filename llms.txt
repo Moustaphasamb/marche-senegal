@@ -6,7 +6,7 @@ Le site est en français. Les prix sont affichés en francs CFA (FCFA). La créa
 
 ## Pages principales
 
-- [Accueil](https://marchesenegal.sn/marche-senegal-accueil.html) : présentation, marchés, produits et boutiques mis en avant
+- [Accueil](https://marchesenegal.sn/) : présentation, marchés, produits et boutiques mis en avant
 - [Les marchés](https://marchesenegal.sn/marche-senegal-marche.html) : les marchés du Sénégal référencés, par ville et par région
 - [Recherche de produits](https://marchesenegal.sn/marche-senegal-recherche.html) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
 

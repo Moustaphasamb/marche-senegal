@@ -15,7 +15,18 @@
       "includeFiles": "marche-senegal-{marche,boutique,produit}.html"
     }
   },
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/marche-senegal-accueil.html"
+    },
     {
       "source": "/marches/:cle",
       "destination": "/api/page?type=marche&cle=:cle"

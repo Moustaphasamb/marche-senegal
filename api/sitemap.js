@@ -5,7 +5,7 @@
 const { SITE, urlPropre } = require('./_lib/remplir-page.js');
 
 const API = 'https://marche-senegal-backend-production.up.railway.app/api';
-const FIXES = ['/marche-senegal-accueil.html', '/marche-senegal-marche.html', '/marche-senegal-recherche.html'];
+const FIXES = ['/', '/marche-senegal-marche.html', '/marche-senegal-recherche.html'];
 
 const dependances = {
   appelerApi: async chemin => {
