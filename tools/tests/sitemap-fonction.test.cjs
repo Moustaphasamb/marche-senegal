@@ -24,6 +24,7 @@ test('liste pages fixes, marchés avec slug, boutiques, produits', async () => {
     assert.ok(res.corps.includes(`<loc>https://marchesenegal.sn${u}</loc>`), u);
   }
   assert.doesNotMatch(res.corps, /m2/);
+  assert.doesNotMatch(res.corps, /marche-senegal-marche.html/);
   assert.match(res.corps, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
 });
 
