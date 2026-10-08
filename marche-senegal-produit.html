@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Produit — Marché Sénégal</title>
 <meta name="description" content="Consultez les détails d'un produit, repérez sa boutique et contactez le vendeur sur Marché Sénégal."/>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap"/></noscript>
 <link rel="stylesheet" href="styles.css"/>
 <style>
 :root{
@@ -375,7 +375,7 @@ a{text-decoration:none;color:inherit}
   </div>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-login">Se connecter</button>
-    <button class="nav-cart" onclick="toast('Panier...')">
+    <button class="nav-cart" onclick="window.location.href='marche-senegal-panier.html'">
       <i class="ic" data-ic="shopping-cart"></i><div class="cart-badge" id="cart-count">0</div>
     </button>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()">
@@ -640,6 +640,7 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <script src="api.js"></script>
+<script src="entete-compte.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE PRODUIT — Données dynamiques

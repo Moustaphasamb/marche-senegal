@@ -53,6 +53,7 @@ async function accueilSansApi() {
   w.fetch = () => new Promise(() => {});  // ne se résout jamais
 
   w.eval(lire('api.js'));
+  w.eval(lire('entete-compte.js'));
   w.eval(scriptsInternes(html));
 
   w.document.dispatchEvent(new w.Event('DOMContentLoaded'));
