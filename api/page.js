@@ -8,7 +8,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { preparerModele, remplirPage, marquerIntrouvable } = require('./_lib/remplir-page.js');
 
-const API = 'https://marche-senegal-backend-production.up.railway.app/api';
+// Aperçu Vercel de la branche « preprod » : pages remplies par la préproduction.
+const API = (process.env.VERCEL_GIT_COMMIT_REF === 'preprod'
+  ? 'https://backend-preprod-preprod-d221.up.railway.app'
+  : 'https://marche-senegal-backend-production.up.railway.app') + '/api';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const PAGES = {
   marche: { fichier: 'marche-senegal-marche.html', route: 'markets', cle: /^[a-z0-9-]{1,80}$/ },

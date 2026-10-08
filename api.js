@@ -5,9 +5,13 @@
 // ════════════════════════════════════════
 
 const PROD_API_URL = 'https://marche-senegal-backend-production.up.railway.app';
+// Préproduction (docs/exploitation/preprod.md) : seule l'adresse fixe que Vercel donne
+// à la branche « preprod » l'appelle. Toute autre adresse publique garde la production.
+const PREPROD_API_URL = 'https://backend-preprod-preprod-d221.up.railway.app';
+const SITE_PREPROD = 'marche-senegal-git-preprod-samb-s-projects1.vercel.app';
 const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:3000'
-  : PROD_API_URL;
+  : window.location.hostname === SITE_PREPROD ? PREPROD_API_URL : PROD_API_URL;
 
 // ────────────────────────────────
 // « Ma vitrine » en pause (2026-10-06) : cachée aux vendeurs et aux acheteurs

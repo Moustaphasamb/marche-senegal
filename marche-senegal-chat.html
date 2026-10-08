@@ -147,9 +147,6 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <script>
-const API_URL_WS = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:3000'
-  : 'https://marche-senegal-backend-production.up.railway.app';
 let currentShopId = null;
 let currentBuyerId = null;   // l'acheteur de la conversation ouverte
 let estVendeur = false;
@@ -687,7 +684,8 @@ function connectSocket(shopId, buyerId, userId) {
   // afficherait le même message plusieurs fois.
   if (socket) socket.disconnect();
 
-  socket = io(API_URL_WS, {
+  // Même serveur que les appels HTTP (api.js), préproduction comprise.
+  socket = io(API_URL, {
     transports: ['websocket', 'polling'],
     // Le serveur refuse les connexions anonymes : sans ce jeton, n'importe
     // qui pourrait rejoindre la conversation de deux inconnus.
