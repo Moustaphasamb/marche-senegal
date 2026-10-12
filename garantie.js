@@ -161,7 +161,10 @@
       orderId: commande.id,
       reason,
       description: String(description || '').trim(),
-      items: articlesChoisis(articles).map(a => ({ orderItemId: a.orderItemId, quantity: a.quantity })),
+      // « Rien reçu » vise toute la commande : le serveur prend tous les articles.
+      // Une quantité choisie avant de changer de motif ne doit pas la réduire.
+      items: MOTIFS_TOUTE_LA_COMMANDE.includes(reason) ? []
+        : articlesChoisis(articles).map(a => ({ orderItemId: a.orderItemId, quantity: a.quantity })),
       preuves: (preuves || []).map(p => ({ kind: p.kind, url: p.url }))
     };
   }

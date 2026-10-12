@@ -113,3 +113,9 @@ test('relecture : une décision en cours d’exécution (échange, retour) bloqu
   assert.equal(e.cas, 'DOSSIER');
   assert.equal(e.litige.id, 'd1');
 });
+
+test('préprod : « rien reçu » vise toute la commande, même après un autre choix de quantités', () => {
+  const corps = G.corpsDossier({ reason: 'NOT_RECEIVED', description: 'Rien reçu du tout.',
+    articles: [{ orderItemId: 'i1', quantity: 1 }], preuves: [] }, commande());
+  assert.deepEqual(corps.items, []);
+});
