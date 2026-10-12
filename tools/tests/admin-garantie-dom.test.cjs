@@ -104,3 +104,15 @@ test('exécution : collecte, retour reçu avec preuve, échange remis', async ()
   const recu = await setup([{ ...resolu, returnStatus: 'RECEIVED' }]);
   assert.deepEqual([...recu.$('disputes-tbody').querySelectorAll('button')].map(b => b.textContent.trim()), ['Bon produit remis']);
 });
+
+test('relecture : par défaut, la file montre aussi les décisions à exécuter, pas les dossiers clos', async () => {
+  const aExecuter = dossier({ id: 'd2', number: 'LIT-2026-0008', status: 'RESOLVED', outcome: 'RETURN_AND_REFUND', returnStatus: 'AWAITING_PICKUP', resolvedAt: dans(-1), refundedAt: null });
+  const clos = dossier({ id: 'd3', number: 'LIT-2026-0009', status: 'CLOSED', outcome: 'REJECTED' });
+  const { $, appels } = await setup([dossier(), aExecuter, clos]);
+  assert.equal($('disputes-filter').value, 'atraiter');
+  assert.ok(appels.some(a => a.url === '/api/admin/disputes?status=all'));
+  const texte = $('disputes-tbody').textContent;
+  assert.match(texte, /LIT-2026-0007/);
+  assert.match(texte, /LIT-2026-0008/);
+  assert.doesNotMatch(texte, /LIT-2026-0009/);
+});

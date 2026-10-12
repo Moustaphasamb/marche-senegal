@@ -41,9 +41,6 @@ test('versé, délai passé, avant réception, sans date de fin, annulée', () =
   assert.equal(G.etatGarantie(commande({ fundsReleasedAt: plus(-1) }), [], T).cas, 'REGLEE');
   assert.equal(G.etatGarantie(commande({ claimDeadlineAt: plus(-1) }), [], T).cas, 'FERMEE');
   assert.equal(G.etatGarantie(commande({ status: 'READY', claimDeadlineAt: null }), [], T).cas, 'AVANT_RECEPTION');
-  const sansFin = G.etatGarantie(commande({ claimDeadlineAt: null }), [], T);
-  assert.equal(sansFin.cas, 'FENETRE');
-  assert.equal(sansFin.reste, null);
   assert.equal(G.etatGarantie(commande({ status: 'CANCELLED' }), [], T, { paye: true }).cas, 'ANNULEE');
   assert.equal(G.etatGarantie(commande({ status: 'CANCELLED' }), [], T, { paye: false }).cas, 'AUCUN');
 });
@@ -100,4 +97,19 @@ test('résumé vendeur : urgent dans les 12 dernières heures', () => {
   assert.deepEqual(r, { titre: 'LIT-2026-0005 · Le produit est abîmé', etat: 'À vous de répondre',
     reste: '10 h 00 min', urgent: true, lien: 'marche-senegal-reclamation.html?id=d1' });
   assert.equal(G.resumeVendeur({ id: 'd2', reason: 'DAMAGED', status: 'OPEN', deadlineAt: plus(30) }, T).urgent, false);
+});
+
+test('relecture : une commande livrée avant la garantie (sans date de fin) n’ouvre pas de fenêtre sans fin', () => {
+  assert.equal(G.etatGarantie(commande({ claimDeadlineAt: null }), [], T).cas, 'FERMEE');
+});
+
+test('relecture : argent déjà versé par l’ancien séquestre = réglée', () => {
+  assert.equal(G.etatGarantie(commande({ payment: { escrowReleased: true } }), [], T).cas, 'REGLEE');
+});
+
+test('relecture : une décision en cours d’exécution (échange, retour) bloque « Tout est conforme »', () => {
+  const litige = { id: 'd1', orderId: 'o1', status: 'RESOLVED', outcome: 'EXCHANGE', createdAt: plus(-2) };
+  const e = G.etatGarantie(commande(), [litige], T);
+  assert.equal(e.cas, 'DOSSIER');
+  assert.equal(e.litige.id, 'd1');
 });

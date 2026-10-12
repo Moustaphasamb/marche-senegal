@@ -95,3 +95,17 @@ test('mauvaise taille : la règle de l’erreur de taille est rappelée', async 
   assert.equal($('rec-note-taille').hidden, false);
   assert.match($('rec-note-taille').textContent, /Si vous vous êtes trompé de taille, ce n’est pas couvert/);
 });
+
+test('relecture : une photo qui arrive après fermeture du formulaire ne rejoint pas une autre réclamation', async () => {
+  const { w, $ } = await formulaire();
+  let livrer;
+  w.EnvoiPreuve = { envoyerPreuve: () => new Promise(r => { livrer = r; }) };
+  w.choisirMotif('DAMAGED'); w.etapeSuivante(); w.changerQuantite('i1', 1); w.etapeSuivante();
+  const envoi = w.ajouterFichiers([{ name: 'a.jpg' }]);
+  w.fermerFormulaire();
+  w.ouvrirFormulaire('o1');
+  livrer({ success: true, preuve: PHOTO });
+  await envoi;
+  assert.equal(w.formulaire.preuves.length, 0);
+  assert.equal(w.formulaire.envoisEnCours, 0);
+});

@@ -548,6 +548,7 @@
     <div class="sec-header">
       <div class="sec-title" id="disputes-title"><i class="ic" data-ic="scale"></i> Litiges</div>
       <select id="disputes-filter" onchange="loadDisputes()" style="height:36px;border:1.5px solid var(--border);border-radius:99px;padding:0 14px;font-size:.82rem;background:#fff;outline:none">
+        <option value="atraiter">À traiter</option>
         <option value="open">Ouverts</option>
         <option value="resolved">Tranchés</option>
         <option value="all">Tous</option>
@@ -1683,12 +1684,15 @@ async function loadDisputes() {
   const tbody = document.getElementById('disputes-tbody');
   if (!tbody) return;
 
-  const filtre = document.getElementById('disputes-filter')?.value || 'open';
+  // « À traiter » : les dossiers ouverts et les décisions encore à exécuter
+  // (collecte, retour reçu, échange, virement), la plus pressée en tête.
+  const filtre = document.getElementById('disputes-filter')?.value || 'atraiter';
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Chargement…</td></tr>';
 
   try {
-    const res = await apiCall('/api/admin/disputes?status=' + filtre);
+    const res = await apiCall('/api/admin/disputes?status=' + (filtre === 'atraiter' ? 'all' : filtre));
     _disputes = res.data || [];
+    if (filtre === 'atraiter') _disputes = _disputes.filter(d => Garantie.actionsAdmin(d, new Date()).length > 0);
 
     const titleEl = document.getElementById('disputes-title');
     if (titleEl) titleEl.textContent = '⚖️ Litiges (' + _disputes.length + ')';

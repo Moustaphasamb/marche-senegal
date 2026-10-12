@@ -1238,17 +1238,20 @@ function afficherPreuves(message) {
 }
 
 async function ajouterFichiers(fichiers) {
+  // Le formulaire peut être fermé, puis rouvert pour une autre commande,
+  // pendant l'envoi : la photo ne doit rejoindre que celui qui l'a demandée.
+  const demandeur = formulaire;
   for (const fichier of Array.from(fichiers || [])) {
-    if (!formulaire) return;
-    formulaire.envoisEnCours += 1;
+    if (!demandeur || formulaire !== demandeur) return;
+    demandeur.envoisEnCours += 1;
     afficherPreuves('Envoi en cours…');
     const resultat = await EnvoiPreuve.envoyerPreuve(fichier, {
       obtenirAutorisation: autorisationPreuves,
       envoyerVideo: (f, options) => EnvoiVideo.envoyer(f, options),
       suivi: texte => afficherPreuves(texte)
     });
-    if (!formulaire) return;
-    formulaire.envoisEnCours -= 1;
+    demandeur.envoisEnCours -= 1;
+    if (formulaire !== demandeur) return;
     if (resultat.success) formulaire.preuves.push(resultat.preuve);
     else erreurFormulaire(resultat.message);
     afficherPreuves('');

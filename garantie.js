@@ -20,6 +20,9 @@
   const MOTIFS_APRES_RECEPTION = ['DAMAGED', 'WRONG_ITEM', 'INCOMPLETE', 'WRONG_SIZE', 'NOT_AS_DESCRIBED', 'NOT_RECEIVED'];
   const LIMITES = { PHOTO: 5, VIDEO: 1 };
   const OUVERTS = ['OPEN', 'AWAITING_BUYER', 'INVESTIGATING'];
+  // Une décision en cours d'exécution (retour, échange, virement) garde la
+  // commande sous dossier : « Tout est conforme » paierait le vendeur trop tôt.
+  const EN_COURS = [...OUVERTS, 'RESOLVED'];
 
   const ETATS = {
     acheteur: {
@@ -107,12 +110,14 @@
       .filter(l => l.orderId === commande.id)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const dernier = dossiers[0] || null;
-    const ouvert = dossiers.find(l => OUVERTS.includes(l.status));
+    const ouvert = dossiers.find(l => EN_COURS.includes(l.status));
     if (ouvert) return { cas: 'DOSSIER', litige: ouvert };
     if (commande.status === 'DELIVERED') {
-      if (commande.fundsReleasedAt) return { cas: 'REGLEE', litige: dernier };
-      // Sans date de fin (anciennes commandes), le serveur laisse signaler.
-      if (!commande.claimDeadlineAt) return { cas: 'FENETRE', reste: null, echeance: null, litige: dernier };
+      // Argent déjà versé : par la garantie, ou par l'ancien séquestre.
+      if (commande.fundsReleasedAt || commande.payment?.escrowReleased) return { cas: 'REGLEE', litige: dernier };
+      // Sans date de fin, la commande a été livrée avant la garantie : pas de
+      // fenêtre sans fin, contraire aux 48 h annoncées.
+      if (!commande.claimDeadlineAt) return { cas: 'FERMEE', litige: dernier };
       const reste = tempsRestant(commande.claimDeadlineAt, maintenant);
       if (reste) return { cas: 'FENETRE', reste, echeance: commande.claimDeadlineAt, litige: dernier };
       return { cas: 'FERMEE', litige: dernier };

@@ -31,3 +31,8 @@ test('la page est liée depuis l’accueil, la fiche produit et le panier', () =
 test('la page est dans le plan du site', () => {
   assert.match(lire('api/sitemap.js'), /'\/marche-senegal-garantie\.html'/);
 });
+
+test('relecture : la fiche produit ne promet le séquestre qu’au paiement en ligne', () => {
+  const ligne = lire('marche-senegal-produit.html').split(/\r?\n/).find(l => l.includes('class="garantie-ligne"'));
+  assert.match(ligne, /paiement en ligne/);
+});
