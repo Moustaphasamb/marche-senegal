@@ -154,6 +154,35 @@ a{text-decoration:none;color:inherit}
 
 /* ACTIONS */
 .actions-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.gar-bloc{border-top:1px solid var(--border);padding:12px 0}
+.gar-bloc:first-child{border-top:0;padding-top:0}
+.gar-boutique{font-weight:700;color:var(--dark);font-size:.86rem;margin-bottom:4px}
+.gar-texte{font-size:.84rem;color:var(--text);margin-bottom:10px}
+.gar-boutons{display:flex;flex-wrap:wrap;gap:8px}
+.gar-boutons .ac-btn{flex:1 1 160px}
+.rec-overlay{position:fixed;inset:0;background:rgba(13,31,23,.55);display:none;align-items:flex-end;justify-content:center;z-index:600}
+.rec-overlay.open{display:flex}
+.rec-box{background:#fff;width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 20px}
+@media(min-width:600px){.rec-overlay{align-items:center}.rec-box{border-radius:18px}}
+.rec-tete{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.rec-tete h3{font-size:1.05rem;color:var(--dark)}
+.rec-fermer{background:none;border:0;font-size:1.1rem;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px}
+.rec-etapes{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.rec-choix{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;font-size:.88rem;cursor:pointer}
+.rec-choix input{width:18px;height:18px}
+.rec-note{background:var(--gdl);border-radius:10px;padding:10px 12px;font-size:.82rem;margin-top:6px}
+.rec-article{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--border);padding:10px 0;font-size:.86rem}
+.rec-article select{height:40px;border:1.5px solid var(--border);border-radius:8px;padding:0 8px}
+.rec-box textarea{width:100%;min-height:110px;border:1.5px solid var(--border);border-radius:10px;padding:10px;font:inherit;font-size:.88rem}
+.rec-box label.rec-libelle{display:block;font-weight:700;font-size:.84rem;margin:12px 0 6px}
+.rec-preuves{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.rec-preuve{position:relative;width:76px}
+.rec-preuve img{width:76px;height:76px;object-fit:cover;border-radius:8px;display:block}
+.rec-preuve button{width:100%;margin-top:4px;font-size:.72rem;background:none;border:1px solid var(--border);border-radius:6px;padding:4px}
+.rec-erreur{color:var(--red);font-size:.84rem;min-height:1.2em;margin:10px 0 0}
+.rec-actions{display:flex;gap:8px;margin-top:12px}
+.rec-actions .ac-btn{flex:1}
+.gar-lien{display:inline-block;margin-top:10px;font-size:.8rem;color:var(--green);font-weight:600}
 .ac-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px}
 .ac-btns{display:flex;flex-direction:column;gap:9px}
 .ac-btn{width:100%;height:44px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
@@ -431,6 +460,30 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
+    <!-- ACHAT PROTÉGÉ : une décision par commande vendeur -->
+    <div class="actions-card" id="garantie-card" style="display:none">
+      <div class="ac-title"><i class="ic" data-ic="shield-check"></i> Achat protégé</div>
+      <div id="garantie-blocs"></div>
+      <a class="gar-lien" href="marche-senegal-garantie.html">Comment fonctionne la garantie</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- RÉCLAMATION : 3 étapes -->
+<div class="rec-overlay" id="reclamation-modal" role="dialog" aria-modal="true" aria-labelledby="rec-titre">
+  <div class="rec-box">
+    <div class="rec-tete">
+      <h3 id="rec-titre">Signaler un problème</h3>
+      <button class="rec-fermer" type="button" onclick="fermerFormulaire()" aria-label="Fermer">✕</button>
+    </div>
+    <div class="rec-etapes" id="rec-etapes"></div>
+    <div id="rec-corps"></div>
+    <p class="rec-erreur" id="rec-erreur" role="alert"></p>
+    <div class="rec-actions">
+      <button class="ac-btn" type="button" id="rec-retour" onclick="etapePrecedente()">Retour</button>
+      <button class="ac-btn ac-btn-green" type="button" id="rec-suivant" onclick="etapeSuivante()">Suivant</button>
+    </div>
   </div>
 </div>
 
@@ -453,6 +506,9 @@ a{text-decoration:none;color:inherit}
 </nav>
 
 <script src="api.js"></script>
+<script src="garantie.js"></script>
+<script src="envoi-video.js"></script>
+<script src="envoi-preuve.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE SUIVI COMMANDE — Données dynamiques
@@ -619,6 +675,7 @@ function renderOrder(order) {
 
   // Actions
   renderActions(order);
+  chargerGarantie(order);
 }
 
 // ── Afficher les étapes de suivi ──
@@ -841,14 +898,6 @@ function renderActions(order) {
     `);
   }
 
-  // Signaler un problème — si livré ou en cours
-  if (!['PENDING', 'CANCELLED'].includes(order.status)) {
-    actions.push(`
-      <button class="ac-btn" onclick="reportProblem()">
-        ⚠️ Signaler un problème
-      </button>
-    `);
-  }
 
   container.innerHTML = actions.join('');
 }
@@ -933,6 +982,346 @@ async function cancelOrder(dropRefused = false) {
   } else {
     showToast('❌ Erreur lors de l\'annulation');
   }
+}
+
+// ════════════════════════════════════════
+//   ACHAT PROTÉGÉ — 48 h pour signaler un problème
+// ════════════════════════════════════════
+// Un panier Marché contient plusieurs commandes vendeur : chacune a sa propre
+// fenêtre de 48 h, son propre dossier et son propre paiement au vendeur.
+
+let commandesGarantie = [];
+
+async function chargerGarantie(order) {
+  commandesGarantie = order._isMarketOrder ? (order.orders || []) : [order];
+  const paye = (order.payment?.status || order.marketOrder?.payment?.status) === 'COMPLETED';
+  const reponse = await getMyDisputes();
+  renderGarantie(commandesGarantie, reponse.success ? (reponse.data || []) : [], { paye });
+}
+
+function boutonGarantie(texte, action, classe, surClic) {
+  const bouton = document.createElement('button');
+  bouton.className = 'ac-btn' + (classe ? ' ' + classe : '');
+  bouton.dataset.action = action;
+  bouton.textContent = texte;
+  bouton.onclick = () => surClic(bouton);
+  return bouton;
+}
+
+function lienReclamation(litige) {
+  const lien = document.createElement('a');
+  lien.className = 'gar-lien';
+  lien.href = Garantie.lienDossier(litige.id);
+  lien.textContent = 'Voir la réclamation ' + (litige.number || '');
+  return lien;
+}
+
+function renderGarantie(commandes, litiges, { maintenant = new Date(), paye = true } = {}) {
+  commandesGarantie = commandes;
+  const carte = document.getElementById('garantie-card');
+  const conteneur = document.getElementById('garantie-blocs');
+  const blocs = [];
+
+  commandes.forEach(commande => {
+    const etat = Garantie.etatGarantie(commande, litiges, maintenant, { paye });
+    if (etat.cas === 'AUCUN' && !etat.litige) return;
+
+    const bloc = document.createElement('div');
+    bloc.className = 'gar-bloc';
+    if (commandes.length > 1) {
+      const nom = document.createElement('div');
+      nom.className = 'gar-boutique';
+      nom.textContent = commande.shop?.name || 'Boutique';
+      bloc.appendChild(nom);
+    }
+    const texte = document.createElement('p');
+    texte.className = 'gar-texte';
+    const boutons = document.createElement('div');
+    boutons.className = 'gar-boutons';
+    const signaler = libelle => boutonGarantie(libelle, 'signaler', '', () => ouvrirFormulaire(commande.id));
+
+    if (etat.cas === 'FENETRE') {
+      texte.textContent = etat.reste
+        ? `Vous avez jusqu’au ${Garantie.dateDakar(etat.echeance)} (encore ${etat.reste}) pour signaler un problème. Sans signalement, le vendeur sera payé.`
+        : 'Vérifiez votre commande. Si tout va bien, dites-le : le vendeur sera payé.';
+      boutons.appendChild(boutonGarantie('Tout est conforme', 'conforme', 'ac-btn-green', b => toutEstConforme(commande.id, b)));
+      boutons.appendChild(signaler('Signaler un problème'));
+    } else if (etat.cas === 'AVANT_RECEPTION') {
+      texte.textContent = 'Votre commande n’est pas encore arrivée ? Vous pouvez le signaler.';
+      boutons.appendChild(signaler('Je n’ai rien reçu'));
+    } else if (etat.cas === 'ANNULEE') {
+      texte.textContent = 'Commande annulée. Si votre argent ne vous a pas été rendu, signalez-le.';
+      boutons.appendChild(signaler('Je n’ai pas été remboursé'));
+    } else if (etat.cas === 'DOSSIER') {
+      texte.textContent = `Réclamation ${etat.litige.number || ''} : ${Garantie.ETATS.acheteur[etat.litige.status] || ''}. Le paiement du vendeur est bloqué en attendant.`;
+    } else if (etat.cas === 'REGLEE') {
+      texte.textContent = 'Tout est réglé : le vendeur a été payé.';
+    } else if (etat.cas === 'FERMEE') {
+      texte.textContent = 'Le délai de 48 h pour signaler un problème est passé.';
+    }
+
+    bloc.appendChild(texte);
+    if (boutons.childElementCount) bloc.appendChild(boutons);
+    if (etat.litige) bloc.appendChild(lienReclamation(etat.litige));
+    blocs.push(bloc);
+  });
+
+  conteneur.replaceChildren(...blocs);
+  carte.style.display = blocs.length ? 'block' : 'none';
+}
+
+function rechargerPage() {
+  location.reload();
+}
+
+async function toutEstConforme(orderId, bouton) {
+  if (bouton.disabled) return;
+  if (!confirm('Tout est conforme ? Le vendeur sera payé tout de suite et vous ne pourrez plus signaler de problème sur cette commande.')) return;
+  bouton.disabled = true;
+  const reponse = await confirmerConforme(orderId);
+  if (reponse.success) {
+    showToast(reponse.message || 'Merci ! Le vendeur va recevoir son paiement.');
+    rechargerPage();
+    return;
+  }
+  showToast(reponse.message || 'Erreur, réessayez.', 'error');
+  bouton.disabled = false;
+}
+
+// ── Réclamation en 3 étapes : motif, articles, photos et description ──
+let formulaire = null;
+Object.defineProperty(window, 'formulaire', { get: () => formulaire, configurable: true });
+
+function ouvrirFormulaire(orderId) {
+  const commande = commandesGarantie.find(c => c.id === orderId);
+  if (!commande) return;
+  const motifs = Garantie.motifsPossibles(commande);
+  formulaire = {
+    commande,
+    etape: 1,
+    reason: motifs.length === 1 ? motifs[0] : null,
+    articles: (commande.items || []).map(i => ({ orderItemId: i.id, quantity: 0 })),
+    preuves: [],
+    description: '',
+    envoisEnCours: 0,
+    envoye: false
+  };
+  afficherEtape();
+  document.getElementById('reclamation-modal').classList.add('open');
+}
+
+function fermerFormulaire() {
+  document.getElementById('reclamation-modal').classList.remove('open');
+  formulaire = null;
+}
+
+function erreurFormulaire(texte) {
+  document.getElementById('rec-erreur').textContent = texte || '';
+}
+
+function etapesUtiles() {
+  return Garantie.MOTIFS_TOUTE_LA_COMMANDE.includes(formulaire.reason) ? [1, 3] : [1, 2, 3];
+}
+
+function choisirMotif(reason) {
+  formulaire.reason = reason;
+  const coche = document.querySelector(`input[name="rec-motif"][value="${reason}"]`);
+  if (coche) coche.checked = true;
+  const note = document.getElementById('rec-note-taille');
+  if (note) note.hidden = reason !== 'WRONG_SIZE';
+  erreurFormulaire('');
+}
+
+function changerQuantite(orderItemId, quantite) {
+  const article = formulaire.articles.find(a => a.orderItemId === orderItemId);
+  if (article) article.quantity = Number(quantite) || 0;
+  erreurFormulaire('');
+}
+
+function etapeMotif(corps) {
+  Garantie.motifsPossibles(formulaire.commande).forEach(reason => {
+    const choix = document.createElement('label');
+    choix.className = 'rec-choix';
+    const radio = document.createElement('input');
+    radio.type = 'radio'; radio.name = 'rec-motif'; radio.value = reason;
+    radio.checked = formulaire.reason === reason;
+    radio.onchange = () => choisirMotif(reason);
+    const libelle = document.createElement('span');
+    libelle.textContent = Garantie.MOTIFS[reason];
+    choix.append(radio, libelle);
+    corps.appendChild(choix);
+  });
+  const note = document.createElement('p');
+  note.className = 'rec-note'; note.id = 'rec-note-taille';
+  note.hidden = formulaire.reason !== 'WRONG_SIZE';
+  note.textContent = 'Couvert si la taille reçue n’est pas celle commandée ou annoncée sur la fiche. Si vous vous êtes trompé de taille, ce n’est pas couvert : demandez un échange au vendeur par message (transport à votre charge).';
+  corps.appendChild(note);
+}
+
+function etapeArticles(corps) {
+  const aide = document.createElement('p');
+  aide.className = 'gar-texte';
+  aide.textContent = 'Quels articles sont concernés, et combien ?';
+  corps.appendChild(aide);
+  (formulaire.commande.items || []).forEach(item => {
+    const ligne = document.createElement('div');
+    ligne.className = 'rec-article';
+    const nom = document.createElement('span');
+    nom.textContent = item.name + (item.size ? ' · taille ' + item.size : '') + (item.color ? ' · ' + item.color : '');
+    const choix = document.createElement('select');
+    choix.id = 'rec-qte-' + item.id;
+    choix.setAttribute('aria-label', 'Quantité concernée : ' + item.name);
+    for (let q = 0; q <= item.quantity; q++) {
+      const option = document.createElement('option');
+      option.value = String(q);
+      option.textContent = q === 0 ? 'Pas concerné' : q + ' sur ' + item.quantity;
+      choix.appendChild(option);
+    }
+    choix.value = String(formulaire.articles.find(a => a.orderItemId === item.id)?.quantity || 0);
+    choix.onchange = () => changerQuantite(item.id, choix.value);
+    ligne.append(nom, choix);
+    corps.appendChild(ligne);
+  });
+}
+
+function etapePreuves(corps) {
+  const titreTexte = document.createElement('label');
+  titreTexte.className = 'rec-libelle'; titreTexte.htmlFor = 'rec-description';
+  titreTexte.textContent = 'Décrivez le problème';
+  const zone = document.createElement('textarea');
+  zone.id = 'rec-description'; zone.maxLength = 1000;
+  zone.placeholder = 'Ce que vous avez constaté en ouvrant le colis…';
+  zone.value = formulaire.description;
+  zone.oninput = () => { formulaire.description = zone.value; erreurFormulaire(''); };
+
+  const titrePhotos = document.createElement('label');
+  titrePhotos.className = 'rec-libelle'; titrePhotos.htmlFor = 'rec-fichiers';
+  titrePhotos.textContent = Garantie.MOTIFS_AVEC_PHOTO.includes(formulaire.reason)
+    ? 'Photos du problème (au moins une, 5 au plus) et une vidéo si besoin'
+    : 'Photos ou vidéo (facultatif)';
+  const fichiers = document.createElement('input');
+  fichiers.type = 'file'; fichiers.id = 'rec-fichiers'; fichiers.multiple = true;
+  fichiers.accept = 'image/jpeg,image/png,image/webp,image/heic,video/mp4,video/quicktime';
+  fichiers.onchange = () => { ajouterFichiers(fichiers.files); fichiers.value = ''; };
+  const etat = document.createElement('p');
+  etat.className = 'gar-texte'; etat.id = 'rec-envoi';
+  const liste = document.createElement('div');
+  liste.className = 'rec-preuves'; liste.id = 'rec-preuves';
+
+  corps.append(titreTexte, zone, titrePhotos, fichiers, etat, liste);
+  afficherPreuves('');
+}
+
+function afficherPreuves(message) {
+  const etat = document.getElementById('rec-envoi');
+  const liste = document.getElementById('rec-preuves');
+  if (!etat || !liste || !formulaire) return;
+  etat.textContent = message || '';
+  liste.replaceChildren(...formulaire.preuves.map((preuve, index) => {
+    const carte = document.createElement('div');
+    carte.className = 'rec-preuve';
+    if (preuve.kind === 'PHOTO') {
+      const image = document.createElement('img');
+      image.src = urlImageSure(preuve.url); image.alt = 'Photo envoyée';
+      carte.appendChild(image);
+    } else {
+      const video = document.createElement('div');
+      video.textContent = 'Vidéo envoyée';
+      carte.appendChild(video);
+    }
+    const retirer = document.createElement('button');
+    retirer.type = 'button'; retirer.textContent = 'Retirer';
+    retirer.onclick = () => retirerPreuve(index);
+    carte.appendChild(retirer);
+    return carte;
+  }));
+}
+
+async function ajouterFichiers(fichiers) {
+  // Le formulaire peut être fermé, puis rouvert pour une autre commande,
+  // pendant l'envoi : la photo ne doit rejoindre que celui qui l'a demandée.
+  const demandeur = formulaire;
+  for (const fichier of Array.from(fichiers || [])) {
+    if (!demandeur || formulaire !== demandeur) return;
+    demandeur.envoisEnCours += 1;
+    afficherPreuves('Envoi en cours…');
+    const resultat = await EnvoiPreuve.envoyerPreuve(fichier, {
+      obtenirAutorisation: autorisationPreuves,
+      envoyerVideo: (f, options) => EnvoiVideo.envoyer(f, options),
+      suivi: texte => afficherPreuves(texte)
+    });
+    demandeur.envoisEnCours -= 1;
+    if (formulaire !== demandeur) return;
+    if (resultat.success) formulaire.preuves.push(resultat.preuve);
+    else erreurFormulaire(resultat.message);
+    afficherPreuves('');
+  }
+}
+
+function retirerPreuve(index) {
+  formulaire.preuves.splice(index, 1);
+  afficherPreuves('');
+}
+
+function afficherEtape() {
+  const etapes = etapesUtiles();
+  const rang = etapes.indexOf(formulaire.etape);
+  document.getElementById('rec-etapes').textContent = `Étape ${rang + 1} sur ${etapes.length}`;
+  const corps = document.getElementById('rec-corps');
+  corps.replaceChildren();
+  if (formulaire.etape === 1) etapeMotif(corps);
+  if (formulaire.etape === 2) etapeArticles(corps);
+  if (formulaire.etape === 3) etapePreuves(corps);
+  document.getElementById('rec-retour').style.visibility = rang === 0 ? 'hidden' : 'visible';
+  const suivant = document.getElementById('rec-suivant');
+  suivant.textContent = formulaire.etape === 3 ? 'Envoyer la réclamation' : 'Suivant';
+  suivant.disabled = false;
+  erreurFormulaire('');
+}
+
+function etapeSuivante() {
+  if (!formulaire) return;
+  if (formulaire.etape === 1 && !formulaire.reason) return erreurFormulaire('Choisissez ce qui ne va pas.');
+  if (formulaire.etape === 2 && !formulaire.articles.some(a => a.quantity > 0)) return erreurFormulaire('Choisissez au moins un article concerné.');
+  if (formulaire.etape === 3) return envoyerReclamation();
+  const etapes = etapesUtiles();
+  formulaire.etape = etapes[etapes.indexOf(formulaire.etape) + 1];
+  afficherEtape();
+}
+
+function etapePrecedente() {
+  if (!formulaire) return;
+  const etapes = etapesUtiles();
+  const rang = etapes.indexOf(formulaire.etape);
+  if (rang > 0) { formulaire.etape = etapes[rang - 1]; afficherEtape(); }
+}
+
+function allerVers(url) {
+  window.location.href = url;
+}
+
+async function envoyerReclamation() {
+  if (!formulaire || formulaire.envoye) return;
+  if (formulaire.envoisEnCours > 0) return erreurFormulaire('Attendez la fin de l’envoi des photos.');
+  const donnees = { reason: formulaire.reason, description: formulaire.description, articles: formulaire.articles, preuves: formulaire.preuves };
+  const erreur = Garantie.validerDossier(donnees, formulaire.commande);
+  if (erreur) return erreurFormulaire(erreur);
+
+  formulaire.envoye = true;
+  const bouton = document.getElementById('rec-suivant');
+  bouton.disabled = true;
+  bouton.textContent = 'Envoi…';
+  const reponse = await openDispute(Garantie.corpsDossier(donnees, formulaire.commande));
+  if (reponse.success && reponse.data?.id) {
+    showToast(reponse.message || 'Réclamation ouverte');
+    allerVers(Garantie.lienDossier(reponse.data.id));
+    return;
+  }
+  if (!formulaire) return;
+  formulaire.envoye = false;
+  bouton.disabled = false;
+  bouton.textContent = 'Envoyer la réclamation';
+  erreurFormulaire(reponse.message || 'La réclamation n’est pas partie. Réessayez.');
 }
 
 // ── Modal Avis ──
@@ -1033,9 +1422,6 @@ function contactSeller(shopId) {
   window.location.href = 'marche-senegal-chat.html?' + params.toString();
 }
 
-function reportProblem() {
-  showToast('⚠️ Signalement en cours de développement');
-}
 
 function goToShop() {
   if (currentOrder?.shopId) {
