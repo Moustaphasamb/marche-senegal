@@ -908,38 +908,20 @@ function updatePreview() {
 // temps de l'examen — n'était ni prévenu ni entendu. Il voit maintenant les
 // dossiers qui visent sa boutique, et peut y donner sa version.
 
-const MOTIFS_LITIGE = {
-  NOT_RECEIVED:     'Commande jamais reçue',
-  DAMAGED:          'Article abîmé',
-  WRONG_ITEM:       'Article ne correspondant pas',
-  INCOMPLETE:       'Commande incomplète',
-  NOT_AS_DESCRIBED: 'Article différent de l’annonce',
-  NOT_REFUNDED:     'Remboursement non reçu',
-  OTHER:            'Autre motif'
-};
-
-const STATUTS_LITIGE = {
-  OPEN:          { texte: 'Ouvert',    cls: 'os-wait' },
-  INVESTIGATING: { texte: 'En examen', cls: 'os-go'   },
-  RESOLVED:      { texte: 'Jugé',      cls: 'os-done' }
-};
-
-// Ce que l'admin a décidé, dit au vendeur dans ses termes à lui.
-const ISSUES_LITIGE = {
-  REFUND_BUYER: 'Le client a été remboursé',
-  FAVOR_SELLER: 'La décision vous a donné raison',
-  REJECTED:     'La réclamation a été jugée infondée'
+// Chaque réclamation mène au dossier complet (marche-senegal-reclamation.html),
+// où le vendeur répond. Le serveur trie par échéance : la plus pressée en tête.
+const CLASSES_LITIGE = {
+  OPEN: 'os-wait', AWAITING_BUYER: 'os-go', INVESTIGATING: 'os-go', RESOLVED: 'os-done', CLOSED: 'os-done'
 };
 
 function litigeEstOuvert(litige) {
-  return litige.status === 'OPEN' || litige.status === 'INVESTIGATING';
+  return Garantie.OUVERTS.includes(litige.status);
 }
 
 async function majBadgeLitiges() {
   const result = await getShopDisputes();
   if (!result.success) return;
-  const ouverts = (result.data || []).filter(litigeEstOuvert).length;
-  majBadgeMenu('sb-badge-litiges', ouverts);
+  majBadgeMenu('sb-badge-litiges', (result.data || []).filter(l => l.status === 'OPEN').length);
 }
 
 async function loadLitiges() {
@@ -949,134 +931,39 @@ async function loadLitiges() {
 
   const result = await getShopDisputes();
   if (!result.success) {
-    setEmpty(liste, 'Impossible de charger les litiges');
+    setEmpty(liste, 'Impossible de charger les réclamations');
     return;
   }
 
   const litiges = result.data || [];
+  const aTraiter = litiges.filter(l => l.status === 'OPEN').length;
   const ouverts = litiges.filter(litigeEstOuvert).length;
-  majBadgeMenu('sb-badge-litiges', ouverts);
-
+  majBadgeMenu('sb-badge-litiges', aTraiter);
   if (resume) {
     resume.textContent = litiges.length === 0
-      ? 'Aucun litige — tout va bien'
-      : ouverts + (ouverts === 1 ? ' litige en cours' : ' litiges en cours') + ' sur ' + litiges.length;
+      ? 'Aucune réclamation — tout va bien'
+      : `${aTraiter} à traiter · ${ouverts} en cours sur ${litiges.length}`;
   }
-
   if (!litiges.length) {
-    setEmpty(liste, 'Aucun litige sur vos commandes — c’est la meilleure des nouvelles');
+    setEmpty(liste, 'Aucune réclamation sur vos commandes — c’est la meilleure des nouvelles');
     return;
   }
 
+  const maintenant = new Date();
   const frag = document.createDocumentFragment();
   litiges.forEach(litige => {
-    const bloc = mk('div', 'avis-bloc');
-    const ligne = mk('div', 'prod-row');
-
-    const statut = STATUTS_LITIGE[litige.status] || STATUTS_LITIGE.OPEN;
-    const puce = mk('div', 'order-status ' + statut.cls, statut.texte);
-
+    const r = Garantie.resumeVendeur(litige, maintenant);
+    const ligne = mk('a', 'prod-row reclamation-ligne' + (r.urgent ? ' urgent' : ''));
+    ligne.href = r.lien;
+    ligne.appendChild(mk('div', 'order-status ' + (CLASSES_LITIGE[litige.status] || 'os-wait'), r.etat));
     const info = mk('div', 'pr-info');
-    info.appendChild(mk('div', 'pr-name', MOTIFS_LITIGE[litige.reason] || 'Réclamation'));
-    info.appendChild(mk('div', 'pr-cat', litige.description || ''));
-
-    const droite = mk('div', 'pr-right');
-    const commande = litige.order?.orderNumber;
-    droite.appendChild(mk('div', 'pr-sold', commande ? 'Commande ' + commande : '—'));
-    droite.appendChild(mk('div', 'pr-rev', formatDate(litige.createdAt)));
-
-    ligne.appendChild(puce); ligne.appendChild(info); ligne.appendChild(droite);
-    bloc.appendChild(ligne);
-
-    // La décision, quand elle est tombée : le vendeur apprenait le verdict en
-    // regardant ses revenus, sans jamais lire ce qui avait été décidé.
-    if (litige.status === 'RESOLVED') {
-      const verdict = mk('div', 'ar-titre',
-        (ISSUES_LITIGE[litige.outcome] || 'Affaire jugée') +
-        (litige.refundAmount ? ' — ' + formatPrice(litige.refundAmount) : ''));
-      bloc.appendChild(verdict);
-      if (litige.resolution) bloc.appendChild(mk('div', 'ar-texte', litige.resolution));
-    }
-
-    bloc.appendChild(zoneVersionVendeur(litige));
-    frag.appendChild(bloc);
+    info.appendChild(mk('div', 'pr-name', r.titre));
+    info.appendChild(mk('div', 'pr-cat', litige.order?.orderNumber ? 'Commande ' + litige.order.orderNumber : ''));
+    ligne.appendChild(info);
+    ligne.appendChild(mk('div', 'pr-right', r.reste ? 'reste ' + r.reste : ''));
+    frag.appendChild(ligne);
   });
   liste.replaceChildren(frag);
-}
-
-function zoneVersionVendeur(litige) {
-  const zone = mk('div', 'avis-reponse');
-  zone.id = 'litige-version-' + litige.id;
-
-  if (litige.sellerResponse) {
-    zone.appendChild(mk('div', 'ar-titre', 'Votre version · ' + formatDate(litige.sellerRespondedAt || litige.createdAt)));
-    zone.appendChild(mk('div', 'ar-texte', litige.sellerResponse));
-    if (litigeEstOuvert(litige)) {
-      const modifier = mk('button', 'ar-lien', 'Modifier');
-      modifier.onclick = () => ouvrirSaisieVersion(litige);
-      zone.appendChild(modifier);
-    }
-    return zone;
-  }
-
-  if (!litigeEstOuvert(litige)) {
-    // Dire pourquoi le bouton n'est plus là vaut mieux que de le retirer en silence.
-    zone.appendChild(mk('div', 'ar-texte', 'Affaire jugée sans votre version.'));
-    return zone;
-  }
-
-  const repondre = mk('button', 'ar-lien', 'Donner ma version');
-  repondre.onclick = () => ouvrirSaisieVersion(litige);
-  zone.appendChild(repondre);
-  return zone;
-}
-
-function ouvrirSaisieVersion(litige) {
-  const zone = document.getElementById('litige-version-' + litige.id);
-  if (!zone) return;
-
-  const champ = mk('textarea', 'ar-champ');
-  champ.placeholder = 'Ce qui s’est passé de votre côté : date de remise au livreur, numéro de bordereau, échange avec le client…';
-  champ.maxLength = 1000;
-  champ.value = litige.sellerResponse || '';
-
-  const envoyer = mk('button', 'ar-btn', litige.sellerResponse ? 'Enregistrer' : 'Envoyer à l’arbitrage');
-  envoyer.onclick = () => envoyerVersion(litige, champ.value, envoyer);
-
-  const annuler = mk('button', 'ar-lien', 'Annuler');
-  annuler.onclick = () => zone.replaceWith(zoneVersionVendeur(litige));
-
-  const actions = mk('div', 'ar-actions');
-  actions.appendChild(envoyer);
-  actions.appendChild(annuler);
-
-  zone.replaceChildren(champ, actions);
-  champ.focus();
-}
-
-async function envoyerVersion(litige, texte, bouton) {
-  const propre = (texte || '').trim();
-  // Le serveur applique la même règle ; la dire ici évite un aller-retour.
-  if (propre.length < 10 || propre.length > 1000) {
-    showToast('Donnez votre version en 10 à 1000 caractères', 'error');
-    return;
-  }
-
-  const libelle = bouton.textContent;
-  bouton.textContent = '⏳ Envoi…';
-  bouton.disabled = true;
-
-  const result = await respondToDispute(litige.id, propre);
-
-  bouton.textContent = libelle;
-  bouton.disabled = false;
-
-  if (result.success) {
-    showToast('✓ Votre version a été ajoutée au dossier');
-    loadLitiges();
-  } else {
-    showToast(result.message || 'Erreur lors de l’envoi', 'error');
-  }
 }
 
 // ════════════════════════════════════════

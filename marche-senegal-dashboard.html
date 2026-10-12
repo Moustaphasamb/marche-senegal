@@ -151,6 +151,8 @@
    « Command… », il ne dit plus au vendeur ce qu'on lui reproche. */
 #litiges-liste .pr-name{white-space:normal;overflow:visible;text-overflow:clip}
 #litiges-liste .avis-reponse{padding-left:16px}
+#litiges-liste .reclamation-ligne{text-decoration:none;color:inherit}
+#litiges-liste .reclamation-ligne.urgent .pr-right{color:var(--red,#C0392B);font-weight:700}
 .prod-row:last-child{border-bottom:none}
 .prod-row:hover{background:#fafcfa}
 .pr-rank{width:22px;height:22px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--green);flex-shrink:0}
@@ -601,7 +603,7 @@
   <!-- ══ LITIGES ══ -->
   <div class="page-section" id="page-litiges">
     <div class="page-header">
-      <div class="ph-title"><i class="ic" data-ic="shield"></i> Litiges</div>
+      <div class="ph-title"><i class="ic" data-ic="shield"></i> Réclamations</div>
       <div style="font-size:.86rem;color:var(--muted)" id="litiges-resume">—</div>
     </div>
     <div class="table-card">
@@ -628,6 +630,7 @@
 
 <script src="api.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
+<script src="garantie.js"></script>
 <script src="marche-senegal-dashboard-script.js"></script>
 
 </body>
