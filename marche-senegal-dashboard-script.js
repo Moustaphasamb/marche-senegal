@@ -655,7 +655,7 @@ function showPage(pageId, navItem) {
   } else if (typeof activerEntreeMenu === 'function') {
     activerEntreeMenu(pageId);
   }
-  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients', litiges:'Litiges' };
+  const titles = { dashboard:'Tableau de bord', promotions:'Mes promotions', avis:'Avis clients', litiges:'Réclamations' };
   document.getElementById('tb-title').textContent = titles[pageId] || '';
   if (pageId === 'promotions')  loadPromotions();
   if (pageId === 'avis')        loadAvis();
