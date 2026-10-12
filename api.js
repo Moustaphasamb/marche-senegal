@@ -467,6 +467,59 @@ async function respondToDispute(id, response) {
   });
 }
 
+// ────────────────────────────────
+// GARANTIE ACHAT PROTÉGÉ (acheteur et vendeur)
+// ────────────────────────────────
+
+// Toutes mes réclamations, avec l'identifiant de leur commande.
+async function getMyDisputes() {
+  return await apiCall('/api/disputes/mine');
+}
+
+// Un dossier complet : articles, preuves, historique. Le serveur ne le rend
+// qu'à l'acheteur, au vendeur de la boutique ou à l'admin.
+async function getDispute(id) {
+  return await apiCall('/api/disputes/' + encodeURIComponent(id));
+}
+
+async function openDispute(corps) {
+  return await apiCall('/api/disputes', { method: 'POST', body: JSON.stringify(corps) });
+}
+
+// « Tout est conforme » : le vendeur est payé tout de suite, la fenêtre de 48 h se ferme.
+async function confirmerConforme(orderId) {
+  return await apiCall('/api/orders/' + encodeURIComponent(orderId) + '/conforme', { method: 'POST' });
+}
+
+async function accepterProposition(id) {
+  return await apiCall('/api/disputes/' + encodeURIComponent(id) + '/accepter', { method: 'POST' });
+}
+
+async function refuserProposition(id, message) {
+  return await apiCall('/api/disputes/' + encodeURIComponent(id) + '/refuser', {
+    method: 'POST', body: JSON.stringify({ message })
+  });
+}
+
+// Réponse du vendeur : REFUND_FULL, REFUND_PARTIAL (avec amount), RETURN_AND_REFUND,
+// EXCHANGE ou CONTEST (avec message).
+async function proposerSolution(id, { proposal, amount, message }) {
+  return await apiCall('/api/disputes/' + encodeURIComponent(id) + '/proposition', {
+    method: 'POST', body: JSON.stringify({ proposal, amount, message })
+  });
+}
+
+async function ajouterPreuves(id, preuves) {
+  return await apiCall('/api/disputes/' + encodeURIComponent(id) + '/preuves', {
+    method: 'POST', body: JSON.stringify({ preuves })
+  });
+}
+
+// Signature d'envoi Cloudinary dans le dossier des preuves de l'utilisateur.
+async function autorisationPreuves() {
+  return await apiCall('/api/disputes/preuves/autorisation', { method: 'POST' });
+}
+
 // Corriger une promotion deja en ligne. Supprimer puis recreer remettait le
 // compteur d'utilisations a zero : un quota « 50 premiers clients » redevenait
 // 50 alors que 31 clients en avaient deja profite.
