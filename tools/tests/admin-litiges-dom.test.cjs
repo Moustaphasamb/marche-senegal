@@ -44,6 +44,7 @@ async function setup(dossiers) {
     return { success: true, data: [], meta: {} };
   };
 
+  w.eval(fs.readFileSync(path.join(root, 'garantie.js'), 'utf8'));
   w.eval(scriptDeLaPage());
   await tick();
   // La liste se remplit par le meme chemin que dans le navigateur : un appel
