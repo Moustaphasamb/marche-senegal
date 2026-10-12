@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="robots" content="noindex"/>
+<title>Réclamation — Marché Sénégal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&display=swap"/></noscript>
+<link rel="stylesheet" href="styles.css"/>
+<script src="icons.js"></script>
+<style>
+:root{--green:#1B6B3A;--gp:#E8F5EC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--border:#D8E8DE;--red:#C0392B;--gdl:#FDF3DC;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+.rc-tete{background:#fff;border-bottom:1.5px solid var(--border);padding:14px 16px;display:flex;justify-content:space-between;gap:12px}
+.rc-tete a{color:var(--green);font-weight:700;text-decoration:none}
+.rc-page{max-width:720px;margin:0 auto;padding:18px 16px 64px}
+.rc-carte{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.rc-carte h2{font-size:.95rem;color:var(--dark);margin-bottom:8px}
+#dossier-numero{font-size:1.3rem;color:var(--dark)}
+#dossier-commande{color:var(--muted);font-size:.84rem}
+#dossier-etat{display:inline-block;margin-top:10px;background:var(--gp);color:var(--green);font-weight:700;border-radius:99px;padding:6px 12px;font-size:.84rem}
+#dossier-echeance{margin-top:8px;font-size:.84rem;color:var(--dark)}
+.rc-liste{list-style:none}
+.rc-liste li{padding:8px 0;border-top:1px solid var(--border);font-size:.86rem}
+.rc-liste li:first-child{border-top:0}
+.rc-meta{color:var(--muted);font-size:.76rem}
+.rc-message{white-space:pre-wrap}
+.rc-preuves{display:flex;flex-wrap:wrap;gap:8px}
+.rc-preuves figure{width:96px}
+.rc-preuves img{width:96px;height:96px;object-fit:cover;border-radius:8px;display:block}
+.rc-preuves figcaption{font-size:.72rem;color:var(--muted)}
+.rc-bouton{width:100%;min-height:46px;border-radius:99px;border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:700;font-size:.9rem;margin-top:8px;cursor:pointer}
+.rc-bouton.plein{background:var(--green);color:#fff}
+.rc-bouton:disabled{opacity:.6}
+.rc-champ{width:100%;min-height:90px;border:1.5px solid var(--border);border-radius:10px;padding:10px;font:inherit;font-size:.88rem;margin-top:8px}
+.rc-choix{display:flex;align-items:center;gap:10px;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;font-size:.88rem}
+.rc-montant{width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 10px;margin-top:8px;font-size:.9rem}
+.rc-note{background:var(--gdl);border-radius:10px;padding:10px 12px;font-size:.82rem;margin-top:8px}
+.rc-erreur{color:var(--red);font-size:.84rem;min-height:1.2em;margin-top:8px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:99px;font-size:.84rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92vw}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<header class="rc-tete">
+  <a href="javascript:history.back()">← Retour</a>
+  <a href="marche-senegal-garantie.html">La garantie</a>
+</header>
+
+<main class="rc-page">
+  <p id="chargement">Chargement du dossier…</p>
+  <div class="rc-carte" id="dossier-introuvable" hidden></div>
+
+  <div id="dossier" hidden>
+    <section class="rc-carte">
+      <h1 id="dossier-numero"></h1>
+      <div id="dossier-commande"></div>
+      <div id="dossier-etat"></div>
+      <div id="dossier-echeance"></div>
+    </section>
+
+    <section class="rc-carte">
+      <h2>Le problème</h2>
+      <div id="dossier-motif" style="font-weight:700"></div>
+      <p class="rc-message" id="dossier-description"></p>
+      <ul class="rc-liste" id="dossier-articles"></ul>
+    </section>
+
+    <section class="rc-carte">
+      <h2><i class="ic" data-ic="camera"></i> Photos et vidéo</h2>
+      <div class="rc-preuves" id="dossier-preuves"></div>
+    </section>
+
+    <section class="rc-carte" id="dossier-proposition" hidden></section>
+    <section class="rc-carte" id="dossier-decision" hidden></section>
+
+    <section class="rc-carte" id="dossier-actions"></section>
+
+    <section class="rc-carte">
+      <h2><i class="ic" data-ic="clock"></i> Historique</h2>
+      <ol class="rc-liste" id="dossier-historique"></ol>
+    </section>
+  </div>
+</main>
+
+<script src="api.js"></script>
+<script src="garantie.js"></script>
+<script src="envoi-video.js"></script>
+<script src="envoi-preuve.js"></script>
+<script>
+// ════════════════════════════════════════
+//   DOSSIER DE RÉCLAMATION — acheteur et vendeur
+// ════════════════════════════════════════
+// Les deux parties lisent le même dossier : le serveur ne le rend qu'à elles
+// et à l'admin. Seules les actions diffèrent selon le rôle.
+
+let dossier = null;
+let role = 'BUYER';
+let envoiAction = false;
+
+function idDossier() {
+  return new URLSearchParams(window.location.search).get('id');
+}
+
+function element(tag, contenu, classe) {
+  const e = document.createElement(tag);
+  if (classe) e.className = classe;
+  if (contenu != null) e.textContent = contenu;
+  return e;
+}
+
+function texte(id, valeur) {
+  document.getElementById(id).textContent = valeur || '';
+}
+
+async function demarrer() {
+  if (!isLoggedIn()) { window.location.href = 'marche-senegal-connexion-acheteur.html'; return; }
+  role = (getCurrentUser() || {}).role || 'BUYER';
+  await chargerDossier();
+}
+
+async function chargerDossier() {
+  const reponse = await getDispute(idDossier());
+  document.getElementById('chargement').hidden = true;
+  if (!reponse.success) {
+    const carte = document.getElementById('dossier-introuvable');
+    carte.textContent = 'Réclamation introuvable : elle n’existe pas ou ne vous concerne pas.';
+    carte.hidden = false;
+    return;
+  }
+  dossier = reponse.data;
+  document.getElementById('dossier').hidden = false;
+  afficherDossier(dossier, new Date());
+}
+
+function afficherDossier(d, maintenant) {
+  const vue = role === 'SELLER' ? 'vendeur' : 'acheteur';
+  texte('dossier-numero', d.number || 'Réclamation');
+  texte('dossier-commande', 'Commande ' + (d.order?.orderNumber || '') + (d.order?.shop?.name ? ' · ' + d.order.shop.name : ''));
+  texte('dossier-etat', Garantie.ETATS[vue][d.status] || d.status);
+  const reste = Garantie.OUVERTS.includes(d.status) ? Garantie.tempsRestant(d.deadlineAt, maintenant) : null;
+  texte('dossier-echeance', reste ? `Échéance : ${Garantie.dateDakar(d.deadlineAt)} (encore ${reste})` : '');
+  texte('dossier-motif', Garantie.MOTIFS[d.reason] || d.reason);
+  texte('dossier-description', d.description);
+  afficherArticles(d.items || []);
+  afficherPreuves(d.evidence || []);
+  afficherProposition(d);
+  afficherDecision(d);
+  afficherHistorique(d.events || []);
+  afficherActions(d, maintenant);
+}
+
+function afficherArticles(items) {
+  document.getElementById('dossier-articles').replaceChildren(...items.map(item => {
+    const ligne = item.orderItem || {};
+    return element('li', `${ligne.name || 'Article'}${ligne.size ? ' · taille ' + ligne.size : ''} — ${item.quantity} sur ${ligne.quantity}`);
+  }));
+}
+
+function afficherPreuves(preuves) {
+  const zone = document.getElementById('dossier-preuves');
+  if (!preuves.length) { zone.replaceChildren(element('p', 'Aucune photo.', 'rc-meta')); return; }
+  zone.replaceChildren(...preuves.map(preuve => {
+    const figure = document.createElement('figure');
+    if (preuve.kind === 'PHOTO') {
+      const image = document.createElement('img');
+      image.src = urlImageSure(preuve.url);
+      image.alt = 'Photo de ' + (Garantie.ACTEURS[preuve.auteur] || 'la réclamation');
+      image.loading = 'lazy';
+      figure.appendChild(image);
+    } else {
+      const lien = element('a', 'Voir la vidéo');
+      lien.href = urlImageSure(preuve.url); lien.target = '_blank'; lien.rel = 'noopener';
+      figure.appendChild(lien);
+    }
+    figure.appendChild(element('figcaption', Garantie.ACTEURS[preuve.auteur] || ''));
+    return figure;
+  }));
+}
+
+function afficherProposition(d) {
+  const zone = document.getElementById('dossier-proposition');
+  if (!d.sellerProposal) { zone.hidden = true; return; }
+  zone.hidden = false;
+  const titre = d.sellerProposal === 'CONTEST'
+    ? 'Le vendeur conteste la réclamation'
+    : 'Le vendeur propose : ' + Garantie.PROPOSITIONS[d.sellerProposal]
+      + (d.sellerProposalAmount ? ' — ' + formatPrice(d.sellerProposalAmount) : '');
+  zone.replaceChildren(element('h2', titre));
+  if (d.sellerResponse) zone.appendChild(element('p', d.sellerResponse, 'rc-message'));
+}
+
+function afficherDecision(d) {
+  const zone = document.getElementById('dossier-decision');
+  if (!d.outcome) { zone.hidden = true; return; }
+  zone.hidden = false;
+  zone.replaceChildren(element('h2', Garantie.ISSUES[d.outcome] + (d.refundAmount ? ' — ' + formatPrice(d.refundAmount) : '')));
+  if (d.resolution) zone.appendChild(element('p', 'Explication : ' + d.resolution, 'rc-message'));
+  if (Garantie.RETOURS[d.returnStatus]) zone.appendChild(element('p', Garantie.RETOURS[d.returnStatus]));
+  if (d.refundReference) {
+    zone.appendChild(element('p', `Remboursé le ${Garantie.dateDakar(d.refundedAt)} — référence ${d.refundReference}`));
+  }
+}
+
+function afficherHistorique(evenements) {
+  document.getElementById('dossier-historique').replaceChildren(...evenements.map(ev => {
+    const ligne = document.createElement('li');
+    ligne.appendChild(element('div', `${Garantie.EVENEMENTS[ev.type] || ev.type} · ${Garantie.ACTEURS[ev.acteur] || ''}`));
+    ligne.appendChild(element('div', Garantie.dateDakar(ev.createdAt), 'rc-meta'));
+    if (ev.message) ligne.appendChild(element('div', ev.message, 'rc-message'));
+    return ligne;
+  }));
+}
+
+function erreurActions(message) {
+  const zone = document.getElementById('actions-erreur');
+  if (zone) zone.textContent = message || '';
+}
+
+function bouton(libelle, id, plein, surClic) {
+  const b = element('button', libelle, 'rc-bouton' + (plein ? ' plein' : ''));
+  b.type = 'button'; b.id = id;
+  b.onclick = () => surClic(b);
+  return b;
+}
+
+function zoneAjoutPreuves() {
+  const fichiers = document.createElement('input');
+  fichiers.type = 'file'; fichiers.id = 'preuves-fichiers'; fichiers.multiple = true;
+  fichiers.accept = 'image/jpeg,image/png,image/webp,image/heic,video/mp4,video/quicktime';
+  fichiers.setAttribute('aria-label', 'Choisir des photos ou une vidéo');
+  fichiers.onchange = () => { ajouterPreuvesDossier(fichiers.files); fichiers.value = ''; };
+  return [element('h2', 'Ajouter des photos'), fichiers];
+}
+
+function afficherActions(d, maintenant) {
+  const zone = document.getElementById('dossier-actions');
+  const morceaux = [];
+  if (role !== 'SELLER') {
+    if (d.status === 'AWAITING_BUYER') {
+      morceaux.push(element('h2', 'Votre réponse'));
+      morceaux.push(bouton('Accepter la proposition', 'btn-accepter', true, accepter));
+      const champ = element('textarea', null, 'rc-champ');
+      champ.id = 'refus-message'; champ.maxLength = 1000;
+      champ.placeholder = 'Si vous refusez, dites pourquoi (facultatif)';
+      morceaux.push(champ);
+      morceaux.push(bouton('Refuser : demander l’avis de Marché Sénégal', 'btn-refuser', false, refuser));
+    }
+    if (Garantie.OUVERTS.includes(d.status)) morceaux.push(...zoneAjoutPreuves());
+  }
+  if (morceaux.length) {
+    const erreur = element('p', '', 'rc-erreur');
+    erreur.id = 'actions-erreur';
+    morceaux.push(erreur);
+  }
+  zone.hidden = morceaux.length === 0;
+  zone.replaceChildren(...morceaux);
+}
+
+async function accepter(b) {
+  if (envoiAction) return;
+  if (!confirm('Accepter cette proposition ? Elle sera appliquée telle quelle.')) return;
+  envoiAction = true; b.disabled = true;
+  const reponse = await accepterProposition(dossier.id);
+  envoiAction = false;
+  if (reponse.success) { showToast(reponse.message); await chargerDossier(); return; }
+  b.disabled = false;
+  erreurActions(reponse.message);
+}
+
+async function refuser(b) {
+  if (envoiAction) return;
+  envoiAction = true; b.disabled = true;
+  const message = document.getElementById('refus-message').value.trim();
+  const reponse = await refuserProposition(dossier.id, message || undefined);
+  envoiAction = false;
+  if (reponse.success) { showToast(reponse.message); await chargerDossier(); return; }
+  b.disabled = false;
+  erreurActions(reponse.message);
+}
+
+async function ajouterPreuvesDossier(fichiers) {
+  const preuves = [];
+  for (const fichier of Array.from(fichiers || [])) {
+    erreurActions('Envoi en cours…');
+    const r = await EnvoiPreuve.envoyerPreuve(fichier, {
+      obtenirAutorisation: autorisationPreuves,
+      envoyerVideo: (f, options) => EnvoiVideo.envoyer(f, options)
+    });
+    if (!r.success) { erreurActions(r.message); return; }
+    preuves.push(r.preuve);
+  }
+  if (!preuves.length) return;
+  const reponse = await ajouterPreuves(dossier.id, preuves);
+  if (!reponse.success) { erreurActions(reponse.message); return; }
+  showToast(reponse.message || 'Preuves ajoutées au dossier');
+  await chargerDossier();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);
+else demarrer();
+</script>
+</body>
+</html>
