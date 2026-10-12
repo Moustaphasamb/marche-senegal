@@ -250,6 +250,10 @@ function afficherActions(d, maintenant) {
     }
     if (Garantie.OUVERTS.includes(d.status)) morceaux.push(...zoneAjoutPreuves());
   }
+  if (role === 'SELLER') {
+    if (Garantie.actionsVendeur(d).length) morceaux.push(...formulaireVendeur(d));
+    else if (d.status === 'INVESTIGATING') morceaux.push(...zoneAjoutPreuves());
+  }
   if (morceaux.length) {
     const erreur = element('p', '', 'rc-erreur');
     erreur.id = 'actions-erreur';
@@ -297,6 +301,94 @@ async function ajouterPreuvesDossier(fichiers) {
   if (!reponse.success) { erreurActions(reponse.message); return; }
   showToast(reponse.message || 'Preuves ajoutées au dossier');
   await chargerDossier();
+}
+
+// ── Réponse du vendeur : un seul écran, cinq choix ──
+let preuvesVendeur = [];
+
+function formulaireVendeur(d) {
+  preuvesVendeur = [];
+  const morceaux = [element('h2', 'Votre réponse (48 h)')];
+  Garantie.actionsVendeur(d).forEach(valeur => {
+    const choix = element('label', null, 'rc-choix');
+    const radio = document.createElement('input');
+    radio.type = 'radio'; radio.name = 'proposition'; radio.value = valeur;
+    radio.onchange = () => choisirProposition(valeur);
+    choix.append(radio, element('span', Garantie.PROPOSITIONS[valeur]));
+    morceaux.push(choix);
+  });
+  const montant = document.createElement('input');
+  montant.type = 'number'; montant.id = 'montant-partiel'; montant.className = 'rc-montant';
+  montant.min = '1'; montant.step = '1'; montant.hidden = true;
+  montant.placeholder = 'Montant à rembourser (FCFA)';
+  morceaux.push(montant);
+  morceaux.push(element('p', 'Pour un retour ou un échange, le transport du retour est à votre charge quand le problème vient de vous.', 'rc-note'));
+  const message = element('textarea', null, 'rc-champ');
+  message.id = 'reponse-message'; message.maxLength = 1000;
+  message.placeholder = 'Votre message au client (obligatoire pour contester)';
+  morceaux.push(message);
+  const fichiers = document.createElement('input');
+  fichiers.type = 'file'; fichiers.id = 'reponse-fichiers'; fichiers.multiple = true;
+  fichiers.accept = 'image/jpeg,image/png,image/webp,image/heic,video/mp4,video/quicktime';
+  fichiers.setAttribute('aria-label', 'Vos photos (facultatif)');
+  fichiers.onchange = () => { ajouterPreuvesVendeur(fichiers.files); fichiers.value = ''; };
+  morceaux.push(element('p', 'Vos photos (facultatif) :', 'rc-meta'), fichiers);
+  const pret = element('p', '', 'rc-meta');
+  pret.id = 'reponse-preuves';
+  morceaux.push(pret);
+  morceaux.push(bouton('Envoyer ma réponse', 'btn-proposer', true, () => envoyerReponseVendeur()));
+  return morceaux;
+}
+
+function choisirProposition(valeur) {
+  const radio = document.querySelector(`input[name="proposition"][value="${valeur}"]`);
+  if (radio) radio.checked = true;
+  document.getElementById('montant-partiel').hidden = valeur !== 'REFUND_PARTIAL';
+  erreurActions('');
+}
+
+async function ajouterPreuvesVendeur(fichiers) {
+  for (const fichier of Array.from(fichiers || [])) {
+    const r = await EnvoiPreuve.envoyerPreuve(fichier, {
+      obtenirAutorisation: autorisationPreuves,
+      envoyerVideo: (f, options) => EnvoiVideo.envoyer(f, options)
+    });
+    if (!r.success) { erreurActions(r.message); return; }
+    preuvesVendeur.push(r.preuve);
+  }
+  texte('reponse-preuves', preuvesVendeur.length ? preuvesVendeur.length + ' fichier(s) prêt(s) à joindre' : '');
+}
+
+async function envoyerReponseVendeur() {
+  if (envoiAction) return;
+  const choisi = document.querySelector('input[name="proposition"]:checked');
+  const proposal = choisi && choisi.value;
+  const message = document.getElementById('reponse-message').value.trim();
+  const montant = parseInt(document.getElementById('montant-partiel').value, 10);
+  const total = dossier.order?.total || 0;
+  if (!proposal) return erreurActions('Choisissez votre réponse.');
+  if (proposal === 'CONTEST' && message.length < 10) return erreurActions('Expliquez pourquoi vous contestez (10 caractères au moins).');
+  if (message && (message.length < 10 || message.length > 1000)) return erreurActions('Votre message doit faire 10 à 1000 caractères.');
+  if (proposal === 'REFUND_PARTIAL' && !(Number.isInteger(montant) && montant > 0 && montant < total)) {
+    return erreurActions(`Montant entre 1 et ${formatPrice(total - 1)}.`);
+  }
+  envoiAction = true;
+  const b = document.getElementById('btn-proposer');
+  b.disabled = true;
+  if (preuvesVendeur.length) {
+    const p = await ajouterPreuves(dossier.id, preuvesVendeur);
+    if (!p.success) { envoiAction = false; b.disabled = false; return erreurActions(p.message); }
+    preuvesVendeur = [];
+  }
+  const reponse = await proposerSolution(dossier.id, {
+    proposal,
+    amount: proposal === 'REFUND_PARTIAL' ? montant : undefined,
+    message: message || undefined
+  });
+  envoiAction = false;
+  if (reponse.success) { showToast(reponse.message); await chargerDossier(); return; }
+  b.disabled = false;
+  erreurActions(reponse.message);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);
