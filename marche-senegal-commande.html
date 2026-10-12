@@ -154,6 +154,13 @@ a{text-decoration:none;color:inherit}
 
 /* ACTIONS */
 .actions-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px}
+.gar-bloc{border-top:1px solid var(--border);padding:12px 0}
+.gar-bloc:first-child{border-top:0;padding-top:0}
+.gar-boutique{font-weight:700;color:var(--dark);font-size:.86rem;margin-bottom:4px}
+.gar-texte{font-size:.84rem;color:var(--text);margin-bottom:10px}
+.gar-boutons{display:flex;flex-wrap:wrap;gap:8px}
+.gar-boutons .ac-btn{flex:1 1 160px}
+.gar-lien{display:inline-block;margin-top:10px;font-size:.8rem;color:var(--green);font-weight:600}
 .ac-title{font-size:.9rem;font-weight:600;color:var(--dark);margin-bottom:14px}
 .ac-btns{display:flex;flex-direction:column;gap:9px}
 .ac-btn{width:100%;height:44px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
@@ -431,6 +438,13 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
 
+    <!-- ACHAT PROTÉGÉ : une décision par commande vendeur -->
+    <div class="actions-card" id="garantie-card" style="display:none">
+      <div class="ac-title"><i class="ic" data-ic="shield-check"></i> Achat protégé</div>
+      <div id="garantie-blocs"></div>
+      <a class="gar-lien" href="marche-senegal-garantie.html">Comment fonctionne la garantie</a>
+    </div>
+
   </div>
 </div>
 
@@ -453,6 +467,9 @@ a{text-decoration:none;color:inherit}
 </nav>
 
 <script src="api.js"></script>
+<script src="garantie.js"></script>
+<script src="envoi-video.js"></script>
+<script src="envoi-preuve.js"></script>
 <script>
 // ════════════════════════════════════════
 //   PAGE SUIVI COMMANDE — Données dynamiques
@@ -619,6 +636,7 @@ function renderOrder(order) {
 
   // Actions
   renderActions(order);
+  chargerGarantie(order);
 }
 
 // ── Afficher les étapes de suivi ──
@@ -841,14 +859,6 @@ function renderActions(order) {
     `);
   }
 
-  // Signaler un problème — si livré ou en cours
-  if (!['PENDING', 'CANCELLED'].includes(order.status)) {
-    actions.push(`
-      <button class="ac-btn" onclick="reportProblem()">
-        ⚠️ Signaler un problème
-      </button>
-    `);
-  }
 
   container.innerHTML = actions.join('');
 }
@@ -933,6 +943,110 @@ async function cancelOrder(dropRefused = false) {
   } else {
     showToast('❌ Erreur lors de l\'annulation');
   }
+}
+
+// ════════════════════════════════════════
+//   ACHAT PROTÉGÉ — 48 h pour signaler un problème
+// ════════════════════════════════════════
+// Un panier Marché contient plusieurs commandes vendeur : chacune a sa propre
+// fenêtre de 48 h, son propre dossier et son propre paiement au vendeur.
+
+let commandesGarantie = [];
+
+async function chargerGarantie(order) {
+  commandesGarantie = order._isMarketOrder ? (order.orders || []) : [order];
+  const paye = (order.payment?.status || order.marketOrder?.payment?.status) === 'COMPLETED';
+  const reponse = await getMyDisputes();
+  renderGarantie(commandesGarantie, reponse.success ? (reponse.data || []) : [], { paye });
+}
+
+function boutonGarantie(texte, action, classe, surClic) {
+  const bouton = document.createElement('button');
+  bouton.className = 'ac-btn' + (classe ? ' ' + classe : '');
+  bouton.dataset.action = action;
+  bouton.textContent = texte;
+  bouton.onclick = () => surClic(bouton);
+  return bouton;
+}
+
+function lienReclamation(litige) {
+  const lien = document.createElement('a');
+  lien.className = 'gar-lien';
+  lien.href = Garantie.lienDossier(litige.id);
+  lien.textContent = 'Voir la réclamation ' + (litige.number || '');
+  return lien;
+}
+
+function renderGarantie(commandes, litiges, { maintenant = new Date(), paye = true } = {}) {
+  commandesGarantie = commandes;
+  const carte = document.getElementById('garantie-card');
+  const conteneur = document.getElementById('garantie-blocs');
+  const blocs = [];
+
+  commandes.forEach(commande => {
+    const etat = Garantie.etatGarantie(commande, litiges, maintenant, { paye });
+    if (etat.cas === 'AUCUN' && !etat.litige) return;
+
+    const bloc = document.createElement('div');
+    bloc.className = 'gar-bloc';
+    if (commandes.length > 1) {
+      const nom = document.createElement('div');
+      nom.className = 'gar-boutique';
+      nom.textContent = commande.shop?.name || 'Boutique';
+      bloc.appendChild(nom);
+    }
+    const texte = document.createElement('p');
+    texte.className = 'gar-texte';
+    const boutons = document.createElement('div');
+    boutons.className = 'gar-boutons';
+    const signaler = libelle => boutonGarantie(libelle, 'signaler', '', () => ouvrirFormulaire(commande.id));
+
+    if (etat.cas === 'FENETRE') {
+      texte.textContent = etat.reste
+        ? `Vous avez jusqu’au ${Garantie.dateDakar(etat.echeance)} (encore ${etat.reste}) pour signaler un problème. Sans signalement, le vendeur sera payé.`
+        : 'Vérifiez votre commande. Si tout va bien, dites-le : le vendeur sera payé.';
+      boutons.appendChild(boutonGarantie('Tout est conforme', 'conforme', 'ac-btn-green', b => toutEstConforme(commande.id, b)));
+      boutons.appendChild(signaler('Signaler un problème'));
+    } else if (etat.cas === 'AVANT_RECEPTION') {
+      texte.textContent = 'Votre commande n’est pas encore arrivée ? Vous pouvez le signaler.';
+      boutons.appendChild(signaler('Je n’ai rien reçu'));
+    } else if (etat.cas === 'ANNULEE') {
+      texte.textContent = 'Commande annulée. Si votre argent ne vous a pas été rendu, signalez-le.';
+      boutons.appendChild(signaler('Je n’ai pas été remboursé'));
+    } else if (etat.cas === 'DOSSIER') {
+      texte.textContent = `Réclamation ${etat.litige.number || ''} : ${Garantie.ETATS.acheteur[etat.litige.status] || ''}. Le paiement du vendeur est bloqué en attendant.`;
+    } else if (etat.cas === 'REGLEE') {
+      texte.textContent = 'Tout est réglé : le vendeur a été payé.';
+    } else if (etat.cas === 'FERMEE') {
+      texte.textContent = 'Le délai de 48 h pour signaler un problème est passé.';
+    }
+
+    bloc.appendChild(texte);
+    if (boutons.childElementCount) bloc.appendChild(boutons);
+    if (etat.litige) bloc.appendChild(lienReclamation(etat.litige));
+    blocs.push(bloc);
+  });
+
+  conteneur.replaceChildren(...blocs);
+  carte.style.display = blocs.length ? 'block' : 'none';
+}
+
+function rechargerPage() {
+  location.reload();
+}
+
+async function toutEstConforme(orderId, bouton) {
+  if (bouton.disabled) return;
+  if (!confirm('Tout est conforme ? Le vendeur sera payé tout de suite et vous ne pourrez plus signaler de problème sur cette commande.')) return;
+  bouton.disabled = true;
+  const reponse = await confirmerConforme(orderId);
+  if (reponse.success) {
+    showToast(reponse.message || 'Merci ! Le vendeur va recevoir son paiement.');
+    rechargerPage();
+    return;
+  }
+  showToast(reponse.message || 'Erreur, réessayez.', 'error');
+  bouton.disabled = false;
 }
 
 // ── Modal Avis ──
@@ -1033,9 +1147,6 @@ function contactSeller(shopId) {
   window.location.href = 'marche-senegal-chat.html?' + params.toString();
 }
 
-function reportProblem() {
-  showToast('⚠️ Signalement en cours de développement');
-}
 
 function goToShop() {
   if (currentOrder?.shopId) {
