@@ -20,7 +20,7 @@ const ENTREES_MENU_VENDEUR = [
   { cle: 'commandes', icone: '🛒', texte: 'Mes commandes',   href: 'marche-senegal-mes-commandes.html', badge: 'sb-badge-orders' },
   { cle: 'promotions', icone: '🎯', texte: 'Promotions',     href: 'marche-senegal-dashboard.html#promotions', badge: 'sb-badge-promotions', badgeOr: true },
   // Un litige suspend le paiement du vendeur : il doit le voir sans le chercher.
-  { cle: 'litiges',   icone: '⚖️', texte: 'Litiges',         href: 'marche-senegal-dashboard.html#litiges', badge: 'sb-badge-litiges' },
+  { cle: 'litiges',   icone: '⚖️', texte: 'Réclamations',    href: 'marche-senegal-dashboard.html#litiges', badge: 'sb-badge-litiges' },
 
   { section: 'Boutique' },
   { cle: 'ajout',     icone: '➕', texte: 'Ajouter un produit', href: 'marche-senegal-ajout-produit.html' },

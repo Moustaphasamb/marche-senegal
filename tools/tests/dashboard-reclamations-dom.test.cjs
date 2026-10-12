@@ -45,3 +45,8 @@ test('aucune réclamation : la bonne nouvelle', async () => {
   const { $ } = await liste([]);
   assert.match($('litiges-liste').textContent, /Aucune réclamation/);
 });
+
+test('préprod : le menu et le titre du vendeur disent « Réclamations »', () => {
+  assert.match(lire('marche-senegal-menu-vendeur.js'), /cle: 'litiges',\s+icone: '[^']*', texte: 'Réclamations'/);
+  assert.match(lire('marche-senegal-dashboard-script.js'), /litiges:'Réclamations'/);
+});
