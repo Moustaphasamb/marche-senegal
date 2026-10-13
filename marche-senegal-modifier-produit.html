@@ -244,7 +244,7 @@ body{padding-left:var(--sidebar-w)}
         </div>
       </div>
 
-      <div class="price-calc" id="price-calc"></div>
+      <div class="price-calc" id="price-calc" hidden></div>
 
       <div class="prod-info-box" id="prod-info-box" style="display:none">
         Ventes : <strong id="info-sales">—</strong><br/>
@@ -259,10 +259,12 @@ body{padding-left:var(--sidebar-w)}
 </div>
 
 <script src="api.js"></script>
+<script src="commission-vendeur.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
 <script>
 const uploadedImages = [null, null, null, null, null];
 let activeSlot = 0;
+let tauxCommission; // undefined tant que le serveur n'a pas répondu (commission-vendeur.js)
 let productId = null;
 
 function showToastLocal(msg, type) {
@@ -361,16 +363,8 @@ function updatePreview() {
       pv.src = main;
     } else { emoji.style.display = ''; if (pv) pv.remove(); }
   }
-  // Aucune commission n'est prélevée par le serveur : le vendeur perçoit le
-  // prix de vente entier. La ligne « Commission (8%) » a donc été retirée.
-  const calc = document.getElementById('price-calc');
-  if (calc) {
-    calc.replaceChildren();
-    const tot = document.createElement('div'); tot.className = 'pc-row pc-total';
-    const tl = document.createElement('span'); tl.textContent = 'Vous recevrez';
-    const tv = document.createElement('span'); tv.textContent = price.toLocaleString() + ' FCFA';
-    tot.appendChild(tl); tot.appendChild(tv); calc.appendChild(tot);
-  }
+  // Ce que le vendeur reçoit : prix moins la commission en vigueur (commission-vendeur.js).
+  remplirPartVendeur(document.getElementById('price-calc'), price, tauxCommission);
 }
 
 async function loadCategories(selectedId) {
@@ -468,6 +462,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!isLoggedIn()) { location.href = 'marche-senegal-connexion-vendeur.html'; return; }
   const user = getCurrentUser();
   if (!user || user.role !== 'SELLER') { location.href = 'marche-senegal-connexion-vendeur.html'; return; }
+  chargerTauxCommission().then(taux => { tauxCommission = taux; updatePreview(); });
 
   const id = new URLSearchParams(location.search).get('id');
   if (!id) { location.href = 'marche-senegal-mes-produits.html'; return; }
