@@ -301,12 +301,8 @@
         </div>
       </div>
 
-      <!-- La commission de 8 % annoncée ici n'existe nulle part côté serveur :
-           le vendeur perçoit le prix de vente entier. Le detail est retire tant
-           qu'aucun prelevement n'est reellement applique. -->
-      <div class="price-calc" id="price-calc">
-        <div class="pc-row pc-total"><span>Vous recevrez</span><span id="net-price">0 FCFA</span></div>
-      </div>
+      <!-- Prix, commission en vigueur et montant reçu : remplis par remplirPartVendeur(). -->
+      <div class="price-calc" id="price-calc" hidden></div>
 
       <!-- Chaque ligne est pilotée par updateChecklist() / updatePreview().
            Les mentions « options de livraison » et « +40% de vues » ont été
@@ -331,6 +327,7 @@
 </div>
 
 <script src="api.js"></script>
+<script src="commission-vendeur.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
 <script src="marche-senegal-plan-vendeur.js"></script>
 <script>
@@ -340,6 +337,7 @@
 
 const uploadedImages = [null, null, null, null, null];
 let activeSlot = 0;
+let tauxCommission; // undefined tant que le serveur n'a pas répondu (commission-vendeur.js)
 
 function toast(msg){
   const t = document.getElementById('toast');
@@ -575,10 +573,8 @@ function updatePreview(){
   setChecklistItem(4, Boolean(categorie),
     categorie ? '✓ Catégorie : ' + categorie.textContent.trim() : '', '✗ Catégorie non choisie');
 
-  // Ce que le vendeur perçoit. Aucun prélèvement n'est appliqué par le serveur :
-  // il reçoit donc le prix de vente entier.
-  const net = document.getElementById('net-price');
-  if (net) net.textContent = price.toLocaleString() + ' FCFA';
+  // Ce que le vendeur reçoit : prix moins la commission en vigueur (commission-vendeur.js).
+  remplirPartVendeur(document.getElementById('price-calc'), price, tauxCommission);
 }
 
 // Bascule une ligne de la checklist entre son état satisfait et son état manquant.
@@ -731,6 +727,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   loadCategories();
   chargerEtatDuPlan();
+  chargerTauxCommission().then(taux => { tauxCommission = taux; updatePreview(); });
   updatePreview();
   updateChecklist();
 });
