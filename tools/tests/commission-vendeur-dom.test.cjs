@@ -89,6 +89,49 @@ test('un seul appel au serveur par page', async () => {
   assert.equal(dom.window.appels.length, 1);
 });
 
+// ── Détail d'une commande : la part vient du serveur (partsVendeur) ──
+const PARTS = { prix: 10000, remise: 1000, remisePlateforme: 0, commission: 450, tauxBps: 500, livraison: 1500, recu: 10050 };
+
+test('détail de commande : prix, remise, commission, livraison et montant reçu', () => {
+  const dom = page({ success: true });
+  const calc = dom.window.document.getElementById('price-calc');
+  dom.window.remplirPartCommande(calc, PARTS);
+  assert.equal(calc.hidden, false);
+  assert.deepEqual(lignes(dom), [
+    'Prix des articles 10 000 FCFA',
+    'Remise de votre boutique − 1 000 FCFA',
+    'Commission Marché Sénégal (5 %) − 450 FCFA',
+    'Livraison + 1 500 FCFA',
+    'Vous recevez 10 050 FCFA'
+  ]);
+});
+
+test('détail de commande : lignes à zéro omises, sauf le montant reçu', () => {
+  const dom = page({ success: true });
+  const calc = dom.window.document.getElementById('price-calc');
+  dom.window.remplirPartCommande(calc, { ...PARTS, remise: 0, remisePlateforme: 1000, commission: 0, tauxBps: null, livraison: 0, recu: 10000 });
+  assert.deepEqual(lignes(dom), ['Prix des articles 10 000 FCFA', 'Vous recevez 10 000 FCFA']);
+});
+
+test('détail de commande : sans part fournie par le serveur, rien n’est affiché', () => {
+  const dom = page({ success: true });
+  const calc = dom.window.document.getElementById('price-calc');
+  for (const parts of [undefined, null]) {
+    dom.window.remplirPartCommande(calc, parts);
+    assert.equal(calc.hidden, true);
+    assert.deepEqual(lignes(dom), []);
+  }
+});
+
+test('marche-senegal-mes-commandes.html charge le module et remplit la part dans le détail', () => {
+  const html = fs.readFileSync(path.join(racine, 'marche-senegal-mes-commandes.html'), 'utf8');
+  const api = html.indexOf('<script src="api.js"></script>');
+  const module = html.indexOf('<script src="commission-vendeur.js"></script>');
+  assert.ok(api > 0 && module > api);
+  assert.match(html, /id="dp-parts"/);
+  assert.match(html, /remplirPartCommande\(document\.getElementById\('dp-parts'\), order\.partsVendeur\)/);
+});
+
 for (const fichier of ['marche-senegal-ajout-produit.html', 'marche-senegal-modifier-produit.html']) {
   test(`${fichier} charge le module après api.js et affiche la part du vendeur`, () => {
     const html = fs.readFileSync(path.join(racine, fichier), 'utf8');

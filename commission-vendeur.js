@@ -53,11 +53,29 @@ function remplirPartVendeur(conteneur, prix, tauxBps) {
     const pourcent = String(tauxBps / 100).replace('.', ',');
     conteneur.append(
       lignePartVendeur('Prix de vente', montantFcfa(part.prix)),
-      lignePartVendeur(`Commission Marché Sénégal (${pourcent} %)`, '− ' + montantFcfa(part.commission))
+      lignePartVendeur(`Commission Marché Sénégal (${pourcent} %)`, '− ' + montantFcfa(part.commission))
     );
   }
   const total = lignePartVendeur('Vous recevrez', montantFcfa(part.net), true);
   // Seule ligne : pas de trait de séparation au-dessus.
   if (!tauxBps) total.style.cssText = 'border-top:0;padding-top:0;margin-top:0';
   conteneur.append(total);
+}
+
+// Détail d'une commande : la part vient toute calculée du serveur
+// (GET /api/orders/:id → partsVendeur). Rien ici ne recalcule. Absente ou
+// null (commande annulée, ancien serveur) : le bloc reste caché.
+function remplirPartCommande(conteneur, parts) {
+  if (!conteneur) return;
+  conteneur.replaceChildren();
+  conteneur.hidden = !parts;
+  if (!parts) return;
+  conteneur.append(lignePartVendeur('Prix des articles', montantFcfa(parts.prix)));
+  if (parts.remise > 0) conteneur.append(lignePartVendeur('Remise de votre boutique', '− ' + montantFcfa(parts.remise)));
+  if (parts.commission > 0) {
+    const pourcent = String(parts.tauxBps / 100).replace('.', ',');
+    conteneur.append(lignePartVendeur(`Commission Marché Sénégal (${pourcent} %)`, '− ' + montantFcfa(parts.commission)));
+  }
+  if (parts.livraison > 0) conteneur.append(lignePartVendeur('Livraison', '+ ' + montantFcfa(parts.livraison)));
+  conteneur.append(lignePartVendeur('Vous recevez', montantFcfa(parts.recu), true));
 }

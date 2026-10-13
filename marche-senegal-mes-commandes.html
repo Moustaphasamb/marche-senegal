@@ -130,6 +130,11 @@ a{text-decoration:none;color:inherit}
 .dp-item-name{font-size:.84rem;font-weight:500;color:var(--dark);flex:1}
 .dp-item-price{font-size:.84rem;font-weight:700;color:var(--green);flex-shrink:0}
 .dp-info-row{display:flex;justify-content:space-between;padding:6px 0;font-size:.84rem}
+/* Ce que le vendeur reçoit : mêmes lignes que l'ajout d'un produit (commission-vendeur.js) */
+.dp-parts{background:var(--gp);border-radius:9px;padding:10px 12px;font-size:.84rem;color:var(--text);line-height:1.8}
+.dp-parts .pc-row{display:flex;justify-content:space-between;gap:10px}
+.dp-parts .pc-row span:last-child{white-space:nowrap}
+.dp-parts .pc-total{font-weight:700;color:var(--green);border-top:1px solid var(--g2);padding-top:4px;margin-top:4px}
 .dp-info-label{color:var(--muted)}
 .dp-info-val{font-weight:500;color:var(--text)}
 .dp-total-row{display:flex;justify-content:space-between;padding:10px 0 0;font-size:.96rem;border-top:1px solid var(--border);margin-top:6px}
@@ -264,6 +269,7 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <script src="api.js"></script>
+<script src="commission-vendeur.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
 <script>
 // ════════════════════════════════════════
@@ -623,6 +629,11 @@ async function openDetail(orderId) {
       </div>
     </div>
 
+    <div class="dp-section" id="dp-parts-section">
+      <div class="dp-section-title">Ce que vous recevez</div>
+      <div class="dp-parts" id="dp-parts"></div>
+    </div>
+
     <div class="dp-section">
       <div class="dp-section-title">Informations client</div>
       <div class="dp-info-row">
@@ -740,6 +751,10 @@ async function openDetail(orderId) {
       </button>
     </div>
   `;
+
+  // Calculée par le serveur ; absente (commande annulée, ancien serveur) → section cachée.
+  remplirPartCommande(document.getElementById('dp-parts'), order.partsVendeur);
+  document.getElementById('dp-parts-section').hidden = !order.partsVendeur;
 
   document.getElementById('detail-overlay').classList.add('show');
 }
