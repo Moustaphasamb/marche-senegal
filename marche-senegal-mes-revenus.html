@@ -40,7 +40,19 @@ a{text-decoration:none;color:inherit}
 .argent-carte{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px}
 .ac-verse{border-left:4px solid var(--green)}
 .ac-attente{border-left:4px solid var(--gold)}
-.ac-gele{border-left:4px solid var(--red)}
+.ac-dispo{border-left:4px solid var(--gl)}
+.ac-envoi{margin-top:6px;font-size:.74rem;font-weight:600;color:var(--green)}
+.indispo{margin:-6px 0 18px;padding:10px 14px;background:var(--rp);border-radius:var(--radius);font-size:.8rem;color:var(--red)}
+
+/* Relevé téléchargeable */
+.releve-corps{padding:14px 18px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.releve-champ{display:flex;flex-direction:column;gap:4px;font-size:.74rem;font-weight:600;color:var(--muted)}
+.releve-champ input{min-height:40px;padding:0 10px;border:1.5px solid var(--border);border-radius:10px;font-size:.86rem;color:var(--text);background:#fff}
+.releve-btn{min-height:40px;padding:0 18px;border:0;border-radius:99px;background:var(--green);color:#fff;font-size:.84rem;font-weight:700;cursor:pointer}
+.releve-btn:disabled{opacity:.6;cursor:wait}
+.releve-erreur{width:100%;font-size:.78rem;color:var(--red)}
+.card + .card{margin-top:16px}
+.bloc-carte{margin-bottom:16px}
 .ac-val{font-family:'Newsreader',serif;font-size:1.6rem;font-weight:900;color:var(--dark);margin-bottom:2px}
 .ac-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:4px}
 .ac-sub{font-size:.74rem;color:var(--muted);line-height:1.45}
@@ -112,22 +124,63 @@ tbody tr:last-child td{border-bottom:none}
 
 <div class="main">
 
+  <!-- Les trois montants viennent du registre du serveur (revenus-vendeur.js) -->
   <div class="argent-row">
+    <div class="argent-carte ac-attente">
+      <div class="ac-val" id="total-bloque">—</div>
+      <div class="ac-label">En attente</div>
+      <div class="ac-sub">Ventes payées que l'acheteur n'a pas encore confirmées, ou objet d'une réclamation en cours</div>
+    </div>
+    <div class="argent-carte ac-dispo">
+      <div class="ac-val" id="total-disponible">—</div>
+      <div class="ac-label">Disponible</div>
+      <div class="ac-sub">Confirmé par l'acheteur : il vous sera versé</div>
+      <div class="ac-envoi" id="en-versement" hidden></div>
+    </div>
     <div class="argent-carte ac-verse">
       <div class="ac-val" id="total-verse">—</div>
-      <div class="ac-label">Acquis</div>
-      <div class="ac-sub">Confirmé par l'acheteur — la plateforme vous le vire</div>
+      <div class="ac-label">Déjà versé</div>
+      <div class="ac-sub">Total reçu sur votre compte depuis le début</div>
     </div>
-    <div class="argent-carte ac-attente">
-      <div class="ac-val" id="total-attente">—</div>
-      <div class="ac-label">En attente de versement</div>
-      <div class="ac-sub">Montant à confirmer auprès de la plateforme avant versement</div>
+  </div>
+  <div class="indispo" id="argent-indisponible" hidden>Vos montants ne peuvent pas être affichés pour le moment. Rechargez la page dans quelques minutes.</div>
+
+  <div class="card bloc-carte" id="carte-versements" hidden>
+    <div class="card-head">
+      <div>
+        <div class="card-title">Vos versements</div>
+        <div class="card-sub">Les 20 derniers</div>
+      </div>
     </div>
-    <div class="argent-carte ac-gele">
-      <div class="ac-val" id="total-gele">—</div>
-      <div class="ac-label">Gelé par un litige</div>
-      <div class="ac-sub">Retenu tant qu'un administrateur n'a pas tranché</div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Versement</th>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Référence</th>
+            <th>État</th>
+          </tr>
+        </thead>
+        <tbody id="versements"></tbody>
+      </table>
     </div>
+  </div>
+
+  <div class="card bloc-carte">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Relevé à télécharger</div>
+        <div class="card-sub">Une ligne par commande : prix, remise, commission, livraison, montant reçu. 92 jours au plus.</div>
+      </div>
+    </div>
+    <form class="releve-corps" id="form-releve">
+      <label class="releve-champ">Du<input type="date" id="releve-du" required/></label>
+      <label class="releve-champ">Au<input type="date" id="releve-au" required/></label>
+      <button class="releve-btn" type="submit" id="releve-btn">Télécharger le relevé</button>
+      <div class="releve-erreur" id="releve-erreur" role="alert"></div>
+    </form>
   </div>
 
   <div class="periodes">
@@ -139,7 +192,7 @@ tbody tr:last-child td{border-bottom:none}
   <div class="card">
     <div class="card-head">
       <div>
-        <div class="card-title">Vos encaissements</div>
+        <div class="card-title">Vos commandes payées</div>
         <div class="card-sub" id="compte-lignes">—</div>
       </div>
     </div>
@@ -171,6 +224,7 @@ tbody tr:last-child td{border-bottom:none}
 </div>
 
 <script src="api.js"></script>
+<script src="revenus-vendeur.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
 <script>
 let periodeCourante = 'tout';
@@ -221,11 +275,6 @@ async function chargerRevenus() {
     return;
   }
 
-  const totaux = resultat.totaux || { verse: 0, enAttente: 0, gele: 0 };
-  document.getElementById('total-verse').textContent = montant(totaux.verse);
-  document.getElementById('total-attente').textContent = montant(totaux.enAttente);
-  document.getElementById('total-gele').textContent = montant(totaux.gele);
-
   const lignes = resultat.data || [];
   const compte = document.getElementById('compte-lignes');
   compte.textContent = lignes.length === 0
@@ -268,7 +317,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'marche-senegal-connexion-vendeur.html';
     return;
   }
-  await chargerRevenus();
+  const periode = periodeParDefaut();
+  document.getElementById('releve-du').value = periode.du;
+  document.getElementById('releve-au').value = periode.au;
+  document.getElementById('form-releve').addEventListener('submit', async evenement => {
+    evenement.preventDefault();
+    const du = document.getElementById('releve-du').value;
+    const au = document.getElementById('releve-au').value;
+    const erreur = document.getElementById('releve-erreur');
+    const bouton = document.getElementById('releve-btn');
+    erreur.textContent = erreurPeriode(du, au) || '';
+    if (erreur.textContent) return;
+    bouton.disabled = true;
+    try {
+      await telechargerReleve(du, au);
+    } catch (e) {
+      erreur.textContent = e.message;
+    } finally {
+      bouton.disabled = false;
+    }
+  });
+  await Promise.all([chargerFinances(), chargerRevenus()]);
 });
 </script>
 </body>
