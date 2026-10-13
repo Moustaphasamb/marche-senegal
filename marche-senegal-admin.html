@@ -405,6 +405,7 @@
     <div class="sb-sec">Plateforme</div>
     <div class="sb-item" onclick="showPage('markets',this)"><span class="sb-icon"><i class="ic" data-ic="map"></i></span>Marchés</div>
     <div class="sb-item" onclick="showPage('revenue',this)"><span class="sb-icon"><i class="ic" data-ic="coins"></i></span>Revenus</div>
+    <div class="sb-item" onclick="showPage('commission',this)"><span class="sb-icon"><i class="ic" data-ic="chart-pie"></i></span>Commission</div>
     <div class="sb-item" onclick="showPage('deliveries',this)"><span class="sb-icon"><i class="ic" data-ic="bike"></i></span>Livreurs</div>
     <div class="sb-item" onclick="showPage('promotions',this)"><span class="sb-icon"><i class="ic" data-ic="target"></i></span>Promotions</div>
     <div class="sb-item" onclick="showPage('stories',this)"><span class="sb-icon"><i class="ic" data-ic="camera"></i></span>Stories</div>
@@ -606,6 +607,47 @@
     </div>
   </div>
 
+  <!-- ── COMMISSION (commission-admin.js) ── -->
+  <div class="ps" id="ps-commission">
+    <div class="sec-header"><div class="sec-title"><i class="ic" data-ic="chart-pie"></i> Commission</div></div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">En ce moment</div></div>
+      <div id="com-etat" style="padding:16px 18px;font-size:.92rem;font-weight:600;color:var(--dark);line-height:1.5">Chargement…</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Changer la commission</div></div>
+      <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px;font-size:.86rem">
+        <label style="display:flex;flex-direction:column;gap:6px;font-weight:600;color:var(--dark)">Taux (en %)
+          <input id="com-taux" type="text" inputmode="decimal" placeholder="5" style="max-width:140px;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.9rem;font-family:inherit"/>
+        </label>
+        <fieldset style="border:0;padding:0;display:flex;flex-direction:column;gap:8px">
+          <legend style="font-weight:600;color:var(--dark);margin-bottom:6px">À partir de quand ?</legend>
+          <label><input type="radio" name="com-mode" value="maintenant"/> Dès maintenant</label>
+          <label><input type="radio" name="com-mode" value="date"/> À une date :
+            <input id="com-date" type="datetime-local" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-family:inherit"/></label>
+          <label><input type="radio" name="com-mode" value="aucune"/> Pas de commission (les vendeurs reçoivent le prix entier)</label>
+        </fieldset>
+        <div style="font-size:.78rem;color:var(--muted);line-height:1.5">Le taux est fixé sur chaque commande au moment où elle est passée : un changement ne touche que les nouvelles commandes. Les clients ne voient jamais la commission.</div>
+        <div id="com-erreur" role="alert" style="color:var(--red);font-size:.82rem"></div>
+        <button id="com-enregistrer" class="sec-btn" onclick="demanderConfirmation()" style="align-self:flex-start;background:var(--green);color:#fff">Enregistrer</button>
+        <div id="com-confirmation" hidden style="padding:14px;border:1.5px solid var(--gold);background:var(--gdl);border-radius:10px">
+          <div id="com-resume" style="font-weight:600;color:var(--dark);line-height:1.5;margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="sec-btn" onclick="confirmerCommission()" style="background:var(--green);color:#fff">Confirmer</button>
+            <button class="sec-btn sec-btn-outline" onclick="annulerConfirmation()">Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Historique des changements</div></div>
+      <ul id="com-historique" style="list-style:none;padding:12px 18px;margin:0;display:flex;flex-direction:column;gap:8px;font-size:.82rem;color:var(--text)"></ul>
+    </div>
+  </div>
+
   <!-- ── DELIVERIES ── -->
   <div class="ps" id="ps-deliveries">
     <div class="sec-header">
@@ -804,6 +846,7 @@
 </main>
 
 <script src="api.js"></script>
+<script src="commission-admin.js"></script>
 <script src="garantie.js"></script>
 <script src="stories.js"></script>
 <script>
@@ -830,6 +873,7 @@ const pageTitles = {
   promotions: 'Promotions',
   logs:       'Activité système',
   revenue:    'Revenus & statistiques',
+  commission: 'Commission',
   deliveries: 'Gestion des livraisons',
   settings:   'Paramètres'
 };
@@ -868,6 +912,7 @@ function showPage(id, navItem) {
   if (id === 'revenue'    && !revenueLoaded)    loadRevenue();
   if (id === 'deliveries' && !deliveriesLoaded) loadDeliveries();
   if (id === 'settings')                        loadSettings();
+  if (id === 'commission')                      chargerCommission();
 }
 
 function ouvrirSectionAdmin(id) {
