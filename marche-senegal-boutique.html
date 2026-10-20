@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<base href="/">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Boutique — Marché Sénégal</title>
@@ -761,6 +762,16 @@ async function loadShop(shopId) {
   // Mettre à jour le titre
   document.title = `${shop.name} — Marché Sénégal`;
 
+  // Ouverte par ?id=, la barre d'adresse montre le nom de la boutique : /boutiques/<slug>.
+  // La balise <base href="/"> garde les liens relatifs à la racine.
+  if (shop.slug && !location.pathname.startsWith('/boutiques/')) {
+    const reste = new URLSearchParams(location.search);
+    reste.delete('id');
+    const suite = reste.toString();
+    history.replaceState(history.state, '', '/boutiques/' + encodeURIComponent(shop.slug) + (suite ? '?' + suite : '') + location.hash);
+    document.querySelectorAll('.ms-skip').forEach(a => { a.href = location.pathname + location.search + a.hash; });
+  }
+
   // Mettre à jour le nom
   const shName = document.querySelector('.sh-name');
   if (shName) shName.textContent = shop.name;
@@ -840,7 +851,7 @@ async function loadShop(shopId) {
   const btnWhatsapp = document.getElementById('btn-whatsapp');
   const numeroWhatsapp = String(shop.whatsapp || '').replace(/\D/g, '');
   if (btnWhatsapp && numeroWhatsapp) {
-    const message = `Bonjour ${shop.name}, je vous contacte depuis Marché Sénégal : ${location.origin}/boutiques/${shop.id}`;
+    const message = `Bonjour ${shop.name}, je vous contacte depuis Marché Sénégal : ${location.origin}/boutiques/${shop.slug || shop.id}`;
     btnWhatsapp.href = 'https://wa.me/' + numeroWhatsapp + '?text=' + encodeURIComponent(message);
     btnWhatsapp.hidden = false;
   }

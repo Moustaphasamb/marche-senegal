@@ -776,7 +776,7 @@ function fillForm(shop, stats) {
   }
 
   const viewLink = document.getElementById('viewLink');
-  if (viewLink) viewLink.href = 'marche-senegal-boutique.html?id=' + shop.id;
+  if (viewLink) viewLink.href = (shop.slug ? '/boutiques/' + encodeURIComponent(shop.slug) : 'marche-senegal-boutique.html?id=' + shop.id);
 
   updatePreview();
 }

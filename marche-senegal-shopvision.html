@@ -181,7 +181,7 @@
         boutique,
         lienApercu: lienBoutique + '&apercu=brouillon',
         // Adresse propre et partageable (WhatsApp) : /boutiques/:id, servie par api/page.js.
-        lienPublic: location.origin + '/boutiques/' + encodeURIComponent(boutique.id),
+        lienPublic: location.origin + '/boutiques/' + encodeURIComponent(boutique.slug || boutique.id),
         confirmer: async message => window.confirm(message)
       });
       await editeur.charger();

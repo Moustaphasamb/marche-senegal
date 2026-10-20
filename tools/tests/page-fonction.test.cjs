@@ -103,7 +103,7 @@ test('API en erreur 500 : page d origine servie', async () => {
 test('clés piégées : 404 sans appel réseau', async () => {
   api({ statut: 200, corps: {} });
   const cas = [['marche', '../etc'], ['marche', 'a'.repeat(200)], ['marche', 'Sandaga'],
-    ['boutique', 'sandaga'], ['produit', ''], ['produit', undefined], ['inconnu', 'x']];
+    ['boutique', 'Mode Fatou'], ['boutique', '../etc'], ['produit', ''], ['produit', undefined], ['inconnu', 'x']];
   for (const [type, cle] of cas) {
     const res = reponse();
     await handler({ query: { type, cle } }, res);
@@ -123,4 +123,13 @@ test('libellés des catégories indisponibles : la page marché sort quand même
   assert.equal(res.statusCode, 200);
   assert.match(res.corps, /FAQPage/);
   assert.doesNotMatch(res.corps, /Que trouve-t-on/);
+});
+
+test('boutique par nom d’adresse : la fonction interroge le serveur avec ce nom', async () => {
+  api({ statut: 200, corps: { success: true, data: { id: BOUTIQUE_ID, slug: 'mode-fatou-ndoye', name: 'Mode Fatou Ndoye', status: 'ACTIVE', products: [] } } });
+  const res = reponse();
+  await handler({ query: { type: 'boutique', cle: 'mode-fatou-ndoye' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.ok(appels.includes('/shops/mode-fatou-ndoye'));
+  assert.match(res.corps, /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/boutiques\/mode-fatou-ndoye">/);
 });

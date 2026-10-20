@@ -670,7 +670,7 @@ async function loadShops(marketId) {
     </div>
     <div class="shops-grid">
       ${result.data.map(shop => `
-        <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html?id=${shop.id}'">
+        <div class="shop-card" data-lien="${shop.slug ? '/boutiques/' + encodeURIComponent(shop.slug) : 'marche-senegal-boutique.html?id=' + encodeURIComponent(shop.id)}" onclick="window.location.href=this.dataset.lien">
           <div class="shop-banner" style="background:#F0EAF8">
             ${urlImageSure(shop.avatarUrl)
               ? `<img src="${escapeHtml(urlImageSure(shop.avatarUrl))}" alt="" style="width:100%;height:100%;object-fit:cover"/>`

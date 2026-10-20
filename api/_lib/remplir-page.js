@@ -28,7 +28,7 @@ function resume(texte, max = 155) {
 
 function urlPropre(type, d) {
   if (type === 'marche') return d.slug ? `${SITE}/marches/${d.slug}` : null;
-  if (type === 'boutique') return `${SITE}/boutiques/${d.id}`;
+  if (type === 'boutique') return `${SITE}/boutiques/${d.slug || d.id}`;
   if (type === 'produit') return `${SITE}/produits/${d.id}`;
   return null;
 }
@@ -68,7 +68,7 @@ function decrireMarche(d, extras = {}) {
       d.horaires ? `<p>Horaires : ${echapper(d.horaires)}</p>` : '',
       d.conseils ? `<p>Conseils : ${echapper(d.conseils)}</p>` : '',
       (d.shops || []).length ? `<h2>Boutiques</h2><ul>${d.shops.map(s =>
-        `<li><a href="/boutiques/${echapper(s.id)}">${echapper(s.name)}</a></li>`).join('')}</ul>` : '',
+        `<li><a href="/boutiques/${echapper(s.slug || s.id)}">${echapper(s.name)}</a></li>`).join('')}</ul>` : '',
       faq.length ? `<h2>Questions fréquentes</h2>${faq.map(q =>
         `<h3>${echapper(q.question)}</h3><p>${echapper(q.reponse)}</p>`).join('')}` : ''
     ]
@@ -121,7 +121,7 @@ function decrireProduit(d) {
       `<h1>${echapper(d.name)}</h1>`,
       `<p>Prix : ${fcfa(d.price)}</p>`,
       d.description ? `<p>${echapper(d.description)}</p>` : '',
-      boutique.id ? `<p>Vendu par <a href="/boutiques/${echapper(boutique.id)}">${echapper(boutique.name)}</a>${
+      boutique.id ? `<p>Vendu par <a href="/boutiques/${echapper(boutique.slug || boutique.id)}">${echapper(boutique.name)}</a>${
         marche ? `, ${echapper(marche)}` : ''}</p>` : ''
     ]
   };

@@ -874,7 +874,7 @@ async function loadFeaturedShops() {
     const marketName = nomCourtMarche(shop.market?.name);
     const city = shop.market?.city || '';
     return `
-    <div class="shop-card" onclick="window.location.href='marche-senegal-boutique.html?id=${shop.id}'">
+    <div class="shop-card" data-lien="${shop.slug ? '/boutiques/' + encodeURIComponent(shop.slug) : 'marche-senegal-boutique.html?id=' + encodeURIComponent(shop.id)}" onclick="window.location.href=this.dataset.lien">
       <div class="shop-banner" style="background:#F0EAF8">
         ${shop.bannerUrl
           ? `<img src="${escapeHtml(shop.bannerUrl)}" style="width:100%;height:100%;object-fit:cover"/>`

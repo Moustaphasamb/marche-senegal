@@ -700,7 +700,7 @@ async function loadProduct(productId) {
   if (prod.shop) {
     if (bcBoutique) {
       bcBoutique.textContent = prod.shop.name;
-      bcBoutique.href = 'marche-senegal-boutique.html?id=' + prod.shop.id;
+      bcBoutique.href = (prod.shop.slug ? '/boutiques/' + encodeURIComponent(prod.shop.slug) : 'marche-senegal-boutique.html?id=' + prod.shop.id);
     }
     if (bcMarche && prod.shop.market) {
       bcMarche.textContent = prod.shop.market.name;
@@ -901,7 +901,7 @@ async function loadProduct(productId) {
   const sellerCard = document.querySelector('.seller-card');
   if (sellerCard && prod.shop) {
     sellerCard.onclick = () => {
-      window.location.href = `marche-senegal-boutique.html?id=${prod.shop.id}`;
+      window.location.href = (prod.shop.slug ? '/boutiques/' + encodeURIComponent(prod.shop.slug) : 'marche-senegal-boutique.html?id=' + prod.shop.id);
     };
 
     const scName = sellerCard.querySelector('.sc-name');
