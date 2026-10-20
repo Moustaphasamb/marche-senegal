@@ -17,19 +17,19 @@ test('les règles M-07 sont dites en clair', () => {
 });
 
 test('adresse officielle, pas d’emoji, pas de délai de remboursement inventé', () => {
-  assert.match(page, /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/marche-senegal-garantie\.html"\/>/);
+  assert.match(page, /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/marche-senegal-garantie"\/>/);
   assert.doesNotMatch(page, /\p{Extended_Pictographic}/u);
   assert.doesNotMatch(texte, /sous \d+ jours?|en \d+ heures? ouvr/);
 });
 
 test('la page est liée depuis l’accueil, la fiche produit et le panier', () => {
   for (const f of ['marche-senegal-accueil.html', 'marche-senegal-produit.html', 'marche-senegal-panier.html']) {
-    assert.match(lire(f), /href="marche-senegal-garantie\.html"/, f);
+    assert.match(lire(f), /href="marche-senegal-garantie.html"/, f);
   }
 });
 
 test('la page est dans le plan du site', () => {
-  assert.match(lire('api/sitemap.js'), /'\/marche-senegal-garantie\.html'/);
+  assert.match(lire('api/sitemap.js'), /'\/marche-senegal-garantie'/);
 });
 
 test('relecture : la fiche produit ne promet le séquestre qu’au paiement en ligne', () => {

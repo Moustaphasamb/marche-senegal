@@ -629,7 +629,7 @@ function retourALaListe() {
 function quitterOuRevenir() {
   if (estVendeur && currentBuyerId) retourALaListe();
   else if (!estVendeur && currentUser?.role === 'BUYER' && !currentShopId) history.back();
-  else if (!estVendeur && currentUser?.role === 'BUYER' && document.getElementById('conv-liste')?.style.display === 'none' && window.location.pathname.endsWith('marche-senegal-chat.html')) {
+  else if (!estVendeur && currentUser?.role === 'BUYER' && document.getElementById('conv-liste')?.style.display === 'none' && /marche-senegal-chat(\.html)?$/.test(window.location.pathname)) {
     currentShopId = null;
     if (socket) { socket.disconnect(); socket = null; }
     const url = new URL(window.location.href);

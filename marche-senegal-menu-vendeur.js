@@ -56,7 +56,9 @@ const PAGE_VERS_ENTREE = {
 // ── Construction ──────────────────────────────────────────────────
 
 function fichierCourant() {
-  return window.location.pathname.split('/').pop() || 'marche-senegal-dashboard.html';
+  // Les adresses sont servies sans « .html » : on le rajoute pour retrouver la page.
+  const fichier = window.location.pathname.split('/').pop() || 'marche-senegal-dashboard.html';
+  return fichier.endsWith('.html') ? fichier : fichier + '.html';
 }
 
 // L'entrée active tient compte du fragment : sur le tableau de bord,

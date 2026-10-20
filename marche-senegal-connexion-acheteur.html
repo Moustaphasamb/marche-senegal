@@ -198,8 +198,8 @@ function destinationMessagesApresConnexion() {
   const next = new URLSearchParams(window.location.search).get('next');
   if (!next) return 'marche-senegal-accueil.html';
   const url = new URL(next, window.location.href);
-  return url.origin === window.location.origin && url.pathname.endsWith('/marche-senegal-chat.html')
-    ? url.pathname.split('/').pop() + url.search : 'marche-senegal-accueil.html';
+  return url.origin === window.location.origin && /\/marche-senegal-chat(\.html)?$/.test(url.pathname)
+    ? 'marche-senegal-chat.html' + url.search : 'marche-senegal-accueil.html';
 }
 document.addEventListener('DOMContentLoaded', function() {
   var user = getCurrentUser();

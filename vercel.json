@@ -8,6 +8,15 @@
           "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
         }
       ]
+    },
+    {
+      "source": "/:page(marche-senegal-[a-z0-9-]+)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        }
+      ]
     }
   ],
   "functions": {
@@ -20,12 +29,31 @@
       "source": "/index.html",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/marche-senegal-accueil.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/marche-senegal-accueil",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/:page(marche-senegal-[a-z0-9-]+).html",
+      "destination": "/:page",
+      "permanent": true
     }
   ],
   "rewrites": [
     {
       "source": "/",
       "destination": "/marche-senegal-accueil.html"
+    },
+    {
+      "source": "/:page(marche-senegal-[a-z0-9-]+)",
+      "destination": "/:page.html"
     },
     {
       "source": "/marches/:cle",

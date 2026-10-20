@@ -7,8 +7,8 @@ Le site est en français. Les prix sont affichés en francs CFA (FCFA). La créa
 ## Pages principales
 
 - [Accueil](https://marchesenegal.sn/) : présentation, marchés, produits et boutiques mis en avant
-- [Les marchés](https://marchesenegal.sn/marche-senegal-marche.html) : les marchés du Sénégal référencés, par ville et par région
-- [Recherche de produits](https://marchesenegal.sn/marche-senegal-recherche.html) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
+- [Les marchés](https://marchesenegal.sn/marche-senegal-marche) : les marchés du Sénégal référencés, par ville et par région
+- [Recherche de produits](https://marchesenegal.sn/marche-senegal-recherche) : recherche par mot-clé, catégorie, prix et proximité ; accepte le paramètre `?q=`
 
 ## Marchés
 
@@ -29,10 +29,10 @@ Chaque marché, boutique et produit a une adresse lisible sans JavaScript (`/mar
 
 ## Pour les commerçants
 
-- [Ouvrir une boutique](https://marchesenegal.sn/marche-senegal-connexion-vendeur.html) : inscription gratuite, dans un marché ou hors marché
+- [Ouvrir une boutique](https://marchesenegal.sn/marche-senegal-connexion-vendeur) : inscription gratuite, dans un marché ou hors marché
 
 ## Catégories
 
-- [Mode et wax](https://marchesenegal.sn/marche-senegal-recherche.html?category=mode)
-- [Artisanat](https://marchesenegal.sn/marche-senegal-recherche.html?category=artisan)
-- [Saveurs locales](https://marchesenegal.sn/marche-senegal-recherche.html?category=aliment)
+- [Mode et wax](https://marchesenegal.sn/marche-senegal-recherche?category=mode)
+- [Artisanat](https://marchesenegal.sn/marche-senegal-recherche?category=artisan)
+- [Saveurs locales](https://marchesenegal.sn/marche-senegal-recherche?category=aliment)
