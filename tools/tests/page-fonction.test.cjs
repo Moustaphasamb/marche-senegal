@@ -133,3 +133,13 @@ test('boutique par nom d’adresse : la fonction interroge le serveur avec ce no
   assert.ok(appels.includes('/shops/mode-fatou-ndoye'));
   assert.match(res.corps, /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/boutiques\/mode-fatou-ndoye">/);
 });
+
+test('produit par nom d’adresse : la fonction interroge le serveur avec ce nom', async () => {
+  api({ statut: 200, corps: { success: true, data: { id: PRODUIT_ID, slug: 'sac-en-cuir', name: 'Sac en cuir', price: 5000, status: 'ACTIVE', shop: { id: BOUTIQUE_ID, slug: 'mode-fatou-ndoye', name: 'Mode Fatou Ndoye', status: 'ACTIVE' } } } });
+  const res = reponse();
+  await handler({ query: { type: 'produit', cle: 'sac-en-cuir' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.ok(appels.includes('/products/sac-en-cuir'));
+  assert.match(res.corps, /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/produits\/sac-en-cuir">/);
+  assert.match(res.corps, /href="\/boutiques\/mode-fatou-ndoye"/);
+});

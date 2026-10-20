@@ -29,7 +29,7 @@ function resume(texte, max = 155) {
 function urlPropre(type, d) {
   if (type === 'marche') return d.slug ? `${SITE}/marches/${d.slug}` : null;
   if (type === 'boutique') return `${SITE}/boutiques/${d.slug || d.id}`;
-  if (type === 'produit') return `${SITE}/produits/${d.id}`;
+  if (type === 'produit') return `${SITE}/produits/${d.slug || d.id}`;
   return null;
 }
 
@@ -94,7 +94,7 @@ function decrireBoutique(d) {
         ? `<a href="/marches/${echapper(d.market.slug)}">${echapper(lieu)}</a>` : echapper(lieu)}</p>` : '',
       d.description ? `<p>${echapper(d.description)}</p>` : '',
       (d.products || []).length ? `<h2>Produits</h2><ul>${d.products.map(p =>
-        `<li><a href="/produits/${echapper(p.id)}">${echapper(p.name)} — ${fcfa(p.price)}</a></li>`).join('')}</ul>` : ''
+        `<li><a href="/produits/${echapper(p.slug || p.id)}">${echapper(p.name)} — ${fcfa(p.price)}</a></li>`).join('')}</ul>` : ''
     ]
   };
 }

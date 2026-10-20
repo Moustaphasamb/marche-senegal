@@ -2285,7 +2285,7 @@ function buildProductActions(actDiv, product, badgeEl) {
   const viewBtn = document.createElement('button');
   viewBtn.className = 'ta view';
   viewBtn.textContent = 'Voir';
-  viewBtn.onclick = () => window.open('marche-senegal-produit.html?id=' + product.id, '_blank');
+  viewBtn.onclick = () => window.open(product.slug ? '/produits/' + encodeURIComponent(product.slug) : 'marche-senegal-produit.html?id=' + encodeURIComponent(product.id), '_blank');
   actDiv.appendChild(viewBtn);
 
   if (product.status === 'ACTIVE') {

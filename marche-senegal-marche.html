@@ -756,7 +756,7 @@ async function loadMarketProducts(marketId) {
     <div class="prods-grid">
       ${result.data.map(prod => `
         <div class="prod-card"
-             onclick="window.location.href='marche-senegal-produit.html?id=${prod.id}'">
+             data-lien="${prod.slug ? '/produits/' + encodeURIComponent(prod.slug) : 'marche-senegal-produit.html?id=' + encodeURIComponent(prod.id)}" onclick="window.location.href=this.dataset.lien">
           <div class="prod-img" style="background:#F0EAF8">
             ${urlImageSure(prod.images[0])
               ? `<img src="${escapeHtml(urlImageSure(prod.images[0]))}" alt="" style="width:100%;height:100%;object-fit:cover"/>`

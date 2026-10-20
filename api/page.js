@@ -9,11 +9,10 @@ const path = require('node:path');
 const { preparerModele, remplirPage, marquerIntrouvable } = require('./_lib/remplir-page.js');
 
 const API = 'https://marche-senegal-backend-production.up.railway.app/api';
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const PAGES = {
   marche: { fichier: 'marche-senegal-marche.html', route: 'markets', cle: /^[a-z0-9-]{1,80}$/ },
   boutique: { fichier: 'marche-senegal-boutique.html', route: 'shops', cle: /^[a-z0-9-]{1,80}$/ },
-  produit: { fichier: 'marche-senegal-produit.html', route: 'products', cle: UUID }
+  produit: { fichier: 'marche-senegal-produit.html', route: 'products', cle: /^[a-z0-9-]{1,80}$/ }
 };
 // Un produit retiré, une boutique suspendue ou un marché fermé ne doivent pas être indexés.
 function publiable(type, d) {

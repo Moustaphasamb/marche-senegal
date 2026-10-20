@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<base href="/">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Produit — Marché Sénégal</title>
@@ -691,6 +692,16 @@ async function loadProduct(productId) {
   // ── Mettre à jour le titre ──
   document.title = `${prod.name} — Marché Sénégal`;
 
+  // Ouverte par ?id=, la barre d'adresse montre le nom du produit : /produits/<slug>.
+  // La balise <base href="/"> garde les liens relatifs à la racine.
+  if (prod.slug && !location.pathname.startsWith('/produits/')) {
+    const reste = new URLSearchParams(location.search);
+    reste.delete('id');
+    const suite = reste.toString();
+    history.replaceState(history.state, '', '/produits/' + encodeURIComponent(prod.slug) + (suite ? '?' + suite : '') + location.hash);
+    document.querySelectorAll('.ms-skip').forEach(a => { a.href = location.pathname + location.search + a.hash; });
+  }
+
   // ── Mettre à jour le breadcrumb ──
   const bcCurrent  = document.querySelector('.bc-current');
   if (bcCurrent) bcCurrent.textContent = prod.name;
@@ -1339,7 +1350,7 @@ async function loadSimilarProducts(prod) {
       const card = document.createElement('div');
       card.className = 'sim-card';
       card.addEventListener('click', () => {
-        window.location.href = 'marche-senegal-produit.html?id=' + p.id;
+        window.location.href = p.slug ? '/produits/' + encodeURIComponent(p.slug) : 'marche-senegal-produit.html?id=' + encodeURIComponent(p.id);
       });
 
       const imgDiv = document.createElement('div');
