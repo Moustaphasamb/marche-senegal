@@ -46,6 +46,21 @@
       "permanent": true
     },
     {
+      "source": "/marches{/}?",
+      "destination": "/marche",
+      "permanent": false
+    },
+    {
+      "source": "/boutiques{/}?",
+      "destination": "/recherche",
+      "permanent": false
+    },
+    {
+      "source": "/produits{/}?",
+      "destination": "/recherche",
+      "permanent": false
+    },
+    {
       "source": "/marche-senegal-:page(admin|ajout-produit|boutique|chat|commande|connexion-acheteur|connexion-admin|connexion-vendeur|dashboard|garantie|ma-boutique|marche|mes-commandes|mes-produits|mes-revenus|mes-stories|modifier-produit|mot-de-passe-oublie|panier|produit|profil|recherche|reclamation|shopvision).html",
       "destination": "/:page",
       "permanent": true
