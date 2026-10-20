@@ -6,7 +6,7 @@ const { SITE, urlPropre } = require('./_lib/remplir-page.js');
 
 const API = 'https://marche-senegal-backend-production.up.railway.app/api';
 // La page marché sans identifiant affiche le premier marché : un doublon de sa page /marches/.
-const FIXES = ['/', '/marche-senegal-recherche', '/marche-senegal-garantie'];
+const FIXES = ['/', '/recherche', '/garantie'];
 
 const dependances = {
   appelerApi: async chemin => {

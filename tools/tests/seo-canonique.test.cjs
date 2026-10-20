@@ -10,7 +10,7 @@ const lire = f => fs.readFileSync(path.join(racine, f), 'utf8');
 
 test('la recherche désigne son adresse sans paramètre comme officielle', () => {
   assert.match(lire('marche-senegal-recherche.html'),
-    /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/marche-senegal-recherche"\/>/);
+    /<link rel="canonical" href="https:\/\/marchesenegal\.sn\/recherche"\/>/);
 });
 
 test('la page marché, modèle de /marches/:slug, n’a pas de canonical fixe', () => {

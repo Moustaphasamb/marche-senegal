@@ -10,7 +10,7 @@
       ]
     },
     {
-      "source": "/:page(marche-senegal-[a-z0-9-]+)",
+      "source": "/:page(admin|ajout-produit|boutique|chat|commande|connexion-acheteur|connexion-admin|connexion-vendeur|dashboard|garantie|ma-boutique|marche|mes-commandes|mes-produits|mes-revenus|mes-stories|modifier-produit|mot-de-passe-oublie|panier|produit|profil|recherche|reclamation|shopvision)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -41,7 +41,17 @@
       "permanent": true
     },
     {
-      "source": "/:page(marche-senegal-[a-z0-9-]+).html",
+      "source": "/accueil",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/marche-senegal-:page(admin|ajout-produit|boutique|chat|commande|connexion-acheteur|connexion-admin|connexion-vendeur|dashboard|garantie|ma-boutique|marche|mes-commandes|mes-produits|mes-revenus|mes-stories|modifier-produit|mot-de-passe-oublie|panier|produit|profil|recherche|reclamation|shopvision).html",
+      "destination": "/:page",
+      "permanent": true
+    },
+    {
+      "source": "/marche-senegal-:page(admin|ajout-produit|boutique|chat|commande|connexion-acheteur|connexion-admin|connexion-vendeur|dashboard|garantie|ma-boutique|marche|mes-commandes|mes-produits|mes-revenus|mes-stories|modifier-produit|mot-de-passe-oublie|panier|produit|profil|recherche|reclamation|shopvision)",
       "destination": "/:page",
       "permanent": true
     }
@@ -52,8 +62,8 @@
       "destination": "/marche-senegal-accueil.html"
     },
     {
-      "source": "/:page(marche-senegal-[a-z0-9-]+)",
-      "destination": "/:page.html"
+      "source": "/:page(admin|ajout-produit|boutique|chat|commande|connexion-acheteur|connexion-admin|connexion-vendeur|dashboard|garantie|ma-boutique|marche|mes-commandes|mes-produits|mes-revenus|mes-stories|modifier-produit|mot-de-passe-oublie|panier|produit|profil|recherche|reclamation|shopvision)",
+      "destination": "/marche-senegal-:page.html"
     },
     {
       "source": "/marches/:cle",
