@@ -111,6 +111,13 @@ a{text-decoration:none;color:inherit}
 .zoom-close{position:fixed;top:18px;right:18px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
 .zoom-close:hover{background:rgba(255,255,255,.28)}
 .img-share:hover{border-color:var(--green)}
+/* Flèches photo précédente / suivante, montrées seulement s'il y a plusieurs photos. */
+.img-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.92);border:1.5px solid var(--border);color:var(--dark);font-size:1.3rem;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:border-color .2s}
+.img-nav:hover{border-color:var(--green)}
+.img-nav:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.img-nav.prev{left:12px}
+.img-nav.next{right:12px}
+.main-img.multi .img-nav{display:flex}
 .thumb-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .thumb-row::-webkit-scrollbar{display:none}
 .thumb{
@@ -420,6 +427,8 @@ a{text-decoration:none;color:inherit}
       <span id="main-emoji"><i class="ic" data-ic="shirt"></i></span>
       <div class="img-wish" id="wish-btn" onclick="toggleWish()"><i class="ic" data-ic="heart"></i></div>
       <div class="img-share" onclick="shareProduct()"><i class="ic" data-ic="share-2"></i></div>
+      <button type="button" class="img-nav prev" aria-label="Photo précédente" onclick="photoVoisine(event,-1)">‹</button>
+      <button type="button" class="img-nav next" aria-label="Photo suivante" onclick="photoVoisine(event,1)">›</button>
     </div>
     <div class="thumb-row">
       <div class="thumb active" onclick="changeImg(this,'👗','#F0EAF8')"><i class="ic" data-ic="shirt"></i></div>
@@ -555,7 +564,7 @@ a{text-decoration:none;color:inherit}
       </button>
     </div>
     <button class="buy-now-btn" onclick="buyNow()">
-      <i class="ic" data-ic="shopping-cart"></i> Ajouter et voir mon panier
+      <i class="ic" data-ic="shopping-cart"></i> Acheter maintenant
     </button>
 
     <a class="garantie-ligne" href="marche-senegal-garantie.html"><i class="ic" data-ic="shield-check"></i> Achat protégé : en paiement en ligne, le vendeur n’est payé qu’une fois votre commande reçue et conforme.</a>
@@ -758,10 +767,14 @@ async function loadProduct(productId) {
     if (images.length > 0) {
       if (emoji) emoji.style.display = 'none';
       mainImg.style.background = '#F0EAF8';
+      // Placée en premier : ajoutée à la fin, elle recouvrait le cœur, le
+      // partage et les flèches. changeImg() change sa source.
       const img = document.createElement('img');
+      img.id = 'main-photo';
+      img.alt = prod.name || '';
       img.src = images[0];
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0';
-      mainImg.appendChild(img);
+      mainImg.prepend(img);
     }
   }
 
@@ -784,6 +797,7 @@ async function loadProduct(productId) {
            onerror="this.parentElement.textContent='👗'"/>
     </div>`;
   }).join('');
+  document.getElementById('main-img')?.classList.toggle('multi', thumbRow.querySelectorAll('.thumb[data-img]').length > 1);
 } else {
   // Pas d'images — garder les miniatures statiques d'origine
   if (thumbRow) thumbRow.style.display = 'none';
@@ -853,7 +867,10 @@ async function loadProduct(productId) {
   }
 
   // ── Mettre à jour les tailles ──
+  // Un produit sans taille ni couleur n'affiche pas « Taille : » vide.
   const sizesContainer = document.querySelector('.opt-btns');
+  sizesContainer?.closest('.opt-section')?.toggleAttribute('hidden', !(prod.sizes || []).length);
+  document.querySelector('.color-btns')?.closest('.opt-section')?.toggleAttribute('hidden', !(prod.colors || []).length);
   if (sizesContainer && (prod.sizes || []).length > 0) {
     sizesContainer.innerHTML = prod.sizes.map(size => `
       <div class="opt-btn" data-size="${escapeHtml(size)}">${escapeHtml(size)}</div>
@@ -897,7 +914,7 @@ async function loadProduct(productId) {
       stockRow.innerHTML = `
         <div class="stock-dot stock-low"></div>
         <span style="font-weight:600">Stock limité</span>
-        <span style="color:var(--muted)">— Il reste <strong>${prod.stock} pièces</strong></span>
+        <span style="color:var(--muted)">— Il reste <strong>${prod.stock} pièce${prod.stock > 1 ? 's' : ''}</strong></span>
       `;
     } else {
       stockRow.innerHTML = `
@@ -1200,7 +1217,10 @@ function changeImg(thumb, imgSrc, bgColor) {
   // écrire d'autres déclarations CSS. urlImageSure borne le schéma, les
   // guillemets bornent la valeur.
   const src = urlImageSure(imgSrc);
-  if (src) {
+  const photo = document.getElementById('main-photo');
+  if (src && photo) {
+    photo.src = src;
+  } else if (src) {
     mainImg.style.backgroundImage = 'url("' + src.replace(/["\\]/g, '') + '")';
     mainImg.style.backgroundSize  = 'cover';
     if (mainEmoji) mainEmoji.style.display = 'none';
@@ -1212,6 +1232,17 @@ function changeImg(thumb, imgSrc, bgColor) {
       mainEmoji.textContent = imgSrc;
     }
   }
+}
+
+// ── Flèches de la photo principale ──
+// Le clic ne doit pas ouvrir le zoom de la photo, d'où stopPropagation.
+function photoVoisine(event, sens) {
+  event.stopPropagation();
+  const miniatures = [...document.querySelectorAll('.thumb[data-img]')];
+  if (miniatures.length < 2) return;
+  const actuelle = miniatures.findIndex(m => m.classList.contains('active'));
+  const suivante = miniatures[(actuelle + sens + miniatures.length) % miniatures.length];
+  changeImg(suivante, suivante.dataset.img);
 }
 
 // ── Clics sur les options venues de l'API ──
