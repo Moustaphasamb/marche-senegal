@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<base href="/">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Marchés du Sénégal — Marché Sénégal</title>
@@ -592,6 +593,17 @@ async function loadMarket(marketId) {
 
   // Mettre à jour le titre de la page
   document.title = `${market.name} — Marché Sénégal`;
+
+  // Ouverte par ?id=, la barre d'adresse montre le nom du marché : /marches/<slug>.
+  // La balise <base href="/"> garde les liens relatifs à la racine.
+  if (market.slug && !location.pathname.startsWith('/marches/')) {
+    const reste = new URLSearchParams(location.search);
+    reste.delete('id');
+    const suite = reste.toString();
+    history.replaceState(history.state, '', '/marches/' + encodeURIComponent(market.slug) + (suite ? '?' + suite : '') + location.hash);
+    // Le lien « Aller au contenu » a été écrit avec l'ancienne adresse.
+    document.querySelectorAll('.ms-skip').forEach(a => { a.href = location.pathname + location.search + a.hash; });
+  }
 
   // « Rechercher dans Sandaga… » et le fil d'Ariane étaient écrits en dur :
   // les 72 pages affichaient le nom du même marché.

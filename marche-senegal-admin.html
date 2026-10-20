@@ -2086,7 +2086,7 @@ function renderMarketsTable(markets) {
       const viewBtn = document.createElement('button');
       viewBtn.className = 'ta view';
       viewBtn.textContent = 'Voir';
-      viewBtn.onclick = () => window.open('marche-senegal-marche.html?id=' + mkt.id, '_blank');
+      viewBtn.onclick = () => window.open(mkt.slug ? '/marches/' + encodeURIComponent(mkt.slug) : 'marche-senegal-marche.html?id=' + mkt.id, '_blank');
 
       const editBtn = document.createElement('button');
       editBtn.className = 'ta approve';

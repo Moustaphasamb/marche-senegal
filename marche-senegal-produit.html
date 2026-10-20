@@ -704,7 +704,7 @@ async function loadProduct(productId) {
     }
     if (bcMarche && prod.shop.market) {
       bcMarche.textContent = prod.shop.market.name;
-      bcMarche.href = 'marche-senegal-marche.html?id=' + prod.shop.market.id;
+      bcMarche.href = prod.shop.market.slug ? '/marches/' + encodeURIComponent(prod.shop.market.slug) : 'marche-senegal-marche.html?id=' + prod.shop.market.id;
     }
   }
 

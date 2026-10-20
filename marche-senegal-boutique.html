@@ -870,7 +870,7 @@ async function loadShop(shopId) {
     // bcLinks[1] = "Marchés", bcLinks[2] = nom du marché
     if (bcLinks[2]) {
       bcLinks[2].textContent = shop.market.name;
-      bcLinks[2].href = 'marche-senegal-marche.html?id=' + shop.market.id;
+      bcLinks[2].href = shop.market.slug ? '/marches/' + encodeURIComponent(shop.market.slug) : 'marche-senegal-marche.html?id=' + shop.market.id;
     }
   } else {
     const bcMarket = document.getElementById('bc-market');

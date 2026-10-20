@@ -234,7 +234,7 @@
     marches.forEach(m => {
       const item = el(doc, 'li', 'jc-marche');
       const lien = el(doc, 'a', 'jc-lien', m.name);
-      lien.href = 'marche-senegal-marche.html?id=' + encodeURIComponent(m.id);
+      lien.href = m.slug ? '/marches/' + encodeURIComponent(m.slug) : 'marche-senegal-marche.html?id=' + encodeURIComponent(m.id);
       item.appendChild(lien);
       if ((m.specialites || []).includes(slug)) item.appendChild(el(doc, 'span', 'jc-specialiste', 'Spécialiste'));
       if (m.city) item.appendChild(el(doc, 'span', 'jc-ville', m.city));

@@ -772,7 +772,7 @@ async function loadMarkets() {
           const n = m._count?.shops ?? 0;
           return `
     <article class="mk-card">
-      <a class="mk-main" href="marche-senegal-marche.html?id=${encodeURIComponent(m.id)}">
+      <a class="mk-main" href="${m.slug ? '/marches/' + encodeURIComponent(m.slug) : 'marche-senegal-marche.html?id=' + encodeURIComponent(m.id)}">
       <span class="mk-picture"><img src="${escapeHtml(urlImageSure(m.imageUrl) || 'assets/banner-placeholder.svg')}" alt="" loading="lazy" width="720" height="440"/></span>
       <span class="mk-body">
         <span class="mk-name">${escapeHtml(nomCourtMarche(m.name))}</span>
