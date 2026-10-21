@@ -320,6 +320,7 @@ async function loadResults() {
              </div>`
           : ''
         }
+        ${prod.category?.name ? `<span class="carte-categorie">${escapeHtml(prod.category.name)}</span>` : ''}
         <div class="rc-wish" onclick="wish(event)">🤍</div>
       </div>
       <div class="rc-body">

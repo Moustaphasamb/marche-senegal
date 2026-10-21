@@ -768,6 +768,7 @@ async function loadMarketProducts(marketId) {
                 </div>`
               : ''
             }
+            ${prod.category?.name ? `<span class="carte-categorie">${escapeHtml(prod.category.name)}</span>` : ''}
             <div class="prod-wish" data-fav-id="${prod.id}" onclick="wish(event,'${prod.id}')">🤍</div>
           </div>
           <div class="prod-body">
@@ -776,7 +777,7 @@ async function loadMarketProducts(marketId) {
             <div class="prod-shop">${escapeHtml(prod.shop.name)} ${prod.shop.isVerified ? '· Vérifié ✓' : ''}</div>
             <div class="prod-rating">
               ${prod.totalReviews > 0
-                ? `<span class="stars">★</span> ${prod.rating} (${prod.totalReviews} avis)`
+                ? `<span class="stars">★</span> ${Number(prod.rating || 0).toFixed(1)} (${Number(prod.totalReviews)} avis)`
                 : ''}
             </div>
             <div class="prod-footer">
