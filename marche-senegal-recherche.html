@@ -70,6 +70,7 @@
 .rv-btn.active,.rv-btn:hover{background:var(--green);border-color:var(--green);color:#fff}
 .active-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .active-chips:empty{display:none}
+.etoiles-filtre{color:#B7841A;letter-spacing:1px}.etoile-vide{color:#D9D2C1;letter-spacing:1px}
 .af-chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:99px;border:0;background:var(--green);color:#fff;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer}
 .af-chip span{font-size:1rem;line-height:1}
 .af-effacer{border:0;background:none;color:#8A5F0E;font:inherit;font-size:.8rem;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 4px}
@@ -189,13 +190,19 @@
       <button class="mp-more" id="mp-more" type="button" onclick="toggleAllMarketPills()" hidden>Voir tous les marchés</button>
     </div>
     <div class="fs-section">
+      <div class="fs-title">Note des acheteurs</div>
+      <div class="cb-list">
+        <div class="cb-row note-filter" data-note="4" onclick="choisirNote(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span><span class="etoiles-filtre" aria-hidden="true">★★★★</span><span class="etoile-vide" aria-hidden="true">★</span> 4 et plus</span></div>
+        <div class="cb-row note-filter" data-note="3" onclick="choisirNote(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span><span class="etoiles-filtre" aria-hidden="true">★★★</span><span class="etoile-vide" aria-hidden="true">★★</span> 3 et plus</span></div>
+      </div>
+    </div>
+    <div class="fs-section">
       <div class="fs-title">Options</div>
       <div class="cb-list">
         <div class="cb-row option-filter checked" data-filter="verified" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Vendeur vérifié ✓</span></div>
         <div class="cb-row option-filter" data-filter="virtualTour" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Visite virtuelle <i class="ic" data-ic="video"></i></span></div>
         <div class="cb-row option-filter" data-filter="promo" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Promotions actives</span></div>
         <div class="cb-row option-filter" data-filter="open" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>Boutique ouverte</span></div>
-        <div class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><span class="cb-check">✓</span></div><span>En stock uniquement</span></div>
       </div>
     </div>
     <button class="apply-btn" onclick="applyFilters()">Appliquer les filtres</button>
@@ -498,6 +505,10 @@ async function applyFilters() {
   if (categories.length) currentFilters.categoryNames = categories.join(',');
   else delete currentFilters.categoryNames;
 
+  const note = document.querySelector('.note-filter.checked')?.dataset.note;
+  if (note) currentFilters.minRating = note;
+  else delete currentFilters.minRating;
+
   document.querySelectorAll('.option-filter').forEach(el => {
     const key = el.dataset.filter;
     if (key) {
@@ -691,6 +702,13 @@ function renderPagination(total) {
 // ── Checkbox ──
 function toggleCb(el) { el.classList.toggle('checked'); }
 
+// Une seule note minimale à la fois : cocher « 3 et plus » décoche « 4 et plus ».
+function choisirNote(el) {
+  const deja = el.classList.contains('checked');
+  document.querySelectorAll('.note-filter').forEach(n => n.classList.remove('checked'));
+  if (!deja) el.classList.add('checked');
+}
+
 // ── Favoris ──
 function wish(e) {
   e.stopPropagation();
@@ -748,6 +766,9 @@ function majPastillesFiltres() {
   if (currentFilters.maxPrice) {
     pastilles.push({ cle: 'maxPrice', texte: 'Jusqu’à ' + Number(currentFilters.maxPrice).toLocaleString('fr-FR') + ' F' });
   }
+  if (currentFilters.minRating) {
+    pastilles.push({ cle: 'minRating', texte: '★ ' + currentFilters.minRating + ' et plus' });
+  }
   if (currentFilters.marketId) {
     const nom = document.querySelector('.mp-item.sel .mp-name')?.textContent || 'Marché choisi';
     pastilles.push({ cle: 'marketId', texte: nom });
@@ -772,6 +793,9 @@ function retirerFiltre(cle, valeur) {
     else delete currentFilters.categoryNames;
   } else if (cle === 'maxPrice') {
     resetPrice();
+  } else if (cle === 'minRating') {
+    document.querySelectorAll('.note-filter').forEach(el => el.classList.remove('checked'));
+    delete currentFilters.minRating;
   } else if (cle === 'marketId') {
     clearMarkets();
   } else if (NOMS_OPTIONS[cle]) {
