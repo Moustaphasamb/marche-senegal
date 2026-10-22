@@ -164,7 +164,8 @@ a{text-decoration:none;color:inherit}
 .opt-guide:hover{text-decoration:underline}
 .opt-btns{display:flex;gap:7px;flex-wrap:wrap}
 .opt-btn{
-  padding:7px 16px;border-radius:8px;
+  min-width:52px;min-height:40px;padding:0 16px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
   border:1.5px solid var(--border);background:#fff;
   font-size:.84rem;font-weight:500;color:var(--text);
   cursor:pointer;transition:all .18s;
@@ -213,6 +214,10 @@ a{text-decoration:none;color:inherit}
   transition:all .2s;box-shadow:0 4px 16px rgba(230,168,23,.25);
 }
 .buy-now-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+/* Une seule ligne d'achat : quantité, Ajouter, Acheter (elle passe à la ligne si l'écran est étroit). */
+.cart-row .qty-ctrl{border-radius:99px}
+.cart-row .add-cart-btn,.cart-row .buy-now-btn{flex:1 1 150px;width:auto;margin:0;border-radius:99px;height:46px}
+.add-cart-btn:disabled,.buy-now-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none}
 
 /* Stock status */
 .stock-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.82rem}
@@ -575,10 +580,10 @@ a{text-decoration:none;color:inherit}
       <button class="add-cart-btn" onclick="addToCart()">
         <i class="ic" data-ic="shopping-cart"></i> Ajouter au panier
       </button>
+      <button class="buy-now-btn" onclick="buyNow()">
+        Acheter maintenant
+      </button>
     </div>
-    <button class="buy-now-btn" onclick="buyNow()">
-      <i class="ic" data-ic="shopping-cart"></i> Acheter maintenant
-    </button>
 
     <a class="garantie-ligne" href="marche-senegal-garantie.html"><i class="ic" data-ic="shield-check"></i> Achat protégé : en paiement en ligne, le vendeur n’est payé qu’une fois votre commande reçue et conforme.</a>
 
@@ -994,6 +999,8 @@ async function loadProduct(productId) {
     `;
   }
   majPartage(prod);
+  document.querySelectorAll('.cart-row .add-cart-btn, .cart-row .buy-now-btn')
+    .forEach(b => { b.disabled = prod.stock === 0; });
 
   // ── Charger les avis ──
   loadReviews(prod);
@@ -1307,12 +1314,19 @@ function changeQty(delta) {
 }
 
 // ── Ajouter au panier ──
+// Renvoie true si l'article est entré dans le panier : buyNow() n'emmène
+// au panier que dans ce cas.
 function addToCart() {
-  if (!currentProduct) return;
+  if (!currentProduct) return false;
+
+  if (currentProduct.stock === 0) {
+    showToast('Ce produit est en rupture de stock');
+    return false;
+  }
 
   if ((currentProduct.sizes || []).length > 0 && !selectedSize) {
     showToast('Veuillez choisir une taille');
-    return;
+    return false;
   }
 
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -1357,11 +1371,12 @@ function addToCart() {
       btn.innerHTML = '🛒 Ajouter au panier';
     }, 1500);
   }
+  return true;
 }
 
 // ── Acheter maintenant ──
 function buyNow() {
-  addToCart();
+  if (!addToCart()) return;
   setTimeout(() => {
     window.location.href = 'marche-senegal-panier.html';
   }, 800);

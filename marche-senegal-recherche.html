@@ -68,7 +68,13 @@
 .rt-views{display:flex;gap:4px}
 .rv-btn{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;transition:all .18s}
 .rv-btn.active,.rv-btn:hover{background:var(--green);border-color:var(--green);color:#fff}
-.active-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.active-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.active-chips:empty{display:none}
+.af-chip{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:99px;border:0;background:var(--green);color:#fff;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer}
+.af-chip span{font-size:1rem;line-height:1}
+.af-effacer{border:0;background:none;color:#8A5F0E;font:inherit;font-size:.8rem;font-weight:700;text-decoration:underline;cursor:pointer;padding:6px 4px}
+/* Bouton Filtres dans la barre de résultats, montré sur téléphone à la place du bouton flottant. */
+.rt-filtres{display:none;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:99px;border:0;background:var(--green);color:#fff;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
 .ac-chip{display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--green);border-radius:99px;padding:4px 12px;font-size:.76rem;font-weight:500;color:var(--green)}
 .ac-remove{cursor:pointer;color:var(--muted);transition:color .18s;margin-left:2px}.ac-remove:hover{color:var(--red)}
 .results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(192px,1fr));gap:14px}
@@ -95,7 +101,9 @@
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:180}.sb-overlay.show{display:block}
 @media(max-width:900px){
   .nav-search{display:none}.nav-btn.nav-btn-login,.nav-btn.nav-btn-primary{display:none}.nav-hamburger{display:flex}
-  .mobile-nav{display:block}.mobile-filter-btn{display:flex}
+  .mobile-nav{display:block}.mobile-filter-btn{display:none}
+  .rt-filtres{display:inline-flex}.rt-views{display:none}
+  .results-topbar{flex-wrap:wrap;gap:10px}
   body{padding-bottom:64px}.toast{bottom:74px}
   .search-layout{grid-template-columns:1fr}
   .filters-sidebar{position:fixed;left:-280px;top:0;bottom:0;width:280px;height:100vh;z-index:190;transition:left .3s;padding-top:80px}
@@ -195,9 +203,10 @@
   </aside>
   <div class="results-area">
     <div class="results-topbar">
-      <div class="rt-count"><strong id="result-count">—</strong> produits trouvés <span id="result-query"></span></div>
+      <div class="rt-count"><strong id="result-count">—</strong> <span id="result-mot">produits trouvés</span> <span id="result-query"></span></div>
       <div class="rt-right">
-        <select class="rt-sort" onchange="updateSort(this.value)"><option value="">Pertinence</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option><option value="rating">Mieux notés</option><option value="newest">Nouveautés</option></select>
+        <button type="button" class="rt-filtres" onclick="openSidebar()"><i class="ic" data-ic="settings"></i> Filtres<span id="rt-filtres-n"></span></button>
+        <select class="rt-sort" aria-label="Trier les produits" onchange="updateSort(this.value)"><option value="">Pertinence</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option><option value="rating">Mieux notés</option><option value="newest">Nouveautés</option></select>
         <div class="rt-views"><button class="rv-btn active">⊞</button><button class="rv-btn">☰</button></div>
       </div>
     </div>
@@ -290,8 +299,11 @@ async function loadResults() {
   const total = result.pagination?.total ?? 0;
   const resultCount = document.getElementById('result-count');
   if (resultCount) resultCount.textContent = total;
+  const resultMot = document.getElementById('result-mot');
+  if (resultMot) resultMot.textContent = total > 1 ? 'produits trouvés' : 'produit trouvé';
   const heroTotal = document.getElementById('hero-total');
   if (heroTotal) heroTotal.textContent = total;
+  majPastillesFiltres();
 
   if (result.data.length === 0) {
     grid.innerHTML = `
@@ -723,6 +735,63 @@ function addCart(event, productId, productName, price) {
   btn.style.transform = 'scale(1.3)';
   setTimeout(() => { btn.style.background = ''; btn.style.transform = ''; }, 500);
 }
+
+// ── Filtres actifs en pastilles (× pour retirer un filtre) ──
+const NOMS_OPTIONS = { verified: 'Vendeur vérifié', virtualTour: 'Visite virtuelle', promo: 'Promotions', open: 'Boutique ouverte' };
+
+function majPastillesFiltres() {
+  const zone = document.getElementById('active-chips');
+  if (!zone) return;
+  const pastilles = [];
+  (currentFilters.categoryNames || '').split(',').filter(Boolean)
+    .forEach(nom => pastilles.push({ cle: 'categoryNames', valeur: nom, texte: nom }));
+  if (currentFilters.maxPrice) {
+    pastilles.push({ cle: 'maxPrice', texte: 'Jusqu’à ' + Number(currentFilters.maxPrice).toLocaleString('fr-FR') + ' F' });
+  }
+  if (currentFilters.marketId) {
+    const nom = document.querySelector('.mp-item.sel .mp-name')?.textContent || 'Marché choisi';
+    pastilles.push({ cle: 'marketId', texte: nom });
+  }
+  Object.keys(NOMS_OPTIONS).forEach(cle => {
+    if (currentFilters[cle]) pastilles.push({ cle, texte: NOMS_OPTIONS[cle] });
+  });
+
+  zone.innerHTML = pastilles.map(p => `<button type="button" class="af-chip" data-cle="${escapeHtml(p.cle)}" data-valeur="${escapeHtml(p.valeur || '')}" aria-label="Retirer le filtre ${escapeHtml(p.texte)}">${escapeHtml(p.texte)} <span aria-hidden="true">×</span></button>`).join('')
+    + (pastilles.length ? '<button type="button" class="af-effacer" data-effacer="1">Tout effacer</button>' : '');
+  const compteur = document.getElementById('rt-filtres-n');
+  if (compteur) compteur.textContent = pastilles.length ? ' (' + pastilles.length + ')' : '';
+}
+
+function retirerFiltre(cle, valeur) {
+  if (cle === 'categoryNames') {
+    document.querySelectorAll('.category-filter').forEach(el => {
+      if (el.dataset.category === valeur) el.classList.remove('checked');
+    });
+    const restantes = (currentFilters.categoryNames || '').split(',').filter(n => n && n !== valeur);
+    if (restantes.length) currentFilters.categoryNames = restantes.join(',');
+    else delete currentFilters.categoryNames;
+  } else if (cle === 'maxPrice') {
+    resetPrice();
+  } else if (cle === 'marketId') {
+    clearMarkets();
+  } else if (NOMS_OPTIONS[cle]) {
+    document.querySelector('.option-filter[data-filter="' + cle + '"]')?.classList.remove('checked');
+    delete currentFilters[cle];
+    if (cle === 'promo' && currentTab === 'En promo') {
+      currentTab = 'Tout';
+      document.querySelectorAll('.ft-tab').forEach((tab, i) => tab.classList.toggle('active', i === 0));
+    }
+  }
+  currentPage = 1;
+  loadResults();
+}
+
+document.getElementById('active-chips')?.addEventListener('click', event => {
+  const bouton = event.target.closest('button');
+  if (!bouton) return;
+  if (bouton.dataset.effacer) return resetFilters();
+  if (bouton.dataset.cle) retirerFiltre(bouton.dataset.cle, bouton.dataset.valeur);
+});
 
 // ── Sidebar filtres ──
 function openSidebar() {
