@@ -73,6 +73,9 @@
 .kpi-change.up{background:var(--gp);color:var(--green)}
 .kpi-change.down{background:var(--rp);color:var(--red)}
 .kpi-change.flat{background:#f0f0f0;color:var(--muted)}
+/* afficherErreurChargementDashboard() cache les blocs avec hidden ; sans cette
+   règle, leur display:flex/grid les laissait visibles sous le message d'erreur. */
+#page-dashboard > [hidden]{display:none !important}
 .kpi-val{font-family:'Newsreader',serif;font-size:1.7rem;font-weight:900;color:var(--dark);line-height:1;margin-bottom:4px}
 .kpi-label{font-size:.76rem;color:var(--muted);font-weight:500}
 .kpi-sub{font-size:.7rem;color:var(--muted);margin-top:3px}
@@ -345,8 +348,8 @@
     <!-- La cloche affichait « 8 » notifications et le bouton d'aide un simple
          message : aucun des deux n'était relié à quoi que ce soit. Retirés. -->
     <div class="tb-profile" onclick="window.location.href='marche-senegal-ma-boutique.html'" title="Modifier mon profil vendeur et ma localisation">
-      <div class="tb-profile-av">MF</div>
-      <span class="tb-profile-name">Fatou Ndoye</span>
+      <div class="tb-profile-av"></div>
+      <span class="tb-profile-name">Ma boutique</span>
     </div>
   </div>
 </header>
@@ -360,10 +363,11 @@
     <div class="welcome-bar">
       <div class="wb-left">
         <div class="wb-greeting">Bonjour 👋</div>
-        <div class="wb-name">Fatou Ndoye</div>
+        <!-- Valeurs neutres jusqu'à la réponse du serveur : un vendeur dont la
+             connexion tarde ne doit jamais voir le nom ni les chiffres d'un autre. -->
+        <div class="wb-name">Votre boutique</div>
         <div class="wb-market">
-          <i class="ic" data-ic="landmark"></i> Marché Sandaga · Allée 3
-          <span class="wb-open">● Boutique ouverte</span>
+          <span class="wb-open">● Chargement…</span>
         </div>
       </div>
       <div class="wb-right">
@@ -377,20 +381,20 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <div class="kpi-icon ki-green"><i class="ic" data-ic="coins"></i></div>
-          <div class="kpi-change up">↑ +18%</div>
+          <div class="kpi-change flat">—</div>
         </div>
-        <div class="kpi-val">342 500</div>
+        <div class="kpi-val">—</div>
         <div class="kpi-label">Revenus encaissés (FCFA)</div>
         <div class="kpi-sub" id="kpi0-sub">commandes livrées</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-top">
           <div class="kpi-icon ki-gold"><i class="ic" data-ic="shopping-cart"></i></div>
-          <div class="kpi-change up">↑ +12%</div>
+          <div class="kpi-change flat">—</div>
         </div>
-        <div class="kpi-val">28</div>
+        <div class="kpi-val">—</div>
         <div class="kpi-label">Commandes ce mois</div>
-        <div class="kpi-sub" id="kpi1-sub">5 en attente</div>
+        <div class="kpi-sub" id="kpi1-sub"></div>
       </div>
       <div class="kpi-card">
         <div class="kpi-top">
