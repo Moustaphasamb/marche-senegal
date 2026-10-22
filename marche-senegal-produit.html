@@ -136,6 +136,9 @@ a{text-decoration:none;color:inherit}
 .tag-market{background:var(--gp);color:var(--green)}
 .tag-cat{background:var(--gdl);color:#8A6100}
 .tag-new{background:var(--green);color:#fff}
+.tag-stock-ok{background:#E3EFE6;color:#1C6845}
+.tag-stock-low{background:#FDF3DC;color:#8A6100}
+.tag-stock-out{background:#FDE8E6;color:#B42318}
 .tag-promo{background:var(--rp);color:var(--red)}
 
 .pi-title{font-family:'Newsreader',serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:10px}
@@ -197,6 +200,11 @@ a{text-decoration:none;color:inherit}
 }
 .add-cart-btn:hover{background:var(--gl);transform:translateY(-1px);box-shadow:0 6px 22px rgba(27,107,58,.35)}
 .garantie-ligne{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none}
+/* Partage : WhatsApp d'abord, c'est là que les produits circulent. */
+.partage-ligne{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:.82rem;color:var(--muted)}
+.partage-btn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--border);background:#fff;color:var(--text);font:inherit;font-size:.8rem;font-weight:600;text-decoration:none;cursor:pointer}
+.partage-btn:hover{border-color:var(--green)}
+.partage-wa{background:#E3EFE6;border-color:#C4D5C5;color:#1C6845}
 .buy-now-btn{
   width:100%;background:var(--gold);color:var(--dark);border:none;
   border-radius:10px;height:44px;margin-bottom:16px;
@@ -328,7 +336,12 @@ a{text-decoration:none;color:inherit}
 .sim-add:hover{background:var(--gl);transform:scale(1.1)}
 
 /* ══ MOBILE STICKY BAR ══ */
-.mobile-sticky{display:none;position:fixed;bottom:70px;left:0;right:0;z-index:150;padding:10px 16px;background:rgba(250,250,247,.97);backdrop-filter:blur(10px);border-top:1.5px solid var(--border);gap:8px}
+.mobile-sticky{display:none;position:fixed;bottom:70px;left:0;right:0;z-index:150;padding:10px 16px;background:rgba(250,250,247,.97);backdrop-filter:blur(10px);border-top:1.5px solid var(--border);gap:8px;align-items:center}
+.ms-prix{display:flex;flex-direction:column;line-height:1.15;flex-shrink:0;margin-right:2px}
+.ms-prix strong{font-size:1rem;color:var(--green)}
+.ms-prix s{font-size:.72rem;color:var(--muted)}
+.mobile-sticky .add-cart-btn,.mobile-sticky .buy-now-btn{flex:1;width:auto;margin:0;height:46px;font-size:.88rem;box-shadow:none}
+.mobile-sticky button:disabled{opacity:.5;cursor:not-allowed}
 
 /* ══ RESPONSIVE ══ */
 @media(max-width:960px){
@@ -569,6 +582,13 @@ a{text-decoration:none;color:inherit}
 
     <a class="garantie-ligne" href="marche-senegal-garantie.html"><i class="ic" data-ic="shield-check"></i> Achat protégé : en paiement en ligne, le vendeur n’est payé qu’une fois votre commande reçue et conforme.</a>
 
+    <div class="partage-ligne">
+      <span>Partager :</span>
+      <a class="partage-btn partage-wa" id="partage-wa" href="https://wa.me/" target="_blank" rel="noopener"><i class="ic" data-ic="message-circle"></i> WhatsApp</a>
+      <a class="partage-btn" id="partage-fb" href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a>
+      <button type="button" class="partage-btn" onclick="copierLienProduit()">Copier le lien</button>
+    </div>
+
     <!-- Delivery info -->
     <div class="delivery-info">
       <div class="di-row" id="product-delivery-row">
@@ -607,6 +627,12 @@ a{text-decoration:none;color:inherit}
 
   </div>
 </div>
+
+<section class="bande-confiance" aria-label="Acheter en confiance">
+  <a class="bc-item" href="marche-senegal-garantie.html"><i class="ic" data-ic="shield-check"></i><span><strong>Achat protégé</strong><span>En paiement en ligne, le vendeur est payé quand votre commande est reçue et conforme.</span></span></a>
+  <div class="bc-item"><i class="ic" data-ic="store"></i><span><strong>Retrait en boutique</strong><span>Au marché, ou livraison quand le vendeur la propose.</span></span></div>
+  <div class="bc-item"><i class="ic" data-ic="message-circle"></i><span><strong>Parler au vendeur</strong><span>Une question ? Échangez directement avec la boutique.</span></span></div>
+</section>
 
 <!-- SIMILAR PRODUCTS -->
 <div class="similar-section">
@@ -740,6 +766,11 @@ async function loadProduct(productId) {
     };
     if (prod.shop?.market) addTag('tag-market', '🏛️ ' + prod.shop.market.name);
     if (prod.category)     addTag('tag-cat',    '👗 ' + prod.category.name);
+    if (typeof prod.stock === 'number') {
+      if (prod.stock === 0)     addTag('tag-stock-out', 'Rupture de stock');
+      else if (prod.stock <= 5) addTag('tag-stock-low', 'Plus que ' + prod.stock);
+      else                      addTag('tag-stock-ok',  'En stock');
+    }
     if (prod.isNew)        addTag('tag-new',    'Nouveau');
     // Le délai annoncé par le vendeur : l acheteur le demande avant de commander.
     if (prod.preparationLabel) addTag('tag-cat', '⏱️ ' + prod.preparationLabel);
@@ -952,14 +983,17 @@ async function loadProduct(productId) {
 
   // ── Mettre à jour le bouton mobile sticky ──
   const mobileSticky = document.getElementById('mobile-sticky');
+  // Prix, Ajouter, Acheter : toujours sous le pouce sur téléphone.
   if (mobileSticky) {
+    const ancien = Number(prod.originalPrice) > Number(prod.price) ? `<s>${formatPrice(prod.originalPrice)}</s>` : '';
+    const epuise = prod.stock === 0 ? 'disabled' : '';
     mobileSticky.innerHTML = `
-      <button class="add-cart-btn" style="height:44px;flex:1"
-              onclick="addToCart()">
-        🛒 Ajouter au panier — ${formatPrice(prod.price)}
-      </button>
+      <div class="ms-prix"><strong>${formatPrice(prod.price)}</strong>${ancien}</div>
+      <button class="add-cart-btn" onclick="addToCart()" ${epuise}>Ajouter</button>
+      <button class="buy-now-btn" onclick="buyNow()" ${epuise}>Acheter</button>
     `;
   }
+  majPartage(prod);
 
   // ── Charger les avis ──
   loadReviews(prod);
@@ -1507,6 +1541,21 @@ function closeZoom() {
 }
 
 // ── Partager (Web Share API sur mobile, clipboard sinon) ──
+// ── Liens de partage (adresse au nom du produit, déjà posée par replaceState) ──
+function majPartage(prod) {
+  const url = window.location.href.split('#')[0];
+  const wa = document.getElementById('partage-wa');
+  const fb = document.getElementById('partage-fb');
+  if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent((prod?.name || 'Marché Sénégal') + ' — ' + url);
+  if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+}
+
+function copierLienProduit() {
+  const url = window.location.href.split('#')[0];
+  if (!navigator.clipboard) return showToast(url);
+  navigator.clipboard.writeText(url).then(() => showToast('Lien copié'), () => showToast(url));
+}
+
 async function shareProduct() {
   const title = currentProduct?.name || 'Marché Sénégal';
   const url   = window.location.href;
