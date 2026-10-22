@@ -241,12 +241,14 @@ body.ms-design.page-chat {height:100dvh;background:#eeefe5}
   body.ms-design .mn-item {position:relative;min-width:0;min-height:55px;padding:5px 2px 4px;gap:3px;border-radius:13px;color:#687468;isolation:isolate}
   body.ms-design .mn-item::before {content:'';position:absolute;inset:2px;border-radius:12px;background:transparent;z-index:-1;transition:background .2s ease,transform .2s ease}
   body.ms-design .mn-icon {width:30px;height:30px;border-radius:10px;background:#edf0e8;color:#526258;font-size:15px;border:1px solid rgba(28,104,69,.04)}
-  body.ms-design .mn-label {font-size:9px;line-height:12px;font-weight:600;color:#6c776d;letter-spacing:-.01em}
+  body.ms-design .mn-label {font-size:11px;line-height:13px;font-weight:600;color:#5f6a60;letter-spacing:-.01em}
   body.ms-design .mn-item.act::before {background:#edf4e9}
   body.ms-design .mn-item.act .mn-icon {color:#fff;background:linear-gradient(145deg,#23784e,#155d3b);border-color:#155d3b;box-shadow:0 5px 12px rgba(28,104,69,.22)}
   body.ms-design .mn-item.act .mn-label {color:#155d3b;font-weight:750}
   body.ms-design .mn-item.act::after {content:'';position:absolute;bottom:1px;width:14px;height:2px;border-radius:99px;background:#1c6845}
   body.ms-design .mn-item:active::before {background:#e8eee4;transform:scale(.96)}
+  /* Fil d'Ariane : des liens de 19 px de haut se ratent au doigt. */
+  .ms-design:not(.accueil-immersif) .bc-link {display:inline-flex;align-items:center;min-height:32px}
 }
 /* Cartes catalogue compactes : même hiérarchie, quelle que soit la longueur
    des noms. Les informations intégrales restent accessibles sur la fiche. */
@@ -272,8 +274,8 @@ body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:40px;height:40p
   body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img) {height:clamp(118px,35vw,150px)}
   body.ms-design:not(.espace-vendeur) :is(.prod-body,.rc-body) {padding:10px;gap:4px}
   body.ms-design:not(.espace-vendeur) :is(.prod-name,.rc-name) {font-size:12px;line-height:17px;height:34px}
-  body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {font-size:10px;line-height:14px}
-  body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {font-size:9px;line-height:14px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {font-size:11px;line-height:15px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {font-size:11px;line-height:15px}
   body.ms-design:not(.espace-vendeur) :is(.prod-price,.rc-price) {font-size:12px;line-height:16px}
   body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:9px;gap:3px}
   body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer) {grid-template-columns:minmax(0,1fr) 36px;gap:4px;padding-top:6px;min-height:42px}

@@ -103,7 +103,7 @@ body.accueil-immersif #hero-motion {width:42px;height:42px;background:#12332380;
 body.accueil-immersif .hero-stats {display:flex;gap:30px;margin:0}
 .accueil-immersif .hero-stats>div {display:grid;grid-template-columns:auto auto;gap:10px;align-items:center}
 body.accueil-immersif .hstat-num {font:400 38px/1 'Newsreader',Georgia,serif;color:#1b6b3a}
-body.accueil-immersif .hstat-label {color:#65725f;font-size:10px;max-width:70px;line-height:1.6}
+body.accueil-immersif .hstat-label {color:#65725f;font-size:11px;max-width:70px;line-height:1.6}
 body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:88px var(--home-gutter);background:var(--home-paper)}
 body.accueil-immersif .section-top {margin-bottom:32px;gap:28px}
 .accueil-immersif .section-label {text-transform:uppercase;letter-spacing:.15em;font-size:10px;color:#456244;font-weight:700;margin-bottom:18px}
@@ -120,7 +120,7 @@ body.accueil-immersif .mk-card {position:relative;display:flex;flex-direction:co
 .accueil-immersif .mk-body {position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:18px 22px 23px}
 .accueil-immersif .mk-name {font:400 29px/1.2 'Newsreader',Georgia,serif;color:#143e2b}
 .accueil-immersif .mk-city {font-size:12px;line-height:1.6;color:#667560}
-.accueil-immersif .mk-count {background:#eaf0e5;color:#1b6b3a;font-size:10px;padding:4px 10px;margin-top:13px;border-radius:4px}
+.accueil-immersif .mk-count {background:#eaf0e5;color:#1b6b3a;font-size:11px;padding:4px 10px;margin-top:13px;border-radius:4px}
 .accueil-immersif .mk-arrow {position:absolute;right:22px;top:24px;font-size:23px;color:#1b6b3a}
 body.accueil-immersif .mk-toggle {background:transparent;border:1px solid #bcc9b8;border-radius:7px;color:#214e32;min-height:46px;padding:12px 22px}
 .accueil-immersif .mk-more {margin-top:23px;font-size:12px}
