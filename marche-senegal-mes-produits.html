@@ -51,6 +51,12 @@ a{text-decoration:none;color:inherit}
 /* Ce que le plan autorise encore, annoncé avant la publication */
 .plan-bandeau{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:7px 16px;margin-bottom:14px}
 .plan-bandeau strong{color:var(--text);font-weight:600}
+/* Alerte rupture : un produit à 0 disparaît de la recherche, le vendeur doit le savoir. */
+.alerte-rupture{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#FDE8E6;border:1.5px solid #F4B9B2;color:#7A1F14;border-radius:14px;padding:12px 16px;margin-bottom:16px;font-size:.86rem;line-height:1.45}
+.alerte-rupture[hidden]{display:none}
+.alerte-rupture > .ic{font-size:1.3rem;flex-shrink:0}
+.alerte-rupture p{margin:0;flex:1 1 260px}
+.alerte-rupture button{min-height:40px;padding:0 16px;border-radius:99px;border:0;background:#B42318;color:#fff;font:inherit;font-weight:700;cursor:pointer}
 .plan-bandeau.plan-plein{border-color:var(--gold);background:var(--gdl,#FDF3DC)}
 .plan-bandeau.plan-plein strong{color:#8A6100}
 .tb-search{display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:99px;padding:0 5px 0 14px;height:38px;flex:1;min-width:200px;transition:border-color .2s}
@@ -218,6 +224,12 @@ a{text-decoration:none;color:inherit}
 <!-- MAIN -->
 <div class="main">
 
+  <div class="alerte-rupture" id="alerte-rupture" role="status" hidden>
+    <i class="ic" data-ic="package"></i>
+    <p id="alerte-rupture-texte"></p>
+    <button type="button" onclick="voirRuptures()">Voir et réapprovisionner</button>
+  </div>
+
   <!-- STATS -->
   <div class="stats-row">
     <div class="stat-card">
@@ -320,7 +332,7 @@ async function loadProducts() {
 function updateStats() {
   const active = allProducts.filter(p => p.status === 'ACTIVE').length;
   const totalSales = allProducts.reduce((sum, p) => sum + p.totalSales, 0);
-  const lowStock = allProducts.filter(p => p.stock <= 5 && p.status === 'ACTIVE').length;
+  const lowStock = allProducts.filter(p => p.stock <= 5 && p.status !== 'PAUSED').length;
   const revenue = allProducts.reduce((sum, p) => sum + (p.price * p.totalSales), 0);
 
   document.getElementById('stat-total').textContent = active;
@@ -335,6 +347,25 @@ function updateStats() {
     document.getElementById('stat-low-text').textContent =
       lowStock + ' produit(s) à réapprovisionner';
   }
+
+  // Un produit à 0 n'apparaît plus dans la recherche des acheteurs.
+  const epuises = allProducts.filter(p => p.stock === 0 && p.status !== 'PAUSED');
+  const alerte = document.getElementById('alerte-rupture');
+  if (alerte) {
+    alerte.hidden = epuises.length === 0;
+    const noms = epuises.slice(0, 3).map(p => p.name).join(', ')
+      + (epuises.length > 3 ? ' et ' + (epuises.length - 3) + ' autre(s)' : '');
+    // textContent : les noms viennent du vendeur.
+    document.getElementById('alerte-rupture-texte').textContent = epuises.length === 1
+      ? '1 produit en rupture de stock : ' + noms + '. Les acheteurs ne le voient plus dans la recherche.'
+      : epuises.length + ' produits en rupture de stock : ' + noms + '. Les acheteurs ne les voient plus dans la recherche.';
+  }
+}
+
+function voirRuptures() {
+  const bouton = [...document.querySelectorAll('.ft')].find(b => b.textContent.trim() === 'Stock faible');
+  if (bouton) setFilter('low', bouton);
+  document.querySelector('.toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── Afficher les produits ──
@@ -443,7 +474,8 @@ function filterProducts() {
   } else if (currentFilter === 'paused') {
     filtered = filtered.filter(p => p.status === 'PAUSED');
   } else if (currentFilter === 'low') {
-    filtered = filtered.filter(p => p.stock <= 5 && p.status === 'ACTIVE');
+    // Un produit à 0 peut avoir le statut OUT_OF_STOCK : il doit apparaître ici.
+    filtered = filtered.filter(p => p.stock <= 5 && p.status !== 'PAUSED');
   }
 
   // Filtre par recherche
