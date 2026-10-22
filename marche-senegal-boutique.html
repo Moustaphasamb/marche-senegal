@@ -75,6 +75,12 @@
 .sh-btn-wa[hidden]{display:none}
 .sh-btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8)}
 .sh-btn-outline:hover{background:rgba(255,255,255,.1)}
+/* Partager la boutique : WhatsApp d'abord, c'est là que les boutiques circulent. */
+.partage-boutique{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:-4px 0 14px;font-size:.8rem;color:rgba(255,255,255,.78)}
+.partage-boutique[hidden]{display:none}
+.pb-btn{min-height:36px;padding:0 14px;border-radius:99px;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:.8rem;font-weight:600;text-decoration:none;cursor:pointer;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff}
+.pb-btn:hover{background:rgba(255,255,255,.16)}
+.pb-wa{background:#25D366;border-color:#25D366}
 .sh-stats-row{display:flex;gap:22px;flex-wrap:wrap}
 .sh-stat-n{font-size:1.25rem;font-weight:700;color:#fff;font-family:'Newsreader',serif}
 .sh-stat-l{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:2px}
@@ -384,7 +390,13 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
           <!-- Seulement si le vendeur a choisi d'afficher un numéro WhatsApp dans « Ma boutique ». -->
           <a class="sh-btn sh-btn-wa" id="btn-whatsapp" target="_blank" rel="noopener noreferrer" hidden><i class="ic" data-ic="message-circle"></i> WhatsApp</a>
           <button class="sh-btn sh-btn-gold" onclick="follow()"><i class="ic ic-red" data-ic="heart" data-ic-fill></i> Suivre</button>
-          <button class="sh-btn sh-btn-outline" onclick="share()"><i class="ic" data-ic="share-2"></i> Partager</button>
+          <button class="sh-btn sh-btn-outline" id="btn-partager" aria-expanded="false" aria-controls="partage-boutique" onclick="share()"><i class="ic" data-ic="share-2"></i> Partager</button>
+        </div>
+        <div class="partage-boutique" id="partage-boutique" hidden>
+          <span>Partager la boutique :</span>
+          <a class="pb-btn pb-wa" id="pb-wa" href="https://wa.me/" target="_blank" rel="noopener"><i class="ic" data-ic="message-circle"></i> WhatsApp</a>
+          <a class="pb-btn" id="pb-fb" href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a>
+          <button type="button" class="pb-btn" onclick="copierLienBoutique()">Copier le lien</button>
         </div>
         <div class="sh-stats-row">
           <div><div class="sh-stat-n">—</div><div class="sh-stat-l">Note moyenne</div></div>
@@ -466,6 +478,12 @@ a.map-btn{display:flex;align-items:center;justify-content:center;gap:6px;text-de
 </section>
 <!-- /bv -->
 </div>
+
+<section class="bande-confiance" aria-label="Acheter en confiance">
+  <a class="bc-item" href="marche-senegal-garantie.html"><i class="ic" data-ic="shield-check"></i><span><strong>Achat protégé</strong><span>En paiement en ligne, le vendeur est payé quand votre commande est reçue et conforme.</span></span></a>
+  <div class="bc-item"><i class="ic" data-ic="store"></i><span><strong>Retrait en boutique</strong><span>Au marché, ou livraison quand le vendeur la propose.</span></span></div>
+  <div class="bc-item"><i class="ic" data-ic="message-circle"></i><span><strong>Parler au vendeur</strong><span>Une question ? Échangez directement avec la boutique.</span></span></div>
+</section>
 
 <!-- ═══════ MAIN ═══════ -->
 <div class="main">
@@ -949,9 +967,23 @@ function follow() {
 }
 
 // ── Partager ──
+// Ouvre la ligne de partage. L'adresse est celle au nom de la boutique,
+// déjà posée par replaceState.
 function share() {
-  navigator.clipboard?.writeText(window.location.href).catch(() => {});
-  showToast('↗ Lien copié !');
+  const zone = document.getElementById('partage-boutique');
+  if (!zone) return;
+  const url = window.location.href.split('#')[0];
+  const nom = document.querySelector('.sh-name')?.textContent.trim() || 'Marché Sénégal';
+  document.getElementById('pb-wa').href = 'https://wa.me/?text=' + encodeURIComponent(nom + ' sur Marché Sénégal — ' + url);
+  document.getElementById('pb-fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  zone.hidden = !zone.hidden;
+  document.getElementById('btn-partager')?.setAttribute('aria-expanded', String(!zone.hidden));
+}
+
+function copierLienBoutique() {
+  const url = window.location.href.split('#')[0];
+  if (!navigator.clipboard) return showToast(url);
+  navigator.clipboard.writeText(url).then(() => showToast('Lien copié'), () => showToast(url));
 }
 
 // ── Copier le code promo ──
