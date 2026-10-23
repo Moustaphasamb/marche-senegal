@@ -363,7 +363,7 @@ a{text-decoration:none;color:inherit}
 @media(max-width:900px){
   .main{grid-template-columns:1fr}
   .sidebar{position:fixed;left:-260px;top:0;bottom:0;width:260px;height:100vh;z-index:190;transition:left .3s;border-right:1px solid var(--border);padding-top:calc(var(--nav-h) + 16px)}
-  .sidebar.open{left:0}.filter-toggle{display:flex}
+  .sidebar.open{left:0}
 }
 @media(max-width:600px){
   :root{--nav-h:58px}
@@ -566,7 +566,7 @@ a{text-decoration:none;color:inherit}
 </div>
 <!-- Questions fréquentes : faq-marche.js, à partir de la fiche -->
 <div class="faq-marche-zone" id="faq-marche" hidden></div>
-<button class="filter-toggle" onclick="openSidebar()"><i class="ic" data-ic="search"></i> Recherche</button>
+<!-- Bouton « Recherche » flottant retiré : il doublait la Recherche de la barre du bas et cachait les cartes. -->
 <nav class="mobile-nav" aria-label="Navigation principale">
   <div class="mn-items">
     <a class="mn-item" href="marche-senegal-accueil.html"><div class="mn-icon"><i class="ic" data-ic="house"></i></div><div class="mn-label">Accueil</div></a>
