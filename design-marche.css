@@ -1,14 +1,70 @@
+/* jetons:debut — Généré par docs/design/jetons/generer.mjs depuis jetons.json (dépôt ms). Ne pas modifier à la main. */
+:root{
+  --ms-vert:#1C6845;
+  --ms-vert-fonce:#155639;
+  --ms-vert-pale:#E7EFE4;
+  --ms-nuit:#0E2A1D;
+  --ms-texte:#1F2D23;
+  --ms-texte-doux:#5A6553;
+  --ms-or:#C49B35;
+  --ms-or-texte:#7A5B12;
+  --ms-or-pale:#F5ECD2;
+  --ms-fond:#F6F4EC;
+  --ms-carte:#FFFDF7;
+  --ms-bordure:#E0DFD3;
+  --ms-bordure-forte:#848B7A;
+  --ms-erreur:#A3401F;
+  --ms-erreur-pale:#F7E4DC;
+  --ms-texte-legende:12px;
+  --ms-interligne-legende:16px;
+  --ms-texte-petit:14px;
+  --ms-interligne-petit:20px;
+  --ms-texte-corps:16px;
+  --ms-interligne-corps:24px;
+  --ms-texte-accent:18px;
+  --ms-interligne-accent:26px;
+  --ms-texte-titre-3:22px;
+  --ms-interligne-titre-3:28px;
+  --ms-texte-titre-2:28px;
+  --ms-interligne-titre-2:34px;
+  --ms-texte-titre-1:36px;
+  --ms-interligne-titre-1:40px;
+  --ms-texte-affiche:48px;
+  --ms-interligne-affiche:52px;
+  --ms-police-titre:'Newsreader', Georgia, serif;
+  --ms-police-texte:'Manrope', Arial, sans-serif;
+  --ms-police-texte-gras:'Manrope', Arial, sans-serif;
+  --ms-espace-xs:4px;
+  --ms-espace-sm:8px;
+  --ms-espace-md:12px;
+  --ms-espace-lg:16px;
+  --ms-espace-xl:24px;
+  --ms-espace-xxl:32px;
+  --ms-espace-xxxl:48px;
+  --ms-rayon-sm:8px;
+  --ms-rayon-md:14px;
+  --ms-rayon-lg:20px;
+  --ms-rayon-pilule:999px;
+  --ms-ombre-douce:0 2px 10px rgba(14, 42, 29, 0.06);
+  --ms-ombre-levee:0 12px 28px -14px rgba(14, 42, 29, 0.45);
+  --ms-cible:44px;
+  --ms-duree-rapide:150ms;
+  --ms-duree-normale:220ms;
+  --ms-courbe:cubic-bezier(0.2, 0.8, 0.2, 1)
+}
+/* jetons:fin */
 /* Direction commune : papier chaud, titres éditoriaux, acheteurs verts et vendeurs jaunes.
    Chargée après les styles locaux. L'accueil conserve sa composition immersive. */
 body.ms-design:not(.accueil-immersif) {
-  --font-ui:'Manrope',sans-serif;--font-display:'Newsreader',Georgia,serif;
-  --bg:#f5f4ed;--white:#fffdf7;--border:#dedfd4;--radius:14px;
+  /* Anciens noms branchés sur les jetons communs (bloc jetons ci-dessus). */
+  --font-ui:var(--ms-police-texte);--font-display:var(--ms-police-titre);
+  --bg:var(--ms-fond);--white:var(--ms-carte);--border:var(--ms-bordure);--radius:var(--ms-rayon-md);
   --shadow:0 5px 22px rgba(27,43,31,.045);--shadow-lg:0 16px 40px rgba(27,43,31,.10);
   --nav-h:80px;--ms-gutter:clamp(20px,5.6vw,90px);
   font-family:var(--font-ui);font-size:15px;color:var(--text);background:var(--bg);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
-body.ms-design:not(.espace-vendeur):not(.accueil-immersif) {--green:#1c6845;--gl:#155639;--gp:#e9efe3;--g2:#c8d8bf;--dark:#173b2a;--text:#293a2d;--muted:#66715f;--gold:#c49b35}
+body.ms-design:not(.espace-vendeur):not(.accueil-immersif) {--green:var(--ms-vert);--gl:var(--ms-vert-fonce);--gp:var(--ms-vert-pale);--g2:#c8d8bf;--dark:var(--ms-nuit);--text:var(--ms-texte);--muted:var(--ms-texte-doux);--gold:var(--ms-or);--red:var(--ms-erreur)}
 body.ms-design.espace-vendeur {--bg:#f9f6ed;--white:#fffdf7;--border:#e5dcc7}
 .ms-design *,.ms-design *::before,.ms-design *::after {box-sizing:border-box}
 .ms-brand-mark{display:inline-block;flex:0 0 40px;width:40px;height:40px;border-radius:9px;background:#fffdf7 url('assets/logo-msn-2026.png') center/140% no-repeat;vertical-align:middle}

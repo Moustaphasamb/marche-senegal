@@ -37,11 +37,14 @@
 .services-kicker {
   margin: 0 0 10px;
   color: #e2bd5c;
-  font-size: .72rem;
+  font-size: .75rem;
   font-weight: 800;
   letter-spacing: .14em;
   text-transform: uppercase;
 }
+/* Sur fond clair, l'or décoratif est illisible (1,7:1) : or foncé des jetons (5,7:1). */
+.market-services-strip .services-kicker,
+.services-explain.light .services-kicker { color: var(--ms-or-texte, #7A5B12); }
 .services-banner h2 {
   margin: 0;
   font-family: 'Newsreader', serif;
