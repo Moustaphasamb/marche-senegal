@@ -227,6 +227,10 @@ a{text-decoration:none;color:inherit}
         <label class="form-label">Téléphone <span style="font-weight:400;color:var(--muted)">(facultatif)</span></label>
         <input class="form-input" id="edit-phone" type="tel" placeholder="+221 77 000 00 00" autocomplete="tel"/>
       </div>
+      <div class="form-group" id="edit-password-group" style="display:none">
+        <label class="form-label">Mot de passe actuel</label>
+        <input class="form-input" id="edit-current-password" type="password" placeholder="Pour confirmer le changement" autocomplete="current-password"/>
+      </div>
       <div style="font-size:.78rem;line-height:1.5;color:var(--muted);background:#f5f4ed;border-radius:10px;padding:10px 12px">Gardez au moins un moyen de connexion. Vous pouvez commencer avec votre e-mail, puis ajouter un téléphone plus tard — ou l’inverse.</div>
     </div>
     <div class="modal-foot">
@@ -923,8 +927,28 @@ function openEditProfile() {
   document.getElementById('edit-lastname').value = user?.lastName || '';
   document.getElementById('edit-email').value = user?.email || '';
   document.getElementById('edit-phone').value = user?.phone || '';
+  document.getElementById('edit-current-password').value = '';
+  majChampMotDePasse();
   openModal('modal-profile');
 }
+
+// Changer d'e-mail ou de téléphone, c'est changer de moyen de connexion : le
+// serveur exige alors le mot de passe actuel, pour qu'un téléphone resté
+// ouvert ne suffise pas à prendre le compte.
+function identifiantsModifies() {
+  const user = getCurrentUser();
+  const email = document.getElementById('edit-email').value.trim();
+  const phone = document.getElementById('edit-phone').value.trim().replace(/\s/g, '');
+  return email.toLowerCase() !== String(user?.email || '').toLowerCase()
+    || phone !== String(user?.phone || '').replace(/\s/g, '');
+}
+
+function majChampMotDePasse() {
+  document.getElementById('edit-password-group').style.display = identifiantsModifies() ? '' : 'none';
+}
+document.addEventListener('input', (e) => {
+  if (e.target?.id === 'edit-email' || e.target?.id === 'edit-phone') majChampMotDePasse();
+});
 
 async function saveProfile() {
   const firstName = document.getElementById('edit-firstname').value.trim();
@@ -938,7 +962,14 @@ async function saveProfile() {
   const btn = document.getElementById('btn-save-profile');
   btn.disabled = true; btn.textContent = 'Enregistrement...';
 
-  const result = await updateProfile({ firstName, lastName, email, phone });
+  const currentPassword = document.getElementById('edit-current-password').value;
+  if (identifiantsModifies() && !currentPassword) {
+    btn.disabled = false; btn.textContent = 'Enregistrer';
+    showToast('Saisissez votre mot de passe actuel pour changer d’e-mail ou de téléphone', 'error');
+    return;
+  }
+
+  const result = await updateProfile({ firstName, lastName, email, phone, ...(currentPassword ? { currentPassword } : {}) });
 
   btn.disabled = false; btn.textContent = 'Enregistrer';
 

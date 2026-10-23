@@ -2764,6 +2764,9 @@ async function changeAdminPassword() {
       body: JSON.stringify({ currentPassword: oldPw, newPassword: newPw })
     });
     if (res.success) {
+      // Changer le mot de passe ferme toutes les sessions ouvertes : le
+      // serveur renvoie un nouveau jeton pour garder celle-ci.
+      if (res.token) localStorage.setItem('token', res.token);
       toast('✅ Mot de passe modifié avec succès');
       document.getElementById('settings-pw-old').value = '';
       document.getElementById('settings-pw-new').value = '';
