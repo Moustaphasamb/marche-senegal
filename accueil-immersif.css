@@ -59,7 +59,7 @@ body.accueil-immersif .hero::after {display:none}
 .accueil-immersif .hero.is-video #hero-video {opacity:1;transform:none}
 @keyframes home-pan {from{transform:scale(1.045) translateX(0)}to{transform:scale(1.13) translateX(-1%)}}
 body.accueil-immersif .hero-content {position:relative;max-width:830px;z-index:1}
-.accueil-immersif .hero-eyebrow {display:flex;align-items:center;gap:10px;color:#e7eddd;font-size:11px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;margin-bottom:27px}
+.accueil-immersif .hero-eyebrow {display:flex;align-items:center;gap:10px;color:#e7eddd;font-size:12px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;margin-bottom:27px}
 .accueil-immersif .hero-eyebrow>span:first-child {width:7px;height:7px;background:#d8e9ba;border-radius:50%;box-shadow:0 0 0 5px #ffffff12}
 body.accueil-immersif .hero h1 {
   max-width:none;font:400 clamp(56px,6.6vw,106px)/1.03 'Newsreader',Georgia,serif;
@@ -77,7 +77,7 @@ body.accueil-immersif .hero-search button {height:49px;flex-shrink:0;display:fle
 .accueil-immersif .hero-search button:hover {background:#124e2b}
 .accueil-immersif .hero-search button span {font-size:20px}
 .accueil-immersif .home-arrow::after {content:'↗';font-family:Arial,sans-serif;font-weight:400}
-.accueil-immersif .hero-suggestions {display:flex;flex-wrap:wrap;gap:9px;align-items:center;color:#e8edde;font-size:11px;margin-top:15px}
+.accueil-immersif .hero-suggestions {display:flex;flex-wrap:wrap;gap:9px;align-items:center;color:#e8edde;font-size:12px;margin-top:15px}
 .accueil-immersif .hero-suggestions>span {margin-right:4px;color:#d6dccf}
 .accueil-immersif .hero-suggestions a {border-bottom:1px solid #ffffff55;padding:4px 0;margin-right:12px}
 .accueil-immersif .hero-suggestions a:hover {color:#d8e9ba;border-color:#d8e9ba}
@@ -86,9 +86,9 @@ body.accueil-immersif .hero-search button {height:49px;flex-shrink:0;display:fle
 .accueil-immersif .explore-arrow {width:40px;height:40px;border:1px solid #ffffff60;border-radius:50%;display:grid;place-items:center;font-size:20px}
 .accueil-immersif .hero-scene-control {display:flex;gap:22px;align-items:center}
 .accueil-immersif .scene-caption {display:grid;grid-template-columns:auto 1fr;gap:4px 14px;text-align:left}
-.accueil-immersif #scene-number {grid-row:span 2;font-size:10px;color:#d4e2c9;align-self:center;letter-spacing:.08em}
+.accueil-immersif #scene-number {grid-row:span 2;font-size:12px;color:#d4e2c9;align-self:center;letter-spacing:.08em}
 .accueil-immersif #scene-title {font-size:12px;font-weight:600}
-.accueil-immersif #scene-credit {font-size:9px;color:#d5ddcc}
+.accueil-immersif #scene-credit {font-size:12px;color:#d5ddcc}
 .accueil-immersif .scene-buttons {display:flex;align-items:center;gap:2px}
 body.accueil-immersif .scene-dot {position:relative;width:32px;min-height:44px;border:none;background:transparent;padding:0;cursor:pointer}
 .accueil-immersif .scene-dot::after {content:'';display:block;width:18px;height:3px;margin:auto;background:#ffffff60;border-radius:4px;transition:background .3s}
@@ -103,10 +103,10 @@ body.accueil-immersif #hero-motion {width:42px;height:42px;background:#12332380;
 body.accueil-immersif .hero-stats {display:flex;gap:30px;margin:0}
 .accueil-immersif .hero-stats>div {display:grid;grid-template-columns:auto auto;gap:10px;align-items:center}
 body.accueil-immersif .hstat-num {font:400 38px/1 'Newsreader',Georgia,serif;color:#1b6b3a}
-body.accueil-immersif .hstat-label {color:#65725f;font-size:11px;max-width:70px;line-height:1.6}
+body.accueil-immersif .hstat-label {color:#65725f;font-size:12px;max-width:70px;line-height:1.6}
 body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:88px var(--home-gutter);background:var(--home-paper)}
 body.accueil-immersif .section-top {margin-bottom:32px;gap:28px}
-.accueil-immersif .section-label {text-transform:uppercase;letter-spacing:.15em;font-size:10px;color:#456244;font-weight:700;margin-bottom:18px}
+.accueil-immersif .section-label {text-transform:uppercase;letter-spacing:.15em;font-size:12px;color:#456244;font-weight:700;margin-bottom:18px}
 body.accueil-immersif .section-title {font:400 clamp(35px,3.7vw,56px)/1.1 'Newsreader',Georgia,serif;letter-spacing:-.035em;color:#18392a}
 .accueil-immersif .section-title em {font-weight:400;color:#52745a}
 .accueil-immersif .section-description {font-size:13px;line-height:1.8;color:#697160;max-width:410px;margin-top:18px}
@@ -116,11 +116,11 @@ body.accueil-immersif .mk-card {position:relative;display:flex;flex-direction:co
 .accueil-immersif .mk-picture {position:relative;display:block;aspect-ratio:1.65;overflow:hidden;background:#e4e8dd}
 .accueil-immersif .mk-picture img {width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
 .accueil-immersif .mk-card:hover .mk-picture img {transform:scale(1.04)}
-.accueil-immersif .mk-photo-credit {display:block;font-size:10px;color:#596951;padding:7px 17px 12px;line-height:1.4}
+.accueil-immersif .mk-photo-credit {display:block;font-size:12px;color:#596951;padding:7px 17px 12px;line-height:1.4}
 .accueil-immersif .mk-body {position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:18px 22px 23px}
 .accueil-immersif .mk-name {font:400 29px/1.2 'Newsreader',Georgia,serif;color:#143e2b}
 .accueil-immersif .mk-city {font-size:12px;line-height:1.6;color:#667560}
-.accueil-immersif .mk-count {background:#eaf0e5;color:#1b6b3a;font-size:11px;padding:4px 10px;margin-top:13px;border-radius:4px}
+.accueil-immersif .mk-count {background:#eaf0e5;color:#1b6b3a;font-size:12px;padding:4px 10px;margin-top:13px;border-radius:4px}
 .accueil-immersif .mk-arrow {position:absolute;right:22px;top:24px;font-size:23px;color:#1b6b3a}
 body.accueil-immersif .mk-toggle {background:transparent;border:1px solid #bcc9b8;border-radius:7px;color:#214e32;min-height:46px;padding:12px 22px}
 .accueil-immersif .mk-more {margin-top:23px;font-size:12px}
@@ -131,11 +131,11 @@ body.accueil-immersif .mk-toggle {background:transparent;border:1px solid #bcc9b
 .accueil-immersif .universe-card::after {content:'';position:absolute;inset:0;background:linear-gradient(0deg,#092718dd,transparent 85%)}
 .accueil-immersif .universe-card:hover img {transform:scale(1.05)}
 .accueil-immersif .universe-copy {position:absolute;bottom:26px;left:26px;right:26px;z-index:1;display:flex;flex-direction:column;gap:13px}
-.accueil-immersif .universe-copy small {font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.accueil-immersif .universe-copy small {font-size:12px;letter-spacing:.1em;text-transform:uppercase}
 .accueil-immersif .universe-copy strong {font:400 clamp(28px,2.4vw,38px)/1.1 'Newsreader',Georgia,serif;letter-spacing:-.035em}
-.accueil-immersif .universe-copy>span {display:flex;justify-content:space-between;align-items:center;font-size:11px;border-top:1px solid #ffffff50;padding-top:14px}
+.accueil-immersif .universe-copy>span {display:flex;justify-content:space-between;align-items:center;font-size:12px;border-top:1px solid #ffffff50;padding-top:14px}
 .accueil-immersif .universe-copy b {font-size:22px}
-.accueil-immersif .universe-credit {font-size:9px;color:#707b66;margin-top:12px}
+.accueil-immersif .universe-credit {font-size:12px;color:#707b66;margin-top:12px}
 body.accueil-immersif .products-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
 body.accueil-immersif .prod-filters {background:transparent;border:0;box-shadow:none;padding:0 0 22px;gap:8px}
 body.accueil-immersif .pf-btn {min-height:42px;border-radius:7px;padding-inline:18px;font-size:12px}
@@ -164,7 +164,7 @@ body.accueil-immersif .dark-bg {background:#143b29;color:#fff}
 body.accueil-immersif .shop-card {border-radius:13px;box-shadow:none}
 .accueil-immersif .shop-banner {height:140px}
 body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#eee8d4;padding:80px var(--home-gutter);color:#302407}
-.accueil-immersif .seller-invitation {font-size:10px;text-transform:uppercase;letter-spacing:.17em}
+.accueil-immersif .seller-invitation {font-size:12px;text-transform:uppercase;letter-spacing:.17em}
 .accueil-immersif .cta-section h2 {font-size:clamp(40px,4.8vw,70px);color:#302407;letter-spacing:-.04em;margin-top:20px}
 .accueil-immersif .cta-section p {color:#6b5e3f;font-size:14px}
 .accueil-immersif .cta-section .btn-cta-white {background:#f4c542;color:#302407;box-shadow:none;border-radius:7px}
@@ -180,7 +180,7 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   body.accueil-immersif {--home-gutter:max(90px,calc((100vw - 1580px)/2))}
 }
 @media(max-width:1150px) {
-  .accueil-immersif .home-nav-links {gap:15px;font-size:11px}
+  .accueil-immersif .home-nav-links {gap:15px;font-size:12px}
   body.accueil-immersif .nav {gap:22px}
   .accueil-immersif .nav-seller-link {display:none}
   .accueil-immersif .hero h1 {font-size:76px}
@@ -215,7 +215,7 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   body.accueil-immersif .hero {min-height:740px;padding:132px 24px 174px;justify-content:flex-start}
   body.accueil-immersif .hero-content {width:100%;min-width:0}
   body.accueil-immersif .hero h1 {font-size:clamp(34px,9.6vw,46px);line-height:1.07;max-width:none;letter-spacing:-.05em;margin-bottom:25px}
-  .accueil-immersif .hero-eyebrow {font-size:9px;letter-spacing:.14em;margin-bottom:25px}
+  .accueil-immersif .hero-eyebrow {font-size:12px;letter-spacing:.14em;margin-bottom:25px}
   body.accueil-immersif .hero-desc {font-size:13px;line-height:1.8;max-width:34ch;margin-bottom:25px}
   .accueil-immersif .desktop-break {display:none}
   .accueil-immersif .hero-stage img {object-position:62% center}
@@ -223,18 +223,18 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   .accueil-immersif .hero-search {width:100%;min-width:0;gap:9px;padding:6px 6px 6px 12px;border-radius:9px}
   .accueil-immersif .hero-search>.ic {font-size:17px}
   .accueil-immersif .hero-search input {flex:1 1 0;width:0;font-size:16px}
-  body.accueil-immersif .hero-search button {padding:0 12px;font-size:11px;gap:6px;height:46px}
+  body.accueil-immersif .hero-search button {padding:0 12px;font-size:12px;gap:6px;height:46px}
   .accueil-immersif .hero-search button span {display:none}
-  .accueil-immersif .hero-suggestions {font-size:10px;gap:6px}
+  .accueil-immersif .hero-suggestions {font-size:12px;gap:6px}
   .accueil-immersif .hero-suggestions>span {flex-basis:100%;margin-top:5px}
   .accueil-immersif .hero-footer {left:24px;right:24px;bottom:28px;flex-direction:column;align-items:stretch;gap:22px}
-  .accueil-immersif .hero-explore {font-size:11px}
+  .accueil-immersif .hero-explore {font-size:12px}
   .accueil-immersif .explore-arrow {width:32px;height:32px}
   .accueil-immersif .hero-scene-control {justify-content:space-between}
   .accueil-immersif .scene-caption {gap:4px 8px}
-  .accueil-immersif #scene-title {font-size:10px}
-  .accueil-immersif #scene-credit {font-size:8px}
-  .accueil-immersif #scene-number {font-size:9px}
+  .accueil-immersif #scene-title {font-size:12px}
+  .accueil-immersif #scene-credit {font-size:12px}
+  .accueil-immersif #scene-number {font-size:12px}
   body.accueil-immersif .scene-dot {width:25px}
   body.accueil-immersif #hero-motion {width:36px;height:36px;margin-left:2px}
   .accueil-immersif .home-intro {padding:25px 24px;flex-direction:column;align-items:flex-start;gap:18px}
@@ -243,7 +243,7 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   body.accueil-immersif .hstat-num {font-size:31px}
   body.accueil-immersif .section-wrap,.accueil-immersif .home-universes {padding:54px 22px}
   body.accueil-immersif .section-title {font-size:37px}
-  .accueil-immersif .section-label {font-size:9px;margin-bottom:14px}
+  .accueil-immersif .section-label {font-size:12px;margin-bottom:14px}
   .accueil-immersif .section-description {font-size:12px}
   .accueil-immersif .mk-live {grid-template-columns:1fr}
   .accueil-immersif .mk-picture {aspect-ratio:1.75}
@@ -263,7 +263,7 @@ body.accueil-immersif .cta-section {border-radius:0;box-shadow:none;background:#
   .accueil-immersif .footer-grid {grid-template-columns:1fr 1fr;gap:30px}
   .accueil-immersif .footer-brand {grid-column:1/-1}
   body.accueil-immersif .mobile-nav {background:rgba(251,252,247,.91);border-color:rgba(27,63,43,.12)}
-  body.accueil-immersif .mn-label {font-size:10px}
+  body.accueil-immersif .mn-label {font-size:12px}
   body.accueil-immersif .mn-item.act .mn-icon {color:#fff}
 }
 @media(prefers-reduced-motion:reduce) {

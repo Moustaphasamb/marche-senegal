@@ -185,7 +185,7 @@
       <div class="fc-title"><span class="fc-icon"><i class="ic" data-ic="file-text"></i></span>Informations du produit</div>
       <div class="fgrid">
         <div class="fgrid-full field">
-          <label class="fl">Nom du produit <span class="fl-req">*</span></label>
+          <label class="fl" for="prod-name">Nom du produit <span class="fl-req">*</span></label>
           <input class="fi" type="text" id="prod-name" oninput="updatePreview()" placeholder="Nom clair et descriptif du produit"/>
           <span class="fi-hint">Un bon nom = plus de visibilité dans la recherche</span>
         </div>
@@ -203,11 +203,11 @@
           <span class="fi-hint">Laissez vide si pas de réduction</span>
         </div>
         <div class="field">
-          <label class="fl">Quantité en stock <span class="fl-req">*</span></label>
+          <label class="fl" for="prod-stock">Quantité en stock <span class="fl-req">*</span></label>
           <input class="fi" type="number" id="prod-stock" value="1" min="0" placeholder="Nombre d'unités disponibles"/>
         </div>
         <div class="field">
-          <label class="fl">Référence produit</label>
+          <label class="fl" for="prod-sku">Référence produit</label>
           <input class="fi" type="text" id="prod-sku" placeholder="Votre code interne (facultatif)"/>
         </div>
       </div>
@@ -254,11 +254,11 @@
       <div class="fc-title"><span class="fc-icon"><i class="ic" data-ic="truck"></i></span>Livraison & Logistique</div>
       <div class="fgrid">
         <div class="field">
-          <label class="fl">Délai de préparation</label>
+          <label class="fl" for="prod-preparation">Délai de préparation</label>
           <select class="fi" id="prod-preparation"><option value="">Non précisé</option><option value="MEME_JOUR">Même jour</option><option value="1_JOUR">1 jour ouvré</option><option value="2_3_JOURS" selected>2 à 3 jours</option><option value="5_7_JOURS">5 à 7 jours</option><option value="SUR_COMMANDE">Sur commande</option></select>
         </div>
         <div class="field">
-          <label class="fl">Poids estimé (grammes)</label>
+          <label class="fl" for="prod-weight">Poids estimé (grammes)</label>
           <input class="fi" type="number" id="prod-weight" min="0" placeholder="Poids en grammes"/>
         </div>
       </div>

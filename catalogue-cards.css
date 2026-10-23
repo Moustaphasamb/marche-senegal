@@ -32,17 +32,17 @@ body.page-marche .prod-body,
 body.page-boutique .bv-info,
 body.page-produit .sim-body{display:flex;flex:0 0 auto;min-height:0;flex-direction:column;padding:10px 12px}
 body.page-accueil .prod-market,
-body.page-marche .prod-market-tag{flex:none;display:block;max-width:100%;padding:0;margin:0 0 4px;background:none;border-radius:0;color:#68806b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-marche .prod-market-tag{flex:none;display:block;max-width:100%;padding:0;margin:0 0 4px;background:none;border-radius:0;color:#68806b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.page-accueil .prod-name,
 body.page-marche .prod-name,
 body.page-boutique .bv-name,
 body.page-produit .sim-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:0;margin:0 0 3px;color:#253d2d;font-size:15px;font-weight:750;line-height:1.25}
 body.page-accueil .prod-shop,
-body.page-marche .prod-shop{flex:none;margin:0;color:#6a776b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.page-produit .sim-shop{flex:none;margin:0;color:#6a776b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-marche .prod-shop{flex:none;margin:0;color:#6a776b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.page-produit .sim-shop{flex:none;margin:0;color:#6a776b;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.page-accueil .prod-rating,
 body.page-marche .prod-rating,
-body.page-boutique .bv-rating{min-height:0;margin:3px 0 0;color:#68786a;font-size:11px}
+body.page-boutique .bv-rating{min-height:0;margin:3px 0 0;color:#68786a;font-size:12px}
 :is(body.page-accueil .prod-rating,body.page-marche .prod-rating):empty{display:none}
 body.page-accueil .prod-footer,
 body.page-marche .prod-footer,
@@ -54,7 +54,7 @@ body.page-boutique .bv-row .bv-price,
 body.page-produit .sim-price{font-size:16px;font-weight:800;white-space:nowrap}
 body.page-accueil .prod-old-price,
 body.page-marche .prod-old,
-body.page-boutique .bv-price s{color:#939b91;font-size:11px}
+body.page-boutique .bv-price s{color:#939b91;font-size:12px}
 body.page-accueil .prod-cart-btn,
 body.page-marche .add-btn,
 body.page-boutique .bv-mini,
@@ -62,7 +62,7 @@ body.page-produit .sim-add{flex:none;width:36px;height:36px;border-radius:9px;ba
 body.page-accueil .prod-badge,
 body.page-marche .prod-badge,
 body.page-boutique .bv-flag,
-body.page-produit .sim-badge{border-radius:6px;background:#e5b840;color:#233724;font-size:11px;font-weight:800}
+body.page-produit .sim-badge{border-radius:6px;background:#e5b840;color:#233724;font-size:12px;font-weight:800}
 body.page-accueil .prod-wish,
 body.page-marche .prod-wish,
 body.page-boutique .bv-heart{width:36px;height:36px;border:1px solid #e7e7dd;border-radius:50%;background:#fffefa}
@@ -85,13 +85,13 @@ body.page-boutique .bv-heart{width:36px;height:36px;border:1px solid #e7e7dd;bor
   body.page-boutique .bv-info,
   body.page-produit .sim-body{padding:8px}
   body.page-accueil .prod-market,
-  body.page-marche .prod-market-tag{font-size:10px;margin-bottom:3px}
+  body.page-marche .prod-market-tag{font-size:12px;margin-bottom:3px}
   body.page-accueil .prod-name,
   body.page-marche .prod-name,
   body.page-boutique .bv-name,
   body.page-produit .sim-name{font-size:13px;line-height:1.22;margin-bottom:2px}
   body.page-accueil .prod-shop,
-  body.page-marche .prod-shop{font-size:10px}
+  body.page-marche .prod-shop{font-size:12px}
   body.page-accueil .prod-footer,
   body.page-marche .prod-footer,
   body.page-boutique .bv-row,
@@ -105,7 +105,7 @@ body.page-boutique .bv-heart{width:36px;height:36px;border:1px solid #e7e7dd;bor
   body.page-boutique .bv-mini,
   body.page-produit .sim-add{width:32px;height:32px}
   .catalogue-placeholder span{font-size:38px}
-  .catalogue-placeholder small{font-size:10px}
+  .catalogue-placeholder small{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){
   body.page-accueil .prod-img img,

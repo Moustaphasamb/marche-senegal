@@ -102,7 +102,7 @@
     </div>
   </div>
 
-  <div class="right">
+  <div class="right" role="main">
     <div class="form-box">
 
       <div class="mode-tabs">
@@ -112,21 +112,21 @@
 
       <!-- CONNEXION -->
       <div id="form-login">
-        <div class="form-title">Bon retour ! 👋</div>
+        <h1 class="form-title">Bon retour ! 👋</h1>
         <div class="form-sub">Retrouvez vos favoris, vos échanges et le suivi de vos commandes.</div>
         <div class="auth-methods" aria-label="Choisir un mode de connexion">
           <button class="auth-method active" id="login-method-password" onclick="setLoginMethod('password')">E-mail + mot de passe</button>
           <button class="auth-method" id="login-method-sms" onclick="setLoginMethod('sms')">Téléphone + SMS</button>
         </div>
         <div class="field" id="login-identifier-field">
-          <label class="fl">Email ou numéro de téléphone</label>
+          <label class="fl" for="login-identifier">Email ou numéro de téléphone</label>
           <input class="fi" type="text" id="login-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username" onkeydown="if(event.key==='Enter')submitLogin()"/>
         </div>
         <div class="field" id="login-password-field">
-          <label class="fl">Mot de passe</label>
+          <label class="fl" for="login-password">Mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="login-password" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitLogin()"/>
-            <button class="fi-eye" id="eye-login" onclick="toggleEye('login-password','eye-login')"><i class="ic" data-ic="eye"></i></button>
+            <button type="button" class="fi-eye" aria-label="Afficher ou masquer le mot de passe" id="eye-login" onclick="toggleEye('login-password','eye-login')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="login-btn" onclick="submitLogin()">Se connecter</button>
@@ -135,7 +135,7 @@
         <div class="otp-login" id="otp-login">
           <div class="fl">Connexion rapide par SMS</div>
           <div class="fi-hint" style="margin-bottom:10px">Recevez un code à usage unique sur votre numéro de téléphone.</div>
-          <div class="field"><input class="fi" type="tel" id="otp-phone" placeholder="+221 77 000 00 00" autocomplete="tel"/></div>
+          <div class="field"><input class="fi" type="tel" id="otp-phone" aria-label="Numéro de téléphone" placeholder="+221 77 000 00 00" autocomplete="tel"/></div>
           <button class="submit-btn" id="otp-send-btn" onclick="sendOtpLogin()">Recevoir le code</button>
           <div id="otp-code-wrap" style="display:none">
             <div class="field"><label class="fl" for="otp-code">Code reçu par SMS</label><input class="fi" type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/></div>
@@ -147,28 +147,28 @@
 
       <!-- INSCRIPTION -->
       <div id="form-register" style="display:none">
-        <div class="form-title">Créer un compte <i class="ic" data-ic="shopping-bag"></i></div>
+        <h1 class="form-title">Créer un compte <i class="ic" data-ic="shopping-bag"></i></h1>
         <div class="form-sub">Créez votre compte pour garder vos favoris, contacter les vendeurs et préparer votre panier.</div>
         <div class="fi-row">
           <div class="field">
-            <label class="fl">Prénom *</label>
+            <label class="fl" for="reg-first-name">Prénom *</label>
             <input class="fi" type="text" id="reg-first-name" placeholder="Fatou" autocomplete="given-name"/>
           </div>
           <div class="field">
-            <label class="fl">Nom *</label>
+            <label class="fl" for="reg-last-name">Nom *</label>
             <input class="fi" type="text" id="reg-last-name" placeholder="Ndiaye" autocomplete="family-name"/>
           </div>
         </div>
         <div class="field">
-          <label class="fl">Email ou numéro de téléphone *</label>
+          <label class="fl" for="reg-identifier">Email ou numéro de téléphone *</label>
           <input class="fi" type="text" id="reg-identifier" placeholder="exemple@email.com ou +221 77 000 00 00" autocomplete="username"/>
           <div class="fi-hint">Choisissez au moins un moyen : e-mail ou numéro de téléphone. Vous pourrez ajouter l’autre depuis votre profil.</div>
         </div>
         <div class="field">
-          <label class="fl">Mot de passe *</label>
+          <label class="fl" for="reg-password">Mot de passe *</label>
           <div class="fi-password">
             <input class="fi" type="password" id="reg-password" placeholder="Minimum 6 caractères" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitRegister()"/>
-            <button class="fi-eye" id="eye-reg" onclick="toggleEye('reg-password','eye-reg')"><i class="ic" data-ic="eye"></i></button>
+            <button type="button" class="fi-eye" aria-label="Afficher ou masquer le mot de passe" id="eye-reg" onclick="toggleEye('reg-password','eye-reg')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="register-btn" onclick="submitRegister()">Créer mon compte</button>

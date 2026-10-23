@@ -113,7 +113,7 @@ body.ms-design.page-recherche .search-hero {padding:68px var(--ms-gutter) 42px;b
 body.ms-design.page-recherche .sh-title {font-size:clamp(36px,4.6vw,66px);font-weight:400;letter-spacing:-.045em;line-height:1.08;max-width:1000px;margin-bottom:26px}
 body.ms-design.page-recherche .sh-title span {color:#d4e4ae}
 .ms-design.page-recherche :is(.sh-label,.sh-stat-l) {color:#d2daca}
-.ms-design.page-recherche .sh-label {letter-spacing:.16em;font-size:11px;margin-bottom:20px}
+.ms-design.page-recherche .sh-label {letter-spacing:.16em;font-size:12px;margin-bottom:20px}
 .ms-design.page-recherche .sh-bar {min-height:62px;max-width:740px;background:#fffdf7;border-radius:10px;box-shadow:none}
 .ms-design.page-recherche .sh-bar-btn {height:50px;border-radius:7px}
 .ms-design.page-recherche .sh-sug {border-radius:5px;min-height:36px;font-size:12px}
@@ -297,7 +297,7 @@ body.ms-design.page-chat {height:100dvh;background:#eeefe5}
   body.ms-design .mn-item {position:relative;min-width:0;min-height:55px;padding:5px 2px 4px;gap:3px;border-radius:13px;color:#687468;isolation:isolate}
   body.ms-design .mn-item::before {content:'';position:absolute;inset:2px;border-radius:12px;background:transparent;z-index:-1;transition:background .2s ease,transform .2s ease}
   body.ms-design .mn-icon {width:30px;height:30px;border-radius:10px;background:#edf0e8;color:#526258;font-size:15px;border:1px solid rgba(28,104,69,.04)}
-  body.ms-design .mn-label {font-size:11px;line-height:13px;font-weight:600;color:#5f6a60;letter-spacing:-.01em}
+  body.ms-design .mn-label {font-size:12px;line-height:13px;font-weight:600;color:#5f6a60;letter-spacing:-.01em}
   body.ms-design .mn-item.act::before {background:#edf4e9}
   body.ms-design .mn-item.act .mn-icon {color:#fff;background:linear-gradient(145deg,#23784e,#155d3b);border-color:#155d3b;box-shadow:0 5px 12px rgba(28,104,69,.22)}
   body.ms-design .mn-item.act .mn-label {color:#155d3b;font-weight:750}
@@ -312,33 +312,43 @@ body.ms-design:not(.espace-vendeur) :is(.prod-card,.rc) {border-radius:16px;posi
 body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img) {height:190px;border-radius:0;overflow:hidden}
 body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img)[style*="background:#F0EAF8"] {background:linear-gradient(145deg,#edf1e5,#e3e9d9)!important}
 body.ms-design:not(.espace-vendeur) :is(.prod-body,.rc-body) {padding:12px 14px;display:flex;flex-direction:column;gap:5px;min-width:0}
-body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {display:block;max-width:100%;width:fit-content;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px;padding:0;background:none;border-radius:0;font-size:10px;color:#56704b;margin:0}
+body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {display:block;max-width:100%;width:fit-content;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:18px;padding:0;background:none;border-radius:0;font-size:12px;color:#56704b;margin:0}
 body.ms-design:not(.espace-vendeur) :is(.prod-name,.rc-name) {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:14px;font-weight:600;line-height:19px;height:38px;margin:0;color:#20382a}
-body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:16px;margin:0;color:#72796a}
-body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:10px;line-height:16px;gap:4px;margin:0;white-space:nowrap}
+body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;line-height:16px;margin:0;color:#72796a}
+body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:12px;line-height:16px;gap:4px;margin:0;white-space:nowrap}
 body.ms-design:not(.espace-vendeur) :is(.prod-stars,.rc-stars) {font-size:9px;letter-spacing:-.5px}
 body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer) {display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center;gap:6px;min-height:44px;margin-top:3px;padding-top:8px;border-top:1px solid #edf0e6}
 body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer)>div {min-width:0}
 body.ms-design:not(.espace-vendeur) :is(.prod-price,.rc-price) {font-size:14px;font-weight:750;line-height:18px;white-space:normal;margin:0;color:#1c6845}
-body.ms-design:not(.espace-vendeur) :is(.prod-old-price,.prod-old,.rc-old) {display:block;font-size:10px;line-height:14px;margin:1px 0 0;color:#858a7f;white-space:normal}
+body.ms-design:not(.espace-vendeur) :is(.prod-old-price,.prod-old,.rc-old) {display:block;font-size:12px;line-height:14px;margin:1px 0 0;color:#858a7f;white-space:normal}
 body.ms-design:not(.espace-vendeur) :is(.prod-cart-btn,.prod-add,.rc-add) {width:40px;height:40px;min-width:40px;min-height:40px;border-radius:12px;box-shadow:none;font-size:21px;font-weight:400;background:#1c6845;color:white;align-self:center}
 body.ms-design:not(.espace-vendeur) :is(.prod-wish,.rc-wish) {width:36px;height:36px;min-width:36px;min-height:36px;top:9px;right:9px;background:#fffdf9e8;border:1px solid #dce2d5;box-shadow:none}
-body.ms-design:not(.espace-vendeur) :is(.prod-badge,.rc-badge) {top:10px;left:10px;border-radius:6px;padding:4px 7px;font-size:10px;font-weight:700;box-shadow:none}
-body.ms-design:not(.espace-vendeur) .prod-market-tag {max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:none;padding:0;margin:0;font-size:10px;line-height:18px;color:#56704b}
+body.ms-design:not(.espace-vendeur) :is(.prod-badge,.rc-badge) {top:10px;left:10px;border-radius:6px;padding:4px 7px;font-size:12px;font-weight:700;box-shadow:none}
+body.ms-design:not(.espace-vendeur) .prod-market-tag {max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:none;padding:0;margin:0;font-size:12px;line-height:18px;color:#56704b}
 body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:40px;height:40px;min-height:40px;min-width:40px;border-radius:12px;box-shadow:none;font-size:21px}
 @media(max-width:600px) {
   body.ms-design:not(.espace-vendeur) :is(.prod-img,.rc-img) {height:clamp(118px,35vw,150px)}
   body.ms-design:not(.espace-vendeur) :is(.prod-body,.rc-body) {padding:10px;gap:4px}
   body.ms-design:not(.espace-vendeur) :is(.prod-name,.rc-name) {font-size:12px;line-height:17px;height:34px}
-  body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {font-size:11px;line-height:15px}
-  body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {font-size:11px;line-height:15px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-shop,.rc-shop) {font-size:12px;line-height:15px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-market,.rc-market) {font-size:12px;line-height:15px}
   body.ms-design:not(.espace-vendeur) :is(.prod-price,.rc-price) {font-size:12px;line-height:16px}
-  body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:9px;gap:3px}
+  body.ms-design:not(.espace-vendeur) :is(.prod-rating,.rc-rating) {font-size:12px;gap:3px}
   body.ms-design:not(.espace-vendeur) :is(.prod-footer,.rc-footer) {grid-template-columns:minmax(0,1fr) 36px;gap:4px;padding-top:6px;min-height:42px}
   body.ms-design:not(.espace-vendeur) :is(.prod-cart-btn,.prod-add,.rc-add) {width:36px;height:36px;min-width:36px;min-height:36px;border-radius:10px;font-size:20px}
   body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:36px;height:36px;min-width:36px;min-height:36px;border-radius:10px;font-size:20px}
-  body.ms-design:not(.espace-vendeur) .prod-market-tag {font-size:9px;line-height:14px}
+  body.ms-design:not(.espace-vendeur) .prod-market-tag {font-size:12px;line-height:14px}
 }
 @media(prefers-reduced-motion:reduce) {
   .ms-design *,.ms-design *::before,.ms-design *::after {animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* Menu du bas : de vrais liens (clavier, nouvel onglet, partage), même apparence qu'avant. */
+:where(.mobile-nav) :is(a,button).mn-item {display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none;font:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+/* Priorité nulle : la couleur des styles du menu (.mn-item) l'emporte toujours ; seul le bleu des liens par défaut disparaît. */
+:where(.mobile-nav a.mn-item) {color:inherit}
+
+/* Titres devenus de vrais h1 (accessibilité) : priorité nulle, ils gardent exactement le style de leur classe. */
+:where(h1):where(.mh-title,.sh-name,.form-title,.lm-titre) {margin:0;font-size:inherit;font-weight:inherit;line-height:inherit}
+/* Lu par les lecteurs d'écran, invisible à l'écran. */
+.ms-visuellement-cache {position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}

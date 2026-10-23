@@ -131,11 +131,11 @@ body{padding-left:var(--sidebar-w)}
       <div class="fc-title"><span><i class="ic" data-ic="file-text"></i></span>Informations du produit</div>
       <div class="fgrid">
         <div class="fgrid-full field">
-          <label class="fl">Nom du produit <span class="fl-req">*</span></label>
+          <label class="fl" for="prod-name">Nom du produit <span class="fl-req">*</span></label>
           <input class="fi" type="text" id="prod-name" oninput="updatePreview()" placeholder="Nom du produit" maxlength="120"/>
         </div>
         <div class="fgrid-full field">
-          <label class="fl">Description <span class="fl-req">*</span></label>
+          <label class="fl" for="prod-desc">Description <span class="fl-req">*</span></label>
           <textarea class="fi fi-ta" id="prod-desc" placeholder="Décrivez votre produit…"></textarea>
         </div>
         <div class="field">
@@ -147,11 +147,11 @@ body{padding-left:var(--sidebar-w)}
           <div class="fi-prefix"><div class="fi-pre-label">FCFA</div><input type="number" id="prod-old-price" oninput="updatePreview()" placeholder="Laisser vide si pas de réduction"/></div>
         </div>
         <div class="field">
-          <label class="fl">Quantité en stock <span class="fl-req">*</span></label>
+          <label class="fl" for="prod-stock">Quantité en stock <span class="fl-req">*</span></label>
           <input class="fi" type="number" id="prod-stock" min="0" placeholder="0"/>
         </div>
         <div class="field">
-          <label class="fl">Statut du produit</label>
+          <label class="fl" for="prod-status">Statut du produit</label>
           <select class="fi" id="prod-status">
             <option value="ACTIVE">Actif — visible par les acheteurs</option>
             <option value="PAUSED">En pause — masqué temporairement</option>
@@ -159,15 +159,15 @@ body{padding-left:var(--sidebar-w)}
           </select>
         </div>
         <div class="field">
-          <label class="fl">Référence interne</label>
+          <label class="fl" for="prod-sku">Référence interne</label>
           <input class="fi" type="text" id="prod-sku" placeholder="Votre code interne (facultatif)"/>
         </div>
         <div class="field">
-          <label class="fl">Poids estimé (grammes)</label>
+          <label class="fl" for="prod-weight">Poids estimé (grammes)</label>
           <input class="fi" type="number" id="prod-weight" min="0" placeholder="Poids en grammes"/>
         </div>
         <div class="field">
-          <label class="fl">Délai de préparation</label>
+          <label class="fl" for="prod-preparation">Délai de préparation</label>
           <select class="fi" id="prod-preparation">
             <option value="">Non précisé</option>
             <option value="MEME_JOUR">Même jour</option>

@@ -97,7 +97,7 @@
     </div>
   </div>
 
-  <div class="right">
+  <div class="right" role="main">
     <div class="form-box">
 
       <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:33%"></div></div>
@@ -105,10 +105,10 @@
       <!-- ÉTAPE 1 — Email -->
       <div id="step-1">
         <div class="back-link" onclick="goBack()">← Retour à la connexion</div>
-        <div class="form-title">Mot de passe oublié ?</div>
+        <h1 class="form-title">Mot de passe oublié ?</h1>
         <div class="form-sub">Entrez l'email associé à votre compte. Nous vous enverrons un code de vérification.</div>
         <div class="field">
-          <label class="fl">Adresse email</label>
+          <label class="fl" for="email-input">Adresse email</label>
           <input class="fi" type="email" id="email-input" placeholder="exemple@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')sendCode()"/>
         </div>
         <button class="submit-btn" id="send-btn" onclick="sendCode()">Envoyer le code</button>
@@ -120,19 +120,19 @@
       <!-- ÉTAPE 2 — Code -->
       <div id="step-2" style="display:none">
         <div class="back-link" onclick="showStep(1)">← Changer d'email</div>
-        <div class="form-title">Entrez le code <i class="ic" data-ic="key-round"></i></div>
+        <h1 class="form-title">Entrez le code <i class="ic" data-ic="key-round"></i></h1>
         <div class="form-sub" id="code-sub">Un code à 6 chiffres a été envoyé à votre adresse email.</div>
         <div class="dev-notice" id="dev-notice">
           <strong>Mode développement</strong>
           <span id="dev-code-display"></span>
         </div>
         <div class="code-grid" id="code-grid">
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c0"/>
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c1"/>
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c2"/>
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c3"/>
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c4"/>
-          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c5"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c0" aria-label="Chiffre 1 sur 6 du code"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c1" aria-label="Chiffre 2 sur 6 du code"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c2" aria-label="Chiffre 3 sur 6 du code"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c3" aria-label="Chiffre 4 sur 6 du code"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c4" aria-label="Chiffre 5 sur 6 du code"/>
+          <input class="code-cell" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="c5" aria-label="Chiffre 6 sur 6 du code"/>
         </div>
         <div class="fi-hint" style="margin-bottom:16px">Le code expire dans 15 minutes.</div>
         <button class="submit-btn" id="verify-btn" onclick="verifyCode()">Vérifier le code</button>
@@ -143,20 +143,20 @@
 
       <!-- ÉTAPE 3 — Nouveau mot de passe -->
       <div id="step-3" style="display:none">
-        <div class="form-title">Nouveau mot de passe <i class="ic" data-ic="lock"></i></div>
+        <h1 class="form-title">Nouveau mot de passe <i class="ic" data-ic="lock"></i></h1>
         <div class="form-sub">Choisissez un mot de passe sécurisé (minimum 6 caractères).</div>
         <div class="field">
-          <label class="fl">Nouveau mot de passe</label>
+          <label class="fl" for="new-password">Nouveau mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="new-password" placeholder="Minimum 6 caractères" autocomplete="new-password"/>
-            <button class="fi-eye" id="eye-new" onclick="toggleEye('new-password','eye-new')"><i class="ic" data-ic="eye"></i></button>
+            <button type="button" class="fi-eye" aria-label="Afficher ou masquer le mot de passe" id="eye-new" onclick="toggleEye('new-password','eye-new')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <div class="field">
-          <label class="fl">Confirmer le mot de passe</label>
+          <label class="fl" for="confirm-password">Confirmer le mot de passe</label>
           <div class="fi-password">
             <input class="fi" type="password" id="confirm-password" placeholder="Retapez le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')submitReset()"/>
-            <button class="fi-eye" id="eye-confirm" onclick="toggleEye('confirm-password','eye-confirm')"><i class="ic" data-ic="eye"></i></button>
+            <button type="button" class="fi-eye" aria-label="Afficher ou masquer le mot de passe" id="eye-confirm" onclick="toggleEye('confirm-password','eye-confirm')"><i class="ic" data-ic="eye"></i></button>
           </div>
         </div>
         <button class="submit-btn" id="reset-btn" onclick="submitReset()">Réinitialiser le mot de passe</button>

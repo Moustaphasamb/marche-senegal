@@ -12,7 +12,7 @@ body.accueil-immersif .hero-desc{max-width:570px;font-size:clamp(15px,1.25vw,19p
 .accueil-immersif .home-story-photo{min-height:450px;overflow:hidden}
 .accueil-immersif .home-story-photo img{display:block;width:100%;height:100%;object-fit:cover}
 .accueil-immersif .home-story-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(45px,7vw,110px)}
-.accueil-immersif .home-story-kicker{color:#e9bd50;text-transform:uppercase;letter-spacing:.2em;font-size:11px;font-weight:800}
+.accueil-immersif .home-story-kicker{color:#e9bd50;text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:800}
 .accueil-immersif .home-story h2{font-family:'Newsreader',Georgia,serif;font-size:clamp(38px,4.2vw,65px);font-weight:500;line-height:1.08;letter-spacing:-.045em;margin:20px 0}
 .accueil-immersif .home-story-copy>p:not(.home-story-kicker){max-width:490px;color:#d5e2d3;line-height:1.8;font-size:16px}
 .accueil-immersif .home-story-copy>a{display:inline-flex;gap:20px;border-bottom:1px solid currentColor;padding-bottom:8px;margin-top:25px;font-size:13px;font-weight:800}

@@ -189,7 +189,7 @@
   </div>
 
   <!-- RIGHT -->
-  <div class="right">
+  <div class="right" role="main">
     <div class="form-box">
 
       <!-- ONGLETS -->
@@ -200,7 +200,7 @@
 
       <!-- ── CONNEXION ── -->
       <div class="step active" id="step-login">
-        <div class="form-title">Connexion vendeur <i class="ic" data-ic="store"></i></div>
+        <h1 class="form-title">Connexion vendeur <i class="ic" data-ic="store"></i></h1>
         <div class="form-sub">Accédez à votre tableau de bord avec votre email ou numéro de téléphone.</div>
         <div class="auth-methods" aria-label="Choisir un mode de connexion">
           <button class="auth-method active" id="seller-login-method-password" onclick="setSellerLoginMethod('password')">E-mail + mot de passe</button>
@@ -231,7 +231,7 @@
         <div class="otp-login" id="otp-login">
           <div class="fl">Connexion vendeur par SMS</div>
           <div class="fi-hint" style="margin-bottom:10px">Recevez un code à usage unique sur votre numéro de téléphone.</div>
-          <div class="field"><input class="fi" type="tel" id="otp-phone" placeholder="+221 77 000 00 00" autocomplete="tel"/></div>
+          <div class="field"><input class="fi" type="tel" id="otp-phone" aria-label="Numéro de téléphone" placeholder="+221 77 000 00 00" autocomplete="tel"/></div>
           <button class="submit-btn" id="otp-send-btn" onclick="sendOtpLogin()">Recevoir le code</button>
           <div id="otp-code-wrap" style="display:none">
             <div class="field"><label class="fl" for="otp-code">Code reçu par SMS</label><input class="fi" type="text" id="otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/></div>
@@ -268,7 +268,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre compte <i class="ic" data-ic="user"></i></div>
+        <h1 class="form-title">Votre compte <i class="ic" data-ic="user"></i></h1>
         <div class="form-sub">Choisissez un e-mail ou un numéro de téléphone pour créer votre accès. Vous pourrez ajouter l’autre depuis votre profil.</div>
 
         <div class="fi-row">
@@ -321,7 +321,7 @@
           <div class="prog-line"></div>
           <div class="prog-step"><div class="prog-dot pending">2</div><span class="prog-label pending">Boutique</span></div>
         </div>
-        <div class="form-title">Vérifiez votre téléphone <i class="ic" data-ic="shield-check"></i></div>
+        <h1 class="form-title">Vérifiez votre téléphone <i class="ic" data-ic="shield-check"></i></h1>
         <div class="form-sub">Un code de sécurité a été envoyé. Validez-le avant de continuer la création de votre boutique.</div>
         <div class="field">
           <label class="fl" for="seller-reg-otp-code">Code reçu par SMS</label>
@@ -346,7 +346,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre boutique <i class="ic" data-ic="store"></i></div>
+        <h1 class="form-title">Votre boutique <i class="ic" data-ic="store"></i></h1>
         <div class="form-sub">Choisissez un nom et indiquez où les acheteurs peuvent vous trouver, dans un marché ou ailleurs.</div>
 
         <div class="field">
@@ -363,7 +363,7 @@
         </div>
 
         <div class="field">
-          <label class="fl">Où se trouve votre boutique ? *</label>
+          <label class="fl" for="market-search">Où se trouve votre boutique ? *</label>
           <input class="market-search" id="market-search" type="text" placeholder="🔍 Rechercher un marché ou une ville..." oninput="filterMarketBtns(this.value)"/>
           <div class="market-grid" id="market-grid"></div>
           <div id="market-no-result" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;padding:12px">Aucun marché trouvé</div>
@@ -413,7 +413,7 @@
           </div>
         </div>
 
-        <div class="form-title">Votre pièce d'identité <i class="ic" data-ic="id-card"></i></div>
+        <h1 class="form-title">Votre pièce d'identité <i class="ic" data-ic="id-card"></i></h1>
         <div class="form-sub">
           Notre équipe en a besoin pour valider votre boutique. Envoyez-la maintenant,
           ou plus tard depuis « Ma boutique ».

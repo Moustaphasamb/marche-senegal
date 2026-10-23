@@ -114,19 +114,19 @@ body::after{content:'';position:fixed;bottom:-150px;left:-150px;width:400px;heig
     </div>
 
     <div class="field">
-      <label class="fl">Email administrateur</label>
+      <label class="fl" for="email-input">Email administrateur</label>
       <input class="fi" type="email" id="email-input"
              placeholder="admin@marche-senegal.sn"
              onkeydown="if(event.key==='Enter')loginAdmin()"/>
     </div>
 
     <div class="field">
-      <label class="fl">Mot de passe</label>
+      <label class="fl" for="password-input">Mot de passe</label>
       <div class="fi-password">
         <input class="fi" type="password" id="password-input"
                placeholder="••••••••••••"
                onkeydown="if(event.key==='Enter')loginAdmin()"/>
-        <button class="fi-eye" onclick="togglePassword()" id="eye-btn"><i class="ic" data-ic="eye"></i></button>
+        <button type="button" class="fi-eye" aria-label="Afficher ou masquer le mot de passe" onclick="togglePassword()" id="eye-btn"><i class="ic" data-ic="eye"></i></button>
       </div>
     </div>
 

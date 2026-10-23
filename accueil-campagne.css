@@ -8,7 +8,7 @@
 }
 .accueil-immersif .promos-band .pb-label {
   display:flex;align-items:center;gap:8px;margin:0;white-space:nowrap;
-  color:#f4c542;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:#f4c542;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
 }
 .accueil-immersif .promos-band .pb-label .ic {font-size:15px}
 .accueil-immersif .promo-pills {
@@ -37,7 +37,7 @@
 .accueil-immersif .pp-shop {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#f8f6e9;margin:0;max-width:230px}
 .accueil-immersif .promo-pill .pp-code {
   flex:0 0 auto;margin:0;padding:5px 9px;border-radius:5px;
-  border-color:rgba(255,255,255,.38);background:transparent;color:#fff;font-size:11px;
+  border-color:rgba(255,255,255,.38);background:transparent;color:#fff;font-size:12px;
 }
 .accueil-immersif .promo-fallback {color:#fff;font-size:12px;font-weight:600;padding:9px 0}
 .accueil-immersif .promo-fallback::after {content:'↗';margin-left:12px}
@@ -63,7 +63,7 @@
   padding:clamp(62px,7vw,120px) var(--home-gutter);background:#e9eddf;color:#173b2b;
 }
 .accueil-immersif .market-basket-eyebrow {
-  display:block;margin-bottom:22px;color:#476747;font-size:10px;font-weight:700;
+  display:block;margin-bottom:22px;color:#476747;font-size:12px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;
 }
 .accueil-immersif .market-basket h2 {
@@ -87,7 +87,7 @@
 .accueil-immersif .market-basket-steps>div p {font-size:12px;color:#5b6b5c;line-height:1.6}
 .accueil-immersif .market-basket-note {
   margin-top:20px;padding:15px 17px;border-radius:8px;background:#f5f6ef;
-  color:#526451;font-size:11px;line-height:1.7;
+  color:#526451;font-size:12px;line-height:1.7;
 }
 @media(max-width:900px) {
   .accueil-immersif .market-basket {grid-template-columns:1fr;gap:42px}
@@ -99,8 +99,8 @@
   .accueil-immersif .promo-pill {min-height:43px;padding:5px 11px;gap:8px}
   .accueil-immersif .pp-link {gap:7px}
   .accueil-immersif .pp-disc {font-size:16px}
-  .accueil-immersif .pp-shop {font-size:11px;max-width:150px}
-  .accueil-immersif .promo-pill .pp-code {font-size:10px;padding:6px 7px;white-space:nowrap}
+  .accueil-immersif .pp-shop {font-size:12px;max-width:150px}
+  .accueil-immersif .promo-pill .pp-code {font-size:12px;padding:6px 7px;white-space:nowrap}
   .accueil-immersif .hero-search,.accueil-immersif .hero-suggestions,.accueil-immersif .hero-market-link {display:none}
   .accueil-immersif .hero-mobile-actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
   .accueil-immersif .hero-mobile-actions a {display:inline-flex;align-items:center;gap:12px;min-height:46px;padding:10px 15px;border-radius:25px;background:#f9faf1;color:#174d30;font-size:12px;font-weight:700}

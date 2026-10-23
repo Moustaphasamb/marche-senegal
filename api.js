@@ -680,7 +680,7 @@ function injecterStyleCredit() {
   const s = document.createElement('style');
   s.id = 'style-credit-banniere';
   s.textContent =
-    '.banner-credit{position:absolute;right:10px;bottom:8px;z-index:3;font-size:.64rem;line-height:1.3;' +
+    '.banner-credit{position:absolute;right:10px;bottom:8px;z-index:3;font-size:.75rem;line-height:1.3;' +
     'color:rgba(255,255,255,.66);text-decoration:none;background:rgba(0,0,0,.32);padding:3px 9px;border-radius:99px}' +
     'a.banner-credit:hover,a.banner-credit:focus-visible{color:#fff;text-decoration:underline}';
   document.head.appendChild(s);
