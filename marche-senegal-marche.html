@@ -432,6 +432,7 @@ a{text-decoration:none;color:inherit}
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
 <link rel="stylesheet" href="catalogue-cards.css"/>
+<link rel="stylesheet" href="marches-liste.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="ms-design page-marche">
@@ -456,6 +457,26 @@ a{text-decoration:none;color:inherit}
 <!-- BREADCRUMB -->
 <div class="breadcrumb"><a href="marche-senegal-accueil.html" class="bc-link">Accueil</a><span class="bc-sep">›</span><span class="bc-link">Marchés</span><span class="bc-sep">›</span><span class="bc-current">Marché</span></div>
 <!-- MARKET HERO -->
+<!-- LISTE DES MARCHÉS : affichée quand la page est ouverte sans marché (/marches) -->
+<section class="liste-marches" id="liste-marches" aria-labelledby="lm-titre" hidden>
+  <div class="lm-tete">
+    <h1 class="lm-titre" id="lm-titre">Les marchés du Sénégal</h1>
+    <p class="lm-intro">Choisissez un marché pour voir ses boutiques et ce qu'elles proposent.</p>
+  </div>
+  <div class="lm-outils">
+    <label class="lm-champ" for="lm-recherche">
+      <span class="lm-champ-texte">Chercher un marché ou une ville</span>
+      <span class="lm-champ-saisie"><i class="ic" data-ic="search" aria-hidden="true"></i><input id="lm-recherche" type="search" placeholder="Nom du marché, ville ou région" autocomplete="off"/></span>
+    </label>
+    <div class="lm-regions" id="lm-regions" role="group" aria-label="Filtrer par région"></div>
+  </div>
+  <p class="lm-compte" id="lm-compte" aria-live="polite"></p>
+  <ul class="lm-grille" id="lm-grille"></ul>
+  <div class="lm-vide" id="lm-vide" hidden>
+    <p>Aucun marché ne correspond à votre recherche.</p>
+    <button type="button" class="lm-effacer" id="lm-effacer">Voir tous les marchés</button>
+  </div>
+</section>
 <section class="market-hero">
   <div class="mh-inner">
     <div>
@@ -596,7 +617,10 @@ async function loadMarket(marketId) {
   if (ctMarket) ctMarket.textContent = nomCourtMarche(market.name);
 
   const status = document.getElementById('mh-status');
-  if (status) status.textContent = market.isActive ? 'Marché actif' : 'Marché inactif';
+  // « Actif » seulement quand des boutiques y vendent déjà : un marché vide l'annonce.
+  const nbBoutiques = market._count?.shops ?? (market.shops || []).length;
+  if (status) status.textContent = !market.isActive ? 'Marché inactif'
+    : nbBoutiques > 0 ? 'Marché actif' : 'Boutiques bientôt en ligne';
 
   const micCity = document.getElementById('mic-city');
   if (micCity) micCity.textContent = market.city;
@@ -1011,6 +1035,96 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// ── Liste des marchés (/marches) ──
+// Les marchés qui ont déjà des boutiques passent devant ; les autres restent visibles,
+// annoncés comme « bientôt », pour qu'on puisse quand même trouver le sien.
+const sansAccents = t => (t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+function lienMarche(m) {
+  return m.slug ? '/marches/' + encodeURIComponent(m.slug) : 'marche-senegal-marche.html?id=' + encodeURIComponent(m.id);
+}
+
+function carteMarche(m) {
+  const nb = m._count?.shops || 0;
+  const image = urlImageSure(m.imageUrl);
+  const lieu = [m.city, m.region && m.region !== m.city ? 'région de ' + m.region : ''].filter(Boolean).join(', ');
+  return `<li><a class="lm-carte${nb ? '' : ' lm-carte--bientot'}" href="${escapeHtml(lienMarche(m))}">
+    <span class="lm-photo">${image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy" decoding="async"/>` : `<i class="ic" data-ic="store" aria-hidden="true"></i>`}</span>
+    <span class="lm-texte">
+      <span class="lm-nom">${escapeHtml(m.name)}</span>
+      <span class="lm-lieu"><i class="ic" data-ic="map-pin" aria-hidden="true"></i>${escapeHtml(lieu)}</span>
+      <span class="lm-etat">${nb ? `${nb} boutique${nb > 1 ? 's' : ''} en ligne` : 'Boutiques bientôt en ligne'}</span>
+    </span>
+  </a></li>`;
+}
+
+async function afficherListeMarches() {
+  document.body.classList.add('mode-liste-marches');
+  document.getElementById('liste-marches').hidden = false;
+  document.title = 'Les marchés du Sénégal — Marché Sénégal';
+  // La recherche de l'en-tête ne vise aucun marché ici : elle cherche dans tout le site.
+  document.querySelectorAll('.nav-search input').forEach(champ => { champ.placeholder = 'Rechercher un produit ou une boutique…'; });
+  const fil = document.querySelector('.breadcrumb');
+  if (fil) fil.innerHTML = '<a href="marche-senegal-accueil.html" class="bc-link">Accueil</a><span class="bc-sep">›</span><span class="bc-current" aria-current="page">Marchés</span>';
+
+  const grille = document.getElementById('lm-grille');
+  const compte = document.getElementById('lm-compte');
+  grille.innerHTML = '<li class="lm-attente">Chargement des marchés…</li>';
+
+  const resultat = await getMarkets();
+  if (!resultat.success || !resultat.data?.length) {
+    grille.innerHTML = '';
+    compte.textContent = 'La liste des marchés n\'a pas pu être chargée. Vérifiez votre connexion puis rechargez la page.';
+    return;
+  }
+
+  const marches = resultat.data.slice().sort((a, b) =>
+    (b._count?.shops || 0) - (a._count?.shops || 0) || a.name.localeCompare(b.name, 'fr'));
+
+  const parRegion = {};
+  marches.forEach(m => { if (m.region) parRegion[m.region] = (parRegion[m.region] || 0) + 1; });
+  const regions = Object.keys(parRegion).sort((a, b) => parRegion[b] - parRegion[a] || a.localeCompare(b, 'fr'));
+
+  let region = '';
+  const zoneRegions = document.getElementById('lm-regions');
+  zoneRegions.innerHTML = ['', ...regions].map(r =>
+    `<button type="button" class="lm-region" data-region="${escapeHtml(r)}" aria-pressed="${r === '' ? 'true' : 'false'}">${r ? escapeHtml(r) : 'Toutes les régions'}</button>`).join('');
+
+  const champ = document.getElementById('lm-recherche');
+  const vide = document.getElementById('lm-vide');
+
+  function filtrer() {
+    const q = sansAccents(champ.value.trim());
+    const visibles = marches.filter(m => (!region || m.region === region)
+      && (!q || sansAccents([m.name, m.city, m.region].join(' ')).includes(q)));
+    grille.innerHTML = visibles.map(carteMarche).join('');
+    vide.hidden = visibles.length > 0;
+    const actifs = visibles.filter(m => m._count?.shops).length;
+    compte.textContent = visibles.length
+      ? `${visibles.length} marché${visibles.length > 1 ? 's' : ''}${region ? ' dans la région de ' + region : ''}`
+        + (actifs ? ` · ${actifs} avec des boutiques en ligne` : '')
+      : '';
+  }
+
+  zoneRegions.addEventListener('click', e => {
+    const bouton = e.target.closest('.lm-region');
+    if (!bouton) return;
+    region = bouton.dataset.region;
+    zoneRegions.querySelectorAll('.lm-region').forEach(b => b.setAttribute('aria-pressed', String(b === bouton)));
+    filtrer();
+  });
+  champ.addEventListener('input', filtrer);
+  document.getElementById('lm-effacer').addEventListener('click', () => {
+    champ.value = '';
+    region = '';
+    zoneRegions.querySelectorAll('.lm-region').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.region === '')));
+    filtrer();
+    champ.focus();
+  });
+
+  filtrer();
+}
+
 // ── Initialisation ──
 document.addEventListener('DOMContentLoaded', async () => {
   updateCartCount();
@@ -1028,11 +1142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (trouve.success && trouve.data) currentMarketId = trouve.data.id;
   }
 
+  // Sans marché demandé (/marches), on montre la liste au lieu d'ouvrir le premier venu.
   if (!currentMarketId) {
-    const marketsResult = await getMarkets();
-    if (marketsResult.success && marketsResult.data.length > 0) {
-      currentMarketId = marketsResult.data[0].id;
-    }
+    await afficherListeMarches();
+    return;
   }
 
   if (currentMarketId) {
