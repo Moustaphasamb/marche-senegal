@@ -8,6 +8,7 @@
 <meta name="description" content="Explorez les boutiques et produits des marchés sénégalais : Sandaga, Tilène, HLM, Touba, Ziguinchor."/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap"/></noscript>
 <link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="services-marche.css"/>
 <style>
 :root{--green:#1B6B3A;--gl:#2E9459;--gp:#E8F5EC;--g2:#B8D8C4;--gold:#E6A817;--gdl:#FDF3DC;--dark:#0D1F17;--text:#1A2E24;--muted:#6B8074;--bg:#F5F7F5;--white:#FAFAF7;--border:#D8E8DE;--red:#C0392B;--rp:#FDE8E6;--shadow:0 2px 16px rgba(27,107,58,.09);--shadow-lg:0 8px 40px rgba(27,107,58,.14);--radius:14px;--nav-h:68px}
 *{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}button,input,select{font-family:inherit}a{text-decoration:none;color:inherit}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
@@ -473,6 +474,18 @@ a{text-decoration:none;color:inherit}
         <div class="mic-row"><div class="mic-dot dot-open"></div><span id="mic-region">—</span></div>
       </div>
     </div>
+  </div>
+</section>
+<!-- SERVICES DU MARCHÉ : raccourci vers les deux services, pour ce marché -->
+<section class="market-services-strip" aria-labelledby="market-services-title">
+  <div class="market-services-strip-copy">
+    <span class="services-kicker">Services du marché</span>
+    <h2 id="market-services-title">Achetez plus simplement, directement auprès des vendeurs.</h2>
+    <p>Composez un panier recette pour cuisiner ou votre liste de courses familiale avec les vendeurs de ce marché.</p>
+  </div>
+  <div class="market-services-strip-actions">
+    <a class="service-strip-link service-strip-link--green" data-services-marche="panier-ceebu-jen" href="marche-senegal-services.html#composer">Voir les paniers recettes <span aria-hidden="true">→</span></a>
+    <a class="service-strip-link service-strip-link--gold" data-services-marche="ravitaillement-famille" href="marche-senegal-services.html?service=ravitaillement-famille#composer">Composer ma liste <span aria-hidden="true">→</span></a>
   </div>
 </section>
 <!-- Guide du marché : rempli par guide-marche.js, masqué pour un marché sans fiche -->
@@ -1023,6 +1036,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (currentMarketId) {
+    // Les services s'ouvrent sur ce marché plutôt que sur tous les marchés.
+    document.querySelectorAll('[data-services-marche]').forEach(lien => {
+      lien.href = 'marche-senegal-services.html?service=' + encodeURIComponent(lien.dataset.servicesMarche)
+        + '&marche=' + encodeURIComponent(currentMarketId) + '#composer';
+    });
     await Promise.all([
       loadMarketsBar(),
       loadMarket(currentMarketId),

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Services du marché - Marché Sénégal</title>
+<meta name="description" content="Paniers recettes et ravitaillement familial composés avec les vendeurs des marchés du Sénégal."/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap" media="print" onload="this.media='all'"/><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,400..600&display=swap"/></noscript>
+<script src="icons.js"></script>
+<script src="entete-compte.js"></script>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="design-marche.css"/>
+<link rel="stylesheet" href="services-marche.css"/>
+</head>
+<body class="ms-design">
+<nav class="nav services-nav" aria-label="Navigation principale">
+  <a href="marche-senegal-accueil.html" class="nav-logo" aria-label="Retour à l'accueil"><span class="brand-mark"><i class="ic" data-ic="store"></i></span><span class="nav-logo-text">Marché<span class="brand-country">Sénégal</span></span></a>
+  <div class="home-nav-links"><a href="marche-senegal-accueil.html#marches">Marchés</a><a href="marche-senegal-recherche.html">Produits</a><a href="marche-senegal-services.html" aria-current="page">Services</a></div>
+  <div class="nav-actions"><button type="button" class="nav-btn nav-btn-login" onclick="window.location.href='marche-senegal-connexion-acheteur.html'">Se connecter</button><a class="nav-cart" aria-label="Ouvrir mon panier" href="marche-senegal-panier.html"><i class="ic" data-ic="shopping-bag"></i></a></div>
+</nav>
+<main id="contenu">
+  <section class="services-page-hero" aria-labelledby="services-title">
+    <div class="services-page-copy"><p class="services-kicker">Les services du marché</p><h1 id="services-title">Plus simple de faire ses courses,<br/><em>plus proche de son marché.</em></h1><p>Choisissez un plat à préparer ou composez votre liste de courses familiale. Les produits viennent des vendeurs des marchés, au prix qu'ils affichent.</p></div>
+  </section>
+  <section class="services-hub" aria-labelledby="hub-title">
+    <div class="services-hub-header"><div><p class="services-hub-label">Deux façons de commencer</p><h2 class="services-hub-title" id="hub-title">Votre quotidien,<br/><em>depuis le marché.</em></h2></div><p class="services-hub-intro">Vous choisissez, vous voyez les prix, puis vous commandez depuis votre panier comme d'habitude.</p></div>
+    <div class="services-hub-grid">
+      <article class="service-card service-card--recettes"><div class="service-card-copy"><span class="service-card-tag">À cuisiner aujourd'hui</span><h3>Paniers<br/>recettes</h3><p>Ceebu Jën, Yassa Poulet ou Mafé : les ingrédients pour le nombre de personnes choisi.</p><a class="service-card-link" data-service-analytics data-service-aller="panier-ceebu-jen" href="#composer">Choisir un plat <span aria-hidden="true">↗</span></a></div><div class="service-art" aria-hidden="true"><div class="basket-3d"><div class="basket-3d-items"><span>🥕</span><span>🥬</span><span>🍅</span><span>🌶️</span></div></div></div></article>
+      <article class="service-card service-card--ravitaillement"><div class="service-card-copy"><span class="service-card-tag">Sans frais de service</span><h3>Mon<br/>ravitaillement</h3><p>Votre liste de courses de la maison, pour la semaine ou le mois.</p><a class="service-card-link" data-service-analytics data-service-aller="ravitaillement-famille" href="#composer">Composer ma liste <span aria-hidden="true">↗</span></a></div><div class="service-art" aria-hidden="true"><div class="service-product-dots"><span>🛒</span><span>🍚</span><span>🧴</span></div><div class="box-3d"></div></div></article>
+    </div>
+    <section class="services-live-panel" id="composer" aria-labelledby="live-services-title">
+      <div class="services-live-head"><div><p class="services-hub-label">Disponibilité en direct</p><h3 id="live-services-title">Composez votre panier depuis un marché.</h3></div><span class="services-live-status" id="services-live-status" role="status">Chargement…</span></div>
+      <div class="services-live-tabs" role="tablist" aria-label="Choisir un service"><button type="button" role="tab" aria-selected="true" class="services-live-tab is-active" data-service-slug="panier-ceebu-jen">Ceebu Jën</button><button type="button" role="tab" aria-selected="false" class="services-live-tab" data-service-slug="panier-yassa">Yassa Poulet</button><button type="button" role="tab" aria-selected="false" class="services-live-tab" data-service-slug="panier-mafe">Mafé</button><button type="button" role="tab" aria-selected="false" class="services-live-tab" data-service-slug="ravitaillement-famille">Ravitaillement</button></div>
+      <div class="services-live-controls">
+        <label for="service-market">Votre marché<select id="service-market"><option value="">Tous les marchés</option></select></label>
+        <label for="service-personnes">Pour combien de personnes<select id="service-personnes"></select></label>
+        <label for="service-frequence" data-ravitaillement-seul hidden>Fréquence<select id="service-frequence"><option value="semaine">Chaque semaine</option><option value="mois">Chaque mois</option></select></label>
+      </div>
+      <fieldset class="services-liste" id="service-liste" data-ravitaillement-seul hidden></fieldset>
+      <div class="services-live-result" id="services-live-result" aria-live="polite"><p class="services-live-loading">Recherche des produits disponibles…</p></div>
+    </section>
+    <p class="services-disclaimer">Les quantités conseillées sont des repères : chaque article est ajouté une fois au panier, où vous ajustez la quantité. Aucun frais de service : vous payez les produits, et la livraison seulement si vous la choisissez.</p>
+  </section>
+  <section class="services-explain" id="paniers-recettes"><div class="services-explain-inner"><div><p class="services-kicker">Service 01</p><h2>Je choisis un plat,<br/><em>le marché fournit les ingrédients.</em></h2><p>Choisissez la recette, le nombre de personnes et le marché. Vous voyez chaque ingrédient, son prix, son vendeur et les autres choix possibles avant d'ajouter au panier.</p><a class="services-big-link" data-service-aller="panier-ceebu-jen" href="#composer">Composer un panier <span>↗</span></a></div><div class="services-process"><div><b>1</b><span>Choisir le plat et le nombre de personnes</span></div><div><b>2</b><span>Choisir le marché, ou tous les marchés</span></div><div><b>3</b><span>Ajouter au panier et commander comme d'habitude</span></div></div></div></section>
+  <section class="services-explain light" id="mon-ravitaillement"><div class="services-explain-inner"><div><p class="services-kicker">Service 02</p><h2>Je garde ma liste,<br/><em>je commande quand je veux.</em></h2><p>Cochez les courses de la maison, indiquez la taille du foyer et choisissez la semaine ou le mois. Votre liste est gardée sur cet appareil : à chaque visite, vous retrouvez les prix du jour avant de commander.</p><a class="services-big-link" data-service-aller="ravitaillement-famille" href="#composer">Composer ma liste <span>↗</span></a></div><div class="services-process"><div><b>1</b><span>Cocher les articles de la maison</span></div><div><b>2</b><span>Indiquer le nombre de personnes et la fréquence</span></div><div><b>3</b><span>Revenir quand vous voulez, vérifier les prix, commander</span></div></div></div></section>
+</main>
+<footer><div class="footer-bottom"><span>© Marché Sénégal</span><a href="marche-senegal-accueil.html">Retour à l'accueil</a></div></footer>
+<script src="api.js" defer></script><script src="design-marche.js" defer></script><script src="services-marche.js" defer></script>
+</body>
+</html>
