@@ -23,7 +23,9 @@ const ENTREES_MENU_VENDEUR = [
   { cle: 'litiges',   icone: '⚖️', texte: 'Réclamations',    href: 'marche-senegal-dashboard.html#litiges', badge: 'sb-badge-litiges' },
 
   { section: 'Boutique' },
-  { cle: 'ajout',     icone: '➕', texte: 'Ajouter un produit', href: 'marche-senegal-ajout-produit.html' },
+  // Un plat ou des courses composés par le vendeur (panier-pret-vendeur.js).
+  { cle: 'panier',    icone: '🧺', texte: 'Créer un panier',    href: 'marche-senegal-ajout-produit.html?panier=1' },
+  { cle: 'ajout',    icone: '➕', texte: 'Ajouter un produit', href: 'marche-senegal-ajout-produit.html' },
   { cle: 'boutique',  icone: '🏪', texte: 'Ma boutique',        href: 'marche-senegal-ma-boutique.html' },
   { cle: 'stories', icone: '📸', texte: 'Mes stories', href: 'marche-senegal-mes-stories.html' },
   { cle: 'shopvision', icone: '📷', texte: 'Ma vitrine', href: 'marche-senegal-shopvision.html' },
@@ -67,6 +69,8 @@ function fichierCourant() {
 function cleActiveCourante() {
   const fragment = window.location.hash.replace('#', '');
   if (fragment === 'promotions' || fragment === 'avis' || fragment === 'litiges') return fragment;
+  if (fichierCourant() === 'marche-senegal-ajout-produit.html'
+    && new URLSearchParams(window.location.search).get('panier') === '1') return 'panier';
   return PAGE_VERS_ENTREE[fichierCourant()] || '';
 }
 

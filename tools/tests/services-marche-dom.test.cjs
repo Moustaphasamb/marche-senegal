@@ -203,6 +203,66 @@ test('modifier un panier reprend son contenu, et le décocher le rend ordinaire'
   assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: { packService: '' } });
 });
 
+function pageVendeur(page, url) {
+  const dom = new JSDOM(`<body><header><div class="tb-title">Ajouter un produit</div></header><main>
+    <div class="form-card" id="carte-photos">Photos</div>
+    <div class="form-card"><div class="cat-grid" id="cat-grid"></div></div>
+    <div id="panier-pret-zone" data-page="${page}"></div>
+    <div class="form-card" id="carte-variantes"><div class="vrow">Tailles</div></div>
+    <button class="publish-btn">Publier le produit</button></main></body>`, { url, runScripts: 'outside-only' });
+  const w = dom.window;
+  w.apiCall = async () => ({ success: true, data: CATALOGUE });
+  w.eval(lire('panier-pret-vendeur.js'));
+  w.PanierPretVendeur.monter();
+  return { w, doc: w.document };
+}
+
+test('« Ajouter un produit » reste un produit ordinaire, sans bloc panier', () => {
+  const { w, doc } = pageVendeur('ajout', 'http://localhost:5500/marche-senegal-ajout-produit.html');
+  assert.equal(doc.getElementById('panier-pret-zone').hidden, true);
+  assert.equal(doc.getElementById('pp-actif'), null);
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: {} });
+});
+
+test('« Créer un panier » ouvre la page en mode panier', async () => {
+  const { w, doc } = pageVendeur('ajout', 'http://localhost:5500/marche-senegal-ajout-produit.html?panier=1');
+  const zone = doc.getElementById('panier-pret-zone');
+  assert.equal(zone.hidden, false);
+  assert.equal(doc.querySelector('main > *'), zone, 'le panier passe en tête du formulaire');
+  assert.equal(doc.getElementById('pp-actif').checked, true);
+  assert.equal(doc.querySelector('.pp-interrupteur').hidden, true);
+  assert.equal(doc.getElementById('carte-variantes').hidden, true);
+  assert.match(doc.querySelector('.tb-title').textContent, /Créer un panier/);
+  assert.match(doc.title, /Créer un panier/);
+  assert.match(doc.querySelector('.publish-btn').textContent, /Publier le panier/);
+
+  // Les rayons arrivent après : Alimentation est choisi d'avance.
+  let choisi = null;
+  doc.getElementById('cat-grid').innerHTML = '<div class="cg-btn">Mode</div><div class="cg-btn">Alimentation</div>';
+  doc.querySelectorAll('.cg-btn').forEach((b) => b.addEventListener('click', () => { choisi = b.textContent; b.classList.add('sel'); }));
+  await tick();
+  assert.equal(choisi, 'Alimentation');
+  assert.equal(doc.querySelector('.pp-nom').value, 'Riz brisé');
+  assert.equal(brut(w.PanierPretVendeur.lire()).champs.packService, 'panier-ceebu-jen');
+});
+
+test('modifier un produit ordinaire ne montre pas le bloc panier', () => {
+  const { w, doc } = pageVendeur('modifier', 'http://localhost:5500/marche-senegal-modifier-produit.html?id=p1');
+  w.PanierPretVendeur.remplir({ packService: null });
+  assert.equal(doc.getElementById('panier-pret-zone').hidden, true);
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: {} });
+  w.PanierPretVendeur.remplir({ packService: 'panier-yassa', packComposants: [{ nom: 'Poulet', quantite: '1' }] });
+  assert.equal(doc.getElementById('panier-pret-zone').hidden, false);
+});
+
+test('le menu vendeur et le tableau de bord mènent à « Créer un panier », au-dessus de « Ajouter un produit »', () => {
+  const menu = lire('marche-senegal-menu-vendeur.js');
+  const panier = menu.indexOf("texte: 'Créer un panier'");
+  assert.ok(panier > 0 && panier < menu.indexOf("texte: 'Ajouter un produit'"));
+  assert.match(menu, /href: 'marche-senegal-ajout-produit\.html\?panier=1'/);
+  assert.match(lire('marche-senegal-dashboard.html'), /ajout-produit\.html\?panier=1'"><i class="ic" data-ic="shopping-basket"><\/i> Créer un panier/);
+});
+
 test('les formulaires vendeur et la fiche produit montrent les paniers tout prêts', () => {
   for (const page of ['marche-senegal-ajout-produit.html', 'marche-senegal-modifier-produit.html']) {
     const html = lire(page);

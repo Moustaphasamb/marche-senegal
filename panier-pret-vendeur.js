@@ -57,9 +57,50 @@
     if (actif && lignes().length === 0) ajouterLigne();
   }
 
+  // « Créer un panier » (menu vendeur) ouvre la page d'ajout avec ?panier=1.
+  // Sans ce paramètre, « Ajouter un produit » reste un produit ordinaire.
+  const modeCreation = () => new URLSearchParams(window.location.search).get('panier') === '1';
+
+  // La page d'ajout devient « Créer un panier » : le panier en tête, les
+  // tailles et couleurs cachées, le rayon Alimentation choisi d'avance.
+  function preparerPageCreation() {
+    zone.querySelector('#pp-actif').checked = true;
+    zone.querySelector('.pp-interrupteur').hidden = true;
+    zone.querySelector('.pp-option').hidden = true;
+    afficherDetails();
+    proposerIngredients(zone.querySelector('#pp-type').value);
+
+    document.title = 'Créer un panier — Marché Sénégal';
+    const titre = document.querySelector('.tb-title');
+    if (titre) titre.innerHTML = '<i class="ic" data-ic="shopping-basket"></i> Créer un panier';
+    const premiere = document.querySelector('.form-card:not(#panier-pret-zone)');
+    if (premiere) premiere.parentNode.insertBefore(zone, premiere);
+    const variantes = document.querySelector('.vrow')?.closest('.form-card');
+    if (variantes) variantes.hidden = true;
+    const publier = document.querySelector('.publish-btn');
+    if (publier) publier.innerHTML = '<i class="ic" data-ic="rocket"></i> Publier le panier';
+
+    const rayons = document.getElementById('cat-grid');
+    if (!rayons) return;
+    const choisirAlimentation = () => {
+      const boutons = [...rayons.querySelectorAll('.cg-btn')];
+      if (!boutons.length) return false;
+      const alimentation = boutons.find((b) => /alimentation/i.test(b.textContent));
+      if (alimentation && !rayons.querySelector('.cg-btn.sel')) alimentation.click();
+      return true;
+    };
+    if (choisirAlimentation()) return;
+    const observateur = new MutationObserver(() => { if (choisirAlimentation()) observateur.disconnect(); });
+    observateur.observe(rayons, { childList: true, subtree: true });
+  }
+
   function monter() {
     zone = document.getElementById('panier-pret-zone');
     if (!zone || zone.dataset.monte) return;
+    const page = zone.dataset.page;
+    if (page === 'ajout' && !modeCreation()) { zone.hidden = true; zone = null; return; }
+    // Modification : le bloc n'apparaît que pour un produit déjà panier (remplir).
+    if (page === 'modifier') zone.hidden = true;
     zone.dataset.monte = '1';
     zone.classList.add('form-card', 'panier-pret-card');
     zone.innerHTML = `
@@ -84,12 +125,14 @@
       const bouton = e.target.closest('.pp-retirer');
       if (bouton) bouton.closest('.pp-ligne').remove();
     });
+    if (page === 'ajout') preparerPageCreation();
   }
 
   // Page de modification : reprend le panier enregistré.
   function remplir(produit) {
     monter();
     if (!zone || !produit?.packService) return;
+    zone.hidden = false;
     etaitPanier = true;
     zone.querySelector('#pp-actif').checked = true;
     zone.querySelector('#pp-type').value = produit.packService;
@@ -101,7 +144,7 @@
 
   // Ce qu'il faut ajouter au corps envoyé au serveur, ou un message à montrer.
   function lire() {
-    if (!zone) return { ok: true, champs: {} };
+    if (!zone || zone.hidden) return { ok: true, champs: {} };
     if (!zone.querySelector('#pp-actif').checked) {
       return { ok: true, champs: etaitPanier ? { packService: '' } : {} };
     }
