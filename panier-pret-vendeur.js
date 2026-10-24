@@ -3,18 +3,21 @@
 // Le bloc se monte dans #panier-pret-zone des pages d'ajout et de modification ;
 // le serveur valide la même chose (src/lib/panier-pret.js du backend).
 (function () {
-  const TYPES = [
+  const PLATS = [
     ['panier-ceebu-jen', 'Ceebu Jën'],
     ['panier-yassa', 'Yassa Poulet'],
     ['panier-mafe', 'Mafé'],
-    ['autre-plat', 'Un autre plat'],
-    ['ravitaillement-famille', 'Ravitaillement (courses de la maison)']
+    ['autre-plat', 'Un autre plat']
   ];
+  const RAVITAILLEMENT = 'ravitaillement-famille';
   const COMPOSANTS_MAX = 30;
 
   let zone = null;
   let etaitPanier = false;
   let suggestions = null;
+  // Vrai tant que la liste affichée est celle proposée, sans retouche du
+  // vendeur : changer de plat ou de genre peut alors la remplacer.
+  let listeProposee = false;
 
   const echapper = (texte) => String(texte ?? '').replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -35,20 +38,38 @@
     zone.querySelector('.pp-liste').insertAdjacentHTML('beforeend', ligneHtml(nom, quantite));
   }
 
-  // Une liste vide se pré-remplit avec les ingrédients du plat choisi : le
-  // vendeur corrige les quantités au lieu de tout taper.
-  async function proposerIngredients(service) {
-    if (!listeVide() || service === 'autre-plat') return;
+  const genre = () => zone.querySelector('input[name="pp-genre"]:checked')?.value || 'plat';
+  const service = () => (genre() === 'ravitaillement' ? RAVITAILLEMENT : zone.querySelector('#pp-type').value);
+
+  // Un plat ou un ravitaillement : le choix du plat n'a de sens que pour un plat.
+  function afficherGenre() {
+    const ravitaillement = genre() === 'ravitaillement';
+    zone.querySelector('.pp-plat').hidden = ravitaillement;
+    zone.querySelector('.pp-titre-liste-texte').textContent = ravitaillement
+      ? 'Ce que contient le ravitaillement'
+      : 'Ce que contient le panier';
+  }
+
+  // La liste se pré-remplit avec les ingrédients du plat, ou les courses du
+  // ravitaillement : le vendeur corrige les quantités au lieu de tout taper.
+  async function proposerIngredients() {
+    const voulu = service();
+    if (!listeVide() && !listeProposee) return;
+    if (voulu === 'autre-plat') {
+      if (listeProposee) { zone.querySelector('.pp-liste').innerHTML = ''; ajouterLigne(); listeProposee = false; }
+      return;
+    }
     if (!suggestions) {
       try {
         const r = await apiCall('/api/services');
         suggestions = r?.success ? r.data : [];
       } catch (_) { suggestions = []; }
     }
-    const trouve = suggestions.find((s) => s.slug === service);
-    if (!trouve?.items?.length || !listeVide()) return;
+    const trouve = suggestions.find((s) => s.slug === voulu);
+    if (!trouve?.items?.length || service() !== voulu || (!listeVide() && !listeProposee)) return;
     zone.querySelector('.pp-liste').innerHTML = '';
     trouve.items.forEach((item) => ajouterLigne(item.label, ''));
+    listeProposee = true;
   }
 
   function afficherDetails() {
@@ -57,9 +78,11 @@
     if (actif && lignes().length === 0) ajouterLigne();
   }
 
-  // « Créer un panier » (menu vendeur) ouvre la page d'ajout avec ?panier=1.
+  // « Créer un panier » (menu vendeur) ouvre la page d'ajout avec ?panier=1,
+  // et &type=ravitaillement pour commencer par un ravitaillement.
   // Sans ce paramètre, « Ajouter un produit » reste un produit ordinaire.
-  const modeCreation = () => new URLSearchParams(window.location.search).get('panier') === '1';
+  const parametres = () => new URLSearchParams(window.location.search);
+  const modeCreation = () => parametres().get('panier') === '1';
 
   // La page d'ajout devient « Créer un panier » : le panier en tête, les
   // tailles et couleurs cachées, le rayon Alimentation choisi d'avance.
@@ -67,8 +90,12 @@
     zone.querySelector('#pp-actif').checked = true;
     zone.querySelector('.pp-interrupteur').hidden = true;
     zone.querySelector('.pp-option').hidden = true;
+    if (parametres().get('type') === 'ravitaillement') {
+      zone.querySelector('input[name="pp-genre"][value="ravitaillement"]').checked = true;
+    }
+    afficherGenre();
     afficherDetails();
-    proposerIngredients(zone.querySelector('#pp-type').value);
+    proposerIngredients();
 
     document.title = 'Créer un panier — Marché Sénégal';
     const titre = document.querySelector('.tb-title');
@@ -107,24 +134,39 @@
       <div class="fc-title"><span class="fc-icon"><i class="ic" data-ic="shopping-basket"></i></span>Panier tout prêt <span class="pp-option">— Optionnel</span></div>
       <label class="pp-interrupteur"><input type="checkbox" id="pp-actif"/> <span>Ce produit est un panier que j'ai composé (un plat ou des courses)</span></label>
       <div class="pp-details" hidden>
-        <p class="pp-aide">L'acheteur le retrouve dans les services du marché. Il paie le prix du produit pour tout le panier, sans retirer d'article.</p>
-        <label class="fl" for="pp-type">Ce panier sert à préparer</label>
-        <select class="fi" id="pp-type">${TYPES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
-        <div class="fl pp-titre-liste">Ce que contient le panier <span class="fl-req">*</span></div>
+        <div class="fl">Que voulez-vous vendre ?</div>
+        <div class="pp-genre" role="radiogroup" aria-label="Que voulez-vous vendre ?">
+          <label class="pp-genre-choix"><input type="radio" name="pp-genre" value="plat" checked/><span><strong>Un plat</strong><small>Tous les ingrédients d'un repas</small></span></label>
+          <label class="pp-genre-choix"><input type="radio" name="pp-genre" value="ravitaillement"/><span><strong>Un ravitaillement</strong><small>Les courses de la maison, pour la semaine ou le mois</small></span></label>
+        </div>
+        <div class="pp-plat">
+          <label class="fl" for="pp-type">Quel plat ?</label>
+          <select class="fi" id="pp-type">${PLATS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
+        </div>
+        <p class="pp-aide">L'acheteur le retrouve dans les services du marché. Il paie votre prix pour tout le panier, sans retirer d'article.</p>
+        <div class="fl pp-titre-liste"><span class="pp-titre-liste-texte">Ce que contient le panier</span> <span class="fl-req">*</span></div>
         <div class="pp-entetes" aria-hidden="true"><span>Article</span><span>Quantité</span><span></span></div>
         <div class="pp-liste"></div>
         <button type="button" class="pp-ajouter"><i class="ic" data-ic="plus"></i> Ajouter un article</button>
       </div>`;
     zone.querySelector('#pp-actif').addEventListener('change', () => {
       afficherDetails();
-      if (zone.querySelector('#pp-actif').checked) proposerIngredients(zone.querySelector('#pp-type').value);
+      if (zone.querySelector('#pp-actif').checked) proposerIngredients();
     });
-    zone.querySelector('#pp-type').addEventListener('change', (e) => proposerIngredients(e.target.value));
-    zone.querySelector('.pp-ajouter').addEventListener('click', () => ajouterLigne());
+    zone.querySelectorAll('input[name="pp-genre"]').forEach((choix) => choix.addEventListener('change', () => {
+      afficherGenre();
+      proposerIngredients();
+    }));
+    zone.querySelector('#pp-type').addEventListener('change', proposerIngredients);
+    zone.querySelector('.pp-ajouter').addEventListener('click', () => { ajouterLigne(); listeProposee = false; });
+    zone.querySelector('.pp-liste').addEventListener('input', () => { listeProposee = false; });
     zone.querySelector('.pp-liste').addEventListener('click', (e) => {
       const bouton = e.target.closest('.pp-retirer');
-      if (bouton) bouton.closest('.pp-ligne').remove();
+      if (!bouton) return;
+      bouton.closest('.pp-ligne').remove();
+      listeProposee = false;
     });
+    afficherGenre();
     if (page === 'ajout') preparerPageCreation();
   }
 
@@ -135,10 +177,14 @@
     zone.hidden = false;
     etaitPanier = true;
     zone.querySelector('#pp-actif').checked = true;
-    zone.querySelector('#pp-type').value = produit.packService;
+    const ravitaillement = produit.packService === RAVITAILLEMENT;
+    zone.querySelector(`input[name="pp-genre"][value="${ravitaillement ? 'ravitaillement' : 'plat'}"]`).checked = true;
+    if (!ravitaillement) zone.querySelector('#pp-type').value = produit.packService;
+    afficherGenre();
     zone.querySelector('.pp-liste').innerHTML = '';
     (Array.isArray(produit.packComposants) ? produit.packComposants : [])
       .forEach((c) => ajouterLigne(c.nom, c.quantite));
+    listeProposee = false;
     afficherDetails();
   }
 
@@ -152,7 +198,7 @@
       .map((l) => ({ nom: l.querySelector('.pp-nom').value.trim(), quantite: l.querySelector('.pp-quantite').value.trim() }))
       .filter((c) => c.nom);
     if (!composants.length) return { ok: false, message: 'Indiquez au moins un article du panier' };
-    return { ok: true, champs: { packService: zone.querySelector('#pp-type').value, packComposants: composants } };
+    return { ok: true, champs: { packService: service(), packComposants: composants } };
   }
 
   window.PanierPretVendeur = { monter, remplir, lire };

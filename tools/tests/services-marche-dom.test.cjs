@@ -246,6 +246,47 @@ test('« Créer un panier » ouvre la page en mode panier', async () => {
   assert.equal(brut(w.PanierPretVendeur.lire()).champs.packService, 'panier-ceebu-jen');
 });
 
+test('« Créer un panier » : le vendeur choisit un plat ou un ravitaillement', async () => {
+  const { w, doc } = pageVendeur('ajout', 'http://localhost:5500/marche-senegal-ajout-produit.html?panier=1');
+  await tick();
+  const ravitaillement = doc.querySelector('input[name="pp-genre"][value="ravitaillement"]');
+  assert.equal(doc.querySelector('.pp-plat').hidden, false);
+  ravitaillement.checked = true;
+  ravitaillement.dispatchEvent(new w.Event('change'));
+  await tick();
+  // Le choix du plat disparaît et la liste proposée devient celle des courses.
+  assert.equal(doc.querySelector('.pp-plat').hidden, true);
+  assert.match(doc.querySelector('.pp-titre-liste').textContent, /ravitaillement/);
+  assert.deepEqual([...doc.querySelectorAll('.pp-nom')].map((c) => c.value), ['Riz', 'Sucre', 'Huile']);
+  assert.equal(brut(w.PanierPretVendeur.lire()).champs.packService, 'ravitaillement-famille');
+
+  // Une liste retouchée par le vendeur n'est plus remplacée.
+  const quantite = doc.querySelector('.pp-quantite');
+  quantite.value = '25 kg';
+  quantite.dispatchEvent(new w.Event('input', { bubbles: true }));
+  const plat = doc.querySelector('input[name="pp-genre"][value="plat"]');
+  plat.checked = true;
+  plat.dispatchEvent(new w.Event('change'));
+  await tick();
+  assert.equal(doc.querySelector('.pp-nom').value, 'Riz');
+  assert.equal(brut(w.PanierPretVendeur.lire()).champs.packService, 'panier-ceebu-jen');
+});
+
+test('le lien « &type=ravitaillement » ouvre directement un ravitaillement', async () => {
+  const { w, doc } = pageVendeur('ajout', 'http://localhost:5500/marche-senegal-ajout-produit.html?panier=1&type=ravitaillement');
+  await tick();
+  assert.equal(doc.querySelector('.pp-plat').hidden, true);
+  assert.equal(brut(w.PanierPretVendeur.lire()).champs.packService, 'ravitaillement-famille');
+});
+
+test('modifier un ravitaillement reprend le bon choix', () => {
+  const { w, doc } = pageVendeur('modifier', 'http://localhost:5500/marche-senegal-modifier-produit.html?id=p2');
+  w.PanierPretVendeur.remplir({ packService: 'ravitaillement-famille', packComposants: [{ nom: 'Riz', quantite: '25 kg' }] });
+  assert.equal(doc.querySelector('input[name="pp-genre"]:checked').value, 'ravitaillement');
+  assert.equal(doc.querySelector('.pp-plat').hidden, true);
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()).champs, { packService: 'ravitaillement-famille', packComposants: [{ nom: 'Riz', quantite: '25 kg' }] });
+});
+
 test('modifier un produit ordinaire ne montre pas le bloc panier', () => {
   const { w, doc } = pageVendeur('modifier', 'http://localhost:5500/marche-senegal-modifier-produit.html?id=p1');
   w.PanierPretVendeur.remplir({ packService: null });
