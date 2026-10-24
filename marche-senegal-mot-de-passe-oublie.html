@@ -119,7 +119,7 @@
 
       <!-- ÉTAPE 2 — Code -->
       <div id="step-2" style="display:none">
-        <div class="back-link" onclick="showStep(1)">← Changer d'email</div>
+        <button type="button" class="back-link lien-action" onclick="showStep(1)">← Changer d'email</button>
         <h1 class="form-title">Entrez le code <i class="ic" data-ic="key-round"></i></h1>
         <div class="form-sub" id="code-sub">Un code à 6 chiffres a été envoyé à votre adresse email.</div>
         <div class="dev-notice" id="dev-notice">
@@ -137,7 +137,7 @@
         <div class="fi-hint" style="margin-bottom:16px">Le code expire dans 15 minutes.</div>
         <button class="submit-btn" id="verify-btn" onclick="verifyCode()">Vérifier le code</button>
         <div style="text-align:center;font-size:.84rem;color:var(--muted)">
-          Pas reçu ? <span style="color:var(--green);font-weight:600;cursor:pointer" onclick="resendCode()">Renvoyer le code</span>
+          Pas reçu ? <button type="button" class="lien-action" onclick="resendCode()">Renvoyer le code</button>
         </div>
       </div>
 
