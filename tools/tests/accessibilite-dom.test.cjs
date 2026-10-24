@@ -80,7 +80,7 @@ test('les liens d\'action des connexions sont de vrais liens ou boutons, plus de
   }
 });
 
-test('plus de bouton « Recherche » flottant sur la page d'un marché (il cachait le texte)', () => {
+test("plus de bouton « Recherche » flottant sur la page d'un marché (il cachait le texte)", () => {
   // Retiré par fecc5e1 : il doublait la Recherche du menu du bas.
   assert.equal(doc('marche-senegal-marche.html').querySelector('button.filter-toggle'), null);
 });
