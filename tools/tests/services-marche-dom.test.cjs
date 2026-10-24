@@ -143,7 +143,7 @@ test('la liste familiale se compose, se garde et se retrouve', async () => {
 
 test('les paniers tout prêts des vendeurs s’affichent et s’ajoutent d’un coup', async () => {
   const panier = {
-    id: 'pk1', slug: 'panier-awa', name: 'Ceebu Jën pour 6 <i>', price: 9500, images: [],
+    id: 'pk1', slug: 'panier-awa', name: 'Ceebu Jën pour 6 <i>', price: 9500, images: ["https://exemple/p.jpg?a='b'"],
     composants: [{ nom: 'Riz brisé', quantite: '2 kg' }, { nom: 'Thiof', quantite: '1 kg' }],
     shop: boutique('s1', 'Chez Awa')
   };
@@ -156,9 +156,12 @@ test('les paniers tout prêts des vendeurs s’affichent et s’ajoutent d’un 
   assert.equal(zone.querySelectorAll('.panier-pret-contenu li').length, 2);
   assert.equal(zone.querySelector('.panier-pret-nom i'), null);
   assert.match(zone.querySelector('.panier-pret-nom a').getAttribute('href'), /id=panier-awa$/);
+  // La photo est une vraie image : une apostrophe dans l'adresse ne sort pas de l'attribut.
+  assert.equal(zone.querySelector('.panier-pret-image img').getAttribute('src'), "https://exemple/p.jpg?a='b'");
+  assert.equal(zone.querySelector('[style]'), null);
   zone.querySelector('[data-panier-pret]').click();
   assert.deepEqual(lirePanier(), [
-    { productId: 'pk1', name: 'Ceebu Jën pour 6 <i>', price: 9500, quantity: 1, shopId: 's1', shopName: 'Chez Awa', marketId: 'm1', marketName: 'Sandaga', image: null }
+    { productId: 'pk1', name: 'Ceebu Jën pour 6 <i>', price: 9500, quantity: 1, shopId: 's1', shopName: 'Chez Awa', marketId: 'm1', marketName: 'Sandaga', image: "https://exemple/p.jpg?a='b'" }
   ]);
 });
 

@@ -207,10 +207,11 @@
 
   function cartePanierPret(panier) {
     const lien = `marche-senegal-produit.html?id=${encodeURIComponent(panier.slug || panier.id)}`;
-    const image = panier.images?.[0];
+    // Seule une adresse http(s) devient une image : l'adresse vient du vendeur.
+    const image = /^https?:\/\//i.test(panier.images?.[0] || '') ? panier.images[0] : null;
     const contenu = (panier.composants || []).map((c) => `<li><span>${escapeHtml(c.nom)}</span><span>${escapeHtml(c.quantite)}</span></li>`).join('');
     return `<li class="panier-pret">
-      ${image ? `<a class="panier-pret-image" href="${lien}" style="background-image:url('${escapeHtml(encodeURI(image))}')" aria-hidden="true" tabindex="-1"></a>` : '<div class="panier-pret-image panier-pret-image--vide" aria-hidden="true"><i class="ic" data-ic="shopping-basket"></i></div>'}
+      ${image ? `<a class="panier-pret-image" href="${lien}" aria-hidden="true" tabindex="-1"><img src="${escapeHtml(image)}" alt="" loading="lazy"/></a>` : '<div class="panier-pret-image panier-pret-image--vide" aria-hidden="true"><i class="ic" data-ic="shopping-basket"></i></div>'}
       <div class="panier-pret-corps">
         <h4 class="panier-pret-nom"><a href="${lien}">${escapeHtml(panier.name)}</a></h4>
         <span class="panier-pret-vendeur">${escapeHtml(panier.shop?.name || 'Vendeur')}${panier.shop?.marketName ? ` · ${escapeHtml(panier.shop.marketName)}` : ''}</span>
