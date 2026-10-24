@@ -84,3 +84,12 @@ test("plus de bouton « Recherche » flottant sur la page d'un marché (il cacha
   // Retiré par fecc5e1 : il doublait la Recherche du menu du bas.
   assert.equal(doc('marche-senegal-marche.html').querySelector('button.filter-toggle'), null);
 });
+
+test("la carte du guide ne remonte pas sur le bandeau des services (elle cachait « Composer ma liste »)", () => {
+  const html = lire('marche-senegal-marche.html');
+  const d = doc('marche-senegal-marche.html');
+  // La carte suit le bandeau des services dans la page...
+  assert.ok(d.querySelector('.market-services-strip + .guide-marche-zone'));
+  // ... et une règle annule alors la marge négative pensée pour chevaucher la photo.
+  assert.match(html, /\.market-services-strip \+ \.guide-marche-zone\{margin-top:20px\}/);
+});
