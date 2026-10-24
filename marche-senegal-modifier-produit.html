@@ -83,6 +83,7 @@ body{padding-left:var(--sidebar-w)}
 <script src="icons.js"></script>
 <link rel="stylesheet" href="identite-vendeur.css"/>
 <link rel="stylesheet" href="design-marche.css"/>
+<link rel="stylesheet" href="panier-pret.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="espace-vendeur ms-design page-modifier-produit">
@@ -194,6 +195,9 @@ body{padding-left:var(--sidebar-w)}
       </div>
     </div>
 
+    <!-- PANIER TOUT PRÊT : rempli par panier-pret-vendeur.js -->
+    <div id="panier-pret-zone"></div>
+
     <div class="form-card">
       <div class="fc-title"><span><i class="ic" data-ic="ruler"></i></span>Tailles & Couleurs</div>
       <div class="vrow">
@@ -260,6 +264,7 @@ body{padding-left:var(--sidebar-w)}
 
 <script src="api.js"></script>
 <script src="commission-vendeur.js"></script>
+<script src="panier-pret-vendeur.js"></script>
 <script src="marche-senegal-menu-vendeur.js"></script>
 <script>
 const uploadedImages = [null, null, null, null, null];
@@ -415,6 +420,7 @@ function fillForm(prod) {
     document.getElementById('info-date').textContent = new Date(prod.createdAt).toLocaleDateString('fr-FR');
   }
 
+  if (window.PanierPretVendeur) PanierPretVendeur.remplir(prod);
   loadCategories(prod.categoryId);
   updatePreview();
 }
@@ -424,6 +430,8 @@ async function saveProduct() {
   const price = document.getElementById('prod-price').value;
   const description = document.getElementById('prod-desc').value.trim();
   if (!name || !price || !description) { showToastLocal('Nom, prix et description sont obligatoires', 'error'); return; }
+  const panierPret = window.PanierPretVendeur ? PanierPretVendeur.lire() : { ok: true, champs: {} };
+  if (!panierPret.ok) { showToastLocal(panierPret.message, 'error'); return; }
 
   const selectedCat = document.querySelector('.cg-btn.sel');
   const body = {
@@ -439,7 +447,8 @@ async function saveProduct() {
     categoryId: selectedCat ? selectedCat.getAttribute('data-id') : undefined,
     images: uploadedImages.filter(Boolean),
     sizes: Array.from(document.querySelectorAll('#sizes-container .vtag.sel')).map(t => t.getAttribute('data-size')),
-    colors: Array.from(document.querySelectorAll('#colors-container .cs.sel')).map(c => c.getAttribute('data-color'))
+    colors: Array.from(document.querySelectorAll('#colors-container .cs.sel')).map(c => c.getAttribute('data-color')),
+    ...panierPret.champs
   };
 
   const btn = document.getElementById('save-btn'), topBtn = document.getElementById('top-save-btn');

@@ -387,6 +387,7 @@ a{text-decoration:none;color:inherit}
 <script src="icons.js"></script>
 <link rel="stylesheet" href="design-marche.css"/>
 <link rel="stylesheet" href="catalogue-cards.css"/>
+<link rel="stylesheet" href="panier-pret.css"/>
 <script src="design-marche.js" defer></script>
 </head>
 <body class="ms-design page-produit">
@@ -903,6 +904,28 @@ async function loadProduct(productId) {
     p.style.cssText = 'font-size:.9rem;color:var(--text);line-height:1.75;margin-bottom:16px;white-space:pre-wrap';
     p.textContent = prod.description || '';
     desc.appendChild(p);
+
+    // Panier tout prêt : la liste de ce qu'il contient (panier-pret.css).
+    const composants = Array.isArray(prod.packComposants) ? prod.packComposants : [];
+    if (prod.packService && composants.length) {
+      const bloc = document.createElement('section');
+      bloc.className = 'panier-pret-fiche';
+      const titre = document.createElement('h2');
+      titre.textContent = `Ce panier contient (${composants.length} article${composants.length > 1 ? 's' : ''})`;
+      const liste = document.createElement('ul');
+      liste.className = 'panier-pret-contenu';
+      composants.forEach(c => {
+        const li = document.createElement('li');
+        const nom = document.createElement('span');
+        nom.textContent = c.nom || '';
+        const quantite = document.createElement('span');
+        quantite.textContent = c.quantite || '';
+        li.append(nom, quantite);
+        liste.appendChild(li);
+      });
+      bloc.append(titre, liste);
+      desc.prepend(bloc);
+    }
   }
 
   // ── Mettre à jour les tailles ──

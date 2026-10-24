@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="design-marche.css"/>
 <link rel="stylesheet" href="services-marche.css"/>
+<link rel="stylesheet" href="panier-pret.css"/>
 </head>
 <body class="ms-design">
 <nav class="nav services-nav" aria-label="Navigation principale">
@@ -37,8 +38,10 @@
         <label for="service-frequence" data-ravitaillement-seul hidden>Fréquence<select id="service-frequence"><option value="semaine">Chaque semaine</option><option value="mois">Chaque mois</option></select></label>
       </div>
       <fieldset class="services-liste" id="service-liste" data-ravitaillement-seul hidden></fieldset>
+      <section class="services-prets" id="services-prets" aria-live="polite" hidden></section>
       <div class="services-live-result" id="services-live-result" aria-live="polite"><p class="services-live-loading">Recherche des produits disponibles…</p></div>
     </section>
+    <section class="services-prets services-autres-plats" id="services-autres-plats" aria-live="polite" hidden></section>
     <p class="services-disclaimer">Les quantités conseillées sont des repères : chaque article est ajouté une fois au panier, où vous ajustez la quantité. Aucun frais de service : vous payez les produits, et la livraison seulement si vous la choisissez.</p>
   </section>
   <section class="services-explain" id="paniers-recettes"><div class="services-explain-inner"><div><p class="services-kicker">Service 01</p><h2>Je choisis un plat,<br/><em>le marché fournit les ingrédients.</em></h2><p>Choisissez la recette, le nombre de personnes et le marché. Vous voyez chaque ingrédient, son prix, son vendeur et les autres choix possibles avant d'ajouter au panier.</p><a class="services-big-link" data-service-aller="panier-ceebu-jen" href="#composer">Composer un panier <span>↗</span></a></div><div class="services-process"><div><b>1</b><span>Choisir le plat et le nombre de personnes</span></div><div><b>2</b><span>Choisir le marché, ou tous les marchés</span></div><div><b>3</b><span>Ajouter au panier et commander comme d'habitude</span></div></div></div></section>

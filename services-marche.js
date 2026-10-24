@@ -200,8 +200,57 @@
     bindActions();
   }
 
+  // ── Paniers tout prêts composés par les vendeurs (GET /api/services/packs) ──
+  const pretsZone = document.getElementById('services-prets');
+  const autresPlatsZone = document.getElementById('services-autres-plats');
+  const derniersPrets = new Map();
+
+  function cartePanierPret(panier) {
+    const lien = `marche-senegal-produit.html?id=${encodeURIComponent(panier.slug || panier.id)}`;
+    const image = panier.images?.[0];
+    const contenu = (panier.composants || []).map((c) => `<li><span>${escapeHtml(c.nom)}</span><span>${escapeHtml(c.quantite)}</span></li>`).join('');
+    return `<li class="panier-pret">
+      ${image ? `<a class="panier-pret-image" href="${lien}" style="background-image:url('${escapeHtml(encodeURI(image))}')" aria-hidden="true" tabindex="-1"></a>` : '<div class="panier-pret-image panier-pret-image--vide" aria-hidden="true"><i class="ic" data-ic="shopping-basket"></i></div>'}
+      <div class="panier-pret-corps">
+        <h4 class="panier-pret-nom"><a href="${lien}">${escapeHtml(panier.name)}</a></h4>
+        <span class="panier-pret-vendeur">${escapeHtml(panier.shop?.name || 'Vendeur')}${panier.shop?.marketName ? ` · ${escapeHtml(panier.shop.marketName)}` : ''}</span>
+        <ul class="panier-pret-contenu" aria-label="Contenu du panier">${contenu}</ul>
+        <div class="panier-pret-pied"><span class="panier-pret-prix">${money(panier.price)}</span><button type="button" class="panier-pret-ajouter" data-panier-pret="${escapeHtml(panier.id)}">Ajouter au panier</button></div>
+      </div>
+    </li>`;
+  }
+
+  async function loadPaniersPrets(zone, service, titre, intro) {
+    if (!zone || typeof apiCall !== 'function') return;
+    const params = new URLSearchParams({ service });
+    if (marketSelect?.value) params.set('marketId', marketSelect.value);
+    const cle = String(params);
+    if (derniersPrets.get(zone.id) === cle) return;
+    derniersPrets.set(zone.id, cle);
+    const response = await apiCall(`/api/services/packs?${params}`, { redirectOnUnauthorized: false });
+    if (derniersPrets.get(zone.id) !== cle) return; // un autre choix a pris la main
+    const paniers = response.success ? response.data || [] : [];
+    zone.hidden = paniers.length === 0;
+    if (!paniers.length) { zone.innerHTML = ''; return; }
+    zone.innerHTML = `<h3 class="services-prets-titre">${titre}</h3><p class="services-prets-intro">${intro}</p><ul class="services-prets-grille">${paniers.map(cartePanierPret).join('')}</ul>`;
+    zone.querySelectorAll('[data-panier-pret]').forEach((bouton) => bouton.addEventListener('click', () => {
+      const panier = paniers.find((p) => String(p.id) === bouton.dataset.panierPret);
+      if (addProductsToCart([panier])) { bouton.textContent = 'Ajouté ✓'; bouton.disabled = true; }
+    }));
+  }
+
+  function chargerTousLesPaniersPrets() {
+    const ravitaillement = currentSlug === RAVITAILLEMENT;
+    loadPaniersPrets(pretsZone, currentSlug,
+      ravitaillement ? 'Packs de courses tout prêts' : 'Paniers tout prêts chez les vendeurs',
+      `Composés par le vendeur, à prix unique : un seul ajout au panier. Ou composez ${ravitaillement ? 'votre liste' : 'le vôtre'} ci-dessous, article par article.`);
+    loadPaniersPrets(autresPlatsZone, 'autre-plat', "D'autres plats tout prêts",
+      'Des vendeurs préparent aussi d’autres plats, avec tout ce qu’il faut.');
+  }
+
   async function loadAvailability() {
     if (!result || typeof apiCall !== 'function') return;
+    chargerTousLesPaniersPrets();
     const params = new URLSearchParams();
     if (marketSelect?.value) params.set('marketId', marketSelect.value);
     params.set('personnes', personnesSelect?.value || '4');

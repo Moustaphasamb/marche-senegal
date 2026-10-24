@@ -15,6 +15,8 @@ const { JSDOM } = require('../../../marche-senegal-mobile/node_modules/jsdom');
 const racine = path.resolve(__dirname, '../..');
 const lire = (f) => fs.readFileSync(path.join(racine, f), 'utf8');
 const tick = (ms = 60) => new Promise((r) => setTimeout(r, ms));
+// Les objets venus de la page jsdom n'ont pas le prototype de Node.
+const brut = (valeur) => JSON.parse(JSON.stringify(valeur));
 
 const boutique = (id, name) => ({ id, name, marketId: 'm1', marketName: 'Sandaga' });
 const CATALOGUE = [
@@ -48,7 +50,7 @@ function disponibilite(url) {
   };
 }
 
-async function pageServices({ url = 'http://localhost:5500/marche-senegal-services.html', stockage = {} } = {}) {
+async function pageServices({ url = 'http://localhost:5500/marche-senegal-services.html', stockage = {}, paniers = {} } = {}) {
   const dom = new JSDOM(lire('marche-senegal-services.html'), { url, runScripts: 'outside-only' });
   const w = dom.window;
   const appels = [];
@@ -59,6 +61,9 @@ async function pageServices({ url = 'http://localhost:5500/marche-senegal-servic
     if (String(adresse).endsWith('/api/markets')) corps = { success: true, data: [{ id: 'm1', name: 'Sandaga', city: 'Dakar' }] };
     else if (String(adresse).endsWith('/api/services')) corps = { success: true, data: CATALOGUE };
     else if (String(adresse).includes('/availability')) corps = { success: true, data: disponibilite(String(adresse)) };
+    else if (String(adresse).includes('/api/services/packs')) {
+      corps = { success: true, data: paniers[new URL(String(adresse)).searchParams.get('service')] || [] };
+    }
     return { ok: true, status: 200, json: async () => corps };
   };
   w.eval(lire('api.js'));
@@ -134,6 +139,75 @@ test('la liste familiale se compose, se garde et se retrouve', async () => {
   }
   await tick();
   assert.match(doc.getElementById('services-live-result').textContent, /Cochez au moins un article/);
+});
+
+test('les paniers tout prêts des vendeurs s’affichent et s’ajoutent d’un coup', async () => {
+  const panier = {
+    id: 'pk1', slug: 'panier-awa', name: 'Ceebu Jën pour 6 <i>', price: 9500, images: [],
+    composants: [{ nom: 'Riz brisé', quantite: '2 kg' }, { nom: 'Thiof', quantite: '1 kg' }],
+    shop: boutique('s1', 'Chez Awa')
+  };
+  const { doc, appels, panier: lirePanier } = await pageServices({ paniers: { 'panier-ceebu-jen': [panier] } });
+  assert.ok(appels.some((a) => a.includes('/api/services/packs?service=panier-ceebu-jen')));
+  assert.ok(appels.some((a) => a.includes('/api/services/packs?service=autre-plat')));
+  const zone = doc.getElementById('services-prets');
+  assert.equal(zone.hidden, false);
+  assert.equal(doc.getElementById('services-autres-plats').hidden, true);
+  assert.equal(zone.querySelectorAll('.panier-pret-contenu li').length, 2);
+  assert.equal(zone.querySelector('.panier-pret-nom i'), null);
+  assert.match(zone.querySelector('.panier-pret-nom a').getAttribute('href'), /id=panier-awa$/);
+  zone.querySelector('[data-panier-pret]').click();
+  assert.deepEqual(lirePanier(), [
+    { productId: 'pk1', name: 'Ceebu Jën pour 6 <i>', price: 9500, quantity: 1, shopId: 's1', shopName: 'Chez Awa', marketId: 'm1', marketName: 'Sandaga', image: null }
+  ]);
+});
+
+test('le vendeur compose son panier : type, articles proposés, envoi au serveur', async () => {
+  const dom = new JSDOM('<body><div id="panier-pret-zone"></div></body>', { url: 'http://localhost:5500/', runScripts: 'outside-only' });
+  const w = dom.window;
+  w.apiCall = async () => ({ success: true, data: CATALOGUE });
+  w.eval(lire('panier-pret-vendeur.js'));
+  w.PanierPretVendeur.monter();
+  const doc = w.document;
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: {} });
+
+  doc.getElementById('pp-actif').checked = true;
+  doc.getElementById('pp-actif').dispatchEvent(new w.Event('change'));
+  await tick();
+  // Ceebu Jën par défaut : la liste se remplit avec ses ingrédients.
+  assert.equal(doc.querySelector('.pp-nom').value, 'Riz brisé');
+  doc.querySelector('.pp-quantite').value = '2 kg';
+  doc.querySelector('.pp-ajouter').click();
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: {
+    packService: 'panier-ceebu-jen', packComposants: [{ nom: 'Riz brisé', quantite: '2 kg' }]
+  } });
+
+  doc.querySelectorAll('.pp-retirer').forEach((b) => b.click());
+  assert.equal(w.PanierPretVendeur.lire().ok, false);
+});
+
+test('modifier un panier reprend son contenu, et le décocher le rend ordinaire', () => {
+  const dom = new JSDOM('<body><div id="panier-pret-zone"></div></body>', { url: 'http://localhost:5500/', runScripts: 'outside-only' });
+  const w = dom.window;
+  w.eval(lire('panier-pret-vendeur.js'));
+  w.PanierPretVendeur.monter();
+  w.PanierPretVendeur.remplir({ packService: 'panier-mafe', packComposants: [{ nom: 'Pâte <b>d’arachide</b>', quantite: '500 g' }] });
+  const doc = w.document;
+  assert.equal(doc.getElementById('pp-type').value, 'panier-mafe');
+  assert.equal(doc.querySelector('.pp-nom').value, 'Pâte <b>d’arachide</b>');
+  assert.equal(doc.querySelector('.pp-liste b'), null);
+  doc.getElementById('pp-actif').checked = false;
+  assert.deepEqual(brut(w.PanierPretVendeur.lire()), { ok: true, champs: { packService: '' } });
+});
+
+test('les formulaires vendeur et la fiche produit montrent les paniers tout prêts', () => {
+  for (const page of ['marche-senegal-ajout-produit.html', 'marche-senegal-modifier-produit.html']) {
+    const html = lire(page);
+    assert.match(html, /id="panier-pret-zone"/, page);
+    assert.match(html, /src="panier-pret-vendeur\.js"/, page);
+    assert.match(html, /\.\.\.panierPret\.champs/, page);
+  }
+  assert.match(lire('marche-senegal-produit.html'), /panier-pret-fiche/);
 });
 
 test('l’accueil et la page Marché mènent aux services', () => {
