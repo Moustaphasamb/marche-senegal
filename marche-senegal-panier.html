@@ -298,6 +298,19 @@
 .sc-btn-secondary{background:var(--gp);color:var(--green);border:none;border-radius:99px;padding:11px;font-size:.86rem;font-weight:600;cursor:pointer;transition:background .2s}
 .sc-btn-secondary:hover{background:var(--g2)}
 
+/* ══ PANIER VIDE ══ */
+body.panier-vide .main{grid-template-columns:1fr;max-width:720px}
+body.panier-vide :is(.order-summary,.steps-bar){display:none}
+body.panier-vide .main > div:first-child > :not(.cart-section):not(.suggested-section){display:none}
+.panier-vide-message{display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 20px 40px;background:var(--white);border:1px solid var(--border);border-radius:20px}
+.pvm-icone{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:var(--gp);color:var(--green);font-size:28px;margin-bottom:16px}
+.pvm-titre{font-family:var(--font-display,'Newsreader',serif);font-weight:400;font-size:28px;line-height:1.15;color:var(--dark);margin:0 0 8px}
+.pvm-texte{font-size:15px;line-height:1.55;color:var(--muted);max-width:380px;margin:0 0 22px}
+.pvm-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pvm-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border-radius:14px;font-size:15px;font-weight:700;text-decoration:none}
+.pvm-principal{background:var(--green);color:#fff}
+.pvm-principal:hover{background:var(--gl)}
+.pvm-secondaire{border:1.5px solid var(--border);color:var(--text);background:var(--white)}
 /* ══ EMPTY CART ══ */
 .empty-cart{display:none;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
 .empty-cart.show{display:flex}
@@ -475,7 +488,7 @@
     <div>
 
       <!-- CART ITEMS -->
-      <div class="sec-title"><i class="ic" data-ic="shopping-cart"></i> Mon panier <span class="sec-count">(3 articles)</span></div>
+      <div class="sec-title"><i class="ic" data-ic="shopping-cart"></i> Mon panier <span class="sec-count"></span></div>
 
       <div class="cart-section"></div>
 
@@ -698,24 +711,19 @@ function loadCart() {
   const cartSection = document.querySelector('.cart-section');
   if (!cartSection) return;
 
+  // Panier vide : un seul message et une suite, sans adresse, code promo ni récapitulatif à 0 FCFA.
+  document.body.classList.toggle('panier-vide', cart.length === 0);
+
   if (cart.length === 0) {
-    // Panier vide
     cartSection.innerHTML = `
-      <div style="text-align:center;padding:60px 20px">
-        <div style="font-size:4rem;margin-bottom:16px">🛒</div>
-        <div style="font-family:'Newsreader',serif;font-size:1.4rem;
-                    font-weight:700;color:var(--dark);margin-bottom:8px">
-          Votre panier est vide
+      <div class="panier-vide-message">
+        <span class="pvm-icone" aria-hidden="true"><i class="ic" data-ic="shopping-basket"></i></span>
+        <h2 class="pvm-titre">Votre panier est vide</h2>
+        <p class="pvm-texte">Choisissez un marché, puis ajoutez les produits des boutiques qui vous plaisent.</p>
+        <div class="pvm-actions">
+          <a class="pvm-principal" href="marche-senegal-marche.html">Découvrir les marchés</a>
+          <a class="pvm-secondaire" href="marche-senegal-recherche.html">Chercher un produit</a>
         </div>
-        <div style="font-size:.9rem;color:var(--muted);margin-bottom:24px">
-          Explorez nos marchés et ajoutez des produits
-        </div>
-        <button onclick="window.location.href='marche-senegal-accueil.html'"
-                style="background:var(--green);color:#fff;border:none;
-                       border-radius:99px;padding:12px 28px;
-                       font-size:.9rem;font-weight:600;cursor:pointer">
-          🛍️ Explorer les produits
-        </button>
       </div>
     `;
     ++deliveryQuoteRequestId;

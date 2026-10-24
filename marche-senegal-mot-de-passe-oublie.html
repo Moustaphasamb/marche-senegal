@@ -104,7 +104,7 @@
 
       <!-- ÉTAPE 1 — Email -->
       <div id="step-1">
-        <div class="back-link" onclick="goBack()">← Retour à la connexion</div>
+        <button type="button" class="back-link lien-action" onclick="goBack()">← Retour à la connexion</button>
         <h1 class="form-title">Mot de passe oublié ?</h1>
         <div class="form-sub">Entrez l'email associé à votre compte. Nous vous enverrons un code de vérification.</div>
         <div class="field">
@@ -113,7 +113,7 @@
         </div>
         <button class="submit-btn" id="send-btn" onclick="sendCode()">Envoyer le code</button>
         <div style="text-align:center;font-size:.84rem;color:var(--muted)">
-          Vous vous souvenez ? <span style="color:var(--green);font-weight:600;cursor:pointer" onclick="goBack()">Se connecter</span>
+          Vous vous souvenez ? <button type="button" class="lien-action" onclick="goBack()">Se connecter</button>
         </div>
       </div>
 

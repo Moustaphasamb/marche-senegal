@@ -71,3 +71,16 @@ test('aucune taille de texte sous 12 px dans les styles des pages publiques', ()
     }
   }
 });
+
+test('les liens d\'action des connexions sont de vrais liens ou boutons, plus des span cliquables', () => {
+  for (const p of ['connexion-acheteur', 'connexion-vendeur', 'mot-de-passe-oublie']) {
+    const d = doc(`marche-senegal-${p}.html`);
+    assert.equal(d.querySelectorAll('span[onclick], div.back-link[onclick]').length, 0, p);
+    for (const el of d.querySelectorAll('.lien-action')) assert.ok(['A', 'BUTTON'].includes(el.tagName), p);
+  }
+});
+
+test('plus de bouton « Recherche » flottant sur la page d'un marché (il cachait le texte)', () => {
+  // Retiré par fecc5e1 : il doublait la Recherche du menu du bas.
+  assert.equal(doc('marche-senegal-marche.html').querySelector('button.filter-toggle'), null);
+});

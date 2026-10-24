@@ -352,3 +352,8 @@ body.ms-design:not(.espace-vendeur) .prod-footer>.add-btn {width:40px;height:40p
 :where(h1):where(.mh-title,.sh-name,.form-title,.lm-titre) {margin:0;font-size:inherit;font-weight:inherit;line-height:inherit}
 /* Lu par les lecteurs d'écran, invisible à l'écran. */
 .ms-visuellement-cache {position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Liens d'action dans le texte (« Mot de passe oublié ? »…) : vrais boutons ou liens, zone de toucher de 44 px sans décaler la page. */
+.lien-action {display:inline-block;padding:12px 6px;margin:-12px -6px;background:none;border:0;font:inherit;font-weight:600;color:var(--green);cursor:pointer;text-decoration:none}
+.lien-action:hover {text-decoration:underline}
+.back-link.lien-action {display:inline-flex;margin:-12px -6px 12px;min-height:44px;padding:0 6px;color:var(--muted);font-weight:500}

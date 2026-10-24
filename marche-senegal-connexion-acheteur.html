@@ -130,8 +130,8 @@
           </div>
         </div>
         <button class="submit-btn" id="login-btn" onclick="submitLogin()">Se connecter</button>
-        <div class="link-text" id="forgot-link" style="margin-bottom:10px"><span onclick="window.location.href='marche-senegal-mot-de-passe-oublie.html'">Mot de passe oublié ?</span></div>
-        <div class="link-text" style="margin-bottom:10px"><span onclick="showOtpLogin()">Se connecter par SMS</span></div>
+        <div class="link-text" id="forgot-link" style="margin-bottom:10px"><a class="lien-action" href="marche-senegal-mot-de-passe-oublie.html">Mot de passe oublié ?</a></div>
+        <div class="link-text" style="margin-bottom:10px"><button type="button" class="lien-action" onclick="showOtpLogin()">Se connecter par SMS</button></div>
         <div class="otp-login" id="otp-login">
           <div class="fl">Connexion rapide par SMS</div>
           <div class="fi-hint" style="margin-bottom:10px">Recevez un code à usage unique sur votre numéro de téléphone.</div>
@@ -142,7 +142,7 @@
             <button class="submit-btn" id="otp-verify-btn" onclick="verifyOtpLogin()">Valider le code</button>
           </div>
         </div>
-        <div class="link-text">Pas encore de compte ? <span onclick="setMode('register')">Créer un compte gratuitement</span></div>
+        <div class="link-text">Pas encore de compte ? <button type="button" class="lien-action" onclick="setMode('register')">Créer un compte gratuitement</button></div>
       </div>
 
       <!-- INSCRIPTION -->
@@ -178,7 +178,7 @@
           <div class="field"><label class="fl" for="reg-otp-code">Code reçu par SMS</label><input class="fi" type="text" id="reg-otp-code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"/></div>
           <button class="submit-btn" id="reg-otp-verify-btn" onclick="verifyRegisterOtp()">Valider et créer mon compte</button>
         </div>
-        <div class="link-text">Déjà un compte ? <span onclick="setMode('login')">Se connecter</span></div>
+        <div class="link-text">Déjà un compte ? <button type="button" class="lien-action" onclick="setMode('login')">Se connecter</button></div>
       </div>
 
       <!-- SUCCÈS -->
